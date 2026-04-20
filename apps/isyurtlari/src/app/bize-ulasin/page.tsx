@@ -56,28 +56,6 @@ export default function ContactPage() {
               </a>
             </div>
 
-            {/* Telefon */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="flex items-center gap-3 font-bold text-gray-900 mb-2">
-                <span className="text-2xl">📱</span> Telefon
-              </h3>
-              <a href="tel:+902121234567" className="text-blue-600 hover:text-blue-700">
-                +90 (212) 123 45 67
-              </a>
-            </div>
-
-            {/* Konum */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="flex items-center gap-3 font-bold text-gray-900 mb-2">
-                <span className="text-2xl">📍</span> Adres
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Adalet Bakanlığı<br />
-                İsyurtları Koordinatörlüğü<br />
-                Ankara, Türkiye
-              </p>
-            </div>
-
             {/* Çalışma Saatleri */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="flex items-center gap-3 font-bold text-gray-900 mb-2">

@@ -247,12 +247,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
               <div>
                 <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-gray-300">İletişim</h3>
-                <p className="text-gray-400 text-sm font-semibold mb-2">Adres:</p>
-                <p className="text-gray-400 text-sm mb-3">Büyükesat Mah. Koza 1. Cad.<br />No: 153/4, Çankaya, Ankara</p>
-                <p className="text-gray-400 text-sm font-semibold mb-1">Telefon:</p>
-                <p className="text-gray-400 text-sm mb-3">+90 505 401 38 95</p>
-                <p className="text-gray-400 text-sm font-semibold mb-1">Çalışma Saatleri:</p>
-                <p className="text-gray-400 text-sm">Her Gün 09:00 - 19:00</p>
+                <p className="text-gray-400 text-sm font-semibold mb-1">E-posta:</p>
+                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-400 text-sm mb-3 hover:text-[#FF6000] transition-colors">info@isyurtlari.com.tr</a>
                 <div className="flex gap-3 mt-4">
                   {['Twitter', 'Instagram', 'Facebook'].map((s) => (
                     <a key={s} href="#" className="w-8 h-8 bg-gray-700 hover:bg-[#FF6000] rounded-full flex items-center justify-center text-xs transition-colors">
@@ -290,16 +286,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'Customer Service',
-                telephone: '+90-505-401-3895',
                 email: 'info@isyurtlari.com.tr',
-              },
-              address: {
-                '@type': 'PostalAddress',
-                streetAddress: 'Büyükesat Mah. Koza 1. Cad. No: 153/4',
-                addressLocality: 'Çankaya',
-                addressRegion: 'Ankara',
-                postalCode: '06100',
-                addressCountry: 'TR',
               },
             }),
           }}
