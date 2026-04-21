@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse } from 'react-icons/lu';
+import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse, LuX, LuChevronDown } from 'react-icons/lu';
 
 interface Product {
   id: string;
@@ -51,6 +51,10 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<SortOption>('default');
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(5000);
+  const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'out-of-stock'>('all');
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
     fetch(`/api/products?category=${categorySlug}`)
@@ -70,7 +74,23 @@ export default function CategoryPage() {
     }
   }, [products]);
 
-  const sorted = [...products].sort((a, b) => {
+  // Calculate max price from products with price (minimum 5000 TL)
+  const maxPriceAvailable = products.length > 0 ? Math.max(...products.filter(p => p.price > 0).map(p => p.price), 5000) : 5000;
+
+  // Apply filters
+  const filtered = products.filter((product) => {
+    // Price filter
+    if (product.price > 0 && (product.price < minPrice || product.price > maxPrice)) {
+      return false;
+    }
+    // Stock filter
+    if (stockFilter === 'in-stock' && product.quantity === 0) return false;
+    if (stockFilter === 'out-of-stock' && product.quantity > 0) return false;
+    return true;
+  });
+
+  // Apply sorting
+  const sorted = [...filtered].sort((a, b) => {
     if (sort === 'price-asc') return a.price - b.price;
     if (sort === 'price-desc') return b.price - a.price;
     if (sort === 'name') return a.name.localeCompare(b.name, 'tr');
@@ -80,6 +100,13 @@ export default function CategoryPage() {
   const meta = categoryMeta[categorySlug];
   const Icon = meta?.Icon ?? LuWrench;
   const categoryName = products[0]?.category.name ?? 'Ürünler';
+
+  // Initialize max price on first load
+  useEffect(() => {
+    if (products.length > 0 && maxPrice === 5000 && maxPriceAvailable > 5000) {
+      setMaxPrice(Math.ceil(maxPriceAvailable * 1.2));
+    }
+  }, [products, maxPriceAvailable]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -132,51 +159,195 @@ export default function CategoryPage() {
           </div>
         )}
 
-        {/* ─── SORT BAR ─── */}
-        <div className="flex items-center justify-between mb-5 bg-white rounded-xl border border-gray-200 px-4 py-3">
-          <p className="text-sm text-gray-500 font-medium">
-            {loading ? '' : <><span className="text-gray-900 font-bold">{products.length}</span> el yapımı ürün</>}
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 hidden sm:inline">Sırala:</span>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortOption)}
-              className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer"
-            >
-              <option value="default">Varsayılan</option>
-              <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
-              <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
-              <option value="name">İsim: A-Z</option>
-            </select>
-          </div>
-        </div>
+        {/* ─── MAIN LAYOUT: FILTERS + PRODUCTS ─── */}
+        <div className="flex gap-6">
 
-        {/* ─── LOADING ─── */}
-        {loading && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className={`bg-gradient-to-br ${meta?.imgBg ?? 'from-orange-100 to-amber-100'} rounded-xl h-72 animate-pulse`} />
-            ))}
-          </div>
-        )}
+          {/* ─── FILTER PANEL (Desktop + Mobile) ─── */}
+          <div className={`
+            ${mobileFiltersOpen ? 'fixed inset-0 z-50 bg-black/50' : 'hidden md:block'}
+            md:relative md:bg-transparent md:z-auto
+          `}>
+            <div className={`
+              ${mobileFiltersOpen ? 'fixed top-0 left-0 right-0 bottom-0 bg-white overflow-y-auto' : ''}
+              md:relative md:bg-white md:h-auto md:overflow-visible
+              md:w-64 flex-shrink-0 rounded-xl border border-gray-200 p-6
+            `}>
+              {/* Close button (mobile only) */}
+              {mobileFiltersOpen && (
+                <button
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="absolute top-4 right-4 md:hidden p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <LuX size={20} />
+                </button>
+              )}
 
-        {/* ─── EMPTY ─── */}
-        {!loading && products.length === 0 && (
-          <div className="bg-white rounded-2xl p-16 text-center">
-            <span className="text-6xl block mb-4">{productPlaceholders[categorySlug] ?? '📦'}</span>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
-            <p className="text-gray-400 mb-2">Adalet Bakanlığı'nın eğitim programları devam etmektedir.</p>
-            <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
-            <Link href="/" className="bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
-              Diğer Kategorileri Keşfet
-            </Link>
-          </div>
-        )}
+              <h3 className="text-lg font-bold text-gray-900 mb-6">Filtrele</h3>
 
-        {/* ─── PRODUCT GRID ─── */}
-        {!loading && sorted.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* ─── PRICE FILTER ─── */}
+              <div className="mb-8">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4">Fiyat Aralığı</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-gray-600 block mb-2">
+                      Min: <span className="font-bold text-gray-900">₺{minPrice.toFixed(0)}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max={maxPriceAvailable}
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF6000]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 block mb-2">
+                      Max: <span className="font-bold text-gray-900">₺{maxPrice.toFixed(0)}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max={maxPriceAvailable}
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice))}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF6000]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* ─── STOCK FILTER ─── */}
+              <div className="mb-8 pb-8 border-b border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4">Stok Durumu</h4>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="stock"
+                      value="all"
+                      checked={stockFilter === 'all'}
+                      onChange={() => setStockFilter('all')}
+                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                    />
+                    <span className="text-sm text-gray-700 group-hover:text-gray-900">Tümü</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="stock"
+                      value="in-stock"
+                      checked={stockFilter === 'in-stock'}
+                      onChange={() => setStockFilter('in-stock')}
+                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                    />
+                    <span className="text-sm text-gray-700 group-hover:text-gray-900">Stokta Var</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="stock"
+                      value="out-of-stock"
+                      checked={stockFilter === 'out-of-stock'}
+                      onChange={() => setStockFilter('out-of-stock')}
+                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                    />
+                    <span className="text-sm text-gray-700 group-hover:text-gray-900">Tükendi</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Reset filters button */}
+              <button
+                onClick={() => {
+                  setMinPrice(0);
+                  setMaxPrice(5000);
+                  setStockFilter('all');
+                }}
+                className="w-full text-sm text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
+          </div>
+
+          {/* ─── PRODUCTS SECTION ─── */}
+          <div className="flex-1">
+            {/* ─── MOBILE FILTER BUTTON + SORT BAR ─── */}
+            <div className="flex items-center justify-between gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-4 py-3">
+              <button
+                onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+                className="md:hidden flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 font-medium"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filtrele
+              </button>
+
+              <p className="text-sm text-gray-500 font-medium hidden md:block flex-1">
+                {loading ? '' : <><span className="text-gray-900 font-bold">{sorted.length}</span> ürün</>}
+              </p>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 hidden sm:inline">Sırala:</span>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as SortOption)}
+                  className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer"
+                >
+                  <option value="default">Varsayılan</option>
+                  <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+                  <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+                  <option value="name">İsim: A-Z</option>
+                </select>
+              </div>
+            </div>
+
+            {/* ─── LOADING ─── */}
+            {loading && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className={`bg-gradient-to-br ${meta?.imgBg ?? 'from-orange-100 to-amber-100'} rounded-xl h-72 animate-pulse`} />
+                ))}
+              </div>
+            )}
+
+            {/* ─── EMPTY ─── */}
+            {!loading && filtered.length === 0 && products.length === 0 && (
+              <div className="bg-white rounded-2xl p-16 text-center col-span-full">
+                <span className="text-6xl block mb-4">{productPlaceholders[categorySlug] ?? '📦'}</span>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
+                <p className="text-gray-400 mb-2">Adalet Bakanlığı'nın eğitim programları devam etmektedir.</p>
+                <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
+                <Link href="/" className="bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
+                  Diğer Kategorileri Keşfet
+                </Link>
+              </div>
+            )}
+
+            {/* ─── NO RESULTS WITH FILTERS ─── */}
+            {!loading && filtered.length === 0 && products.length > 0 && (
+              <div className="bg-white rounded-2xl p-12 text-center col-span-full">
+                <span className="text-5xl block mb-4">🔍</span>
+                <h3 className="text-lg font-bold text-gray-700 mb-2">Filtrelerinizi eşleşen ürün bulunamadı</h3>
+                <p className="text-gray-400 mb-6">Lütfen filtrelerinizi ayarlayıp yeniden deneyin.</p>
+                <button
+                  onClick={() => {
+                    setMinPrice(0);
+                    setMaxPrice(5000);
+                    setStockFilter('all');
+                  }}
+                  className="text-[#FF6000] font-medium hover:text-[#e55500] transition-colors"
+                >
+                  Filtreleri Temizle
+                </button>
+              </div>
+            )}
+
+            {/* ─── PRODUCT GRID ─── */}
+            {!loading && sorted.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sorted.map((product) => (
               <Link
                 key={product.id}
@@ -242,9 +413,11 @@ export default function CategoryPage() {
                   </div>
                 </div>
               </Link>
-            ))}
+              ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Bottom spacing */}

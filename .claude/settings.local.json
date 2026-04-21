@@ -62,7 +62,8 @@
       "Bash(grep -E \"\\(utils|lib\\)$\")",
       "Bash(ls -1 *.json)",
       "Bash(ls -la *.png)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(dir C:\\\\\\\\sosyal:*)"
     ]
   },
   "model": "claude-haiku-4-5-20251001"

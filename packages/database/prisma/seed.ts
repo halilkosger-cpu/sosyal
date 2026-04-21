@@ -626,31 +626,36 @@ async function main() {
     where: { slug: 'gida-urunleri' },
     update: {},
     create: {
-    data: {
       name: 'Gıda Ürünleri',
       slug: 'gida-urunleri',
       description: 'Adalet Bakanlığı İsyurtları tarafından üretilen kaliteli gıda ürünleri',
     },
   })
 
-  const tekstilCategory = await prisma.productCategory.create({
-    data: {
+  const tekstilCategory = await prisma.productCategory.upsert({
+    where: { slug: 'tekstil-urunleri' },
+    update: {},
+    create: {
       name: 'Tekstil Ürünleri',
       slug: 'tekstil-urunleri',
       description: 'Emeğinin karşılığını aldığınız kaliteli tekstil ürünleri',
     },
   })
 
-  const ahsapCategory = await prisma.productCategory.create({
-    data: {
+  const ahsapCategory = await prisma.productCategory.upsert({
+    where: { slug: 'ahsap-urunler' },
+    update: {},
+    create: {
       name: 'Ahşap Ürünler',
       slug: 'ahsap-urunler',
       description: 'El işçiliğiyle yapılmış ahşap ürünleri',
     },
   })
 
-  const dokumaCategory = await prisma.productCategory.create({
-    data: {
+  const dokumaCategory = await prisma.productCategory.upsert({
+    where: { slug: 'dokuma' },
+    update: {},
+    create: {
       name: 'Dokuma',
       slug: 'dokuma',
       description: 'Geleneksel dokuma sanatıyla yapılmış ürünler',

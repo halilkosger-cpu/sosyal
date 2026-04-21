@@ -1,0 +1,8 @@
+{                                                                                                                         "pipeline": {
+      "dev": {                                                                                                                  "cache": false
+      },
+      "build": {
+        "outputs": [".next/**"]
+      }
+    }
+  }
