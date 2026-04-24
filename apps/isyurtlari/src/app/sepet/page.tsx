@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+interface Campaign {
+  id: string;
+  name: string;
+  discount: number;
+  discountedPrice: number;
+}
+
 interface CartItem {
   id: string;
   name: string;
@@ -11,6 +18,7 @@ interface CartItem {
   quantity: number;
   slug: string;
   imageUrl?: string;
+  campaign?: Campaign | null;
 }
 
 export default function CartPage() {
@@ -47,7 +55,17 @@ export default function CartPage() {
     window.dispatchEvent(new Event('cartUpdated'));
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calculate prices with campaign discounts
+  const getItemPrice = (item: CartItem): number => {
+    if (item.campaign) {
+      return item.campaign.discountedPrice;
+    }
+    return item.price;
+  };
+
+  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
+  const originalSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalDiscount = originalSubtotal - subtotal;
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
@@ -108,9 +126,25 @@ export default function CartPage() {
                     >
                       {item.name}
                     </Link>
-                    <p className="text-blue-600 font-bold text-lg mt-1">
-                      ₺{item.price.toFixed(2)}
-                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      {item.campaign ? (
+                        <>
+                          <span className="text-red-600 font-bold text-lg">
+                            ₺{item.campaign.discountedPrice.toFixed(2)}
+                          </span>
+                          <span className="text-gray-400 line-through text-sm">
+                            ₺{item.price.toFixed(2)}
+                          </span>
+                          <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
+                            %{item.campaign.discount} İndirim
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-blue-600 font-bold text-lg">
+                          ₺{item.price.toFixed(2)}
+                        </span>
+                      )}
+                    </div>
 
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-3 w-fit">
@@ -144,7 +178,7 @@ export default function CartPage() {
                       Sil
                     </button>
                     <p className="text-gray-900 font-bold text-lg">
-                      ₺{(item.price * item.quantity).toFixed(2)}
+                      ₺{(getItemPrice(item) * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -159,8 +193,14 @@ export default function CartPage() {
                 <div className="space-y-3 mb-4 pb-4 border-b border-gray-200">
                   <div className="flex justify-between text-gray-600">
                     <span>Ara Toplam</span>
-                    <span>₺{subtotal.toFixed(2)}</span>
+                    <span>₺{originalSubtotal.toFixed(2)}</span>
                   </div>
+                  {totalDiscount > 0 && (
+                    <div className="flex justify-between text-green-600 font-bold">
+                      <span>İndirim Tasarrufu</span>
+                      <span>-₺{totalDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-600">
                     <span>KDV (%10)</span>
                     <span>₺{tax.toFixed(2)}</span>

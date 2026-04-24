@@ -63,7 +63,11 @@
       "Bash(ls -1 *.json)",
       "Bash(ls -la *.png)",
       "Bash(pnpm add:*)",
-      "Bash(dir C:\\\\\\\\sosyal:*)"
+      "Bash(dir C:\\\\\\\\sosyal:*)",
+      "Bash(npx tsc:*)",
+      "Read(//c/sosyal/**)",
+      "Bash(npx next:*)",
+      "Bash(npm:*)"
     ]
   },
   "model": "claude-haiku-4-5-20251001"

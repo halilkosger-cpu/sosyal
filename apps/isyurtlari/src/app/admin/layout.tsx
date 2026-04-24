@@ -5,14 +5,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
-  LuLogOut, LuMenu,
+  LuLogOut, LuMenu, LuFlame,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
 const navItems = [
-  { href: '/admin',           label: 'Dashboard',   Icon: LuLayoutDashboard },
-  { href: '/admin/urunler',   label: 'Ürünler',     Icon: LuPackage         },
-  { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag           },
+  { href: '/admin',            label: 'Dashboard',   Icon: LuLayoutDashboard },
+  { href: '/admin/urunler',    label: 'Ürünler',     Icon: LuPackage         },
+  { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
+  { href: '/admin/kampanyalar', label: 'Kampanyalar', Icon: LuFlame         },
   { href: '/admin/siparisler', label: 'Siparişler',  Icon: LuShoppingBag    },
 ];
 

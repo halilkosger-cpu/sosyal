@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { LuHouse, LuBadgeCheck, LuHeart, LuGraduationCap, LuUsers } from 'react-icons/lu';
+import FavoriteButton from '@/components/FavoriteButton';
 
 const categoryPurpose: Record<string, { purpose: string; trainingHours: number; skillDescription: string }> = {
   'gida-urunleri': { purpose: 'Beslenme & Aşçılık Eğitimi', trainingHours: 40, skillDescription: 'Profesyonel aşçılık ve beslenme bilgisi' },
@@ -14,6 +15,13 @@ const categoryPurpose: Record<string, { purpose: string; trainingHours: number; 
   'demir-metal-urunleri': { purpose: 'Metal İşleri Eğitimi', trainingHours: 55, skillDescription: 'Metal işleri ve tornacılık becerisi' },
 };
 
+interface Campaign {
+  id: string;
+  name: string;
+  discount: number;
+  discountedPrice: number;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -23,6 +31,7 @@ interface Product {
   quantity: number;
   imageUrl?: string;
   category: { name: string; slug: string };
+  campaign?: Campaign;
 }
 
 const productEmojis: Record<string, string> = {
@@ -122,13 +131,28 @@ const getProductValues = (slug: string): string[] => {
   ];
 };
 
+interface Review {
+  id: string;
+  rating: number;
+  title?: string;
+  text: string;
+  user: { name: string; avatar?: string };
+  createdAt: string;
+  helpfulCount: number;
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', text: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -137,12 +161,30 @@ export default function ProductDetailPage() {
       .catch(() => setLoading(false));
   }, [slug]);
 
+  useEffect(() => {
+    setReviewsLoading(true);
+    fetch(`/api/products/${slug}/reviews`)
+      .then((res) => res.json())
+      .then((data) => { setReviews(Array.isArray(data) ? data : []); setReviewsLoading(false); })
+      .catch(() => setReviewsLoading(false));
+  }, [slug]);
+
   const handleAddToCart = () => {
     if (!product) return;
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existing = cart.find((i: { id: string }) => i.id === product.id);
     if (existing) { existing.quantity += quantity; }
-    else { cart.push({ id: product.id, name: product.name, price: product.price, quantity, slug: product.slug, imageUrl: product.imageUrl }); }
+    else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        slug: product.slug,
+        imageUrl: product.imageUrl,
+        campaign: product.campaign || null,
+      });
+    }
     localStorage.setItem('cart', JSON.stringify(cart));
     window.dispatchEvent(new Event('cartUpdated'));
     setAdded(true);
@@ -229,10 +271,13 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
-              {product.name}
-            </h1>
+            {/* Title + Favorite */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
+                {product.name}
+              </h1>
+              <FavoriteButton productId={product.id} size="lg" />
+            </div>
 
             {/* Description */}
             <p className="text-gray-500 leading-relaxed mb-6 text-sm">
@@ -255,13 +300,34 @@ export default function ProductDetailPage() {
               </ul>
             </div>
 
+            {/* Campaign Banner */}
+            {product.campaign && (
+              <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl">🏷️</span>
+                  <h4 className="font-bold text-red-700">Kampanya: {product.campaign.name}</h4>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold text-red-600">%{product.campaign.discount}</span>
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      <span className="line-through">₺{product.price.toFixed(2)}</span>
+                    </p>
+                    <p className="text-lg font-bold text-red-600">
+                      ₺{product.campaign.discountedPrice.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Price box */}
             <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5 mb-5">
               {hasPrice ? (
                 <>
-                  <p className="text-sm text-gray-400 mb-1">Fiyat</p>
+                  <p className="text-sm text-gray-400 mb-1">{product.campaign ? 'İndirimli Fiyat' : 'Fiyat'}</p>
                   <p className="text-4xl font-extrabold text-[#FF6000]">
-                    ₺{product.price.toFixed(2)}
+                    ₺{product.campaign ? product.campaign.discountedPrice.toFixed(2) : product.price.toFixed(2)}
                   </p>
                   <p className="text-xs text-gray-400 mt-2">KDV dahil · Ücretsiz kargo</p>
                 </>
@@ -394,6 +460,206 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
+        </div>
+
+        {/* ─── REVIEWS SECTION ─── */}
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          {reviewsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6000]" />
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl">
+              <p className="text-gray-600 mb-4">Bu ürün hakkında henüz yorum yapılmamış</p>
+              <p className="text-sm text-gray-500">Bu ürünü satın aldıysanız ilk yorum yapan siz olabilirsiniz!</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-4xl font-bold text-gray-900">
+                        {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                      </span>
+                      <div className="flex gap-0.5">
+                        {Array(Math.round(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length)).fill(0).map((_, i) => (
+                          <span key={i} className="text-2xl">⭐</span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500">{reviews.length} müşteri yorumu</p>
+                  </div>
+                </div>
+
+                {/* Rating breakdown */}
+                <div className="space-y-2 max-w-xs">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = reviews.filter(r => r.rating === stars).length;
+                    const percent = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                    return (
+                      <div key={stars} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-600 min-w-fit">{stars}★ ({count})</span>
+                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#FF6000]" style={{ width: `${percent}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Reviews list */}
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <div key={review.id} className="bg-white rounded-2xl border border-gray-200 p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#FF6000] to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {review.user.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{review.user.name}</p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(review.createdAt).toLocaleDateString('tr-TR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-0.5">
+                        {Array(review.rating).fill(0).map((_, i) => (
+                          <span key={i} className="text-lg">⭐</span>
+                        ))}
+                      </div>
+                    </div>
+                    {review.title && (
+                      <p className="font-semibold text-gray-900 text-sm mb-2">{review.title}</p>
+                    )}
+                    <p className="text-sm text-gray-700 leading-relaxed mb-3">{review.text}</p>
+                    <div className="flex items-center gap-4 text-xs">
+                      <button className="text-gray-500 hover:text-[#FF6000] font-medium transition-colors">
+                        👍 Faydalı ({review.helpfulCount})
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Review Form Modal */}
+          {reviewFormOpen && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-96 overflow-y-auto">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Ürün Yorumu Yaz</h3>
+
+                <div className="space-y-4">
+                  {/* Rating */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Puan (1-5 ⭐)</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                          className={`text-3xl transition ${star <= reviewForm.rating ? '⭐' : '☆'}`}
+                        >
+                          {star <= reviewForm.rating ? '⭐' : '☆'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Başlık (İsteğe bağlı)</label>
+                    <input
+                      type="text"
+                      value={reviewForm.title}
+                      onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
+                      placeholder="Ürün hakkındaki düşünceniz"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6000]"
+                    />
+                  </div>
+
+                  {/* Comment */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Yorumunuz *</label>
+                    <textarea
+                      value={reviewForm.text}
+                      onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+                      placeholder="Ürünü kullanarak yaşadığınız deneyimi paylaşın..."
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6000]"
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      onClick={() => {
+                        setReviewFormOpen(false);
+                        setReviewForm({ rating: 5, title: '', text: '' });
+                      }}
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg transition"
+                    >
+                      İptal
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!reviewForm.text.trim()) {
+                          alert('Yorum metni boş olamaz');
+                          return;
+                        }
+                        setSubmittingReview(true);
+                        try {
+                          const userId = localStorage.getItem('userId') || 'guest-' + Date.now();
+                          const res = await fetch(`/api/products/${slug}/reviews`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              userId,
+                              rating: reviewForm.rating,
+                              title: reviewForm.title || null,
+                              text: reviewForm.text,
+                            }),
+                          });
+
+                          if (res.ok) {
+                            alert('✅ Yorumunuz alındı! Admin onayı sonrasında yayımlanacak.');
+                            setReviewFormOpen(false);
+                            setReviewForm({ rating: 5, title: '', text: '' });
+                          } else {
+                            const error = await res.json();
+                            alert('❌ ' + (error.error || 'Yorum gönderilemedi'));
+                          }
+                        } catch (error) {
+                          alert('❌ Bir hata oluştu');
+                        } finally {
+                          setSubmittingReview(false);
+                        }
+                      }}
+                      disabled={submittingReview}
+                      className="flex-1 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-medium py-2 rounded-lg transition"
+                    >
+                      {submittingReview ? 'Gönderiliyor...' : 'Yorumu Gönder'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Write review CTA */}
+          <div className="mt-8 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-6 text-center">
+            <h3 className="font-bold text-gray-900 mb-2">Siz de Yorum Yapın</h3>
+            <p className="text-sm text-gray-600 mb-4">Bu ürünü satın aldıysanız deneyiminizi diğer müşterilerle paylaşın</p>
+            <button
+              onClick={() => setReviewFormOpen(true)}
+              className="bg-[#FF6000] hover:bg-[#e55500] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
+            >
+              Yorum Yaz ⭐
+            </button>
+          </div>
         </div>
       </div>
 

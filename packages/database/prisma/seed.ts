@@ -669,7 +669,7 @@ async function main() {
       {
         name: 'Badem',
         slug: 'badem',
-        description: 'İsyurtları tarafından üretilen kaliteli badem. Taze ve besleyici.',
+        description: 'Adalet Bakanlığı İşyurtları bahçelerinde hassas bakımla yetiştirilen, soğuk iklim bölgelerine uygun sağlıklı badem. Vitamin E ve antioksidanlar açısından zengindir. Dişlerin sağlığını destekler ve kan şekerini dengeler. Saf halde tüketilir veya pasta, fırınlı ürünlerde kullanılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -678,7 +678,7 @@ async function main() {
       {
         name: 'Biber Reçeli',
         slug: 'biber-receli',
-        description: 'Ev yapımı biber reçeli. Doğal ve katkısız.',
+        description: 'İşyurtları atölyesinde seçilmiş kırmızı biberlerden el yapımı olarak hazırlanan, doğal ve katkısız reçeli. Geleneksel tarif kullanılarak yavaş pişirme yöntemiyle üretilir. Vitamin C açısından çok zengindir. Kahvaltı masasının vazgeçilmez lezzeti olarak veya peynir, taze ekmek ile eşlik eder.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -687,7 +687,7 @@ async function main() {
       {
         name: 'Biber Salçası',
         slug: 'biber-salcasi',
-        description: 'Geleneksel yöntemle yapılmış biber salçası.',
+        description: 'Anadolu tarımsal mirasından gelen geleneksel biber salçası, güneş enerjisiyle doğal kurutmayı takiben öğütülerek hazırlanır. Kimyasal madde içermez, tamamen doğal yapımıdır. Yemek hazırlamada temel malzeme ve lezzet vericisidir. Tüm türlü körü, çorbada ve etli yemeklere uyarlanır.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -696,7 +696,7 @@ async function main() {
       {
         name: 'Çekirdek',
         slug: 'cekirdek',
-        description: 'İsyurtları bahçesinden taze çekirdek.',
+        description: 'İşyurtları bahçelerinden toprakla yetiştirilen, doğal güneş ışığında kurutulmuş sağlıklı çekirdek. Magnezyum, çinko ve E vitamini bakımından zengindir. Sinir sistemi sağlığını destekler ve enerji verir. Sade tüketilir veya tatlı, kahvaltılık ürünlere katılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -705,7 +705,7 @@ async function main() {
       {
         name: 'Domates Salçası',
         slug: 'domates-salcasi',
-        description: 'Doğal koşullarda kurutulmuş domates ile yapılmış salça.',
+        description: 'Özel ziraat alanlarında yetişen, olgunlaşmış domateslerin doğal güneş ışığında kurutulması ve daha sonra sos haline getirilmesi ile elde edilen saflık. Licopene (güçlü antioxidan) açısından oldukça zengindir. Bütün türlü yemek ve soslar için vazgeçilmez bir bileşendir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -714,7 +714,7 @@ async function main() {
       {
         name: 'Fındık',
         slug: 'findik',
-        description: 'Taze ve lezzetli fındık. Bol besleyici değer.',
+        description: 'Anadolu coğrafyasının en verimli fındık ürünü, işyurtları bahçelerinde dikkatli ve özverili çalışmalarla hasat ve işlenmiştir. Yüksek protein ve sağlıklı yağlar içerir. Kalp sağlığını korur ve beyin işlevini destekler. Kabuğu kırılmış veya çikolatalı haliyle tüketilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -723,7 +723,7 @@ async function main() {
       {
         name: 'Haşaş Ezme',
         slug: 'hasas-ezme',
-        description: 'Sesam tohumundan yapılmış haşaş ezme.',
+        description: 'Beyaz sesam tohumlarının işyurtlarında kavrularak, geleneksel taş değirmenlerde ezilmesiyle elde edilen doğal ürün. Kalsiyum, demir ve B vitamini açısından oldukça zengindir. Pürüzlü dokusu sayesinde tatlı ve tuzlu gıdalara uyumludur. Tahta kaşık ve tatlılarla sevilen bir ikramdır.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -732,7 +732,7 @@ async function main() {
       {
         name: 'İncir Reçeli',
         slug: 'incir-receli',
-        description: 'Ev yapımı, doğal incir reçeli. Tatl ve besleyici.',
+        description: 'Kuruyan incir meyvesinin işyurtlarında özverili ellerle reçel haline dönüştürülmesi, geleneksel pişirme yöntemi kullanılır. Şeker ilavesi minimal, tamamı doğal fruktoz. Sindirim sistemini güçlendirir ve tabii laksatif etkiye sahiptir. Sabah kahvaltısında veya çay saatinde vazgeçilmez.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -741,7 +741,7 @@ async function main() {
       {
         name: 'Kuru Baklagil',
         slug: 'kuru-baklagil',
-        description: 'Kuru nohut, fasulye ve mercimek karışımı.',
+        description: 'Nohut, kırmızı mercimek ve beyaz fasulyenin dikkatlice seçilerek karıştırıldığı sağlıklı protein kaynağı. Bitki kökenli protein ve lif açısından zengindir. Doyurucu ve besleyici bir yemektir. Çorbaya, salaş yemeğine veya pirince katılarak pişirilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -750,7 +750,7 @@ async function main() {
       {
         name: 'Pirinç',
         slug: 'pirnic',
-        description: 'Kaliteli, hasıl pirinç. Pişmesi kolay.',
+        description: 'İşyurtları tarımsal alanlarında üretilen, kaliteli ve pişmesi hızlı pirinç çeşidi. İyi depolama koşullarında sürdürülen ürün, vitamin B kompleksi ve mineraller açısından zengindir. Kolay pişer ve tüm pirinç yemeğine uyarlanır. Aile sofrasının temel karbonhidrat kaynağıdır.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -759,7 +759,7 @@ async function main() {
       {
         name: 'Sarı Üzüm (Kuru Üzüm)',
         slug: 'sari-uzum',
-        description: 'Kurutulmuş sarı üzüm. Doğal şeker kaynağı.',
+        description: 'Taze üzümün doğal güneş ışığında kurutulmasıyla elde edilen doğal şeker kaynağı. Şeker, demir ve antioksidanlar açısından zengindir. Çocukların sağlıklı atıştırması ve sporcuların enerji kaynağıdır. Tatlılara, pasta ve cerealye katılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -768,7 +768,7 @@ async function main() {
       {
         name: 'Siyah Üzüm (Kuru Üzüm)',
         slug: 'siyah-uzum',
-        description: 'Seçkin siyah kuru üzüm. Antioksidan açısından zengin.',
+        description: 'Seçkin siyah üzüm çeşidinin doğal kurutulması ile elde edilen, antioksidanlar açısından oldukça zengin ürün. Koyu renkli ve daha tatlı tadı vardır. Bağışıklık sistemini güçlendirir. Gün içinde beslenme takviyesi olarak tüketilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -777,7 +777,7 @@ async function main() {
       {
         name: 'Tereyağ',
         slug: 'tereyag',
-        description: 'Doğal yapımda, hiçbir katkı maddesi olmayan tereyağ.',
+        description: 'İşyurtlarının özel çiftliklerinden toplanan taze süt, geleneksel yöntemle çırpılarak elde edilen doğal tereyağ. Hiçbir katkı maddesi, boyarmadde veya koruyucu içermez. Vitamin A açısından zengindir ve kemiş sağlığı destekler. Kahvaltı masasının lezzet kaynağı ve pişirme malzemesidir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -786,7 +786,7 @@ async function main() {
       {
         name: 'Üzüm Pekmezi',
         slug: 'uzum-pekmezi',
-        description: 'Doğal üzüm pekmezi. Şeker ilavesi yok.',
+        description: 'Taze üzümün yavaşça kaynattılarak doğal şekeri konsantre edilmesiyle elde edilen sağlıklı tatlandırıcı. Şeker ilavesi yoktur, tamamen doğal üzüm özüdür. Demir, kalsiyum ve potasyum açısından zengindir. Tahıl ürünlerine ve tatlılara katılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -795,7 +795,7 @@ async function main() {
       {
         name: 'Yer Fıstığı',
         slug: 'yer-fistagi',
-        description: 'Taze yer fıstığı. Protein açısından zengin.',
+        description: 'Çiftlik alanlarında bakımla yetiştirilen yer fıstığının doğal ve sağlıklı şekilde hasat edilmesi. Bitki kökenli protein açısından oldukça zengindir ve uzun süre enerji verir. Kalp sağlığını ve beyin fonksiyonlarını destekler. Sade veya rozgelé haliyle tüketilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -804,7 +804,7 @@ async function main() {
       {
         name: 'Yeşil Zeytin',
         slug: 'yesil-zeytin',
-        description: 'İsyurtları tarımında üretilen yeşil zeytin.',
+        description: 'İşyurtları tarımsal bölgelerinden toprakta yetiştirilen, erken hasat edilen yeşil zeytinin işlenmiş halidir. Tuz ve doğal koruyucular kullanılarak tat dengesi sağlanır. Kan basıncını ve kolesterol seviyesini düşürmeye yardımcı olur. Meze olarak veya salatalara katılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -813,7 +813,7 @@ async function main() {
       {
         name: 'Zeytinyağ',
         slug: 'zeytinyag',
-        description: 'Extra virgin zeytinyağ. Soğuk preslenmiş.',
+        description: 'İşyurtlarının özel bahçelerinden hasat edilen, soğuk preslenmiş extra virgin zeytinyağ. Hiçbir kimyasal işlem görmemiş, doğal antioksidanlar ve polifenollerle dolu. Kalp sağlığını korur ve yaşlanma sürecini yavaşlatır. Salatada, yemeklerde ve tatlılarda kullanılabilir.',
         categoryId: gidaCategory.id,
         price: 0,
         quantity: 0,
@@ -823,7 +823,7 @@ async function main() {
       {
         name: 'Türk Bayrağı Özlü Havlu',
         slug: 'turk-bayragi-ozlu-havlu',
-        description: 'Kaliteli pamuktan yapılmış, yüksek emici beige havlu. Her hanede olması gereken temel ev tekstili.',
+        description: 'İşyurtları dokuma atölyesinde yüksek kaliteli pamuktan işlenen, su emme özelliği maksimal olan havlu. Türk bayrağı deseniyle gurur konu olabilecek, her hanede olması gereken temel ev tekstili. Yumuşak dokusu cildi hırpalamaz ve uzun ömürlüdür.',
         categoryId: tekstilCategory.id,
         price: 89.99,
         quantity: 50,
@@ -831,7 +831,7 @@ async function main() {
       {
         name: 'Organik Pamuk Çarşaf Seti',
         slug: 'organik-pamuk-carsaf-seti',
-        description: '100% organik pamuktan yapılmış, deri dostu çarşaf seti. Rahat uyku için ideal.',
+        description: '100% organik pamuktan işyurtlarının tekstil atölyesinde dikkatlice dokuma yapılan, dermatolog onaylı çarşaf seti. Pestisit ve kimyasal madde içermez. Cilt hassasiyeti olan çocuk ve yetişkinler için ideal seçimdir. Rahat uyku ve terletici olmayan rahat rahatlık sağlar.',
         categoryId: tekstilCategory.id,
         price: 349.99,
         quantity: 30,
@@ -839,7 +839,7 @@ async function main() {
       {
         name: 'El Dokuma Halı - 150x100cm',
         slug: 'el-dokuma-hali-150x100',
-        description: 'Geleneksel dokuma tekniğiyle yapılmış, her biri benzersiz desenlere sahip halı.',
+        description: 'İşyurtlarının dokuma ustalarının saat saat emek vermesiyle, geleneksel tezgahlarda dokunmuş benzersiz tasarımlı halı. Her halı orijinal ve farklı motif içerir. El sanatının en güzel örneklerinden biri. Yaşlı ile müzisyen ve insanlar tarafından tarifi yapılmıştır.',
         categoryId: dokumaCategory.id,
         price: 899.99,
         quantity: 10,
@@ -847,7 +847,7 @@ async function main() {
       {
         name: 'Ahşap Kesme Tahtası Seti',
         slug: 'ahsap-kesme-tahtasi-seti',
-        description: 'Doğal ceviz ağacından yapılmış, sağlıklı ve dayanıklı kesme tahtası.',
+        description: 'İşyurtlarının marangozluk atölyesinde, doğal ceviz ağacından titizlikle işlenen kesme tahtaları seti. Antibakteriyel özelliklere sahip ahşap malzeme, gıda güvenliğini sağlar. Dayanıklı ve uzun ömürlü. Mutfağın vazgeçilmez aracı ve hediye olarak mükemmel seçim.',
         categoryId: ahsapCategory.id,
         price: 199.99,
         quantity: 20,
@@ -855,7 +855,7 @@ async function main() {
       {
         name: 'Evde Dokuma Mermerli Mendil',
         slug: 'mermerli-mendil',
-        description: 'Makinede yıkanabilir, göz dostu dizaynla yapılmış mendil. Koleksiyona değer katacak.',
+        description: 'İşyurtlarının tekstil atölyesinde dokuma tezgahlarında göz dostu mermerli desenleriyle işlenen, makinede yıkanabilir kaliteli mendil. Koleksiyonculuk ve hediye almaya değer tasarım. Ev dekorasyonuna ve el sanatları çalışmasına uygun.',
         categoryId: tekstilCategory.id,
         price: 29.99,
         quantity: 100,
@@ -863,7 +863,7 @@ async function main() {
       {
         name: 'Ahşap Mutfak Takımı (5 Parça)',
         slug: 'ahsap-mutfak-takimi',
-        description: 'Kayın ağacından yapılmış, gıda güvenliği standartlarına uygun mutfak aletleri.',
+        description: 'İşyurtlarının marangozluk ustalarınca kayın ağacından titizlikle işlenen, gıda güvenliği sertifikaları olan mutfak aletleri seti. Kaşık, spatula ve diğer aletler harmanlı olarak paketlenmiştir. Doğal, güvenilir, estetik ve fonksiyonel.',
         categoryId: ahsapCategory.id,
         price: 279.99,
         quantity: 15,
@@ -871,7 +871,7 @@ async function main() {
       {
         name: 'İçi Pamuk Yastık',
         slug: 'ici-pamuk-yastig',
-        description: 'Hipoalerjenik, tıbbi olarak test edilmiş pamuk yastık. Boynu destekler.',
+        description: 'İşyurtlarında dermatolog kontrolü ve tıbbi testler geçirmiş, hipoalerjenik pamuk yastık. Boyun ve omuz desteğini mükemmel şekilde sağlar. Uyku kalitesini artırır ve servikal sorunları azaltır. Yazı döneminde ve kışında rahat bir uyku ortamı yaratır.',
         categoryId: tekstilCategory.id,
         price: 159.99,
         quantity: 40,
@@ -879,7 +879,7 @@ async function main() {
       {
         name: 'El Sanatı Dekoratif Ahşap Kutu',
         slug: 'dekoratif-ahsap-kutu',
-        description: 'Şifreli kilit sistemiyle güvenli saklama alanı. Ev dekorasyonuna uyum sağlayan tasarım.',
+        description: 'İşyurtlarının el sanatları ustalarının her biri özverili olarak tasarladığı, şifreli kilit sistemiyle güvenli saklama kutusu. Kıymetli eşyaların, belgelerin veya hatıraların saklanması için ideal. Ev dekorasyonuna zarafet ve ön yüzeyine değer katar.',
         categoryId: ahsapCategory.id,
         price: 249.99,
         quantity: 25,
@@ -887,7 +887,7 @@ async function main() {
       {
         name: 'Dokuma Şal (Merino Yün)',
         slug: 'dokuma-sal-merino-yun',
-        description: 'Merino yünden yapılmış, yazlık ve kışlık giyilebilen şal. Evrensel tasarım.',
+        description: 'İşyurtlarının dokuma ustalarınca merino yününden işlenen, hem yazlık hem kışlık giyilebilen çok yönlü şal. Evrensel tasarımı herkes tarafından giyilebilir. Sıcak tutarken terletmez. Konfor, stil ve işlevselliğin müdür harmanı.',
         categoryId: dokumaCategory.id,
         price: 399.99,
         quantity: 20,
@@ -895,7 +895,7 @@ async function main() {
       {
         name: 'Organik Pamuk Elbise Kumaşı (Metre)',
         slug: 'organik-pamuk-elbise-kumasi',
-        description: 'Terzi ve dikiş severler için organik pamuk kumaş. Cilt dostu.',
+        description: 'Terzi ve DIY dikiş tutkunları için işyurtlarından organic pamuk kumaş. Cilt dostu, hipoalerjenik ve nefes alabilen yapısı ile konforlu kıyafetler tasarlamaya elverişlidir. Yazı ve hafif kış kıyafetleri için ideal. Renk canlılığı korunur ve dikişi kolay.',
         categoryId: tekstilCategory.id,
         price: 79.99,
         quantity: 200,

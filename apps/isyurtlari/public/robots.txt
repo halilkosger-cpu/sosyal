@@ -1,11 +1,15 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /api
-Disallow: /ara
 Disallow: /checkout
-Disallow: /sepet
 Disallow: /order-confirmation
+Disallow: /api/
+Disallow: /*.json$
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
 
 Sitemap: https://isyurtlari.com.tr/sitemap.xml
-

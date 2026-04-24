@@ -25,6 +25,7 @@ export default async function Head({ params }: { params: { slug: string } }) {
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      <link rel="canonical" href={url} />
       <meta property="og:title" content={`${product.name} | isyurtlari.com.tr`} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
@@ -37,26 +38,52 @@ export default async function Head({ params }: { params: { slug: string } }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org/',
-            '@type': 'Product',
-            name: product.name,
-            description: product.description || description,
-            price: product.price,
-            priceCurrency: 'TRY',
-            category: product.category.name,
-            brand: {
-              '@type': 'Organization',
-              name: 'Adalet Bakanlığı İşyurtları',
-            },
-            offers: {
-              '@type': 'Offer',
-              availability: product.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              priceCurrency: 'TRY',
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org/',
+              '@type': 'Product',
+              name: product.name,
+              description: product.description || description,
               price: product.price,
-              url: url,
+              priceCurrency: 'TRY',
+              category: product.category.name,
+              brand: {
+                '@type': 'Organization',
+                name: 'Adalet Bakanlığı İşyurtları',
+              },
+              offers: {
+                '@type': 'Offer',
+                availability: product.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                priceCurrency: 'TRY',
+                price: product.price,
+                url: url,
+              },
             },
-          }),
+            {
+              '@context': 'https://schema.org/',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'Ana Sayfa',
+                  item: 'https://isyurtlari.com.tr',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: product.category.name,
+                  item: `https://isyurtlari.com.tr/${product.category.slug}`,
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 3,
+                  name: product.name,
+                  item: url,
+                },
+              ],
+            },
+          ]),
         }}
       />
     </>

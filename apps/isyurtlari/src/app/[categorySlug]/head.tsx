@@ -37,6 +37,7 @@ export default async function Head({ params }: { params: { categorySlug: string 
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
+      <link rel="canonical" href={url} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
@@ -48,18 +49,38 @@ export default async function Head({ params }: { params: { categorySlug: string 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org/',
-            '@type': 'CollectionPage',
-            name: catName,
-            description: description,
-            url: url,
-            publisher: {
-              '@type': 'Organization',
-              name: 'Adalet Bakanlığı İşyurtları',
-              url: 'https://isyurtlari.com.tr',
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org/',
+              '@type': 'CollectionPage',
+              name: catName,
+              description: description,
+              url: url,
+              publisher: {
+                '@type': 'Organization',
+                name: 'Adalet Bakanlığı İşyurtları',
+                url: 'https://isyurtlari.com.tr',
+              },
             },
-          }),
+            {
+              '@context': 'https://schema.org/',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                {
+                  '@type': 'ListItem',
+                  position: 1,
+                  name: 'Ana Sayfa',
+                  item: 'https://isyurtlari.com.tr',
+                },
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: catName,
+                  item: url,
+                },
+              ],
+            },
+          ]),
         }}
       />
     </>

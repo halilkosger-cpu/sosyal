@@ -4,6 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse, LuX, LuChevronDown } from 'react-icons/lu';
+import FavoriteButton from '@/components/FavoriteButton';
+
+interface Campaign {
+  id: string;
+  name: string;
+  discount: number;
+  discountedPrice: number;
+}
 
 interface Product {
   id: string;
@@ -14,6 +22,7 @@ interface Product {
   quantity: number;
   imageUrl?: string;
   category: { name: string; slug: string };
+  campaign?: Campaign;
 }
 
 const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string; bg: string; banner: string; purpose: string; impact: string; imgBg: string }> = {
@@ -380,6 +389,13 @@ export default function CategoryPage() {
                     </span>
                   )}
 
+                  {/* Campaign Badge */}
+                  {product.campaign && (
+                    <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                      %{product.campaign.discount} İndirim
+                    </span>
+                  )}
+
                   {/* Impact Badge */}
                   <span className="absolute bottom-2 right-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded-full max-w-[140px] line-clamp-2">
                     {meta?.impact || '🎓 Eğitim Desteği'}
@@ -397,19 +413,33 @@ export default function CategoryPage() {
 
                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                     {product.price > 0 ? (
-                      <span className="text-lg font-extrabold text-[#FF6000]">
-                        ₺{product.price.toFixed(2)}
-                      </span>
+                      <div className="flex flex-col">
+                        {product.campaign ? (
+                          <>
+                            <span className="text-xs text-gray-400 line-through">₺{product.price.toFixed(2)}</span>
+                            <span className="text-lg font-extrabold text-red-600">
+                              ₺{product.campaign.discountedPrice.toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg font-extrabold text-[#FF6000]">
+                            ₺{product.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="text-xs text-gray-400 italic">Fiyat belirleniyor</span>
                     )}
-                    <button
-                      onClick={(e) => { e.preventDefault(); }}
-                      className="w-8 h-8 bg-[#FF6000] hover:bg-[#e55500] text-white rounded-lg flex items-center justify-center transition-colors"
-                      aria-label="Sepete ekle"
-                    >
-                      <LuShoppingCart size={15} strokeWidth={2} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <FavoriteButton productId={product.id} size="sm" />
+                      <button
+                        onClick={(e) => { e.preventDefault(); }}
+                        className="w-8 h-8 bg-[#FF6000] hover:bg-[#e55500] text-white rounded-lg flex items-center justify-center transition-colors"
+                        aria-label="Sepete ekle"
+                      >
+                        <LuShoppingCart size={15} strokeWidth={2} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </Link>

@@ -65,6 +65,8 @@ model User {
   userBadges       UserBadge[]
   cart             Cart?
   orders           Order[]
+  reviews          Review[]
+  favorites        Favorite[]
 
   @@index([email])
   @@index([username])
@@ -441,6 +443,9 @@ model Product {
   category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
   cartItems   CartItem[]
+  campaigns   CampaignProduct[]
+  reviews     Review[]
+  favorites   Favorite[]
 
   @@index([categoryId])
   @@index([slug])
@@ -547,3 +552,65 @@ model Payment {
   @@index([transactionId])
 }
 
+// ─── E-TİCARET: KAMPANYALAR ───────────────────────────────────
+model Campaign {
+  id        String   @id @default(cuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products CampaignProduct[]
+
+  @@index([active])
+  @@index([startDate])
+}
+
+model CampaignProduct {
+  id         String  @id @default(cuid())
+  campaignId String
+  productId  String
+  discount   Float   // Yüzde (ör: 20 için %20 indirim)
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, productId])
+  @@index([campaignId])
+}
+
+// ─── E-TİCARET: ÜRÜN YORUMLARI ────────────────────────────────
+model Review {
+  id            String   @id @default(cuid())
+  productId     String
+  userId        String
+  rating        Int      // 1-5
+  title         String?  // Yorum başlığı
+  text          String   // Yorum metni
+  approved      Boolean  @default(false)  // Admin onayı
+  helpfulCount  Int      @default(0)     // Kaç kişi faydalı buldu
+  createdAt     DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId],    references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([userId])
+  @@index([approved])
+}
+
+// ─── E-TİCARET: FAVORİLER ─────────────────────────────────────
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId],    references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+}

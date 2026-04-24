@@ -6,6 +6,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { LuInfo } from 'react-icons/lu';
 
+interface Campaign {
+  id: string;
+  name: string;
+  discount: number;
+  discountedPrice: number;
+}
+
 interface CartItem {
   id: string;
   name: string;
@@ -13,6 +20,7 @@ interface CartItem {
   quantity: number;
   slug: string;
   imageUrl?: string;
+  campaign?: Campaign | null;
 }
 
 export default function CheckoutPage() {
@@ -39,7 +47,17 @@ export default function CheckoutPage() {
     setPageLoading(false);
   }, [router]);
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calculate prices with campaign discounts
+  const getItemPrice = (item: CartItem): number => {
+    if (item.campaign) {
+      return item.campaign.discountedPrice;
+    }
+    return item.price;
+  };
+
+  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
+  const originalSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalDiscount = originalSubtotal - subtotal;
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
@@ -71,7 +89,7 @@ export default function CheckoutPage() {
           items: cart.map((item) => ({
             id: item.id,
             quantity: item.quantity,
-            price: item.price,
+            price: getItemPrice(item),
           })),
           totalAmount: total,
           paymentMethod,
@@ -330,8 +348,14 @@ export default function CheckoutPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Ara Toplam</span>
-                  <span>₺{subtotal.toFixed(2)}</span>
+                  <span>₺{originalSubtotal.toFixed(2)}</span>
                 </div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between text-green-600 font-bold">
+                    <span>İndirim Tasarrufu</span>
+                    <span>-₺{totalDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600">
                   <span>KDV (%10)</span>
                   <span>₺{tax.toFixed(2)}</span>

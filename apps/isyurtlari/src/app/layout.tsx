@@ -93,6 +93,60 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+
+        <Script
+          id="local-business-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              '@id': 'https://isyurtlari.com.tr/#business',
+              name: 'Adalet Bakanlığı İşyurtları Online Mağaza',
+              url: 'https://isyurtlari.com.tr',
+              description:
+                'Hükümlülerin el emeğiyle üretilen ürün satış mağazası. Adalet Bakanlığı Sosyal Girişimi.',
+              image: 'https://isyurtlari.com.tr/logo.png',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: 'Adalet Bakanlığı',
+                addressLocality: 'Ankara',
+                addressRegion: 'Ankara',
+                postalCode: '06100',
+                addressCountry: 'TR',
+              },
+              sameAs: [
+                'https://www.instagram.com/isyurtlari',
+                'https://www.facebook.com/isyurtlari',
+              ],
+              contact: {
+                '@type': 'ContactPoint',
+                contactType: 'Customer Support',
+                email: 'info@isyurtlari.com.tr',
+              },
+            }),
+          }}
+        />
+
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Adalet Bakanlığı İşyurtları',
+              url: 'https://isyurtlari.com.tr',
+              logo: 'https://isyurtlari.com.tr/logo.png',
+              description:
+                'Hükümlülerin rehabilitasyonu ve yeniden entegrasyon için sosyal girişim projesi',
+              sameAs: [
+                'https://www.instagram.com/isyurtlari',
+                'https://www.facebook.com/isyurtlari',
+              ],
+            }),
+          }}
+        />
       </head>
       <body className="bg-gray-100 text-gray-900">
 

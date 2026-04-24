@@ -4,6 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { LuArrowLeft, LuStar } from 'react-icons/lu';
+import FavoriteButton from '@/components/FavoriteButton';
+
+interface Campaign {
+  id: string;
+  name: string;
+  discount: number;
+  discountedPrice: number;
+}
 
 interface Product {
   id: string;
@@ -13,6 +21,7 @@ interface Product {
   quantity: number;
   imageUrl?: string;
   category: { name: string; slug: string };
+  campaign?: Campaign;
 }
 
 const productEmojis: Record<string, string> = {
@@ -110,7 +119,12 @@ export default function SearchPage() {
                       <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
                     </div>
                   )}
-                  {product.quantity > 0 && (
+                  {product.campaign && (
+                    <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+                      %{product.campaign.discount}
+                    </span>
+                  )}
+                  {product.quantity > 0 && !product.campaign && (
                     <span className="absolute top-2 right-2 bg-[#FF6000] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
                   )}
                 </div>
@@ -121,11 +135,25 @@ export default function SearchPage() {
                     {[1,2,3,4,5].map((s) => <LuStar key={s} size={10} fill="#FF6000" color="#FF6000" />)}
                     <span className="text-[10px] text-gray-400 ml-1">5.0</span>
                   </div>
-                  {product.price > 0 ? (
-                    <p className="text-lg font-bold text-[#FF6000] tracking-tight">₺{product.price.toFixed(2)}</p>
-                  ) : (
-                    <p className="text-xs text-gray-400 italic">Fiyat belirleniyor</p>
-                  )}
+                  <div className="flex items-end justify-between gap-2">
+                    <div>
+                      {product.price > 0 ? (
+                        <div>
+                          {product.campaign ? (
+                            <>
+                              <p className="text-xs text-gray-400 line-through tracking-tight">₺{product.price.toFixed(2)}</p>
+                              <p className="text-lg font-bold text-red-600 tracking-tight">₺{product.campaign.discountedPrice.toFixed(2)}</p>
+                            </>
+                          ) : (
+                            <p className="text-lg font-bold text-[#FF6000] tracking-tight">₺{product.price.toFixed(2)}</p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">Fiyat belirleniyor</p>
+                      )}
+                    </div>
+                    <FavoriteButton productId={product.id} size="sm" />
+                  </div>
                 </div>
               </Link>
             ))}

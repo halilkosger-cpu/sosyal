@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
 
-interface OrderItem { quantity: number; price: number; product: { name: string }; }
+interface OrderItem { quantity: number; price: number; product?: { name: string }; }
 interface Order {
   id: string; orderNumber: string; status: string; totalAmount: number;
   paymentMethod: string; shippingAddress: string; createdAt: string;
-  user: { name: string; email: string };
+  user?: { name: string; email: string } | null;
   items: OrderItem[];
 }
 
@@ -108,7 +108,7 @@ export default function AdminOrdersPage() {
                         {order.paymentMethod === 'TRANSFER' ? '🏦 Havale' : '💳 Kredi Kartı'}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{order.user.name} · {order.user.email}</p>
+                    <p className="text-xs text-gray-500 mt-1">{order.user?.name || 'Misafir'} · {order.user?.email || 'Bilinmiyor'}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-[#FF6000]">₺{order.totalAmount.toFixed(2)}</p>
@@ -125,7 +125,7 @@ export default function AdminOrdersPage() {
                       <div className="space-y-1">
                         {order.items.map((item, i) => (
                           <div key={i} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">{item.product.name} <span className="text-gray-400">x{item.quantity}</span></span>
+                            <span className="text-gray-700">{item.product?.name || 'Bilinmeyen Ürün'} <span className="text-gray-400">x{item.quantity}</span></span>
                             <span className="font-semibold text-gray-900">₺{(item.price * item.quantity).toFixed(2)}</span>
                           </div>
                         ))}

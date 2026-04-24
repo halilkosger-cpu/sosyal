@@ -11,6 +11,8 @@ import {
 interface Category { id: string; name: string; slug: string; }
 interface Product  { id: string; name: string; slug: string; price: number; quantity: number; imageUrl?: string; category: { name: string; slug: string }; }
 interface SalesStats { totalOrders: number; totalItems: number; totalRevenue: number; totalTrainingHours: number; prisonersSupportedCount: number; }
+interface CampaignProduct { productId: string; discount: number; product: Product; }
+interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
 const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string; purpose: string }> = {
   // Eski slug format (uyumluluk için)
@@ -38,14 +40,15 @@ const productEmojis: Record<string, string> = {
 
 const announcements = [
   '🎓  Her Satın Alma Bir İkinci Şans Demek',
-  '✅  Adalet Bakanlığı Onaylı Sosyal Girişim',
-  '❤️  Hükümlülerin Rehabilitasyonuna Destek Ol',
-  '🏭  İşyurtlarında El Yapımı Ürünler',
+  '✨  El Emeği, Gerçek Değer, Sosyal Girişim',
+  '❤️  Beceri Kazanan İnsanları Destekle',
+  '🏭  Kaliteli Ürünler, İnsan Odaklı İşyurtları',
 ];
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products,   setProducts]   = useState<Product[]>([]);
+  const [campaigns,  setCampaigns]  = useState<Campaign[]>([]);
   const [stats,      setStats]      = useState<SalesStats | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [ticker,     setTicker]     = useState(0);
@@ -59,10 +62,12 @@ export default function HomePage() {
     Promise.all([
       fetch('/api/categories').then((r) => r.json()).catch(() => []),
       fetch('/api/products').then((r) => r.json()).catch(() => []),
+      fetch('/api/campaigns/active').then((r) => r.json()).catch(() => []),
       fetch('/api/stats/sales').then((r) => r.json()).catch(() => null),
-    ]).then(([cats, prods, statsData]) => {
+    ]).then(([cats, prods, camps, statsData]) => {
       setCategories(Array.isArray(cats) ? cats : []);
       setProducts(Array.isArray(prods) ? prods.slice(0, 8) : []);
+      setCampaigns(Array.isArray(camps) ? camps : []);
       setStats(statsData?.totalOrders !== undefined ? statsData : null);
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -88,11 +93,11 @@ export default function HomePage() {
           {/* Left */}
           <div>
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-orange-300 text-xs font-semibold px-4 py-2 rounded-full mb-7 tracking-wide">
-              <LuBadgeCheck size={14} /> Adalet Bakanlığı Sosyal Girişimi
+              <LuBadgeCheck size={14} /> El Emeğine Dayanan Sosyal Girişim
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-5 tracking-tight">
-              Adalet<br />
-              <span className="text-[#FF6000]">Bakanlığı'nı</span> Destekle
+              Beceri<br />
+              <span className="text-[#FF6000]">Değer</span> Yaratan
             </h1>
             <p className="text-sky-300 text-base mb-9 max-w-sm leading-relaxed">
               Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bireyin yeniden başlamasına ve topluma kazanılmasına yardım eder.
@@ -142,6 +147,105 @@ export default function HomePage() {
 
         </div>
       </section>
+
+      {/* ─── ACTIVE CAMPAIGNS (CAROUSEL STYLE) ─── */}
+      {campaigns.length > 0 && (
+        <section className="bg-gradient-to-r from-[#FF6000]/5 to-[#0F2040]/5 border-y border-[#FF6000]/20">
+          <div className="max-w-screen-xl mx-auto px-4 py-8">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <LuZap size={18} className="text-[#FF6000]" />
+                <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Kampanyadaki Ürünler</h2>
+            </div>
+
+            {/* Campaigns Carousel */}
+            <div className="w-screen -mx-4 overflow-hidden">
+              <div className="flex gap-0 animate-scroll px-4 pb-4">
+                {/* Original campaigns */}
+                {campaigns.map(campaign => (
+                  <div key={campaign.id} className="flex-shrink-0 w-[70vw] md:w-[350px]">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">{campaign.name}</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                      <div className="flex gap-4 w-max">
+                        {campaign.products.slice(0, 8).map(cp => {
+                        const discountedPrice = cp.product.price * (1 - cp.discount / 100);
+                        return (
+                          <Link
+                            key={cp.productId}
+                            href={`/urun/${cp.product.slug}`}
+                            className="group bg-white rounded-xl border-2 border-[#FF6000] hover:shadow-lg transition-all overflow-hidden flex-shrink-0 w-40"
+                          >
+                            <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
+                              {cp.product.imageUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                              ) : (
+                                <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
+                              )}
+                              <div className="absolute top-2 right-2 bg-[#FF6000] text-white text-xs font-bold px-3 py-1 rounded-full">
+                                -%{cp.discount}
+                              </div>
+                            </div>
+                            <div className="p-2.5">
+                              <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
+                              <div className="flex flex-col gap-0.5">
+                                <p className="text-xs text-gray-400 line-through">₺{cp.product.price.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {/* Duplicate for seamless loop */}
+                {campaigns.map(campaign => (
+                  <div key={campaign.id + '-clone'} className="flex-shrink-0 w-[70vw] md:w-[350px]">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">{campaign.name}</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                      <div className="flex gap-4 w-max">
+                        {campaign.products.slice(0, 8).map(cp => {
+                        const discountedPrice = cp.product.price * (1 - cp.discount / 100);
+                        return (
+                          <Link
+                            key={cp.productId + '-clone'}
+                            href={`/urun/${cp.product.slug}`}
+                            className="group bg-white rounded-xl border-2 border-[#FF6000] hover:shadow-lg transition-all overflow-hidden flex-shrink-0 w-40"
+                          >
+                            <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
+                              {cp.product.imageUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                              ) : (
+                                <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
+                              )}
+                              <div className="absolute top-2 right-2 bg-[#FF6000] text-white text-xs font-bold px-3 py-1 rounded-full">
+                                -%{cp.discount}
+                              </div>
+                            </div>
+                            <div className="p-2.5">
+                              <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
+                              <div className="flex flex-col gap-0.5">
+                                <p className="text-xs text-gray-400 line-through">₺{cp.product.price.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── CATEGORIES ─── */}
       <section className="max-w-screen-xl mx-auto px-4 py-8">
@@ -227,7 +331,7 @@ export default function HomePage() {
           <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-8 text-white">
             <p className="text-5xl font-bold mb-2">%100</p>
             <p className="text-base font-semibold mb-1">Kar Amacı Gütmüyor</p>
-            <p className="text-sm opacity-90">Adalet Bakanlığı Sosyal Girişimi</p>
+            <p className="text-sm opacity-90">Sosyal Girişim, İnsan Onurlu</p>
           </div>
         </div>
       </section>
