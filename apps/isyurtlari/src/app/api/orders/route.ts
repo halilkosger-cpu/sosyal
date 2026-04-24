@@ -1,6 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 
+// Email sending function
+async function sendOrderEmail(orderNumber: string, customerName: string, totalAmount: number, items: any[]) {
+  try {
+    const recipientEmail = process.env.EMAIL_RECIPIENT || 'halil.kosger@gmail.com';
+    const bankName = process.env.BANK_NAME || 'T.C. Garanti Bankası';
+    const accountName = process.env.BANK_ACCOUNT_NAME || 'Zülfikar Solak';
+    const iban = process.env.BANK_ACCOUNT_IBAN || 'TR...';
+
+    const itemsHtml = items
+      .map(
+        (item: any) =>
+          `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.product?.name || 'Ürün'}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">×${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₺${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>`
+      )
+      .join('');
+
+    const emailContent = `
+      <h2 style="color: #FF6000;">🎉 YENİ SİPARİŞ GELDİ!</h2>
+      <hr style="border: none; border-top: 2px solid #FF6000; margin: 20px 0;">
+
+      <h3>Müşteri Bilgileri:</h3>
+      <p><strong>Adı Soyadı:</strong> ${customerName}</p>
+      <p><strong>Sipariş Numarası:</strong> ${orderNumber}</p>
+
+      <h3>Sipariş Detayları:</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="padding: 8px; text-align: left;">Ürün Adı</th>
+            <th style="padding: 8px; text-align: center;">Miktar</th>
+            <th style="padding: 8px; text-align: right;">Fiyat</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 20px;">Ödeme Bilgileri:</h3>
+      <p><strong>Toplam Tutar:</strong> <span style="font-size: 18px; color: #FF6000;">₺${totalAmount.toFixed(2)}</span></p>
+      <p><strong>Ödeme Yöntemi:</strong> Havale/EFT</p>
+
+      <h3>Havale Detayları:</h3>
+      <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #FF6000;">
+        <p><strong>Banka:</strong> ${bankName}</p>
+        <p><strong>Hesap Sahibi:</strong> ${accountName}</p>
+        <p><strong>IBAN:</strong> <code style="background: #eee; padding: 5px;">${iban}</code></p>
+        <p style="color: #666; font-size: 12px;"><em>Havale açıklamasına sipariş numarasını yazınız: ${orderNumber}</em></p>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="color: #666; font-size: 12px;">Bu email isyurtlari.com.tr otomatik sipariş bildirimi sistemi tarafından gönderilmiştir.</p>
+    `;
+
+    // Using Resend API
+    if (process.env.RESEND_API_KEY) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: 'siparis@isyurtlari.com',
+          to: recipientEmail,
+          subject: `📦 Yeni Sipariş: ${orderNumber}`,
+          html: emailContent,
+        }),
+      });
+    } else {
+      // Fallback: log to console
+      console.log(`📧 Email would be sent to ${recipientEmail}: Order ${orderNumber}`);
+    }
+  } catch (error) {
+    console.error('Email sending error:', error);
+    // Don't fail the order if email fails
+  }
+}
+
 export const dynamic = 'force-dynamic';
 
 interface OrderRequest {
@@ -121,6 +203,9 @@ export async function POST(req: NextRequest) {
         description: `Sipariş #${orderNumber}`,
       },
     });
+
+    // Send email notification
+    await sendOrderEmail(orderNumber, body.customerName, body.totalAmount, orderWithItems?.items || []);
 
     return NextResponse.json({
       success: true,
