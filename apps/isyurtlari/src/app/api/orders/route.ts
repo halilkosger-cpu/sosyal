@@ -124,11 +124,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      orderId: orderWithItems?.id,
+      id: orderWithItems?.id,
       orderNumber: orderWithItems?.orderNumber,
       status: orderWithItems?.status,
       totalAmount: orderWithItems?.totalAmount,
       paymentMethod: orderWithItems?.paymentMethod,
+      shippingAddress: orderWithItems?.shippingAddress,
+      items: orderWithItems?.items || [],
+      orderItems: orderWithItems?.items || [],
       impact: {
         trainingHoursFunded,
         prisonersSupportedCount,

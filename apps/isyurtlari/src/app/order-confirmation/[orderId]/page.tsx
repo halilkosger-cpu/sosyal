@@ -12,13 +12,20 @@ interface OrderData {
   totalAmount: number;
   paymentMethod: string;
   shippingAddress: string;
-  notes: string;
+  notes?: string;
   orderItems: Array<{ id: string; quantity: number; price: number; product: { name: string; slug: string } }>;
   impact?: {
     trainingHoursFunded: number;
     prisonersSupportedCount: number;
     totalItemsCount: number;
     missionMessage: string;
+  };
+  bankDetails?: {
+    accountName: string;
+    iban: string;
+    branch: string;
+    accountNo: string;
+    message?: string;
   };
 }
 
@@ -179,15 +186,15 @@ export default function OrderConfirmationPage() {
                 <div className="space-y-4 bg-white rounded-xl p-6">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Hesap Adı</p>
-                    <p className="font-semibold text-gray-900">{process.env.NEXT_PUBLIC_BANK_NAME || 'Adalet Bakanlığı'}</p>
+                    <p className="font-semibold text-gray-900">{order.bankDetails?.accountName || 'Adalet Bakanlığı'}</p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">IBAN</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-mono font-bold text-gray-900">{process.env.NEXT_PUBLIC_BANK_IBAN || 'TR...'}</p>
+                      <p className="font-mono font-bold text-gray-900">{order.bankDetails?.iban || 'TR...'}</p>
                       <button
-                        onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_BANK_IBAN || '')}
+                        onClick={() => copyToClipboard(order.bankDetails?.iban || '')}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                         title="Kopyala"
                       >
@@ -200,11 +207,11 @@ export default function OrderConfirmationPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Şube</p>
-                      <p className="font-semibold text-gray-900">{process.env.NEXT_PUBLIC_BANK_BRANCH || 'Ankara'}</p>
+                      <p className="font-semibold text-gray-900">{order.bankDetails?.branch || 'Ankara'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Hesap No</p>
-                      <p className="font-semibold text-gray-900">{process.env.NEXT_PUBLIC_BANK_ACCOUNT || '...'}</p>
+                      <p className="font-semibold text-gray-900">{order.bankDetails?.accountNo || '...'}</p>
                     </div>
                   </div>
 
