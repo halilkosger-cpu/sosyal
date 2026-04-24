@@ -40,13 +40,21 @@ export default function OrderConfirmationPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (!orderId || orderId === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
     fetch(`/api/orders?id=${orderId}`)
       .then((res) => res.json())
       .then((data) => {
         setOrder(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error('Error fetching order:', err);
+        setLoading(false);
+      });
   }, [orderId]);
 
   const handleShare = () => {

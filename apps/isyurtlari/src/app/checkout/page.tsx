@@ -105,6 +105,12 @@ export default function CheckoutPage() {
 
       const data = await res.json();
 
+      if (!data.orderId) {
+        setError('Sipariş oluşturulmadı (orderId bulunamadı)');
+        setSubmitting(false);
+        return;
+      }
+
       if (paymentMethod === 'CREDIT_CARD') {
         // Iyzico payment
         const paymentRes = await fetch('/api/checkout/iyzico', {

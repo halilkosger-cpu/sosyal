@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       id: orderWithItems?.id,
+      orderId: orderWithItems?.id,
       orderNumber: orderWithItems?.orderNumber,
       status: orderWithItems?.status,
       totalAmount: orderWithItems?.totalAmount,
@@ -163,7 +164,7 @@ export async function GET(req: NextRequest) {
   try {
     const orderId = req.nextUrl.searchParams.get('id');
 
-    if (!orderId) {
+    if (!orderId || orderId === 'undefined') {
       return NextResponse.json({ error: 'Sipariş ID gerekli' }, { status: 400 });
     }
 
@@ -182,7 +183,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Sipariş bulunamadı' }, { status: 404 });
     }
 
-    return NextResponse.json(order);
+    return NextResponse.json({
+      ...order,
+      items: order.items || [],
+      orderItems: order.items || [],
+      bankDetails: order.paymentMethod === 'TRANSFER'
+        ? {
+            accountName: process.env.BANK_ACCOUNT_NAME || 'Adalet Bakanlığı',
+            iban: process.env.BANK_ACCOUNT_IBAN || 'TR...',
+            branch: process.env.BANK_ACCOUNT_BRANCH || 'Ankara Şubesi',
+            accountNo: process.env.BANK_ACCOUNT_NO || '...',
+          }
+        : undefined,
+    });
   } catch (error) {
     console.error('Order fetch error:', error);
     return NextResponse.json({ error: 'Sipariş getirilemedi' }, { status: 500 });
