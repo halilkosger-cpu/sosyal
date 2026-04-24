@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse, LuX, LuChevronDown } from 'react-icons/lu';
+import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse, LuX } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 
 interface Campaign {
