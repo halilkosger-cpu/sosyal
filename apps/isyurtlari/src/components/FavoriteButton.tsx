@@ -46,16 +46,14 @@ export default function FavoriteButton({ productId, size = 'md', showLabel = fal
 
     try {
       const method = isFavorite ? 'DELETE' : 'POST';
-      const res = await fetch('/api/favorites', {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        ...(method === 'POST' && { body: JSON.stringify({ userId, productId }) }),
-        ...(method === 'DELETE' && {
-          url: `/api/favorites?userId=${userId}&productId=${productId}`,
-        }),
-      });
 
-      if (method === 'DELETE') {
+      if (method === 'POST') {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, productId }),
+        });
+      } else {
         // For DELETE, use the query string approach
         await fetch(`/api/favorites?userId=${userId}&productId=${productId}`, {
           method: 'DELETE',
