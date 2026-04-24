@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 // GET /api/products/[slug]/reviews - Onaylanmış yorumları getir
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
