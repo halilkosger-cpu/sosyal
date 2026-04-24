@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   const [pageLoading, setPageLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('CREDIT_CARD');
+  const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('TRANSFER');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -252,22 +252,21 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Ödeme Yöntemi</h2>
                 <div className="space-y-4">
-                  <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{borderColor: paymentMethod === 'CREDIT_CARD' ? '#2563eb' : undefined,
-                            backgroundColor: paymentMethod === 'CREDIT_CARD' ? '#eff6ff' : undefined}}>
+                  <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-not-allowed bg-gray-50 opacity-50 transition"
+                    title="Yakında aktif edilecek">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="CREDIT_CARD"
-                      checked={paymentMethod === 'CREDIT_CARD'}
-                      onChange={() => setPaymentMethod('CREDIT_CARD')}
-                      className="w-4 h-4 text-blue-600"
+                      checked={false}
+                      disabled
+                      className="w-4 h-4 text-gray-400"
                     />
                     <div className="ml-4 flex-1">
-                      <p className="font-semibold text-gray-900">iyzico ile Öde</p>
-                      <p className="text-sm text-gray-600">Visa, Mastercard ve daha fazla</p>
+                      <p className="font-semibold text-gray-600">iyzico ile Öde</p>
+                      <p className="text-sm text-gray-500">Visa, Mastercard ve daha fazla (Yakında)</p>
                     </div>
-                    <Image src="/iyzico.png" alt="iyzico" width={60} height={24} className="h-6 w-auto" />
+                    <Image src="/iyzico.png" alt="iyzico" width={60} height={24} className="h-6 w-auto opacity-50" />
                   </label>
 
                   <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition"

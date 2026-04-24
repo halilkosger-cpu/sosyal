@@ -620,10 +620,9 @@ async function main() {
   console.log('✅ Destek kaynakları güncellendi')
 
   // ─── E-TİCARET: ÜRÜNLER ─────────────────────────────────────
-  // await prisma.productCategory.deleteMany({}) // ⚠️ Silinmedi - mevcut kategorileri koru
 
   const gidaCategory = await prisma.productCategory.upsert({
-    where: { slug: 'gida-urunleri' },
+    where: { name: 'Gıda Ürünleri' },
     update: {},
     create: {
       name: 'Gıda Ürünleri',
@@ -633,7 +632,7 @@ async function main() {
   })
 
   const tekstilCategory = await prisma.productCategory.upsert({
-    where: { slug: 'tekstil-urunleri' },
+    where: { name: 'Tekstil Ürünleri' },
     update: {},
     create: {
       name: 'Tekstil Ürünleri',
@@ -643,7 +642,7 @@ async function main() {
   })
 
   const ahsapCategory = await prisma.productCategory.upsert({
-    where: { slug: 'ahsap-urunler' },
+    where: { name: 'Ahşap Ürünler' },
     update: {},
     create: {
       name: 'Ahşap Ürünler',
@@ -653,7 +652,7 @@ async function main() {
   })
 
   const dokumaCategory = await prisma.productCategory.upsert({
-    where: { slug: 'dokuma' },
+    where: { name: 'Dokuma' },
     update: {},
     create: {
       name: 'Dokuma',
@@ -662,9 +661,9 @@ async function main() {
     },
   })
 
-  // await prisma.product.deleteMany({}) // ⚠️ Silinmedi - mevcut ürünleri koru
   await prisma.product.createMany({
     data: [
+      // Gıda Ürünleri (slug unique, varsa skip et)
       // Gıda Ürünleri
       {
         name: 'Badem',

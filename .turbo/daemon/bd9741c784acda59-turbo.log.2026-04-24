@@ -1,0 +1,67 @@
+2026-04-24T10:27:43.408210Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo\\cookies\\1.cookie"), AnchoredSystemPathBuf(".turbo\\cookies")}
+2026-04-24T10:27:43.408802Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-04-24T10:27:43.478573Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-24T10:27:43.505147Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo"), AnchoredSystemPathBuf(".turbo\\cookies"), AnchoredSystemPathBuf(".turbo\\cookies\\.turbo-cookie"), AnchoredSystemPathBuf(".turbo\\cookies\\1.cookie"), AnchoredSystemPathBuf(".turbo\\daemon")}
+2026-04-24T10:27:43.505273Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-04-24T10:27:44.514224Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.turbo\\turbo-build.log"), AnchoredSystemPathBuf("apps\\cezaevinden\\.turbo"), AnchoredSystemPathBuf(".turbo\\cookies\\3.cookie"), AnchoredSystemPathBuf(".turbo\\cookies\\2.cookie"), AnchoredSystemPathBuf("apps\\isyurtlari"), AnchoredSystemPathBuf("apps\\isyurtlari\\.turbo"), AnchoredSystemPathBuf("apps\\cezaevinden"), AnchoredSystemPathBuf("apps\\isyurtlari\\.turbo\\turbo-build.log"), AnchoredSystemPathBuf(".turbo"), AnchoredSystemPathBuf(".turbo\\daemon\\bd9741c784acda59-turbo.log.2026-04-24"), AnchoredSystemPathBuf(".turbo\\cookies")}
+2026-04-24T10:27:44.514263Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }, WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }, WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-04-24T10:27:45.621169Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.turbo"), AnchoredSystemPathBuf("apps\\isyurtlari\\.turbo")}
+2026-04-24T10:27:45.621213Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }, WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:27:45.621392Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:45.621653Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:47.017681Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:27:47.017712Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:27:48.070010Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:48.070341Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:27:48.070372Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:27:48.070498Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:48.706382Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:27:48.706424Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:27:48.782798Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:55.509855Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:27:55.509897Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:27:59.075560Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:27:59.077990Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:27:59.078001Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:27:59.078119Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:00.516730Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:28:00.516764Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:28:01.695982Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:03.322088Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:03.322121Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:03.398413Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:05.294176Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:05.294227Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:05.811304Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:10.907407Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:10.907423Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:11.054427Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:17.904034Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:28:17.904087Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:28:20.584239Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:20.585262Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.next")}
+2026-04-24T10:28:20.585271Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }}))
+2026-04-24T10:28:20.585352Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:32.216650Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:32.216668Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:32.386821Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:32.388859Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:32.388904Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:32.389104Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:36.707102Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\isyurtlari\\.turbo\\turbo-build.log"), AnchoredSystemPathBuf("apps\\cezaevinden\\.turbo\\turbo-build.log")}
+2026-04-24T10:28:36.707118Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("isyurtlari"), path: AnchoredSystemPathBuf("apps\\isyurtlari") }, WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:37.508585Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:37.508610Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:37.508685Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:46.516043Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:46.516075Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:47.721548Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:47.722580Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:47.722606Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:47.722727Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:47.807458Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:47.807538Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:48.079081Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-04-24T10:28:48.079273Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\cezaevinden\\.next")}
+2026-04-24T10:28:48.079304Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("cezaevinden"), path: AnchoredSystemPathBuf("apps\\cezaevinden") }}))
+2026-04-24T10:28:48.079470Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
