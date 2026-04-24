@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
     await prisma.campaign.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
