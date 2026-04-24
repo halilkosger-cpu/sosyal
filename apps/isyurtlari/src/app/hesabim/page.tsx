@@ -133,7 +133,7 @@ export default function MyAccountPage() {
                 <button className="w-full bg-purple-50 hover:bg-purple-100 text-purple-600 font-medium py-2 rounded-lg transition mb-3">
                   Şifreyi Değiştir
                 </button>
-                <button className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2 rounded-lg transition">
+                <button onClick={handleLogout} className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2 rounded-lg transition">
                   Çıkış Yap
                 </button>
               </div>
