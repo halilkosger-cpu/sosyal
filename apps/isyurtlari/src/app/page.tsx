@@ -11,7 +11,6 @@ import { content } from '@/config/content';
 
 interface Category { id: string; name: string; slug: string; }
 interface Product  { id: string; name: string; slug: string; price: number; quantity: number; imageUrl?: string; category: { name: string; slug: string }; }
-interface SalesStats { totalOrders: number; totalItems: number; totalRevenue: number; totalTrainingHours: number; prisonersSupportedCount: number; }
 interface CampaignProduct { productId: string; discount: number; product: Product; }
 interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
@@ -45,7 +44,6 @@ export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [products,   setProducts]   = useState<Product[]>([]);
   const [campaigns,  setCampaigns]  = useState<Campaign[]>([]);
-  const [stats,      setStats]      = useState<SalesStats | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [ticker,     setTicker]     = useState(0);
 
@@ -59,12 +57,10 @@ export default function HomePage() {
       fetch('/api/categories').then((r) => r.json()).catch(() => []),
       fetch('/api/products').then((r) => r.json()).catch(() => []),
       fetch('/api/campaigns/active').then((r) => r.json()).catch(() => []),
-      fetch('/api/stats/sales').then((r) => r.json()).catch(() => null),
-    ]).then(([cats, prods, camps, statsData]) => {
+    ]).then(([cats, prods, camps]) => {
       setCategories(Array.isArray(cats) ? cats : []);
       setProducts(Array.isArray(prods) ? prods.slice(0, 8) : []);
       setCampaigns(Array.isArray(camps) ? camps : []);
-      setStats(statsData?.totalOrders !== undefined ? statsData : null);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
