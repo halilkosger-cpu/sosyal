@@ -7,6 +7,7 @@ import {
   LuTruck, LuShieldCheck, LuHeart, LuArrowRight, LuStar, LuBadgeCheck,
   LuZap, LuTrendingUp, LuUsers, LuBook,
 } from 'react-icons/lu';
+import { content } from '@/config/content';
 
 interface Category { id: string; name: string; slug: string; }
 interface Product  { id: string; name: string; slug: string; price: number; quantity: number; imageUrl?: string; category: { name: string; slug: string }; }
@@ -38,12 +39,7 @@ const productEmojis: Record<string, string> = {
   'havlu-beyaz':'🛁','havlu-renkli':'🛁','ahsap-sandalye':'🪑','ahsap-masa':'🪑',
 };
 
-const announcements = [
-  '🎓  Her Satın Alma Bir İkinci Şans Demek',
-  '✨  El Emeği, Gerçek Değer, Sosyal Girişim',
-  '❤️  Beceri Kazanan İnsanları Destekle',
-  '🏭  Kaliteli Ürünler, İnsan Odaklı İşyurtları',
-];
+const announcements = content.home.announcements;
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -93,28 +89,28 @@ export default function HomePage() {
           {/* Left */}
           <div>
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-orange-300 text-xs font-semibold px-4 py-2 rounded-full mb-7 tracking-wide">
-              <LuBadgeCheck size={14} /> El Emeğine Dayanan Sosyal Girişim
+              <LuBadgeCheck size={14} /> {content.home.hero.badge}
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-5 tracking-tight">
-              Beceri<br />
-              <span className="text-[#FF6000]">Değer</span> Yaratan
+              {content.home.hero.title}<br />
+              <span className="text-[#FF6000]">{content.home.hero.titleHighlight}</span> {content.home.hero.titleSuffix}
             </h1>
             <p className="text-sky-300 text-base mb-9 max-w-sm leading-relaxed">
-              Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bireyin yeniden başlamasına ve topluma kazanılmasına yardım eder.
+              {content.home.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
               <Link href="/gida" className="bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-2 text-sm">
-                Değiştir. Satın Al. Destekle. <LuArrowRight size={16} />
+                {content.home.hero.ctaPrimary} <LuArrowRight size={16} />
               </Link>
               <Link href="/hakkimizda" className="bg-white/8 hover:bg-white/15 text-white font-semibold px-7 py-3.5 rounded-xl transition-all border border-white/15 text-sm">
-                Misyon & Vizyon
+                {content.home.hero.ctaSecondary}
               </Link>
             </div>
             <div className="flex gap-10 pt-8 border-t border-white/10">
-              {[['70.000+', 'İşyurtlarında'], ['500+', 'Ürün & Hizmet'], ['%100', 'Sosyal Girişim']].map(([v, l]) => (
-                <div key={l}>
-                  <p className="text-2xl font-bold text-[#FF6000]">{v}</p>
-                  <p className="text-blue-300 text-xs mt-0.5">{l}</p>
+              {content.home.stats.map(({ value, label }) => (
+                <div key={label}>
+                  <p className="text-2xl font-bold text-[#FF6000]">{value}</p>
+                  <p className="text-blue-300 text-xs mt-0.5">{label}</p>
                 </div>
               ))}
             </div>
@@ -318,80 +314,30 @@ export default function HomePage() {
       {/* ─── IMPACT STATISTICS ─── */}
       <section className="max-w-screen-xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white">
-            <p className="text-5xl font-bold mb-2">70.000+</p>
-            <p className="text-base font-semibold mb-1">Hükümlü Çalışmakta</p>
-            <p className="text-sm opacity-90">Adalet Bakanlığı İşyurtlarında aktif olarak istihdam</p>
-          </div>
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white">
-            <p className="text-5xl font-bold mb-2">500+</p>
-            <p className="text-base font-semibold mb-1">Ürün & Hizmet</p>
-            <p className="text-sm opacity-90">El yapımı, kaliteli, sosyal girişim ürünleri</p>
-          </div>
-          <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-8 text-white">
-            <p className="text-5xl font-bold mb-2">%100</p>
-            <p className="text-base font-semibold mb-1">Kar Amacı Gütmüyor</p>
-            <p className="text-sm opacity-90">Sosyal Girişim, İnsan Onurlu</p>
-          </div>
+          {content.home.impactCards.map((card, idx) => {
+            const gradients = [
+              'from-emerald-500 to-teal-600',
+              'from-blue-500 to-indigo-600',
+              'from-orange-500 to-red-600',
+            ];
+            return (
+              <div key={idx} className={`bg-gradient-to-br ${gradients[idx]} rounded-2xl p-8 text-white`}>
+                <p className="text-5xl font-bold mb-2">{card.value}</p>
+                <p className="text-base font-semibold mb-1">{card.title}</p>
+                <p className="text-sm opacity-90">{card.description}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* ─── LIVE IMPACT DASHBOARD ─── */}
-      {stats && (
-        <section className="max-w-screen-xl mx-auto px-4 pb-12">
-          <div className="mb-5">
-            <div className="flex items-center gap-2 mb-1">
-              <LuZap size={18} className="text-[#FF6000]" />
-              <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest">Canlı Etki</p>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Sizin Katkınızın Etkisi</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-600 font-medium">Satılan Ürün</p>
-                <LuTrendingUp size={18} className="text-orange-500" />
-              </div>
-              <p className="text-4xl font-bold text-gray-900 mb-1">{stats.totalItems}</p>
-              <p className="text-xs text-gray-400">Hükümlüler tarafından yapılan ürün</p>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-600 font-medium">Desteklenen Kişi</p>
-                <LuUsers size={18} className="text-emerald-500" />
-              </div>
-              <p className="text-4xl font-bold text-gray-900 mb-1">~{stats.prisonersSupportedCount}</p>
-              <p className="text-xs text-gray-400">Rehabilitasyon programında destek alan</p>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-600 font-medium">Eğitim Saati</p>
-                <LuBook size={18} className="text-blue-500" />
-              </div>
-              <p className="text-4xl font-bold text-gray-900 mb-1">{stats.totalTrainingHours}</p>
-              <p className="text-xs text-gray-400">Meslek eğitimi saati</p>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-gray-600 font-medium">Toplam Destek</p>
-                <LuHeart size={18} className="text-rose-500" />
-              </div>
-              <p className="text-4xl font-bold text-gray-900 mb-1">₺{stats.totalRevenue.toLocaleString('tr-TR')}</p>
-              <p className="text-xs text-gray-400">Sosyal program finansmanı</p>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ─── FEATURED PRODUCTS ─── */}
       <section className="max-w-screen-xl mx-auto px-4 pb-8">
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest mb-1">El Yapımı Ürünler</p>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Hükümlülerin Eğitimi Sayesinde Üretildi</h2>
+            <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
           <Link href="/gida" className="flex items-center gap-1 text-[#FF6000] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
             Tüm Ürünleri Keşfet <LuArrowRight size={15} />
@@ -449,9 +395,9 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 pb-10">
         <div className="bg-[#0F2040] rounded-3xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { Icon: LuHeart,        title: 'Hükümlü Rehabilitasyonu', desc: 'Meslek eğitimi ve yeniden başlama'   },
-            { Icon: LuShieldCheck,  title: 'Adalet Bakanlığı Onaylı',  desc: 'Resmi program ve kalite güvencesi'  },
-            { Icon: LuTruck,        title: 'Her Satın Alma Yardım Eder', desc: 'Hükümlülerin topluma kazanılması'        },
+            { Icon: LuHeart,        title: content.home.socialImpact[0].title, desc: content.home.socialImpact[0].description },
+            { Icon: LuShieldCheck,  title: content.home.socialImpact[1].title,  desc: content.home.socialImpact[1].description },
+            { Icon: LuTruck,        title: content.home.socialImpact[2].title, desc: content.home.socialImpact[2].description },
           ].map(({ Icon, title, desc }) => (
             <div key={title} className="flex items-center gap-4">
               <div className="w-12 h-12 bg-[#FF6000]/15 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#FF6000]/20">

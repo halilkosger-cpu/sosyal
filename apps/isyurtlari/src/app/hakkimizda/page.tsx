@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { LuHouse, LuShieldCheck, LuTarget, LuHeart, LuBadgeCheck, LuUsers, LuLeaf, LuBuilding2, LuArrowRight } from 'react-icons/lu';
+import { content } from '@/config/content';
 
 export default function AboutPage() {
   return (
@@ -24,15 +25,14 @@ export default function AboutPage() {
         <div className="relative max-w-screen-xl mx-auto px-4 py-16 md:py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-sky-300 text-xs font-semibold px-4 py-2 rounded-full mb-6 tracking-wide">
-              <LuBadgeCheck size={14} /> Adalet Bakanlığı Onaylı Platform
+              <LuBadgeCheck size={14} /> {content.about.hero.badge}
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 tracking-tight leading-tight">
-              İşyurtları Ürünleriyle<br />
-              <span className="text-[#FF6000]">Sosyal Değer</span> Yaratın
+              {content.about.hero.title}<br />
+              <span className="text-[#FF6000]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
             </h1>
             <p className="text-sky-200 text-lg leading-relaxed max-w-xl">
-              Adalet Bakanlığı bünyesindeki cezaevi işyurtlarında üretilen kaliteli ürünleri sizlere
-              ulaştırıyoruz. Her alışverişiniz, bireylerin topluma yeniden kazandırılması sürecine destek olur.
+              {content.about.hero.description}
             </p>
           </div>
         </div>
@@ -42,12 +42,7 @@ export default function AboutPage() {
       <section className="bg-white border-b border-gray-100">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
-            {[
-              { value: '81',    label: 'İlde Faaliyet'       },
-              { value: '500+',  label: 'Ürün Çeşidi'         },
-              { value: '6',     label: 'Kategori'             },
-              { value: '100%',  label: 'Yerli & El Yapımı'   },
-            ].map(({ value, label }) => (
+            {content.about.stats.map(({ value, label }) => (
               <div key={label} className="py-8 px-6 text-center">
                 <p className="text-3xl font-bold text-[#FF6000]">{value}</p>
                 <p className="text-sm text-gray-500 mt-1">{label}</p>
@@ -67,24 +62,19 @@ export default function AboutPage() {
                 <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                   <LuBuilding2 size={20} color="#FF6000" strokeWidth={1.8} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 tracking-tight">İşyurtları Nedir?</h2>
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">{content.about.sections.whatIsWorkshop.title}</h2>
               </div>
               <p className="text-gray-600 leading-relaxed mb-4">
-                İşyurtları; Adalet Bakanlığı Ceza İnfaz Kurumları bünyesinde faaliyet gösteren ve
-                hükümlülerin çalıştırıldığı üretim tesisleridir. Türkiye genelindeki 81 ilde
-                kurulu bu tesislerde gıda, tekstil, mobilya, ahşap ürünleri ve daha pek çok alanda
-                üretim gerçekleştirilmektedir.
+                {content.about.sections.whatIsWorkshop.content}
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Bu tesislerde üretilen ürünler; hükümlülerin bir meslek edinmesine, özgüvenlerini
-                kazanmalarına ve tahliye sonrasında topluma sağlıklı bir şekilde yeniden
-                entegre olmalarına önemli katkılar sağlamaktadır.
+                {content.about.sections.whatIsWorkshop.content2}
               </p>
             </div>
             <div className="bg-gradient-to-br from-[#111827] to-[#1e3a78] p-8 md:p-10 flex flex-col justify-center">
               <p className="text-sky-300 text-xs font-bold uppercase tracking-widest mb-3">Sosyal Etki</p>
               <p className="text-white text-lg font-semibold leading-relaxed mb-6">
-                "Alışveriş yaparak rehabilitasyon sürecine doğrudan destek olabilirsiniz."
+                "{content.about.sections.whatIsWorkshop.socialImpactQuote}"
               </p>
               <Link
                 href="/"
@@ -103,12 +93,10 @@ export default function AboutPage() {
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                 <LuTarget size={20} color="#3B82F6" strokeWidth={1.8} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Misyonumuz</h2>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">{content.about.sections.mission.title}</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              Adalet Bakanlığı cezaevi işyurtlarında üretilen kaliteli ürünleri geniş kitlelere
-              ulaştırarak sosyal sorumluluk bilinci oluşturmak ve her alışverişin bireylerin
-              rehabilitasyonuna katkı sağlamasını güvence altına almak.
+              {content.about.sections.mission.content}
             </p>
           </section>
 
@@ -117,12 +105,10 @@ export default function AboutPage() {
               <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
                 <LuLeaf size={20} color="#10B981" strokeWidth={1.8} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Vizyonumuz</h2>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">{content.about.sections.vision.title}</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
-              İşyurtları ürünlerinin kalitesi ve çeşitliliğinin artırıldığı, toplumun her
-              kesiminin bu ürünlere kolayca ulaşabildiği ve sosyal rehabilitasyonun öncelikli
-              hedef olarak benimsendiği bir Türkiye'yi inşa etmek.
+              {content.about.sections.vision.content}
             </p>
           </section>
         </div>
@@ -137,10 +123,10 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
             {[
-              { Icon: LuBadgeCheck, color: '#10B981', bg: 'bg-emerald-50', title: 'Kalite',               desc: 'Her ürün titiz üretim ve kalite kontrol süreçlerinden geçer.' },
-              { Icon: LuShieldCheck, color: '#3B82F6', bg: 'bg-blue-50',   title: 'Güvenilirlik',         desc: 'Adalet Bakanlığı denetimi altında şeffaf ve güvenilir işleticilik.' },
-              { Icon: LuHeart,       color: '#EF4444', bg: 'bg-red-50',    title: 'Sosyal Sorumluluk',    desc: 'Her satın alma rehabilitasyon programlarını ve sosyal entegrasyonu destekler.' },
-              { Icon: LuLeaf,        color: '#F59E0B', bg: 'bg-amber-50',  title: 'Sürdürülebilirlik',    desc: 'Çevreye duyarlı ve sürdürülebilir üretim anlayışıyla faaliyet.' },
+              { Icon: LuBadgeCheck, color: '#10B981', bg: 'bg-emerald-50', title: content.about.sections.values[0].title, desc: content.about.sections.values[0].description },
+              { Icon: LuShieldCheck, color: '#3B82F6', bg: 'bg-blue-50',   title: content.about.sections.values[1].title, desc: content.about.sections.values[1].description },
+              { Icon: LuHeart,       color: '#EF4444', bg: 'bg-red-50',    title: content.about.sections.values[2].title, desc: content.about.sections.values[2].description },
+              { Icon: LuLeaf,        color: '#F59E0B', bg: 'bg-amber-50',  title: content.about.sections.values[3].title, desc: content.about.sections.values[3].description },
             ].map(({ Icon, color, bg, title, desc }) => (
               <div key={title} className="flex flex-col gap-3">
                 <div className={`w-11 h-11 ${bg} rounded-xl flex items-center justify-center`}>
@@ -162,21 +148,21 @@ export default function AboutPage() {
               <LuUsers size={18} color="#7DD3FC" strokeWidth={1.8} />
               <p className="text-sky-300 text-sm font-semibold">Bizimle iletişime geçin</p>
             </div>
-            <h3 className="text-white text-2xl font-bold tracking-tight">Sorularınız mı var?</h3>
-            <p className="text-blue-300 text-sm mt-1">Size yardımcı olmaktan mutluluk duyarız.</p>
+            <h3 className="text-white text-2xl font-bold tracking-tight">{content.about.contact.title}</h3>
+            <p className="text-blue-300 text-sm mt-1">{content.about.contact.subtitle}</p>
           </div>
           <Link
             href="/bize-ulasin"
             className="flex-shrink-0 bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] flex items-center gap-2 text-sm"
           >
-            Bize Ulaşın <LuArrowRight size={16} />
+            {content.about.contact.cta} <LuArrowRight size={16} />
           </Link>
         </section>
 
         {/* ─── LEGAL DISCLAIMER ─── */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-xs text-gray-500 leading-relaxed">
-            <span className="font-semibold text-gray-600">Yasal Uyarı:</span> isyurtlari.com.tr, Adalet Bakanlığı veya İşyurtları Genel Müdürlüğü'nün resmi bir platformu değildir ve söz konusu kurumlarla hukuki bir bağı bulunmamaktadır. Bu platform, Adalet Bakanlığı cezaevi işyurtlarında üretilen ürünlerin müstakil olarak satışa sunulması amacıyla faaliyet göstermektedir. İşyurtları Genel Müdürlüğü tarafından üretilen ürünlerin satışından kaynaklanan tüm sorumluluk platformun işletmecisine aittir. Ürünlerin kaynağı ve orijinalliği hakkında daha detaylı bilgi için lütfen sorumlu kurumlarla iletişime geçiniz. Bu platform, Adalet Bakanlığı veya ilgili kurumlar tarafından dava açılmasına karşın tüm yasal sorumlulukları üstlenmektedir.
+            <span className="font-semibold text-gray-600">Yasal Uyarı:</span> {content.about.legalDisclaimer}
           </p>
         </div>
 
