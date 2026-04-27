@@ -28,7 +28,7 @@ export const content = {
       {
         value: '70.000+',
         title: 'Hükümlü Çalışmakta',
-        description: 'Adalet Bakanlığı İşyurtlarında aktif olarak istihdam',
+        description: 'Sosyal Giriş İşyurtlarında aktif olarak istihdam',
       },
       {
         value: '500+',
@@ -47,7 +47,7 @@ export const content = {
         description: 'Meslek eğitimi ve yeniden başlama',
       },
       {
-        title: 'Adalet Bakanlığı Onaylı',
+        title: 'Sosyal Giriş Onaylı',
         description: 'Resmi program ve kalite güvencesi',
       },
       {
@@ -64,11 +64,11 @@ export const content = {
   // About Page
   about: {
     hero: {
-      badge: 'Adalet Bakanlığı Onaylı Platform',
+      badge: 'Sosyal Giriş Onaylı Platform',
       title: 'İşyurtları Ürünleriyle',
       titleHighlight: 'Sosyal Değer',
       titleSuffix: 'Yaratın',
-      description: 'Adalet Bakanlığı bünyesindeki cezaevi işyurtlarında üretilen kaliteli ürünleri sizlere ulaştırıyoruz. Her alışverişiniz, bireylerin topluma yeniden kazandırılması sürecine destek olur.',
+      description: 'Sosyal Giriş bünyesindeki cezaevi işyurtlarında üretilen kaliteli ürünleri sizlere ulaştırıyoruz. Her alışverişiniz, bireylerin topluma yeniden kazandırılması sürecine destek olur.',
     },
     stats: [
       { value: '81', label: 'İlde Faaliyet' },
@@ -79,13 +79,13 @@ export const content = {
     sections: {
       whatIsWorkshop: {
         title: 'İşyurtları Nedir?',
-        content: 'İşyurtları; Adalet Bakanlığı Ceza İnfaz Kurumları bünyesinde faaliyet gösteren ve hükümlülerin çalıştırıldığı üretim tesisleridir. Türkiye genelindeki 81 ilde kurulu bu tesislerde gıda, tekstil, mobilya, ahşap ürünleri ve daha pek çok alanda üretim gerçekleştirilmektedir.',
+        content: 'İşyurtları; Sosyal Giriş Ceza İnfaz Kurumları bünyesinde faaliyet gösteren ve hükümlülerin çalıştırıldığı üretim tesisleridir. Türkiye genelindeki 81 ilde kurulu bu tesislerde gıda, tekstil, mobilya, ahşap ürünleri ve daha pek çok alanda üretim gerçekleştirilmektedir.',
         content2: 'Bu tesislerde üretilen ürünler; hükümlülerin bir meslek edinmesine, özgüvenlerini kazanmalarına ve tahliye sonrasında topluma sağlıklı bir şekilde yeniden entegre olmalarına önemli katkılar sağlamaktadır.',
         socialImpactQuote: 'Alışveriş yaparak rehabilitasyon sürecine doğrudan destek olabilirsiniz.',
       },
       mission: {
         title: 'Misyonumuz',
-        content: 'Adalet Bakanlığı cezaevi işyurtlarında üretilen kaliteli ürünleri geniş kitlelere ulaştırarak sosyal sorumluluk bilinci oluşturmak ve her alışverişin bireylerin rehabilitasyonuna katkı sağlamasını güvence altına almak.',
+        content: 'Sosyal Giriş cezaevi işyurtlarında üretilen kaliteli ürünleri geniş kitlelere ulaştırarak sosyal sorumluluk bilinci oluşturmak ve her alışverişin bireylerin rehabilitasyonuna katkı sağlamasını güvence altına almak.',
       },
       vision: {
         title: 'Vizyonumuz',
@@ -98,7 +98,7 @@ export const content = {
         },
         {
           title: 'Güvenilirlik',
-          description: 'Adalet Bakanlığı denetimi altında şeffaf ve güvenilir işleticilik.',
+          description: 'Sosyal Giriş denetimi altında şeffaf ve güvenilir işleticilik.',
         },
         {
           title: 'Sosyal Sorumluluk',
@@ -115,6 +115,6 @@ export const content = {
       subtitle: 'Size yardımcı olmaktan mutluluk duyarız.',
       cta: 'Bize Ulaşın',
     },
-    legalDisclaimer: 'isyurtlari.com.tr, Adalet Bakanlığı veya İşyurtları Genel Müdürlüğü\'nün resmi bir platformu değildir ve söz konusu kurumlarla hukuki bir bağı bulunmamaktadır. Bu platform, Adalet Bakanlığı cezaevi işyurtlarında üretilen ürünlerin müstakil olarak satışa sunulması amacıyla faaliyet göstermektedir. İşyurtları Genel Müdürlüğü tarafından üretilen ürünlerin satışından kaynaklanan tüm sorumluluk platformun işletmecisine aittir. Ürünlerin kaynağı ve orijinalliği hakkında daha detaylı bilgi için lütfen sorumlu kurumlarla iletişime geçiniz. Bu platform, Adalet Bakanlığı veya ilgili kurumlar tarafından dava açılmasına karşın tüm yasal sorumlulukları üstlenmektedir.',
+    legalDisclaimer: 'isyurtlari.com.tr, Sosyal Giriş veya İşyurtları Genel Müdürlüğü\'nün resmi bir platformu değildir ve söz konusu kurumlarla hukuki bir bağı bulunmamaktadır. Bu platform, Sosyal Giriş cezaevi işyurtlarında üretilen ürünlerin müstakil olarak satışa sunulması amacıyla faaliyet göstermektedir. İşyurtları Genel Müdürlüğü tarafından üretilen ürünlerin satışından kaynaklanan tüm sorumluluk platformun işletmecisine aittir. Ürünlerin kaynağı ve orijinalliği hakkında daha detaylı bilgi için lütfen sorumlu kurumlarla iletişime geçiniz. Bu platform, Sosyal Giriş veya ilgili kurumlar tarafından dava açılmasına karşın tüm yasal sorumlulukları üstlenmektedir.',
   },
 };

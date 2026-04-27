@@ -8,33 +8,41 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://isyurtlari.com.tr'),
-  title: 'isyurtlari.com.tr | Adalet Bakanlığı İşyurtları Online Mağaza',
-  description: 'İşyurtları online satış mağazası. Adalet Bakanlığı hükümlülerinin el emeğiyle üretilen doğal ve katkısız ürünler. Sosyal girişim, rehabilitasyon ve yeniden entegrasyon projesi.',
+  title: 'isyurtlari.com.tr | Sosyal Giriş İşyurtları Online Mağaza',
+  description: 'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ve katkısız ürünler. Sosyal girişim, rehabilitasyon ve yeniden entegrasyon projesi.',
   keywords: [
     'işyurtları online mağaza',
     'işyurtları ürün satış',
-    'adalet bakanlığı ürün satışı',
+    'sosyal giriş ürünleri',
     'hükümlü ürünleri',
     'rehabilitasyon ürünleri',
     'sosyal girişim ürünleri',
     'el yapımı ürünler türkiye',
     'doğal katkısız gıda',
-    'adalet bakanlığı',
     'hükümlü destekle',
     'sosyal sorumluluk',
     'rehabilitasyon projesi',
   ],
   openGraph: {
     title: 'Her Satın Alma Bir İkinci Şans Demek',
-    description: 'Adalet Bakanlığı Sosyal Girişimi - Hükümlülerin rehabilitasyonunu destekle',
+    description: 'Sosyal Giriş - Hükümlülerin rehabilitasyonunu destekle',
     type: 'website',
     locale: 'tr_TR',
     url: 'https://isyurtlari.com.tr',
+    images: [
+      {
+        url: 'https://isyurtlari.com.tr/logo.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'isyurtlari.com.tr',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'isyurtlari.com.tr | Adalet Bakanlığı Sosyal Girişimi',
+    title: 'isyurtlari.com.tr | Sosyal Giriş',
     description: 'Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bir kişinin yeniden başlamasına yardım eder.',
+    image: 'https://isyurtlari.com.tr/logo.jpg',
   },
   robots: {
     index: true,
@@ -99,11 +107,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'LocalBusiness',
               '@id': 'https://isyurtlari.com.tr/#business',
-              name: 'Adalet Bakanlığı İşyurtları Online Mağaza',
+              name: 'Sosyal Giriş - İşyurtları Online Mağaza',
               url: 'https://isyurtlari.com.tr',
               description:
-                'Hükümlülerin el emeğiyle üretilen ürün satış mağazası. Adalet Bakanlığı Sosyal Girişimi.',
-              image: 'https://isyurtlari.com.tr/logo.png',
+                'Hükümlülerin el emeğiyle üretilen ürün satış mağazası. Sosyal Giriş Projesi.',
+              image: 'https://isyurtlari.com.tr/logo.jpg',
               address: {
                 '@type': 'PostalAddress',
                 streetAddress: 'Adalet Bakanlığı',
@@ -132,9 +140,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Adalet Bakanlığı İşyurtları',
+              name: 'Sosyal Giriş İşyurtları',
               url: 'https://isyurtlari.com.tr',
-              logo: 'https://isyurtlari.com.tr/logo.png',
+              logo: 'https://isyurtlari.com.tr/logo.jpg',
               description:
                 'Hükümlülerin rehabilitasyonu ve yeniden entegrasyon için sosyal girişim projesi',
               sameAs: [
