@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-TQBZ9JDV5T" />
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT" />
 
         <Script
           dangerouslySetInnerHTML={{
@@ -86,10 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-TQBZ9JDV5T', {
-                'anonymize_ip': true,
-                'allow_google_signals': false
-              });
+              gtag('config', 'G-KTWVN830XT');
             `,
           }}
         />
