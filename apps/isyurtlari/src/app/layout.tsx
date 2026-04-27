@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 import CartBadge from '@/components/CartBadge';
+import CookieConsent from '@/components/CookieConsent';
 import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench } from 'react-icons/lu';
 import './globals.css';
 
@@ -206,6 +207,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 />
                 <button
                   type="submit"
+                  aria-label="Ürün ara"
                   className="bg-[#CC4E00] hover:bg-[#B34400] text-white px-5 py-2.5 rounded-r-lg font-medium text-sm transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,18 +221,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 href="https://cezaevinden.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
+                className="hidden md:flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
               >
                 <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span className="text-xs font-medium">Platform</span>
+                <span className="text-xs font-semibold">Platform</span>
               </Link>
 
               {/* Cart */}
               <Link
                 href="/sepet"
-                className="relative flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
+                className="relative flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
               >
                 <div className="relative">
                   <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,7 +240,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </svg>
                   <CartBadge />
                 </div>
-                <span className="text-xs font-medium">Sepetim</span>
+                <span className="text-xs font-semibold">Sepetim</span>
               </Link>
 
             </div>
@@ -306,38 +308,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-screen-xl mx-auto px-4 py-12">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-gray-300">Kurumsal</h3>
+                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white font-bold">Kurumsal</h3>
                 <ul className="space-y-2">
-                  <li><Link href="/hakkimizda" className="text-gray-400 hover:text-white text-sm transition">Hakkımızda</Link></li>
-                  <li><Link href="/guvenlı-aliveri" className="text-gray-400 hover:text-white text-sm transition">Güvenli Alışveriş</Link></li>
-                  <li><Link href="/kvkk" className="text-gray-400 hover:text-white text-sm transition">KVKK</Link></li>
-                  <li><Link href="/mesafeli-satis-sozlesmesi" className="text-gray-400 hover:text-white text-sm transition">Mesafeli Satış Sözleşmesi</Link></li>
+                  <li><Link href="/hakkimizda" className="text-gray-300 hover:text-white text-sm transition font-medium">Hakkımızda</Link></li>
+                  <li><Link href="/guvenlı-aliveri" className="text-gray-300 hover:text-white text-sm transition font-medium">Güvenli Alışveriş</Link></li>
+                  <li><Link href="/kvkk" className="text-gray-300 hover:text-white text-sm transition font-medium">KVKK</Link></li>
+                  <li><Link href="/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Mesafeli Satış Sözleşmesi</Link></li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-gray-300">Kategoriler</h3>
+                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">Kategoriler</h3>
                 <ul className="space-y-2">
-                  <li><Link href="/gida" className="text-gray-400 hover:text-white text-sm transition">Gıda Ürünleri</Link></li>
-                  <li><Link href="/tekstil" className="text-gray-400 hover:text-white text-sm transition">Tekstil</Link></li>
-                  <li><Link href="/mobilya" className="text-gray-400 hover:text-white text-sm transition">Mobilya</Link></li>
-                  <li><Link href="/ahsap" className="text-gray-400 hover:text-white text-sm transition">Ahşap Ürünler</Link></li>
+                  <li><Link href="/gida" className="text-gray-300 hover:text-white text-sm transition font-medium">Gıda Ürünleri</Link></li>
+                  <li><Link href="/tekstil" className="text-gray-300 hover:text-white text-sm transition font-medium">Tekstil</Link></li>
+                  <li><Link href="/mobilya" className="text-gray-300 hover:text-white text-sm transition font-medium">Mobilya</Link></li>
+                  <li><Link href="/ahsap" className="text-gray-300 hover:text-white text-sm transition font-medium">Ahşap Ürünler</Link></li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-gray-300">Yardım</h3>
+                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">Yardım</h3>
                 <ul className="space-y-2">
-                  <li><Link href="/bize-ulasin" className="text-gray-400 hover:text-white text-sm transition">Bize Ulaşın</Link></li>
-                  <li><Link href="/teslimat-iade-sartlari" className="text-gray-400 hover:text-white text-sm transition">Teslimat & İade</Link></li>
-                  <li><Link href="/gizlilik-sozlesmesi" className="text-gray-400 hover:text-white text-sm transition">Gizlilik Sözleşmesi</Link></li>
+                  <li><Link href="/bize-ulasin" className="text-gray-300 hover:text-white text-sm transition font-medium">Bize Ulaşın</Link></li>
+                  <li><Link href="/teslimat-iade-sartlari" className="text-gray-300 hover:text-white text-sm transition font-medium">Teslimat & İade</Link></li>
+                  <li><Link href="/gizlilik-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Gizlilik Sözleşmesi</Link></li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-gray-300">İletişim</h3>
-                <p className="text-gray-400 text-sm font-semibold mb-1">E-posta:</p>
-                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-400 text-sm mb-3 hover:text-[#FF6000] transition-colors">info@isyurtlari.com.tr</a>
+                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">İletişim</h3>
+                <p className="text-gray-300 text-sm font-bold mb-1">E-posta:</p>
+                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-300 text-sm mb-3 font-medium hover:text-[#FF6000] transition-colors">info@isyurtlari.com.tr</a>
                 <div className="flex gap-3 mt-4">
                   {['Twitter', 'Instagram', 'Facebook'].map((s) => (
-                    <a key={s} href="#" className="w-8 h-8 bg-gray-700 hover:bg-[#FF6000] rounded-full flex items-center justify-center text-xs transition-colors">
+                    <a key={s} href="#" aria-label={s} className="w-8 h-8 bg-gray-700 hover:bg-[#FF6000] rounded-full flex items-center justify-center text-xs font-semibold text-white transition-colors">
                       {s[0]}
                     </a>
                   ))}
@@ -378,6 +380,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
+        <CookieConsent />
       </body>
     </html>
   );

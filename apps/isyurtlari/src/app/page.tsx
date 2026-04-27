@@ -69,8 +69,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#F4F5F7]">
 
       {/* ─── ANNOUNCEMENT BAR ─── */}
-      <div className="bg-[#FF6000] text-white py-2.5 text-center overflow-hidden">
-        <p className="text-sm font-semibold tracking-wide transition-all duration-500">
+      <div className="bg-[#FF6000] text-gray-900 py-2.5 text-center overflow-hidden">
+        <p className="text-sm font-bold tracking-wide transition-all duration-500">
           {announcements[ticker]}
         </p>
       </div>
@@ -91,7 +91,7 @@ export default function HomePage() {
               {content.home.hero.title}<br />
               <span className="text-[#FF6000]">{content.home.hero.titleHighlight}</span> {content.home.hero.titleSuffix}
             </h1>
-            <p className="text-sky-300 text-base mb-9 max-w-sm leading-relaxed">
+            <p className="text-white text-base mb-9 max-w-sm leading-relaxed">
               {content.home.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
@@ -106,7 +106,7 @@ export default function HomePage() {
               {content.home.stats.map(({ value, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-bold text-[#FF6000]">{value}</p>
-                  <p className="text-blue-300 text-xs mt-0.5">{label}</p>
+                  <p className="text-white text-xs mt-0.5">{label}</p>
                 </div>
               ))}
             </div>
@@ -147,7 +147,7 @@ export default function HomePage() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
                 <LuZap size={18} className="text-[#FF6000]" />
-                <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
+                <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Kampanyadaki Ürünler</h2>
             </div>
@@ -176,14 +176,14 @@ export default function HomePage() {
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#FF6000] text-white text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
                             <div className="p-2.5">
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
-                                <p className="text-xs text-gray-400 line-through">₺{cp.product.price.toFixed(2)}</p>
+                                <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
                                 <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
@@ -215,14 +215,14 @@ export default function HomePage() {
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#FF6000] text-white text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
                             <div className="p-2.5">
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
-                                <p className="text-xs text-gray-400 line-through">₺{cp.product.price.toFixed(2)}</p>
+                                <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
                                 <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
@@ -243,7 +243,7 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 py-8">
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest mb-1">Meslek Eğitim Programları</p>
+            <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest mb-1">Meslek Eğitim Programları</p>
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Hangi Alanda Destek Olmak İstiyorsunuz?</h2>
           </div>
         </div>
@@ -282,7 +282,7 @@ export default function HomePage() {
           <Link href="/gida" className="group col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F2040] to-[#1e4a90] p-8 flex items-center justify-between min-h-44 hover:shadow-xl transition-all">
             <div className="absolute top-0 right-0 w-72 h-72 bg-[#FF6000]/10 rounded-full translate-x-1/3 -translate-y-1/3" />
             <div className="relative z-10">
-              <span className="bg-[#FF6000] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3">Öne Çıkan</span>
+              <span className="bg-[#FF6000] text-gray-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3">Öne Çıkan</span>
               <h3 className="text-white text-3xl font-bold mb-1 tracking-tight">Gıda Ürünleri</h3>
               <p className="text-gray-400 text-sm mb-5">Doğal, taze, güvenilir</p>
               <span className="inline-flex items-center gap-2 bg-white text-gray-900 text-xs font-semibold px-4 py-2.5 rounded-lg group-hover:bg-[#FF6000] group-hover:text-white transition-colors">
@@ -332,7 +332,7 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 pb-8">
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-[#FF6000] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
+            <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
           <Link href="/gida" className="flex items-center gap-1 text-[#FF6000] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
@@ -361,24 +361,24 @@ export default function HomePage() {
                   )}
                   {product.quantity === 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
+                      <span className="bg-red-500 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
                     </div>
                   )}
                   {product.quantity > 0 && (
-                    <span className="absolute top-2 right-2 bg-[#FF6000] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
+                    <span className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
                   )}
                 </div>
                 <div className="p-3.5">
-                  <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">{product.category?.name}</p>
+                  <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-1">{product.category?.name}</p>
                   <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6000] transition-colors leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-0.5 mt-1.5 mb-2">
                     {[1,2,3,4,5].map((s) => <LuStar key={s} size={10} fill="#FF6000" color="#FF6000" />)}
-                    <span className="text-[10px] text-gray-400 ml-1">5.0</span>
+                    <span className="text-[10px] text-gray-700 font-semibold ml-1">5.0</span>
                   </div>
                   {product.price > 0 ? (
                     <p className="text-lg font-bold text-[#FF6000] tracking-tight">₺{product.price.toFixed(2)}</p>
                   ) : (
-                    <p className="text-xs text-gray-400 italic">Fiyat belirleniyor</p>
+                    <p className="text-xs text-gray-600 italic font-medium">Fiyat belirleniyor</p>
                   )}
                 </div>
               </Link>
@@ -401,7 +401,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">{title}</p>
-                <p className="text-blue-300 text-xs mt-0.5">{desc}</p>
+                <p className="text-white text-xs mt-0.5">{desc}</p>
               </div>
             </div>
           ))}
