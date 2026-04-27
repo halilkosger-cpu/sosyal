@@ -8,6 +8,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://isyurtlari.com.tr'),
+  icons: {
+    icon: '/logo.jpg',
+    shortcut: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
   title: 'isyurtlari.com.tr | Sosyal Giriş İşyurtları Online Mağaza',
   description: 'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ve katkısız ürünler. Sosyal girişim, rehabilitasyon ve yeniden entegrasyon projesi.',
   keywords: [
