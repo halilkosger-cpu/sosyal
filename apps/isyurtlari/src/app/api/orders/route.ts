@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 
 // Email sending function
@@ -58,21 +59,18 @@ async function sendOrderEmail(orderNumber: string, customerName: string, totalAm
       <p style="color: #666; font-size: 12px;">Bu email isyurtlari.com.tr otomatik sipariş bildirimi sistemi tarafından gönderilmiştir.</p>
     `;
 
-    // Using Resend API
+    // Using Resend SDK
     if (process.env.RESEND_API_KEY) {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: 'siparis@isyurtlari.resend.dev',
-          to: recipientEmail,
-          subject: `📦 Yeni Sipariş: ${orderNumber}`,
-          html: emailContent,
-        }),
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { error } = await resend.emails.send({
+        from: 'Sipariş Bildirimi <onboarding@resend.dev>',
+        to: recipientEmail,
+        subject: `📦 Yeni Sipariş: ${orderNumber}`,
+        html: emailContent,
       });
+      if (error) {
+        console.error('Resend error:', error);
+      }
     } else {
       // Fallback: log to console
       console.log(`📧 Email would be sent to ${recipientEmail}: Order ${orderNumber}`);

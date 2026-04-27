@@ -69,7 +69,8 @@
       "Bash(npx next:*)",
       "Bash(npm:*)",
       "Bash(pnpm build:*)",
-      "Read(//c/sosyal/apps/isyurtlari/**)"
+      "Read(//c/sosyal/apps/isyurtlari/**)",
+      "Bash(find .:*)"
     ]
   },
   "model": "claude-haiku-4-5-20251001"
