@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'isyurtlari.com.tr | Sosyal Giriş',
     description: 'Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bir kişinin yeniden başlamasına yardım eder.',
-    image: 'https://isyurtlari.com.tr/logo.jpg',
+    images: ['https://isyurtlari.com.tr/logo.jpg'],
   },
   robots: {
     index: true,
