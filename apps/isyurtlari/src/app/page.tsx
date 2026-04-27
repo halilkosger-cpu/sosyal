@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench,
   LuTruck, LuShieldCheck, LuHeart, LuArrowRight, LuStar, LuBadgeCheck,
-  LuZap, LuUsers, LuBook,
+  LuZap,
 } from 'react-icons/lu';
 import { content } from '@/config/content';
 
