@@ -3,7 +3,15 @@ import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 
 // Email sending function
-async function sendOrderEmail(orderNumber: string, customerName: string, totalAmount: number, items: any[]) {
+async function sendOrderEmail(
+  orderNumber: string,
+  customerName: string,
+  customerEmail: string,
+  customerPhone: string,
+  shippingAddress: string,
+  totalAmount: number,
+  items: any[]
+) {
   try {
     const recipientEmail = process.env.EMAIL_RECIPIENT || 'halil.kosger@gmail.com';
     const bankName = process.env.BANK_NAME || 'T.C. Garanti Bankası';
@@ -27,6 +35,9 @@ async function sendOrderEmail(orderNumber: string, customerName: string, totalAm
 
       <h3>Müşteri Bilgileri:</h3>
       <p><strong>Adı Soyadı:</strong> ${customerName}</p>
+      <p><strong>Email:</strong> ${customerEmail}</p>
+      <p><strong>Telefon:</strong> ${customerPhone}</p>
+      <p><strong>Teslimat Adresi:</strong> ${shippingAddress}</p>
       <p><strong>Sipariş Numarası:</strong> ${orderNumber}</p>
 
       <h3>Sipariş Detayları:</h3>
@@ -203,7 +214,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email notification
-    await sendOrderEmail(orderNumber, body.customerName, body.totalAmount, orderWithItems?.items || []);
+    await sendOrderEmail(
+      orderNumber,
+      body.customerName,
+      body.email,
+      body.phone,
+      body.shippingAddress,
+      body.totalAmount,
+      orderWithItems?.items || []
+    );
 
     return NextResponse.json({
       success: true,
