@@ -67,7 +67,7 @@ async function sendOrderEmail(orderNumber: string, customerName: string, totalAm
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'siparis@isyurtlari.com',
+          from: 'siparis@isyurtlari.resend.dev',
           to: recipientEmail,
           subject: `📦 Yeni Sipariş: ${orderNumber}`,
           html: emailContent,
