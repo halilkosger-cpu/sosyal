@@ -16,9 +16,9 @@ export default async function Head({ params }: { params: { slug: string } }) {
   }
 
   const title = `${product.name} | isyurtlari.com.tr`;
-  const description = `${product.name} - Adalet Bakanlığı'nın Sosyal Girişimi tarafından ${product.category.name} eğitimi alan hükümlüler tarafından el emeğiyle üretilmiştir.`;
+  const description = `${product.name} - Sosyal Giriş tarafından ${product.category.name} eğitimi alan hükümlüler tarafından el emeğiyle üretilmiştir.`;
   const url = `https://isyurtlari.com.tr/urun/${product.slug}`;
-  const keywords = `${product.name}, ${product.category.name}, işyurtları, adalet bakanlığı ürün, hükümlü ürünü, sosyal girişim, rehabilitasyon`;
+  const keywords = `${product.name}, ${product.category.name}, işyurtları, hükümlü ürünü, sosyal girişim, rehabilitasyon`;
 
   return (
     <>
@@ -49,7 +49,7 @@ export default async function Head({ params }: { params: { slug: string } }) {
               category: product.category.name,
               brand: {
                 '@type': 'Organization',
-                name: 'Adalet Bakanlığı İşyurtları',
+                name: 'Sosyal Giriş İşyurtları',
               },
               offers: {
                 '@type': 'Offer',

@@ -79,7 +79,7 @@ export default function CategoryPage() {
   useEffect(() => {
     if (products.length > 0) {
       const categoryName = products[0]?.category.name ?? 'Ürünler';
-      document.title = `${categoryName} | Adalet Bakanlığı Sosyal Girişimi`;
+      document.title = `${categoryName} | Sosyal Giriş`;
     }
   }, [products]);
 
@@ -327,7 +327,7 @@ export default function CategoryPage() {
               <div className="bg-white rounded-2xl p-16 text-center col-span-full">
                 <span className="text-6xl block mb-4">{productPlaceholders[categorySlug] ?? '📦'}</span>
                 <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
-                <p className="text-gray-400 mb-2">Adalet Bakanlığı'nın eğitim programları devam etmektedir.</p>
+                <p className="text-gray-400 mb-2">Sosyal Giriş'in eğitim programları devam etmektedir.</p>
                 <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
                 <Link href="/" className="bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
                   Diğer Kategorileri Keşfet
@@ -371,6 +371,8 @@ export default function CategoryPage() {
                       src={product.imageUrl}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">

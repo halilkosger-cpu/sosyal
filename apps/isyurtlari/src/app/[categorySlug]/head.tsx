@@ -24,10 +24,10 @@ const categoryDescriptions: Record<string, string> = {
 
 export default async function Head({ params }: { params: { categorySlug: string } }) {
   const catName = categoryNames[params.categorySlug] || 'Ürünler';
-  const catDesc = categoryDescriptions[params.categorySlug] || 'Adalet Bakanlığı Sosyal Girişimi ürünleri';
+  const catDesc = categoryDescriptions[params.categorySlug] || 'Sosyal Giriş ürünleri';
   const url = `https://isyurtlari.com.tr/${params.categorySlug}`;
 
-  const title = `${catName} | isyurtlari.com.tr - Adalet Bakanlığı Sosyal Girişimi`;
+  const title = `${catName} | isyurtlari.com.tr - Sosyal Giriş`;
   const description = `${catDesc} Her satın alma, hükümlülerin yeniden başlamasına ve topluma kazanılmasına yardım eder.`;
 
   const keywords = `${catName}, işyurtları, adalet bakanlığı, sosyal girişim, el yapımı, hükümlü ürünleri, rehabilitasyon`;
@@ -58,7 +58,7 @@ export default async function Head({ params }: { params: { categorySlug: string 
               url: url,
               publisher: {
                 '@type': 'Organization',
-                name: 'Adalet Bakanlığı İşyurtları',
+                name: 'Sosyal Giriş İşyurtları',
                 url: 'https://isyurtlari.com.tr',
               },
             },

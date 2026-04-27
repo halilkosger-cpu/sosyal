@@ -208,7 +208,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <button
                   type="submit"
                   aria-label="Ürün ara"
-                  className="bg-[#CC4E00] hover:bg-[#B34400] text-white px-5 py-2.5 rounded-r-lg font-medium text-sm transition-colors"
+                  className="bg-[#CC4E00] hover:bg-[#B34400] text-white px-5 py-3 rounded-r-lg font-medium text-sm transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -363,10 +363,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org/',
               '@type': 'Organization',
               name: 'isyurtlari.com.tr',
-              alternateName: 'Adalet Bakanlığı İşyurtları',
+              alternateName: 'Sosyal Giriş İşyurtları',
               url: 'https://isyurtlari.com.tr',
               logo: 'https://isyurtlari.com.tr/logo.jpg',
-              description: 'Adalet Bakanlığı Sosyal Girişimi - Hükümlülerin el emeğiyle üretilen ürünler',
+              description: 'Sosyal Giriş - Hükümlülerin el emeğiyle üretilen ürünler',
               sameAs: [
                 'https://twitter.com/isyurtlari',
                 'https://instagram.com/isyurtlari',

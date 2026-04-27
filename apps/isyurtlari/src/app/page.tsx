@@ -172,7 +172,7 @@ export default function HomePage() {
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
@@ -211,7 +211,7 @@ export default function HomePage() {
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
