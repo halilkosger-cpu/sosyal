@@ -2,9 +2,24 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 import CartBadge from '@/components/CartBadge';
 import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench } from 'react-icons/lu';
 import './globals.css';
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-space-grotesk',
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-plus-jakarta-sans',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://isyurtlari.com.tr'),
@@ -73,10 +88,11 @@ const categories = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning>
+    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
       <head>
         <Script
           id="gtag-consent-init"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -91,9 +107,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT" />
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT"
+          strategy="afterInteractive"
+        />
 
         <Script
+          id="gtag-config"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
