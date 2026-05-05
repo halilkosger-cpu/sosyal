@@ -7,6 +7,7 @@ import CartBadge from '@/components/CartBadge';
 import CookieConsent from '@/components/CookieConsent';
 import SearchSuggest from '@/components/SearchSuggest';
 import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture, IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
+import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -31,14 +32,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://isyurtlari.com.tr'),
-  icons: {
-    icon: '/logo.jpg',
-    shortcut: '/logo.jpg',
-    apple: '/logo.jpg',
-  },
-  title: 'isyurtlari.com.tr | Sosyal Giriş İşyurtları Online Mağaza',
-  description: 'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ve katkısız ürünler. Sosyal girişim, rehabilitasyon ve yeniden entegrasyon projesi.',
+  ...defaultMetadata,
   keywords: [
     'işyurtları online mağaza',
     'işyurtları ürün satış',
@@ -52,38 +46,6 @@ export const metadata: Metadata = {
     'sosyal sorumluluk',
     'rehabilitasyon projesi',
   ],
-  openGraph: {
-    title: 'Her Satın Alma Bir İkinci Şans Demek',
-    description: 'Sosyal Giriş - Hükümlülerin rehabilitasyonunu destekle',
-    type: 'website',
-    locale: 'tr_TR',
-    url: 'https://isyurtlari.com.tr',
-    images: [
-      {
-        url: 'https://isyurtlari.com.tr/logo.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'isyurtlari.com.tr',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'isyurtlari.com.tr | Sosyal Giriş',
-    description: 'Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bir kişinin yeniden başlamasına yardım eder.',
-    images: ['https://isyurtlari.com.tr/logo.jpg'],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-snippet': -1,
-      'max-image-preview': 'large',
-      'max-video-preview': -1,
-    },
-  },
 };
 
 const categories = [
@@ -138,56 +100,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
 
         <Script
-          id="local-business-schema"
+          id="organization-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'LocalBusiness',
-              '@id': 'https://isyurtlari.com.tr/#business',
-              name: 'Sosyal Giriş - İşyurtları Online Mağaza',
-              url: 'https://isyurtlari.com.tr',
-              description:
-                'Hükümlülerin el emeğiyle üretilen ürün satış mağazası. Sosyal Giriş Projesi.',
-              image: 'https://isyurtlari.com.tr/logo.jpg',
-              address: {
-                '@type': 'PostalAddress',
-                streetAddress: 'Adalet Bakanlığı',
-                addressLocality: 'Ankara',
-                addressRegion: 'Ankara',
-                postalCode: '06100',
-                addressCountry: 'TR',
-              },
-              sameAs: [
-                'https://www.instagram.com/isyurtlari',
-                'https://www.facebook.com/isyurtlari',
-              ],
-              contact: {
-                '@type': 'ContactPoint',
-                contactType: 'Customer Support',
-                email: 'info@isyurtlari.com.tr',
-              },
-            }),
+            __html: JSON.stringify(organizationJsonLd),
           }}
         />
 
         <Script
-          id="organization-schema"
+          id="website-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Sosyal Giriş İşyurtları',
-              url: 'https://isyurtlari.com.tr',
-              logo: 'https://isyurtlari.com.tr/logo.jpg',
-              description:
-                'Hükümlülerin rehabilitasyonu ve yeniden entegrasyon için sosyal girişim projesi',
-              sameAs: [
-                'https://www.instagram.com/isyurtlari',
-                'https://www.facebook.com/isyurtlari',
-              ],
-            }),
+            __html: JSON.stringify(websiteJsonLd),
           }}
         />
       </head>
@@ -348,31 +272,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
         </footer>
-
-        <Script
-          id="organization-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org/',
-              '@type': 'Organization',
-              name: 'isyurtlari.com.tr',
-              alternateName: 'Sosyal Giriş İşyurtları',
-              url: 'https://isyurtlari.com.tr',
-              logo: 'https://isyurtlari.com.tr/logo.jpg',
-              description: 'Sosyal Giriş - Hükümlülerin el emeğiyle üretilen ürünler',
-              sameAs: [
-                'https://twitter.com/isyurtlari',
-                'https://instagram.com/isyurtlari',
-              ],
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'Customer Service',
-                email: 'info@isyurtlari.com.tr',
-              },
-            }),
-          }}
-        />
 
         <CookieConsent />
       </body>
