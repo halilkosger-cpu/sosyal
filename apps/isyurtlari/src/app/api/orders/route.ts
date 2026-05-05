@@ -87,7 +87,11 @@ async function sendOrderEmail(
       const customerEmailHtml = emailTemplates.orderConfirmation({
         orderNumber,
         customerName,
-        items: orderWithItems?.items || [],
+        items: items.map((item: any) => ({
+          name: item.product?.name || 'Ürün',
+          quantity: item.quantity,
+          price: item.price,
+        })),
         total: totalAmount,
         bankName,
         accountName,
