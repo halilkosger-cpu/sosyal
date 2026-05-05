@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
-  LuLogOut, LuMenu, LuFlame,
+  LuLogOut, LuMenu, LuFlame, LuMail,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -15,6 +15,7 @@ const navItems = [
   { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
   { href: '/admin/kampanyalar', label: 'Kampanyalar', Icon: LuFlame         },
   { href: '/admin/siparisler', label: 'Siparişler',  Icon: LuShoppingBag    },
+  { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

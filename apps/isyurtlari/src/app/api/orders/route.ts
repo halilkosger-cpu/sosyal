@@ -71,8 +71,8 @@ async function sendOrderEmail(
     `;
 
     // Using Resend SDK - send to admin
-    if (process.env.RESEND_API_KEY) {
-      const resend = new Resend(process.env.RESEND_API_KEY);
+    if (process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
 
       // Admin notification
       await resend.emails.send({
