@@ -4,7 +4,7 @@ export const SITE_URL = 'https://isyurtlari.com.tr';
 export const SITE_NAME = 'isyurtlari.com.tr';
 export const SITE_TITLE = 'Sosyal Giriş İşyurtları Online Mağaza';
 export const SITE_DESCRIPTION =
-  'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ürünler ve sosyal girişimim alışveriş deneyimi.';
+  'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ürünler ve sosyal girişim alışveriş deneyimi.';
 
 export const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;

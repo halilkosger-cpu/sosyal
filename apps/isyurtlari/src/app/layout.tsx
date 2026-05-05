@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     'sosyal girişim ürünleri',
     'hükümlü ürünleri',
     'rehabilitasyon ürünleri',
-    'sosyal girişimim ürünleri',
+    'sosyal girişim ürünleri',
     'el yapımı ürünler türkiye',
     'doğal katkısız gıda',
     'hükümlü destekle',

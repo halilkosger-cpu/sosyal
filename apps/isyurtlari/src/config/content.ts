@@ -33,7 +33,7 @@ export const content = {
       {
         value: '500+',
         title: 'Ürün & Hizmet',
-        description: 'El yapımı, kaliteli, sosyal girişimim ürünleri',
+        description: 'El yapımı, kaliteli, sosyal girişim ürünleri',
       },
       {
         value: '%100',
@@ -67,7 +67,7 @@ export const content = {
       title: 'İşyurtları ürünleriyle',
       titleHighlight: 'gerçek değer',
       titleSuffix: 'yaratın',
-      description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren sosyal girişimim platformu.',
+      description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren sosyal girişim platformu.',
     },
     stats: [
       { value: '81', label: 'İlde faaliyet' },
@@ -88,7 +88,7 @@ export const content = {
       },
       vision: {
         title: 'Vizyonumuz',
-        content: 'Türkiye’nin en güven veren sosyal girişimim alışveriş deneyimini inşa ederek işyurtları üretimini daha modern, ulaşılabilir ve sürdürülebilir hale getirmek.',
+        content: 'Türkiye’nin en güven veren sosyal girişim alışveriş deneyimini inşa ederek işyurtları üretimini daha modern, ulaşılabilir ve sürdürülebilir hale getirmek.',
       },
       values: [
         { title: 'Kalite', description: 'Ürün, sunum ve hizmette tutarlı bir standart.' },
@@ -102,6 +102,6 @@ export const content = {
       subtitle: 'Platformu birlikte daha güçlü hale getirelim.',
       cta: 'Bize ulaşın',
     },
-    legalDisclaimer: 'isyurtlari.com.tr bağımsız bir sosyal girişimim platformudur. Ürün, içerik ve satış süreçleri platform sorumluluğunda yürütülür; kurumlarla resmi temsil ilişkisi bulunduğu anlamına gelmez.',
+    legalDisclaimer: 'isyurtlari.com.tr bağımsız bir sosyal girişim platformudur. Ürün, içerik ve satış süreçleri platform sorumluluğunda yürütülür; kurumlarla resmi temsil ilişkisi bulunduğu anlamına gelmez.',
   },
 };

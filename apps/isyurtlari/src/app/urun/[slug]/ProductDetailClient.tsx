@@ -72,7 +72,7 @@ const productValues: Record<string, string[]> = {
     'Sosyal Giriş İşyurtlarında depolanan, kontrol edilen ürün',
     'Beslenme Eğitimi Alan Hükümlüler Tarafından Paketlenmiştir',
     'Kar amacı gütmeden sunulan kaliteli beslenme ürünü',
-    'Devlet tarafından onaylanmış ve güvence altına alınan sosyal girişimim'
+    'Devlet tarafından onaylanmış ve güvence altına alınan sosyal girişim'
   ],
   'tereyag': [
     'Doğal sütten üretilen, hiçbir yapay maddesi olmayan tereyağ',
@@ -86,7 +86,7 @@ const productValues: Record<string, string[]> = {
     'Pestisite maruz kalmamış kaynaklardan el emeğiyle hazırlanmıştır',
     'Sosyal Giriş Beslenme Eğitim Program Mezunları Tarafından Yapılmış',
     'Koruyucu ve katkı madde kullanılmaksızın geleneksel yöntemle konserve edilmiş',
-    'Devlet destekli sosyal girişimim - her satın alma bireyin yeniden başlamasını sağlar'
+    'Devlet destekli sosyal girişim - her satın alma bireyin yeniden başlamasını sağlar'
   ],
   'findik': [
     'Kaliteli, taze ve doğal fındık - özel seçim ve temizlik işlemi yapılmış',
