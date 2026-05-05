@@ -83,7 +83,7 @@ async function sendOrderEmail(
       });
 
       // Customer confirmation email
-      const customerEmail = `
+      const customerEmailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #FF6000;">Merhaba ${customerName}! 👋</h2>
           <p>Siparişiniz başarıyla oluşturulmuştur.</p>
@@ -115,7 +115,7 @@ async function sendOrderEmail(
         from: 'info@isyurtlari.com.tr',
         to: body.email,
         subject: `✅ Siparişiniz Onaylandı - #${orderNumber}`,
-        html: customerEmail,
+        html: customerEmailHtml,
       });
     } else {
       // Fallback: log to console
