@@ -78,7 +78,10 @@
       "PowerShell(head *)",
       "PowerShell(vercel *)",
       "WebFetch(domain:www.isyurtlari.com.tr)",
-      "PowerShell(Move-Item *)"
+      "PowerShell(Move-Item *)",
+      "PowerShell(Get-Process *)",
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(curl -X POST http://localhost:3001/api/test-email -H 'Content-Type: application/json' -d '{\"recipientEmail\":\"halil.kosger@gmail.com\"}')"
     ]
   },
   "model": "claude-haiku-4-5-20251001"
