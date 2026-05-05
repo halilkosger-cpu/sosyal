@@ -3,7 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
+const hasDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL;
+  return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
+};
+
 export async function GET(req: NextRequest) {
+  if (!hasDatabaseUrl()) {
+    return NextResponse.json([]);
+  }
+
   try {
     const categorySlug = req.nextUrl.searchParams.get('category');
     const search = req.nextUrl.searchParams.get('search');

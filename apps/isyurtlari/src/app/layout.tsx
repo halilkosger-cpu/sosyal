@@ -99,9 +99,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
 
-              // Analytics enabled - banner sonra eklenecek
+              const storedConsent = localStorage.getItem('cookieConsent');
               gtag('consent', 'default', {
-                'analytics_storage': 'granted',
+                'analytics_storage': storedConsent === 'accepted' ? 'granted' : 'denied',
                 'ad_storage': 'denied'
               });
             `,
@@ -221,7 +221,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 href="https://cezaevinden.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
+                className="hidden md:flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
               >
                 <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -232,7 +232,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Cart */}
               <Link
                 href="/sepet"
-                className="relative flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
+                className="relative flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
               >
                 <div className="relative">
                   <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LuArrowLeft, LuHome, LuSearch } from 'react-icons/lu';
+import { LuArrowLeft, LuHouse, LuSearch } from 'react-icons/lu';
 
 export default function NotFound() {
   return (
@@ -32,7 +32,7 @@ export default function NotFound() {
             href="/"
             className="inline-flex items-center justify-center gap-2 bg-[#FF6000] hover:bg-[#CC4E00] text-white font-semibold px-6 py-3 rounded-lg transition-colors"
           >
-            <LuHome size={18} />
+            <LuHouse size={18} />
             Ana Sayfa
           </Link>
           <Link
