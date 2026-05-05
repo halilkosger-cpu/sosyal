@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // Generate OTP
     const code = generateOTP();
-    storeOTP(email, code);
+    await storeOTP(email, code);
 
     console.log(`OTP for ${email}: ${code}`);
 

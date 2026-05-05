@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify OTP
-    const isValid = verifyOTP(email, code);
+    const isValid = await verifyOTP(email, code);
 
     if (!isValid) {
-      const remaining = getRemainingAttempts(email);
+      const remaining = await getRemainingAttempts(email);
       logAudit('OTP_VERIFY', email, 'failed', `Invalid code. Remaining: ${remaining}`, ip);
       if (remaining <= 0) {
         return NextResponse.json(
