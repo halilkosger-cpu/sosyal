@@ -1,15 +1,63 @@
+﻿# Robots.txt for İsyurtları E-Commerce Platform
+# https://isyurtlari.com.tr
+
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /checkout
-Disallow: /order-confirmation
-Disallow: /api/
-Disallow: /*.json$
+Allow: /gida
+Allow: /tekstil
+Allow: /ahsap
+Allow: /dokuma
+Allow: /hediyelik
+Allow: /peyzaj-cicek
+Allow: /temizlik
+Allow: /urun/
+Allow: /kategori/
+Allow: /kampanya/
+Allow: /hakkimizda
+Allow: /bize-ulasin
+Allow: /guvenlı-aliveri
+Allow: /kvkk
+Allow: /gizlilik-sozlesmesi
+Allow: /mesafeli-satis-sozlesmesi
+Allow: /teslimat-iade-sartlari
 
+Disallow: /admin/
+Disallow: /api/
+Disallow: /hesabim/
+Disallow: /siparislerim/
+Disallow: /checkout/
+Disallow: /sepet/
+Disallow: /favoriler/
+Disallow: /_next/
+Disallow: /public/
+Disallow: /*.json$
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /ara?
+Disallow: /search?
+
+# Crawl delay and request rate
+Crawl-delay: 1
+Request-rate: 30/60
+
+# Sitemap location
+Sitemap: https://isyurtlari.com.tr/sitemap.xml
+
+# Special rules for search engines
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 0
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
-Sitemap: https://isyurtlari.com.tr/sitemap.xml
+User-agent: Yandexbot
+Allow: /
+Crawl-delay: 1
+
+# Exclude bad bots
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+Disallow: /
