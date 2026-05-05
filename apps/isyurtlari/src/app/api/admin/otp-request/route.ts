@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { generateOTP, storeOTP } from '@/lib/otp';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { logAudit } from '@/lib/audit-log';
 
 const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
 
     if (!email) {
       return NextResponse.json({ error: 'Email gereklidir' }, { status: 400 });
@@ -15,7 +18,18 @@ export async function POST(req: NextRequest) {
     // Validate email (should be admin email)
     const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
     if (email !== ADMIN_EMAIL) {
+      logAudit('OTP_REQUEST', email, 'failed', 'Unauthorized email', ip);
       return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
+    }
+
+    // Rate limiting: 5 requests per minute per email
+    const rateLimit = checkRateLimit(`otp-request:${email}`, 5, 60 * 1000);
+    if (!rateLimit.allowed) {
+      logAudit('OTP_REQUEST', email, 'failed', 'Rate limit exceeded', ip);
+      return NextResponse.json(
+        { error: 'Çok fazla istek. Lütfen 1 dakika bekleyin.' },
+        { status: 429 }
+      );
     }
 
     // Generate OTP
@@ -56,11 +70,14 @@ export async function POST(req: NextRequest) {
 
     if (result.error) {
       console.error('Email sending error:', result.error);
+      logAudit('OTP_REQUEST', email, 'failed', 'Email sending failed', ip);
       return NextResponse.json(
         { error: 'Email gönderme başarısız' },
         { status: 500 }
       );
     }
+
+    logAudit('OTP_REQUEST', email, 'success', `OTP sent`, ip);
 
     return NextResponse.json({
       success: true,
@@ -68,6 +85,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('OTP request error:', error);
+    logAudit('OTP_REQUEST', email || 'unknown', 'failed', String(error), ip);
     return NextResponse.json(
       { error: 'Giriş kodu gönderme başarısız' },
       { status: 500 }
