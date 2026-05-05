@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Mobilya">
+  <title>Mobilya</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M206 274C290 274 276 426 316 478C356 530 472 498 496 580C514 642 448 674 344 656H206C182 656 162 636 162 612V318C162 294 182 274 206 274Z" stroke="#0F2040"/>
+    <line x1="254" y1="656" x2="202" y2="820" stroke="#0F2040"/>
+    <line x1="412" y1="656" x2="468" y2="820" stroke="#0F2040"/>
+    <path d="M568 530H826C858 530 884 556 884 588C884 620 858 646 826 646H568" stroke="#0F2040"/>
+    <line x1="704" y1="646" x2="704" y2="820" stroke="#0F2040"/>
+    <line x1="604" y1="820" x2="804" y2="820" stroke="#0F2040"/>
+    <line x1="640" y1="586" x2="824" y2="586" stroke="#FF6000"/>
+  </g>
+</svg>

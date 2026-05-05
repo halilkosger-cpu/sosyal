@@ -3,8 +3,19 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { LuHouse, LuBadgeCheck, LuHeart, LuGraduationCap, LuUsers } from 'react-icons/lu';
+import { LuHouse, LuBadgeCheck, LuHeart } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
+import {
+  IconProductOrigin,
+  IconVocationalTraining,
+  IconSocialContribution,
+  IconCampaign,
+  IconSuccess,
+  IconEducationGoal,
+  IconEmploymentSupport,
+  IconReintegration,
+  IconTransferInfo,
+} from '@/components/Icons';
 
 const categoryPurpose: Record<string, { purpose: string; trainingHours: number; skillDescription: string }> = {
   'gida-urunleri': { purpose: 'Beslenme & Aşçılık Eğitimi', trainingHours: 40, skillDescription: 'Profesyonel aşçılık ve beslenme bilgisi' },
@@ -33,20 +44,6 @@ interface Product {
   category: { name: string; slug: string };
   campaign?: Campaign;
 }
-
-const productEmojis: Record<string, string> = {
-  'badem':'🌰','biber-receli':'🫙','biber-salcasi':'🌶️','cekirdek':'🌻',
-  'domates-salcasi':'🍅','findik':'🥜','hasas-ezme':'🫙','incir-receli':'🍓',
-  'kuru-baklagil':'🫘','pirinc':'🍚','sari-uzum':'🍇','siyah-uzum':'🍇',
-  'tereyag':'🧈','uzum-pekmezi':'🫙','yer-fistagi':'🥜','yesil-zeytin':'🫒',
-  'zeytinyag':'🫒','peynir':'🧀','havlu-beyaz':'🛁','havlu-renkli':'🛁',
-  'carsaf-seti-cift':'🛏️','yastig-pamuk':'🛌','tulbent-beyaz':'🧵','uyku-gomlekleri':'👕',
-  'ahsap-sandalye':'🪑','ahsap-masa':'🪑','kitap-rafi-ahsap':'📚','sehpa-ahsap':'🛋️',
-  'yatak-basligi-ahsap':'🛏️','elbise-dolabi-ahsap':'🚪','kapi-kollari':'🚪',
-  'sarniyeler':'🔧','civi-seti':'🔨','vida-civi-seti':'🔩','metal-aski':'⚙️','kilitler':'🔐',
-  'geleneksel-hali':'🧵','kilim-2x3m':'🧵','masa-ortusü':'🧵','yaslik-ortüsü':'🧵',
-  'perde-metre':'🧵','duvar-ortüsü':'🧵','sofra-havlusu':'🧵',
-};
 
 const productValues: Record<string, string[]> = {
   'zeytinyag': [
@@ -212,7 +209,7 @@ export default function ProductDetailPage() {
   const hasPrice = product.price > 0;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="store-shell">
 
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-200">
@@ -235,12 +232,12 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* ─── IMAGE ─── */}
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden aspect-square flex items-center justify-center relative">
+          <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
             {product.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
             ) : (
-              <span className="text-[120px] select-none">{productEmojis[product.slug] ?? '📦'}</span>
+              <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
             )}
             {!inStock && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -285,15 +282,15 @@ export default function ProductDetailPage() {
             </p>
 
             {/* Production Values */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 mb-6">
+            <div className="bg-white border border-orange-200 rounded-2xl p-6 mb-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <LuBadgeCheck size={20} className="text-blue-600" />
+                <IconSuccess className="w-8 h-8 object-contain" />
                 <h3 className="font-bold text-gray-900">Üretim Değerleri & Güvence</h3>
               </div>
               <ul className="space-y-3">
                 {getProductValues(slug).map((value, idx) => (
                   <li key={idx} className="flex gap-3">
-                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">✓</span>
+                    <span className="text-[#FF6000] font-bold text-lg leading-none mt-0.5">✓</span>
                     <span className="text-sm text-gray-700 leading-relaxed">{value}</span>
                   </li>
                 ))}
@@ -302,9 +299,9 @@ export default function ProductDetailPage() {
 
             {/* Campaign Banner */}
             {product.campaign && (
-              <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 mb-5">
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-2xl">🏷️</span>
+                  <IconCampaign className="w-9 h-9 object-contain" />
                   <h4 className="font-bold text-red-700">Kampanya: {product.campaign.name}</h4>
                 </div>
                 <div className="flex items-center gap-3">
@@ -322,7 +319,7 @@ export default function ProductDetailPage() {
             )}
 
             {/* Price box */}
-            <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5 mb-5">
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-5 shadow-sm">
               {hasPrice ? (
                 <>
                   <p className="text-sm text-gray-400 mb-1">{product.campaign ? 'İndirimli Fiyat' : 'Fiyat'}</p>
@@ -333,8 +330,8 @@ export default function ProductDetailPage() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-                    <span className="text-xl">⏳</span>
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
+                    <IconTransferInfo className="w-9 h-9 object-contain" />
                   </div>
                   <div>
                     <p className="font-bold text-gray-700">Fiyat Belirleniyor</p>
@@ -398,12 +395,12 @@ export default function ProductDetailPage() {
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3 mt-6">
               {[
-                { Icon: LuGraduationCap, text: 'Meslek Eğitimi'   },
-                { Icon: LuBadgeCheck,    text: 'Sosyal Giriş' },
-                { Icon: LuHeart,         text: 'Sosyal Proje'     },
+                { Icon: IconVocationalTraining, text: 'Meslek Eğitimi' },
+                { Icon: IconSuccess,            text: 'Sosyal Giriş' },
+                { Icon: IconSocialContribution, text: 'Sosyal Proje' },
               ].map(({ Icon, text }) => (
-                <div key={text} className="bg-blue-50 rounded-xl border border-blue-200 p-3 flex flex-col items-center gap-1.5 text-center">
-                  <Icon size={22} color="#1d4ed8" />
+                <div key={text} className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col items-center gap-1.5 text-center shadow-sm">
+                  <Icon className="w-9 h-9 object-contain" />
                   <span className="text-xs font-medium text-blue-900">{text}</span>
                 </div>
               ))}
@@ -416,10 +413,10 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
 
           {/* Purpose section */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <LuGraduationCap size={22} color="white" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
+                <IconVocationalTraining className="w-11 h-11 object-contain" />
               </div>
               <h3 className="text-lg font-bold text-gray-900">Bu Ürün Kimden Geliyor?</h3>
             </div>
@@ -427,9 +424,12 @@ export default function ProductDetailPage() {
               <p>
                 Bu ürün, <span className="font-semibold text-blue-900">{categoryPurpose[product.category.slug]?.purpose || 'Meslek Eğitimi'}</span> alan hükümlüler tarafından el emeğiyle üretilmiştir.
               </p>
-              <p>
-                🎯 <span className="font-semibold">Eğitim Hedefi:</span> {categoryPurpose[product.category.slug]?.skillDescription || 'Profesyonel beceri geliştirme'}
-              </p>
+              <div className="flex items-start gap-3 rounded-2xl bg-orange-50 border border-orange-200 p-3">
+                <IconEducationGoal className="w-9 h-9 object-contain flex-shrink-0" />
+                <p>
+                  <span className="font-semibold">Eğitim Hedefi:</span> {categoryPurpose[product.category.slug]?.skillDescription || 'Profesyonel beceri geliştirme'}
+                </p>
+              </div>
               <p className="text-xs text-gray-600 italic border-l-4 border-blue-400 pl-3 mt-2">
                 Her satın alma, bu bireyin yeniden başlama yolculuğuna ve topluma kazanılmasına direkt katkı sağlar.
               </p>
@@ -437,26 +437,36 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Impact section */}
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-6">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <LuUsers size={22} color="white" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
+                <IconSocialContribution className="w-11 h-11 object-contain" />
               </div>
               <h3 className="text-lg font-bold text-gray-900">Yardımın Nasıl Kullanılacak?</h3>
             </div>
             <div className="space-y-3 text-sm text-gray-700">
-              <div className="flex items-start gap-2">
-                <span className="text-lg">📚</span>
-                <span><span className="font-semibold">Eğitim Programı:</span> {categoryPurpose[product.category.slug]?.trainingHours || 50} saat mesleki eğitime yatırım</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-lg">💼</span>
-                <span><span className="font-semibold">Istihdam Desteği:</span> Yeniden başlayan bireyin iş arayışına destek</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-lg">🤝</span>
-                <span><span className="font-semibold">Reentegrasyon:</span> Topluma başarılı dönüş için gerekli tüm destek</span>
-              </div>
+              {[
+                {
+                  Icon: IconEducationGoal,
+                  title: 'Eğitim Programı',
+                  text: `${categoryPurpose[product.category.slug]?.trainingHours || 50} saat mesleki eğitime yatırım`,
+                },
+                {
+                  Icon: IconEmploymentSupport,
+                  title: 'İstihdam Desteği',
+                  text: 'Yeniden başlayan bireyin iş arayışına destek',
+                },
+                {
+                  Icon: IconReintegration,
+                  title: 'Reentegrasyon',
+                  text: 'Topluma başarılı dönüş için gerekli tüm destek',
+                },
+              ].map(({ Icon, title, text }) => (
+                <div key={title} className="flex items-start gap-3 rounded-2xl bg-gray-50 border border-gray-200 p-3">
+                  <Icon className="w-9 h-9 object-contain flex-shrink-0" />
+                  <span><span className="font-semibold">{title}:</span> {text}</span>
+                </div>
+              ))}
             </div>
           </div>
 

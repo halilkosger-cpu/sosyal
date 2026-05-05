@@ -3,7 +3,18 @@ import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
+export const dynamic = 'force-dynamic';
+
+const hasDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL;
+  return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
+};
+
 export async function GET() {
+  if (!hasDatabaseUrl()) {
+    return NextResponse.json([]);
+  }
+
   try {
     const now = new Date();
     const activeCampaigns = await prisma.campaign.findMany({

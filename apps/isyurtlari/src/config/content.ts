@@ -5,10 +5,10 @@ export const content = {
   // Home Page
   home: {
     announcements: [
-      '🎓  Her Satın Alma Bir İkinci Şans Demek',
-      '✨  El Emeği, Gerçek Değer, Sosyal Girişim',
-      '❤️  Beceri Kazanan İnsanları Destekle',
-      '🏭  Kaliteli Ürünler, İnsan Odaklı İşyurtları',
+      'Her satın alma bir ikinci şansa dönüşür',
+      'El emeği, gerçek değer ve sosyal fayda',
+      'Beceri kazanan insanları birlikte destekleyin',
+      'Kaliteli ürünler, insan odaklı üretim',
     ],
     hero: {
       badge: 'El Emeğine Dayanan Sosyal Girişim',
@@ -61,60 +61,47 @@ export const content = {
     },
   },
 
-  // About Page
   about: {
     hero: {
-      badge: 'Sosyal Giriş Onaylı Platform',
-      title: 'İşyurtları Ürünleriyle',
-      titleHighlight: 'Sosyal Değer',
-      titleSuffix: 'Yaratın',
-      description: 'Sosyal Giriş bünyesindeki cezaevi işyurtlarında üretilen kaliteli ürünleri sizlere ulaştırıyoruz. Her alışverişiniz, bireylerin topluma yeniden kazandırılması sürecine destek olur.',
+      badge: 'Sosyal etki odaklı pazar yeri',
+      title: 'İşyurtları ürünleriyle',
+      titleHighlight: 'gerçek değer',
+      titleSuffix: 'yaratın',
+      description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren sosyal girişim platformu.',
     },
     stats: [
-      { value: '81', label: 'İlde Faaliyet' },
-      { value: '500+', label: 'Ürün Çeşidi' },
-      { value: '6', label: 'Kategori' },
-      { value: '100%', label: 'Yerli & El Yapımı' },
+      { value: '81', label: 'İlde faaliyet' },
+      { value: '500+', label: 'Ürün çeşidi' },
+      { value: '6', label: 'Ana kategori' },
+      { value: '%100', label: 'Sosyal fayda' },
     ],
     sections: {
       whatIsWorkshop: {
-        title: 'İşyurtları Nedir?',
-        content: 'İşyurtları; Sosyal Giriş Ceza İnfaz Kurumları bünyesinde faaliyet gösteren ve hükümlülerin çalıştırıldığı üretim tesisleridir. Türkiye genelindeki 81 ilde kurulu bu tesislerde gıda, tekstil, mobilya, ahşap ürünleri ve daha pek çok alanda üretim gerçekleştirilmektedir.',
-        content2: 'Bu tesislerde üretilen ürünler; hükümlülerin bir meslek edinmesine, özgüvenlerini kazanmalarına ve tahliye sonrasında topluma sağlıklı bir şekilde yeniden entegre olmalarına önemli katkılar sağlamaktadır.',
-        socialImpactQuote: 'Alışveriş yaparak rehabilitasyon sürecine doğrudan destek olabilirsiniz.',
+        title: 'İşyurtları nedir?',
+        content: 'İşyurtları, ceza infaz kurumları bünyesinde mesleki üretim yapan ve hükümlülerin çalışma disiplini, beceri ve özgüven kazanmasını destekleyen üretim alanlarıdır.',
+        content2: 'Bu platform, üretilen ürünleri daha çağdaş, erişilebilir ve güven veren bir alışveriş deneyimiyle insanlara ulaştırmayı hedefler.',
+        socialImpactQuote: 'Alışveriş yalnızca bir ürün seçimi değil, yeniden başlama ihtimaline verilen destektir.',
       },
       mission: {
         title: 'Misyonumuz',
-        content: 'Sosyal Giriş cezaevi işyurtlarında üretilen kaliteli ürünleri geniş kitlelere ulaştırarak sosyal sorumluluk bilinci oluşturmak ve her alışverişin bireylerin rehabilitasyonuna katkı sağlamasını güvence altına almak.',
+        content: 'Nitelikli el emeğini görünür kılmak, üretim hikayesini şeffaf biçimde anlatmak ve her satın almayı ölçülebilir sosyal faydaya dönüştürmek.',
       },
       vision: {
         title: 'Vizyonumuz',
-        content: 'İşyurtları ürünlerinin kalitesi ve çeşitliliğinin artırıldığı, toplumun her kesiminin bu ürünlere kolayca ulaşabildiği ve sosyal rehabilitasyonun öncelikli hedef olarak benimsendiği bir Türkiye\'yi inşa etmek.',
+        content: 'Türkiye’nin en güven veren sosyal girişim alışveriş deneyimini inşa ederek işyurtları üretimini daha modern, ulaşılabilir ve sürdürülebilir hale getirmek.',
       },
       values: [
-        {
-          title: 'Kalite',
-          description: 'Her ürün titiz üretim ve kalite kontrol süreçlerinden geçer.',
-        },
-        {
-          title: 'Güvenilirlik',
-          description: 'Sosyal Giriş denetimi altında şeffaf ve güvenilir işleticilik.',
-        },
-        {
-          title: 'Sosyal Sorumluluk',
-          description: 'Her satın alma rehabilitasyon programlarını ve sosyal entegrasyonu destekler.',
-        },
-        {
-          title: 'Sürdürülebilirlik',
-          description: 'Çevreye duyarlı ve sürdürülebilir üretim anlayışıyla faaliyet.',
-        },
+        { title: 'Kalite', description: 'Ürün, sunum ve hizmette tutarlı bir standart.' },
+        { title: 'Güven', description: 'Açık bilgi, sade süreç ve şeffaf iletişim.' },
+        { title: 'Sosyal Fayda', description: 'Her alışverişte rehabilitasyon ve meslek edinme desteği.' },
+        { title: 'Sürdürülebilirlik', description: 'Yerel üretime ve uzun vadeli etkiye odaklanan yaklaşım.' },
       ],
     },
     contact: {
-      title: 'Sorularınız mı var?',
-      subtitle: 'Size yardımcı olmaktan mutluluk duyarız.',
-      cta: 'Bize Ulaşın',
+      title: 'Bir fikriniz veya sorunuz mu var?',
+      subtitle: 'Platformu birlikte daha güçlü hale getirelim.',
+      cta: 'Bize ulaşın',
     },
-    legalDisclaimer: 'isyurtlari.com.tr, Sosyal Giriş veya İşyurtları Genel Müdürlüğü\'nün resmi bir platformu değildir ve söz konusu kurumlarla hukuki bir bağı bulunmamaktadır. Bu platform, Sosyal Giriş cezaevi işyurtlarında üretilen ürünlerin müstakil olarak satışa sunulması amacıyla faaliyet göstermektedir. İşyurtları Genel Müdürlüğü tarafından üretilen ürünlerin satışından kaynaklanan tüm sorumluluk platformun işletmecisine aittir. Ürünlerin kaynağı ve orijinalliği hakkında daha detaylı bilgi için lütfen sorumlu kurumlarla iletişime geçiniz. Bu platform, Sosyal Giriş veya ilgili kurumlar tarafından dava açılmasına karşın tüm yasal sorumlulukları üstlenmektedir.',
+    legalDisclaimer: 'isyurtlari.com.tr bağımsız bir sosyal girişim platformudur. Ürün, içerik ve satış süreçleri platform sorumluluğunda yürütülür; kurumlarla resmi temsil ilişkisi bulunduğu anlamına gelmez.',
   },
 };

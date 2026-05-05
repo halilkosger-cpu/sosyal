@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { IconCart, IconProductOrigin, IconContinueShopping } from '@/components/Icons';
 
 interface Campaign {
   id: string;
@@ -78,12 +79,12 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="store-shell">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
-            ← Devam Et
+          <Link href="/" className="text-[#CC4E00] hover:text-[#FF6000] font-medium inline-flex items-center gap-2">
+            <IconContinueShopping className="w-5 h-5 object-contain" /> Alışverişe devam et
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Sepetim</h1>
         </div>
@@ -92,15 +93,15 @@ export default function CartPage() {
       {/* Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {cart.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <div className="text-5xl mb-4">🛒</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sepetiniz Boş</h2>
-            <p className="text-gray-600 mb-6">Ürün eklemek için ürün sayfasına dön</p>
+          <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center shadow-sm">
+            <IconCart className="w-24 h-24 object-contain mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sepetiniz boş</h2>
+            <p className="text-gray-600 mb-6">Sosyal faydaya dönüşecek ürünleri keşfetmek için vitrine dönebilirsiniz.</p>
             <Link
               href="/"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
+              className="inline-flex items-center justify-center bg-[#FF6000] text-white px-6 py-3 rounded-xl hover:bg-[#e55500] transition font-semibold"
             >
-              Ürünleri Gözle
+              Ürünleri keşfet
             </Link>
           </div>
         ) : (
@@ -108,13 +109,13 @@ export default function CartPage() {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cart.map((item) => (
-                <div key={item.id} className="bg-white rounded-lg border border-gray-200 p-4 flex gap-4">
+                <div key={item.id} className="store-card rounded-2xl p-4 flex gap-4">
                   {/* Image */}
                   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200">
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover rounded" />
                     ) : (
-                      <span className="text-3xl">📦</span>
+                      <IconProductOrigin className="w-14 h-14 object-contain" />
                     )}
                   </div>
 
@@ -122,7 +123,7 @@ export default function CartPage() {
                   <div className="flex-1">
                     <Link
                       href={`/urun/${item.slug}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition"
+                      className="text-lg font-semibold text-gray-900 hover:text-[#FF6000] transition"
                     >
                       {item.name}
                     </Link>
@@ -140,7 +141,7 @@ export default function CartPage() {
                           </span>
                         </>
                       ) : (
-                        <span className="text-blue-600 font-bold text-lg">
+                        <span className="text-[#FF6000] font-bold text-lg">
                           ₺{item.price.toFixed(2)}
                         </span>
                       )}
@@ -187,8 +188,8 @@ export default function CartPage() {
 
             {/* Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-20">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Özet</h3>
+              <div className="store-card rounded-2xl p-6 sticky top-20">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Sipariş özeti</h3>
 
                 <div className="space-y-3 mb-4 pb-4 border-b border-gray-200">
                   <div className="flex justify-between text-gray-600">
@@ -214,14 +215,14 @@ export default function CartPage() {
 
                 <button
                   onClick={() => router.push('/checkout')}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition mb-3"
+                  className="w-full bg-[#FF6000] text-white py-3 rounded-xl font-semibold hover:bg-[#e55500] transition mb-3"
                 >
                   Ödemeye Geç
                 </button>
 
                 <button
                   onClick={clearCart}
-                  className="w-full border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+                  className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
                 >
                   Sepeti Boşalt
                 </button>

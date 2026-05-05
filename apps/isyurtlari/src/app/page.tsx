@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench,
-  LuTruck, LuShieldCheck, LuHeart, LuArrowRight, LuStar, LuBadgeCheck,
-  LuZap,
-} from 'react-icons/lu';
+  IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
+  IconSuccess, IconWeekSpecial,
+  IconTransfer, IconFastShipping, IconSocialContribution,
+} from '@/components/Icons';
 import { content } from '@/config/content';
 
 interface Category { id: string; name: string; slug: string; }
@@ -16,19 +16,19 @@ interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
 const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string; purpose: string }> = {
   // Eski slug format (uyumluluk için)
-  'gida-urunleri':        { Icon: LuUtensils,  gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil-urunleri':     { Icon: LuShirt,     gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
-  'ahsap-urunler':        { Icon: LuTreePine,  gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
-  'dokuma':               { Icon: LuScissors,  gradient: 'from-violet-600 to-purple-400',  purpose: 'Dokuma & Sanat Terapisi' },
-  'mobilya-urunleri':     { Icon: LuSofa,      gradient: 'from-rose-500 to-pink-400',      purpose: 'Furniture Tasarım Eğitimi' },
-  'demir-metal-urunleri': { Icon: LuWrench,    gradient: 'from-slate-600 to-slate-400',    purpose: 'Metal İşleri Ustası Programı' },
+  'gida-urunleri':        { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
+  'tekstil-urunleri':     { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
+  'ahsap-urunler':        { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
+  'dokuma':               { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'Dokuma & Sanat Terapisi' },
+  'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',      purpose: 'Furniture Tasarım Eğitimi' },
+  'demir-metal-urunleri': { Icon: IconFurniture, gradient: 'from-slate-600 to-slate-400',    purpose: 'Metal İşleri Ustası Programı' },
   // Yeni slug format (seed script'ten)
-  'gida':                 { Icon: LuUtensils,  gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil':              { Icon: LuShirt,     gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
-  'ahsap':                { Icon: LuTreePine,  gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
-  'temizlik':             { Icon: LuScissors,  gradient: 'from-cyan-500 to-blue-400',      purpose: 'Temizlik & Kozmetik Eğitimi' },
-  'hediyelik':            { Icon: LuScissors,  gradient: 'from-rose-500 to-pink-400',      purpose: 'El Sanatları & Tasarım' },
-  'peyzaj-cicek':         { Icon: LuTreePine,  gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
+  'gida':                 { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
+  'tekstil':              { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
+  'ahsap':                { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
+  'temizlik':             { Icon: IconWeaving,  gradient: 'from-cyan-500 to-blue-400',      purpose: 'Temizlik & Kozmetik Eğitimi' },
+  'hediyelik':            { Icon: IconWeaving,  gradient: 'from-rose-500 to-pink-400',      purpose: 'El Sanatları & Tasarım' },
+  'peyzaj-cicek':         { Icon: IconWood,     gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
 };
 
 const productEmojis: Record<string, string> = {
@@ -69,10 +69,24 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#F4F5F7]">
 
       {/* ─── ANNOUNCEMENT BAR ─── */}
-      <div className="bg-[#FF6000] text-gray-900 py-2.5 text-center overflow-hidden">
-        <p className="text-sm font-bold tracking-wide transition-all duration-500">
-          {announcements[ticker]}
-        </p>
+      <div className="bg-[#0A1628] text-white border-b border-white/10 overflow-hidden">
+        <div className="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center justify-center md:justify-between gap-4">
+          <div className="hidden md:flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#FF6000]" />
+            Sosyal etki
+          </div>
+          <p className="min-h-5 text-center text-sm md:text-[15px] font-medium tracking-[0.01em] text-white transition-all duration-500">
+            {announcements[ticker]}
+          </p>
+          <div className="hidden md:flex items-center gap-1.5" aria-hidden="true">
+            {announcements.map((_, index) => (
+              <span
+                key={index}
+                className={`h-1.5 rounded-full transition-all duration-300 ${index === ticker ? 'w-6 bg-[#FF6000]' : 'w-1.5 bg-white/30'}`}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ─── HERO ─── */}
@@ -83,30 +97,36 @@ export default function HomePage() {
         <div className="relative max-w-screen-xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
           {/* Left */}
-          <div>
-            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-orange-300 text-xs font-semibold px-4 py-2 rounded-full mb-7 tracking-wide">
-              <LuBadgeCheck size={14} /> {content.home.hero.badge}
+          <div className="font-[var(--font-inter)]">
+            <div className="inline-flex items-center gap-3 bg-white/10 border border-white/15 text-orange-100 text-xs font-semibold px-4 py-2.5 rounded-full mb-7 tracking-normal shadow-lg shadow-black/10">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
+                <IconSuccess className="w-6 h-6 object-contain" />
+              </span>
+              <span>{content.home.hero.badge}</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-5 tracking-tight">
+            <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.05] mb-6 tracking-normal">
               {content.home.hero.title}<br />
-              <span className="text-[#FF6000]">{content.home.hero.titleHighlight}</span> {content.home.hero.titleSuffix}
+              <span className="font-bold text-[#FF7A1A]">{content.home.hero.titleHighlight}</span> {content.home.hero.titleSuffix}
             </h1>
-            <p className="text-white text-base mb-9 max-w-sm leading-relaxed">
+            <p className="text-white/75 text-[17px] md:text-[19px] mb-9 max-w-2xl leading-8 font-normal">
               {content.home.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
-              <Link href="/gida" className="bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-2 text-sm">
-                {content.home.hero.ctaPrimary} <LuArrowRight size={16} />
+              <Link href="/gida" className="bg-[#FF6000] hover:bg-[#e55500] text-white font-bold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-3 text-sm">
+                <span>{content.home.hero.ctaPrimary}</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/95">
+                  <IconTransfer className="w-6 h-6 object-contain" />
+                </span>
               </Link>
-              <Link href="/hakkimizda" className="bg-white/8 hover:bg-white/15 text-white font-semibold px-7 py-3.5 rounded-xl transition-all border border-white/15 text-sm">
+              <Link href="/hakkimizda" className="bg-white/8 hover:bg-white/15 text-white font-bold px-7 py-3.5 rounded-xl transition-all border border-white/15 text-sm">
                 {content.home.hero.ctaSecondary}
               </Link>
             </div>
             <div className="flex gap-10 pt-8 border-t border-white/10">
               {content.home.stats.map(({ value, label }) => (
                 <div key={label}>
-                  <p className="text-2xl font-bold text-[#FF6000]">{value}</p>
-                  <p className="text-white text-xs mt-0.5">{label}</p>
+                  <p className="text-2xl font-extrabold text-[#FF7A1A] tracking-normal">{value}</p>
+                  <p className="text-white/75 text-xs mt-0.5 font-semibold">{label}</p>
                 </div>
               ))}
             </div>
@@ -114,22 +134,22 @@ export default function HomePage() {
 
           {/* Right — category preview grid */}
           <div className="hidden md:grid grid-cols-2 gap-3">
-            {(loading ? [
+            {(loading || categories.length === 0 ? [
               { slug: 'gida',     name: 'Gıda Ürünleri'  },
               { slug: 'tekstil',  name: 'Tekstil'         },
               { slug: 'hediyelik',     name: 'Hediyelik'  },
               { slug: 'ahsap',     name: 'Ahşap Ürünler'  },
             ] : categories.slice(0, 4)).map((cat) => {
               const cfg = categoryConfig[cat.slug];
-              const Icon = cfg?.Icon ?? LuWrench;
+              const Icon = cfg?.Icon ?? IconFurniture;
               return (
                 <Link
                   key={cat.slug}
                   href={`/${cat.slug}`}
-                  className={`group bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-600 to-gray-500'} rounded-2xl p-5 h-36 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
+                  className={`group bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-600 to-gray-500'} rounded-2xl p-5 h-44 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
                 >
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                    <Icon size={20} color="white" strokeWidth={1.8} />
+                  <div className="w-20 h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Icon className="w-16 h-16 object-contain drop-shadow-sm" />
                   </div>
                   <p className="text-white font-semibold text-sm">{cat.name}</p>
                 </Link>
@@ -146,7 +166,7 @@ export default function HomePage() {
           <div className="max-w-screen-xl mx-auto px-4 py-8">
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <LuZap size={18} className="text-[#FF6000]" />
+                <IconWeekSpecial className="w-5 h-5 object-contain" />
                 <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Kampanyadaki Ürünler</h2>
@@ -256,16 +276,16 @@ export default function HomePage() {
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
             {categories.map((cat) => {
               const cfg = categoryConfig[cat.slug];
-              const Icon = cfg?.Icon ?? LuWrench;
+              const Icon = cfg?.Icon ?? IconFurniture;
               return (
                 <Link
                   key={cat.id}
                   href={`/${cat.slug}`}
-                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-500 to-gray-400'} p-4 flex flex-col items-center justify-center text-center min-h-[9rem] hover:scale-[1.04] hover:shadow-xl transition-all duration-200 shadow-md`}
+                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-500 to-gray-400'} p-4 flex flex-col items-center justify-center text-center min-h-[11rem] hover:scale-[1.04] hover:shadow-xl transition-all duration-200 shadow-md`}
                   title={cfg?.purpose}
                 >
-                  <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center mb-2.5 group-hover:bg-white/30 transition-colors">
-                    <Icon size={22} color="white" strokeWidth={1.8} />
+                  <div className="w-20 h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <Icon className="w-16 h-16 object-contain drop-shadow-sm" />
                   </div>
                   <p className="text-white text-xs font-semibold leading-tight mb-1">{cat.name}</p>
                   <p className="text-white/70 text-[10px] leading-tight">{cfg?.purpose}</p>
@@ -286,10 +306,10 @@ export default function HomePage() {
               <h3 className="text-white text-3xl font-bold mb-1 tracking-tight">Gıda Ürünleri</h3>
               <p className="text-gray-400 text-sm mb-5">Doğal, taze, güvenilir</p>
               <span className="inline-flex items-center gap-2 bg-white text-gray-900 text-xs font-semibold px-4 py-2.5 rounded-lg group-hover:bg-[#FF6000] group-hover:text-white transition-colors">
-                İncele <LuArrowRight size={13} />
+                İncele <IconTransfer className="w-4 h-4" />
               </span>
             </div>
-            <LuUtensils size={100} color="white" strokeWidth={0.8} className="opacity-10 group-hover:opacity-20 transition-opacity" />
+            <IconFood className="w-40 h-40 object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
           </Link>
 
           <Link href="/tekstil" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-500 p-7 flex flex-col justify-between min-h-44 hover:shadow-xl transition-all">
@@ -299,9 +319,9 @@ export default function HomePage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-xs font-semibold px-3 py-2 rounded-lg group-hover:bg-white/25 transition-colors">
-                Görüntüle <LuArrowRight size={12} />
+                Görüntüle <IconTransfer className="w-3 h-3" />
               </span>
-              <LuShirt size={48} color="white" strokeWidth={1} className="opacity-25" />
+              <IconTextile className="w-24 h-24 object-contain opacity-95" />
             </div>
           </Link>
         </div>
@@ -336,11 +356,11 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
           <Link href="/gida" className="flex items-center gap-1 text-[#FF6000] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
-            Tüm Ürünleri Keşfet <LuArrowRight size={15} />
+            Tüm Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
           </Link>
         </div>
 
-        {loading ? (
+        {loading || products.length === 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl h-72 animate-pulse" />)}
           </div>
@@ -372,7 +392,7 @@ export default function HomePage() {
                   <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-1">{product.category?.name}</p>
                   <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6000] transition-colors leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-0.5 mt-1.5 mb-2">
-                    {[1,2,3,4,5].map((s) => <LuStar key={s} size={10} fill="#FF6000" color="#FF6000" />)}
+                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#FF6000]" />)}
                     <span className="text-[10px] text-gray-700 font-semibold ml-1">5.0</span>
                   </div>
                   {product.price > 0 ? (
@@ -391,17 +411,17 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 pb-10">
         <div className="bg-[#0F2040] rounded-3xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { Icon: LuHeart,        title: content.home.socialImpact[0].title, desc: content.home.socialImpact[0].description },
-            { Icon: LuShieldCheck,  title: content.home.socialImpact[1].title,  desc: content.home.socialImpact[1].description },
-            { Icon: LuTruck,        title: content.home.socialImpact[2].title, desc: content.home.socialImpact[2].description },
+            { Icon: IconSocialContribution, title: content.home.socialImpact[0].title, desc: content.home.socialImpact[0].description },
+            { Icon: IconSuccess,            title: content.home.socialImpact[1].title,  desc: content.home.socialImpact[1].description },
+            { Icon: IconFastShipping,       title: content.home.socialImpact[2].title, desc: content.home.socialImpact[2].description },
           ].map(({ Icon, title, desc }) => (
             <div key={title} className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#FF6000]/15 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#FF6000]/20">
-                <Icon size={22} color="#FF6000" strokeWidth={1.8} />
+              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Icon className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">{title}</p>
-                <p className="text-white text-xs mt-0.5">{desc}</p>
+                <p className="text-white/70 text-xs mt-1 leading-relaxed">{desc}</p>
               </div>
             </div>
           ))}

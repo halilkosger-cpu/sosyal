@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Hızlı Kargo">
+  <title>Hızlı Kargo</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M346 324L576 218L790 324V616L560 736L346 616V324Z" stroke="#0F2040"/>
+    <path d="M346 324L560 444L790 324" stroke="#0F2040"/>
+    <line x1="560" y1="444" x2="560" y2="736" stroke="#0F2040"/>
+    <path d="M452 270L668 390V512" stroke="#FF6000"/>
+    <line x1="132" y1="380" x2="246" y2="380" stroke="#FF6000"/>
+    <line x1="92" y1="500" x2="246" y2="500" stroke="#FF6000"/>
+    <line x1="132" y1="620" x2="246" y2="620" stroke="#FF6000"/>
+    <path d="M618 594H852M778 520L852 594L778 668" stroke="#FF6000"/>
+  </g>
+</svg>

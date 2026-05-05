@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Ahşap">
+  <title>Ahşap</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M386 620V360" stroke="#0F2040"/>
+    <path d="M386 430L306 350" stroke="#0F2040"/>
+    <path d="M386 510L500 396" stroke="#0F2040"/>
+    <path d="M264 554H220C142 554 78 490 78 412C78 340 132 280 202 272C222 194 292 136 376 136C466 136 540 202 554 288C638 302 702 374 702 462C702 512 682 558 648 592" stroke="#0F2040"/>
+    <path d="M352 696L664 384L794 514L482 826L352 696Z" stroke="#FF6000"/>
+    <path d="M438 740L470 708M506 672L538 640M574 604L606 572" stroke="#FF6000"/>
+    <path d="M706 430L778 358C812 324 868 324 902 358C936 392 936 448 902 482L830 554" stroke="#FF6000"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+Figma import önerisi:
+1) svg klasöründeki 27 SVG dosyasını Figma canvas'a sürükleyip bırakın.
+2) Her SVG zaten 1024x1024 viewBox ile ayrı ikon/artboard mantığında hazırlanmıştır.
+3) Figma'da her ikonu seçip Frame selection yaparak ayrı artboard oluşturabilirsiniz.
+4) Export ayarlarında SVG seçerek vektör; PNG için 48px, 64px, 128px ölçülerinde export alabilirsiniz.
+
+Paket içeriği:
+- svg/: 27 ayrı SVG ikon
+- png/48, png/64, png/128: hazır PNG export'ları
+- all_svg_codes.txt: tüm SVG kodları tek metin dosyasında
+- preview.html: tarayıcıda hızlı önizleme

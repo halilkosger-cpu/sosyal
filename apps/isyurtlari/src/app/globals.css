@@ -11,23 +11,31 @@
 
   html {
     scroll-behavior: smooth;
+    background: #f5f6f8;
   }
 
   body {
     font-family: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
-    color: #1f2937;
+    background:
+      radial-gradient(circle at 12% -10%, rgba(255, 96, 0, 0.09), transparent 28rem),
+      linear-gradient(180deg, #f7f8fa 0%, #eef1f5 100%);
+    color: #111827;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-space-grotesk), sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-weight: 700;
   }
 
   a {
     @apply transition-colors;
+  }
+
+  ::selection {
+    background: rgba(255, 96, 0, 0.22);
+    color: #0A1628;
   }
 }
 
@@ -37,7 +45,7 @@
   }
 
   .btn-primary {
-    @apply bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium;
+    @apply bg-[#FF6000] text-white px-6 py-2 rounded-lg hover:bg-[#e55500] transition font-medium;
   }
 
   .btn-secondary {
@@ -45,7 +53,39 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#FF6000] to-[#0F2040] bg-clip-text text-transparent;
+  }
+
+  .store-shell {
+    @apply min-h-screen bg-[#F4F5F7];
+  }
+
+  .store-container {
+    @apply max-w-screen-xl mx-auto px-4;
+  }
+
+  .store-panel {
+    @apply bg-white/95 border border-gray-200/80 shadow-sm;
+  }
+
+  .store-card {
+    @apply bg-white border border-gray-200/80 shadow-sm transition-all duration-300;
+  }
+
+  .store-card-hover {
+    @apply hover:border-[#FF6000]/60 hover:shadow-xl hover:shadow-slate-900/10 hover:-translate-y-0.5;
+  }
+
+  .store-eyebrow {
+    @apply text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest;
+  }
+
+  .store-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 outline-none transition focus:border-[#FF6000] focus:ring-4 focus:ring-orange-500/10;
+  }
+
+  .store-hero-band {
+    @apply bg-[#0F2040] text-white relative overflow-hidden;
   }
 }
 

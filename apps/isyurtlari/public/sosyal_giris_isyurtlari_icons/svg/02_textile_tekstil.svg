@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Tekstil">
+  <title>Tekstil</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M274 316H706C752 316 790 354 790 400C790 446 752 484 706 484H328" stroke="#0F2040"/>
+    <path d="M274 316C222 316 180 358 180 410V498C180 554 226 600 282 600C338 600 384 554 384 498V400C384 354 346 316 300 316" stroke="#0F2040"/>
+    <path d="M384 484H760C806 484 844 522 844 568V690H384V484Z" stroke="#0F2040"/>
+    <circle cx="278" cy="500" r="54" stroke="#0F2040"/>
+    <line x1="470" y1="648" x2="760" y2="648" stroke="#FF6000"/>
+    <line x1="548" y1="648" x2="548" y2="648" stroke="#FF6000"/>
+  </g>
+</svg>

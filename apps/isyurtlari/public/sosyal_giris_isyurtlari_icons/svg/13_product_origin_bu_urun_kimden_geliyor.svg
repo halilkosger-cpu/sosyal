@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Bu Ürün Kimden Geliyor">
+  <title>Bu Ürün Kimden Geliyor</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <circle cx="240" cy="254" r="76" stroke="#0F2040"/>
+    <path d="M108 644V492C108 424 164 368 232 368H302C350 368 392 392 416 428" stroke="#0F2040"/>
+    <path d="M486 470L726 354L886 448V716L646 838L486 724V470Z" stroke="#0F2040"/>
+    <path d="M486 470L646 564L886 448" stroke="#0F2040"/>
+    <line x1="646" y1="564" x2="646" y2="838" stroke="#0F2040"/>
+    <path d="M586 424L746 518V628" stroke="#FF6000"/>
+    <path d="M384 604C424 574 454 544 486 470" stroke="#FF6000"/>
+  </g>
+</svg>

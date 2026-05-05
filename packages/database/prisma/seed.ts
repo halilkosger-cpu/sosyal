@@ -6,6 +6,43 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seed başlıyor...')
 
+  // ─── ÜRÜN KATEGORİLERİ ───────────────────────────────────────
+
+  const categories = await Promise.all([
+    prisma.productCategory.upsert({
+      where: { slug: 'gida' },
+      update: {},
+      create: { name: 'Gıda Ürünleri', slug: 'gida', description: 'Doğal ve organik gıda ürünleri' },
+    }),
+    prisma.productCategory.upsert({
+      where: { slug: 'tekstil' },
+      update: {},
+      create: { name: 'Tekstil', slug: 'tekstil', description: 'El yapımı tekstil ve kumaşlar' },
+    }),
+    prisma.productCategory.upsert({
+      where: { slug: 'ahsap' },
+      update: {},
+      create: { name: 'Ahşap Ürünler', slug: 'ahsap', description: 'Ahşap el sanatları' },
+    }),
+    prisma.productCategory.upsert({
+      where: { slug: 'dokuma' },
+      update: {},
+      create: { name: 'Dokuma', slug: 'dokuma', description: 'Geleneksel dokuma sanatları' },
+    }),
+    prisma.productCategory.upsert({
+      where: { slug: 'mobilya' },
+      update: {},
+      create: { name: 'Mobilya', slug: 'mobilya', description: 'Mobilya ve iç dekorasyon' },
+    }),
+    prisma.productCategory.upsert({
+      where: { slug: 'hediyelik' },
+      update: {},
+      create: { name: 'Hediyelik Eşyalar', slug: 'hediyelik', description: 'Özel hediyeler ve hatıralar' },
+    }),
+  ])
+
+  console.log('✅ Ürün kategorileri oluşturuldu')
+
   // ─── KULLANICILAR ───────────────────────────────────────────
 
   const adminHash   = await bcrypt.hash('admin123!',   12)

@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 import CartBadge from '@/components/CartBadge';
 import CookieConsent from '@/components/CookieConsent';
-import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench } from 'react-icons/lu';
+import SearchSuggest from '@/components/SearchSuggest';
+import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture, IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -20,6 +21,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['300', '400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-plus-jakarta-sans',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -79,18 +87,20 @@ export const metadata: Metadata = {
 };
 
 const categories = [
-  { name: 'Gıda',    slug: 'gida',        Icon: LuUtensils  },
-  { name: 'Tekstil', slug: 'tekstil',      Icon: LuShirt     },
-  { name: 'Ahşap',   slug: 'ahsap',         Icon: LuTreePine  },
-  { name: 'Dokuma',  slug: 'dokuma',                Icon: LuScissors  },
-  { name: 'Mobilya', slug: 'mobilya',      Icon: LuSofa      },
-  { name: 'Metal',   slug: 'metal',  Icon: LuWrench    },
+  { name: 'Gıda',    slug: 'gida',        Icon: IconFood    },
+  { name: 'Tekstil', slug: 'tekstil',      Icon: IconTextile },
+  { name: 'Ahşap',   slug: 'ahsap',       Icon: IconWood    },
+  { name: 'Dokuma',  slug: 'dokuma',      Icon: IconWeaving },
+  { name: 'Mobilya', slug: 'mobilya',     Icon: IconFurniture },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
+    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} ${inter.variable}`}>
       <head>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <Script
           id="gtag-consent-init"
           strategy="afterInteractive"
@@ -99,9 +109,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
 
-              // Analytics enabled - banner sonra eklenecek
+              const storedConsent = localStorage.getItem('cookieConsent');
               gtag('consent', 'default', {
-                'analytics_storage': 'granted',
+                'analytics_storage': storedConsent === 'accepted' ? 'granted' : 'denied',
                 'ad_storage': 'denied'
               });
             `,
@@ -198,30 +208,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
 
               {/* Search bar */}
-              <form action="/ara" method="GET" className="flex-1 flex">
-                <input
-                  name="q"
-                  type="text"
-                  placeholder="Ürün, kategori veya marka ara..."
-                  className="flex-1 px-4 py-2.5 text-sm rounded-l-lg border-0 outline-none bg-white text-gray-800 placeholder-gray-400"
-                />
-                <button
-                  type="submit"
-                  aria-label="Ürün ara"
-                  className="bg-[#CC4E00] hover:bg-[#B34400] text-white px-5 py-3 rounded-r-lg font-medium text-sm transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </form>
+              <SearchSuggest />
 
               {/* Account */}
               <Link
                 href="https://cezaevinden.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
+                className="hidden md:flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
               >
                 <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -232,12 +226,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Cart */}
               <Link
                 href="/sepet"
-                className="relative flex flex-col items-center text-[#FF6000] hover:text-orange-300 transition-colors flex-shrink-0"
+                className="relative flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
               >
                 <div className="relative">
-                  <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                  <IconCart className="w-6 h-6 mb-0.5 brightness-0 invert" />
                   <CartBadge />
                 </div>
                 <span className="text-xs font-semibold">Sepetim</span>
@@ -256,7 +248,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href={`/${cat.slug}`}
                     className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#FF6000] hover:bg-orange-50 border-b-2 border-transparent hover:border-[#FF6000] transition-all whitespace-nowrap flex-shrink-0"
                   >
-                    <cat.Icon size={16} />
+                    <cat.Icon className="w-5 h-5" />
                     {cat.name}
                   </Link>
                 ))}
@@ -287,13 +279,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="max-w-screen-xl mx-auto px-4 py-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { icon: '🚚', title: 'Hızlı Kargo', sub: 'Türkiye geneli teslimat' },
-                  { icon: '🔒', title: 'Güvenli Ödeme', sub: 'SSL ile şifreli işlem' },
-                  { icon: '↩️', title: 'Kolay İade', sub: '14 gün iade hakkı' },
-                  { icon: '❤️', title: 'Sosyal Katkı', sub: 'Her alışveriş fark yaratır' },
+                  { Icon: IconFastShipping,       title: 'Hızlı Kargo', sub: 'Türkiye geneli teslimat' },
+                  { Icon: IconSecurePayment,      title: 'Güvenli Ödeme', sub: 'SSL ile şifreli işlem' },
+                  { Icon: IconEasyReturn,         title: 'Kolay İade', sub: '14 gün iade hakkı' },
+                  { Icon: IconSocialContribution, title: 'Sosyal Katkı', sub: 'Her alışveriş fark yaratır' },
                 ].map((item) => (
                   <div key={item.title} className="flex items-center gap-3">
-                    <span className="text-2xl">{item.icon}</span>
+                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <item.Icon className="w-9 h-9 object-contain" />
+                    </div>
                     <div>
                       <p className="text-sm font-semibold text-white">{item.title}</p>
                       <p className="text-xs text-gray-400">{item.sub}</p>

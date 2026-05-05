@@ -3,8 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { LuUtensils, LuShirt, LuTreePine, LuScissors, LuSofa, LuWrench, LuShoppingCart, LuHouse, LuX } from 'react-icons/lu';
+import { LuShoppingCart, LuHouse, LuX } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
+import {
+  IconFood,
+  IconTextile,
+  IconWood,
+  IconWeaving,
+  IconFurniture,
+  IconProductOrigin,
+} from '@/components/Icons';
 
 interface Campaign {
   id: string;
@@ -27,29 +35,19 @@ interface Product {
 
 const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string; bg: string; banner: string; purpose: string; impact: string; imgBg: string }> = {
   // Eski slug format
-  'gida-urunleri':        { Icon: LuUtensils,  iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: '🎓 Aşçılık Meslek Eğitimi', imgBg: 'from-emerald-200 to-green-100' },
-  'tekstil-urunleri':     { Icon: LuShirt,     iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: '🎓 Derzillik Eğitimi Programı', imgBg: 'from-blue-200 to-indigo-100' },
-  'ahsap-urunler':        { Icon: LuTreePine,  iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: '🎓 Marangozluk Eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
-  'dokuma':               { Icon: LuScissors,  iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'Dokuma & Sanat Terapisi', impact: '🎓 Dokuma & Terapi Programı', imgBg: 'from-violet-200 to-purple-100' },
-  'mobilya-urunleri':     { Icon: LuSofa,      iconColor: '#be123c', bg: 'bg-rose-100',   banner: 'from-rose-600 to-pink-500',      purpose: 'Furniture Tasarım Eğitimi', impact: '🎓 Mobilya Tasarım Eğitimi', imgBg: 'from-rose-200 to-pink-100' },
-  'demir-metal-urunleri': { Icon: LuWrench,    iconColor: '#334155', bg: 'bg-slate-100',  banner: 'from-slate-600 to-gray-500',     purpose: 'Metal İşleri Ustası Programı', impact: '🎓 Metal İşleri Eğitimi', imgBg: 'from-slate-200 to-gray-100' },
+  'gida-urunleri':        { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100' },
+  'tekstil-urunleri':     { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100' },
+  'ahsap-urunler':        { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
+  'dokuma':               { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'Dokuma & Sanat Terapisi', impact: 'Dokuma ve sanat terapisi', imgBg: 'from-violet-200 to-purple-100' },
+  'mobilya-urunleri':     { Icon: IconFurniture, iconColor: '#be123c', bg: 'bg-rose-100',   banner: 'from-rose-600 to-pink-500',      purpose: 'Mobilya Tasarım Eğitimi', impact: 'Mobilya tasarım eğitimi', imgBg: 'from-rose-200 to-pink-100' },
+  'demir-metal-urunleri': { Icon: IconFurniture, iconColor: '#334155', bg: 'bg-slate-100',  banner: 'from-slate-600 to-gray-500',     purpose: 'Metal İşleri Ustası Programı', impact: 'Metal işleri eğitimi', imgBg: 'from-slate-200 to-gray-100' },
   // Yeni slug format (seed script'ten)
-  'gida':                 { Icon: LuUtensils,  iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: '🎓 Aşçılık Meslek Eğitimi', imgBg: 'from-emerald-200 to-green-100' },
-  'tekstil':              { Icon: LuShirt,     iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: '🎓 Derzillik Eğitimi Programı', imgBg: 'from-blue-200 to-indigo-100' },
-  'ahsap':                { Icon: LuTreePine,  iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: '🎓 Marangozluk Eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
-  'temizlik':             { Icon: LuScissors,  iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: '🎓 Kozmetik Eğitimi', imgBg: 'from-cyan-200 to-blue-100' },
-  'hediyelik':            { Icon: LuScissors,  iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: '🎓 El Sanatları', imgBg: 'from-red-200 to-pink-100' },
-  'peyzaj-cicek':         { Icon: LuTreePine,  iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: '🎓 Peyzaj Tasarım Eğitimi', imgBg: 'from-green-200 to-emerald-100' },
-};
-
-const productPlaceholders: Record<string, string> = {
-  // Eski format
-  'gida-urunleri': '🍽️', 'tekstil-urunleri': '🧵',
-  'ahsap-urunler': '🪵', 'dokuma': '🧣',
-  'mobilya-urunleri': '🛋️', 'demir-metal-urunleri': '⚙️',
-  // Yeni format
-  'gida': '🍽️', 'tekstil': '🧵', 'ahsap': '🪵',
-  'temizlik': '🧼', 'hediyelik': '🎁', 'peyzaj-cicek': '🌸',
+  'gida':                 { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100' },
+  'tekstil':              { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100' },
+  'ahsap':                { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
+  'temizlik':             { Icon: IconWeaving,   iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: 'Kozmetik üretim eğitimi', imgBg: 'from-cyan-200 to-blue-100' },
+  'hediyelik':            { Icon: IconWeaving,   iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: 'El sanatları becerisi', imgBg: 'from-red-200 to-pink-100' },
+  'peyzaj-cicek':         { Icon: IconWood,      iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: 'Peyzaj tasarım eğitimi', imgBg: 'from-green-200 to-emerald-100' },
 };
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
@@ -107,7 +105,7 @@ export default function CategoryPage() {
   });
 
   const meta = categoryMeta[categorySlug];
-  const Icon = meta?.Icon ?? LuWrench;
+  const Icon = meta?.Icon ?? IconProductOrigin;
   const categoryName = products[0]?.category.name ?? 'Ürünler';
 
   // Initialize max price on first load
@@ -118,7 +116,7 @@ export default function CategoryPage() {
   }, [products, maxPriceAvailable]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="store-shell">
 
       {/* ─── CATEGORY BANNER ─── */}
       <div className={`bg-gradient-to-r ${meta?.banner ?? 'from-gray-600 to-gray-500'} text-white`}>
@@ -134,8 +132,8 @@ export default function CategoryPage() {
           </div>
 
           <div className="flex items-start gap-4 mb-6">
-            <div className={`w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0`}>
-              <Icon size={32} color="white" />
+            <div className="w-24 h-24 flex items-center justify-center flex-shrink-0">
+              <Icon className="w-20 h-20 object-contain drop-shadow-md" />
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-extrabold">{loading ? '...' : categoryName}</h1>
@@ -151,7 +149,7 @@ export default function CategoryPage() {
           {/* Mission Message */}
           <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm">
             <p className="text-white text-sm leading-relaxed">
-              <span className="font-semibold">🎓 Bu kategorideki her satın alma:</span> Hükümlülerin {meta?.purpose?.toLowerCase() || 'meslek eğitimi'}ne destek olur ve yeniden başlama yolculuklarında onları destekler.
+              <span className="font-semibold">Bu kategorideki her satın alma:</span> Hükümlülerin {meta?.purpose?.toLowerCase() || 'meslek eğitimi'}ne destek olur ve yeniden başlama yolculuklarında onları destekler.
             </p>
           </div>
         </div>
@@ -161,9 +159,9 @@ export default function CategoryPage() {
 
         {/* ─── INFO BANNER ─── */}
         {!loading && products.length > 0 && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-sm text-blue-900">
-              <span className="font-semibold">💡 Bilgi:</span> Bu kategorideki ürünleri satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan hükümlülerin yeniden başlamasına ve topluma kazanılmasına katkı sağlıyorsunuz.
+          <div className="mb-6 bg-white border border-orange-200 rounded-2xl p-4 shadow-sm">
+            <p className="text-sm text-gray-700">
+              <span className="font-semibold text-[#CC4E00]">Sosyal etki:</span> Bu kategorideki ürünleri satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan hükümlülerin yeniden başlamasına ve topluma kazanılmasına katkı sağlıyorsunuz.
             </p>
           </div>
         )}
@@ -325,7 +323,7 @@ export default function CategoryPage() {
             {/* ─── EMPTY ─── */}
             {!loading && filtered.length === 0 && products.length === 0 && (
               <div className="bg-white rounded-2xl p-16 text-center col-span-full">
-                <span className="text-6xl block mb-4">{productPlaceholders[categorySlug] ?? '📦'}</span>
+                <Icon className="w-24 h-24 object-contain mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
                 <p className="text-gray-400 mb-2">Sosyal Giriş'in eğitim programları devam etmektedir.</p>
                 <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
@@ -361,7 +359,7 @@ export default function CategoryPage() {
               <Link
                 key={product.id}
                 href={`/urun/${product.slug}`}
-                className="group bg-white rounded-xl border border-gray-200 hover:border-[#FF6000] hover:shadow-lg transition-all overflow-hidden flex flex-col"
+                className="group store-card store-card-hover rounded-2xl overflow-hidden flex flex-col"
               >
                 {/* Image */}
                 <div className={`relative h-48 bg-gradient-to-br ${meta?.imgBg ?? 'from-orange-100 to-amber-100'} flex items-center justify-center overflow-hidden`}>
@@ -375,9 +373,7 @@ export default function CategoryPage() {
                       decoding="async"
                     />
                   ) : (
-                    <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">
-                      {productPlaceholders[categorySlug] ?? '📦'}
-                    </span>
+                    <Icon className="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300" />
                   )}
 
                   {product.quantity === 0 && (
@@ -399,8 +395,8 @@ export default function CategoryPage() {
                   )}
 
                   {/* Impact Badge */}
-                  <span className="absolute bottom-2 right-2 bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 rounded-full max-w-[140px] line-clamp-2">
-                    {meta?.impact || '🎓 Eğitim Desteği'}
+                  <span className="absolute bottom-2 right-2 bg-[#0F2040] text-white text-[10px] font-semibold px-2.5 py-1 rounded-full max-w-[150px] line-clamp-2">
+                    {meta?.impact || 'Eğitim desteği'}
                   </span>
                 </div>
 

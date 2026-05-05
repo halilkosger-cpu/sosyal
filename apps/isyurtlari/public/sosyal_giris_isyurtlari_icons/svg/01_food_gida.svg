@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Gıda">
+  <title>Gıda</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M232 612C150 542 134 414 198 324C264 232 390 198 492 246C572 284 624 360 636 448" stroke="#0F2040"/>
+    <path d="M252 612C338 650 444 622 498 544" stroke="#0F2040"/>
+    <path d="M404 704C428 554 560 430 790 442C782 650 624 756 404 704Z" stroke="#FF6000"/>
+    <path d="M404 704C506 620 608 552 724 520" stroke="#FF6000"/>
+  </g>
+</svg>

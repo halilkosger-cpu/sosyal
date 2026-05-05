@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Hakkımızda">
+  <title>Hakkımızda</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <circle cx="512" cy="236" r="74" stroke="#0F2040"/>
+    <path d="M348 464C370 372 432 328 512 328C592 328 654 372 676 464" stroke="#0F2040"/>
+    <path d="M270 600C360 600 438 622 512 704C586 622 664 600 754 600V796C646 796 574 770 512 704C450 770 378 796 270 796V600Z" stroke="#0F2040"/>
+    <path d="M512 566C478 520 404 540 404 604C404 674 512 724 512 724C512 724 620 674 620 604C620 540 546 520 512 566Z" stroke="#FF6000"/>
+  </g>
+</svg>

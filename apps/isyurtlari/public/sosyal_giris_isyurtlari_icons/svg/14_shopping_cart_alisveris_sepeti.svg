@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Alışveriş Sepeti">
+  <title>Alışveriş Sepeti</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M158 282H252L318 638H724C772 638 812 604 822 558L872 336H322" stroke="#0F2040"/>
+    <path d="M350 430H790" stroke="#FF6000"/>
+    <circle cx="390" cy="774" r="56" stroke="#0F2040"/>
+    <circle cx="704" cy="774" r="56" stroke="#0F2040"/>
+  </g>
+</svg>

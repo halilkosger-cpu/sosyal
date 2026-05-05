@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Sosyal Proje">
+  <title>Sosyal Proje</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <circle cx="512" cy="224" r="70" stroke="#FF6000"/>
+    <circle cx="260" cy="512" r="70" stroke="#0F2040"/>
+    <circle cx="512" cy="800" r="70" stroke="#0F2040"/>
+    <circle cx="764" cy="512" r="70" stroke="#0F2040"/>
+    <path d="M352 316C414 256 610 256 672 316" stroke="#FF6000"/>
+    <path d="M820 614C780 712 650 800 582 804" stroke="#FF6000"/>
+    <path d="M352 708C290 654 250 600 244 582" stroke="#0F2040"/>
+    <path d="M672 708C734 654 774 600 780 582" stroke="#0F2040"/>
+  </g>
+</svg>

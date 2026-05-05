@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Kampanya / İndirim">
+  <title>Kampanya / İndirim</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M290 212L708 150C772 140 828 196 818 260L756 678C752 704 738 728 720 746L500 966L150 616L370 396C388 378 412 364 438 360" stroke="#0F2040"/>
+    <circle cx="590" cy="306" r="44" stroke="#0F2040"/>
+    <path d="M512 442L404 610H522L458 756L652 544H532L612 442H512Z" stroke="#FF6000"/>
+  </g>
+</svg>

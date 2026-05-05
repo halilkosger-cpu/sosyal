@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Bu Hafta Özel">
+  <title>Bu Hafta Özel</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M744 524C744 666 628 782 486 782C344 782 228 666 228 524C228 382 344 266 486 266C588 266 676 326 718 412" stroke="#0F2040"/>
+    <line x1="486" y1="376" x2="486" y2="530" stroke="#0F2040"/>
+    <line x1="486" y1="530" x2="586" y2="600" stroke="#0F2040"/>
+    <path d="M686 326C734 364 764 420 774 484" stroke="#FF6000"/>
+    <path d="M720 540L626 704H746L692 870L868 642H752L820 540H720Z" stroke="#FF6000"/>
+  </g>
+</svg>

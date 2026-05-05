@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Güvenli Ödeme">
+  <title>Güvenli Ödeme</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M512 124L806 238V448C806 650 682 812 512 900C342 812 218 650 218 448V238L512 124Z" stroke="#0F2040"/>
+    <rect x="326" y="362" width="372" height="226" rx="32" stroke="#0F2040"/>
+    <line x1="326" y1="438" x2="698" y2="438" stroke="#0F2040"/>
+    <rect x="384" y="496" width="90" height="52" rx="12" stroke="#FF6000"/>
+    <path d="M438 668L500 730L626 604" stroke="#FF6000"/>
+  </g>
+</svg>

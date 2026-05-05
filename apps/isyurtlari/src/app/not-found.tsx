@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LuArrowLeft, LuHome, LuSearch } from 'react-icons/lu';
+import { IconCart, IconTransfer } from '@/components/Icons';
 
 export default function NotFound() {
   return (
@@ -17,7 +17,7 @@ export default function NotFound() {
         {/* Icon */}
         <div className="mb-8">
           <div className="inline-block bg-white rounded-full p-6 shadow-lg">
-            <LuSearch size={48} className="text-[#FF6000]" />
+            <IconCart className="w-12 h-12 text-[#FF6000]" />
           </div>
         </div>
 
@@ -32,14 +32,14 @@ export default function NotFound() {
             href="/"
             className="inline-flex items-center justify-center gap-2 bg-[#FF6000] hover:bg-[#CC4E00] text-white font-semibold px-6 py-3 rounded-lg transition-colors"
           >
-            <LuHome size={18} />
+            <IconTransfer className="w-5 h-5 object-contain brightness-0 invert" />
             Ana Sayfa
           </Link>
           <Link
             href="/ara"
             className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-900 font-semibold px-6 py-3 rounded-lg border border-gray-200 transition-colors"
           >
-            <LuSearch size={18} />
+            <IconCart className="w-5 h-5 object-contain" />
             Ürün Ara
           </Link>
         </div>
@@ -49,7 +49,7 @@ export default function NotFound() {
           onClick={() => window.history.back()}
           className="mt-6 inline-flex items-center gap-2 text-[#FF6000] hover:text-[#CC4E00] font-medium transition-colors"
         >
-          <LuArrowLeft size={18} />
+          <IconTransfer className="w-5 h-5 object-contain transform rotate-180" />
           Geri Dön
         </button>
       </div>

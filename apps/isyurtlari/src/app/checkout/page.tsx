@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { LuInfo } from 'react-icons/lu';
+import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
   id: string;
@@ -161,15 +162,15 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="store-shell">
       {/* Header */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/sepet" className="text-blue-600 hover:text-blue-700 font-medium">
-            ← Geri
+          <Link href="/sepet" className="text-[#CC4E00] hover:text-[#FF6000] font-medium">
+            Sepete geri dön
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Ödeme</h1>
-          <p className="text-gray-600 text-sm mt-1">🎓 Her satın alma, hükümlülerin yeniden başlamasına destek olur</p>
+          <p className="text-gray-600 text-sm mt-1">Her satın alma, hükümlülerin yeniden başlamasına destek olur.</p>
         </div>
       </div>
 
@@ -187,7 +188,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Kişisel Bilgiler */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="store-card rounded-2xl p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Kişisel Bilgiler</h2>
                 <div className="space-y-4">
                   <div>
@@ -199,7 +200,7 @@ export default function CheckoutPage() {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="store-input"
                       placeholder="Adınız Soyadınız"
                       required
                     />
@@ -213,7 +214,7 @@ export default function CheckoutPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="store-input"
                       placeholder="ornek@email.com"
                       required
                     />
@@ -227,7 +228,7 @@ export default function CheckoutPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="store-input"
                       placeholder="+90 (5XX) XXX XX XX"
                       required
                     />
@@ -236,7 +237,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Teslimat Adresi */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="store-card rounded-2xl p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Teslimat Adresi</h2>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -247,7 +248,7 @@ export default function CheckoutPage() {
                     value={formData.address}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="store-input"
                     placeholder="Ev/İş adresi"
                     required
                   />
@@ -255,7 +256,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Ödeme Yöntemi */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="store-card rounded-2xl p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Ödeme Yöntemi</h2>
                 <div className="space-y-4">
                   <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-not-allowed bg-gray-50 opacity-50 transition"
@@ -275,22 +276,22 @@ export default function CheckoutPage() {
                     <Image src="/iyzico.png" alt="iyzico" width={60} height={24} className="h-6 w-auto opacity-50" />
                   </label>
 
-                  <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{borderColor: paymentMethod === 'TRANSFER' ? '#2563eb' : undefined,
-                            backgroundColor: paymentMethod === 'TRANSFER' ? '#eff6ff' : undefined}}>
+                  <label className="flex items-center p-4 border rounded-2xl cursor-pointer hover:bg-orange-50/60 transition"
+                    style={{borderColor: paymentMethod === 'TRANSFER' ? '#FF6000' : '#e5e7eb',
+                            backgroundColor: paymentMethod === 'TRANSFER' ? '#fff7ed' : undefined}}>
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="TRANSFER"
                       checked={paymentMethod === 'TRANSFER'}
                       onChange={() => setPaymentMethod('TRANSFER')}
-                      className="w-4 h-4 text-blue-600"
+                      className="w-4 h-4 accent-[#FF6000]"
                     />
                     <div className="ml-4 flex-1">
                       <p className="font-semibold text-gray-900">Havale / EFT</p>
                       <p className="text-sm text-gray-600">Manuel ödeme onayı gerekir</p>
                     </div>
-                    <span className="text-2xl">🏦</span>
+                    <IconTransfer className="w-10 h-10 object-contain" />
                   </label>
                 </div>
               </div>
@@ -306,9 +307,9 @@ export default function CheckoutPage() {
                     İşleniyor...
                   </>
                 ) : paymentMethod === 'CREDIT_CARD' ? (
-                  '💳 Kredi Kartı ile Destekle'
+                  'Kredi Kartı ile Destekle'
                 ) : (
-                  '🏦 Havale ile Devam Et'
+                  'Havale ile Devam Et'
                 )}
               </button>
             </form>
@@ -316,16 +317,19 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-20 space-y-6">
+            <div className="store-card rounded-2xl p-6 sticky top-20 space-y-6">
               {/* Impact Preview */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="text-sm font-bold text-blue-900 mb-3">🎓 Yardımın Etkisi</h4>
+              <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <IconSocialContribution className="w-8 h-8 object-contain" />
+                  <h4 className="text-sm font-bold text-gray-900">Yardımın etkisi</h4>
+                </div>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-blue-900">
+                  <div className="flex justify-between text-gray-700">
                     <span>Eğitim Saati</span>
                     <span className="font-bold">{cart.reduce((sum, item) => sum + item.quantity * 5, 0)} saat</span>
                   </div>
-                  <div className="flex justify-between text-blue-900">
+                  <div className="flex justify-between text-gray-700">
                     <span>Desteklenen Hükümlü</span>
                     <span className="font-bold">~{Math.ceil(cart.reduce((sum, item) => sum + item.quantity, 0) * 0.5)} kişi</span>
                   </div>
