@@ -3,6 +3,19 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+const updateAnalyticsConsent = (analyticsStorage: 'granted' | 'denied') => {
+  window.gtag?.('consent', 'update', {
+    analytics_storage: analyticsStorage,
+    ad_storage: 'denied',
+  });
+};
+
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
 
@@ -16,12 +29,14 @@ export default function CookieConsent() {
   const handleAccept = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    updateAnalyticsConsent('granted');
     setShowBanner(false);
   };
 
   const handleReject = () => {
     localStorage.setItem('cookieConsent', 'rejected');
     localStorage.setItem('cookieConsentDate', new Date().toISOString());
+    updateAnalyticsConsent('denied');
     setShowBanner(false);
   };
 

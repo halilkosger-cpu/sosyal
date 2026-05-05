@@ -1,6 +1,11 @@
 import { MetadataRoute } from 'next';
 import { prisma } from '@isyurtlari/database';
 
+const hasDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL;
+  return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://isyurtlari.com.tr';
 
@@ -55,6 +60,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
   ];
+
+  if (!hasDatabaseUrl()) {
+    return staticPages;
+  }
 
   try {
     // Kategori sayfaları
