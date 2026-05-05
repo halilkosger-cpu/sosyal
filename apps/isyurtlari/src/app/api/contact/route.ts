@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { emailTemplates } from '@/lib/email-templates';
 
 const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
 
@@ -30,16 +31,16 @@ export async function POST(request: NextRequest) {
     });
 
     // Müşteriye teşekkür emaili gönder
+    const confirmationEmailHtml = emailTemplates.contactConfirmation({
+      name,
+      email,
+    });
+
     await resend.emails.send({
       from: 'info@isyurtlari.com.tr',
       to: email,
       subject: 'İletişim formunuz alındı',
-      html: `
-        <h2>Merhaba ${name},</h2>
-        <p>İletişim formunuz başarıyla alınmıştır.</p>
-        <p>En kısa sürede size geri dönüş yapacağız.</p>
-        <p>Teşekkürler,<br />isyurtlari.com.tr Ekibi</p>
-      `,
+      html: confirmationEmailHtml,
     });
 
     return NextResponse.json(

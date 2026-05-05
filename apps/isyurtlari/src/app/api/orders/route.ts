@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
+import { emailTemplates } from '@/lib/email-templates';
 
 // Email sending function
 async function sendOrderEmail(
@@ -82,34 +83,16 @@ async function sendOrderEmail(
         html: emailContent,
       });
 
-      // Customer confirmation email
-      const customerEmailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #FF6000;">Merhaba ${customerName}! 👋</h2>
-          <p>Siparişiniz başarıyla oluşturulmuştur.</p>
-
-          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3>Sipariş Numarası: <strong style="color: #FF6000;">${orderNumber}</strong></h3>
-            <p><strong>Toplam Tutar:</strong> ₺${totalAmount.toFixed(2)}</p>
-          </div>
-
-          <h3>Ödeme Bilgileri:</h3>
-          <p><strong>Ödeme Yöntemi:</strong> Havale/EFT</p>
-          <div style="background: #f0f7ff; padding: 15px; border-left: 4px solid #FF6000;">
-            <p><strong>Banka:</strong> ${bankName}</p>
-            <p><strong>Hesap Sahibi:</strong> ${accountName}</p>
-            <p><strong>IBAN:</strong> <code style="background: #eee; padding: 5px; font-family: monospace;">${iban}</code></p>
-            <p style="color: #666; font-size: 12px;"><strong>⚠️ Lütfen havale açıklamasına sipariş numarasını yazınız:</strong> ${orderNumber}</p>
-          </div>
-
-          <h3>Teslimat Adresi:</h3>
-          <p>${shippingAddress}</p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="color: #666; font-size: 12px;">Sorularınız için <strong>info@isyurtlari.com.tr</strong> adresine yazabilirsiniz.</p>
-          <p style="color: #666; font-size: 12px;">Teşekkürler,<br />isyurtlari.com.tr Ekibi</p>
-        </div>
-      `;
+      // Customer confirmation email with template
+      const customerEmailHtml = emailTemplates.orderConfirmation({
+        orderNumber,
+        customerName,
+        items: orderWithItems?.items || [],
+        total: totalAmount,
+        bankName,
+        accountName,
+        iban,
+      });
 
       await resend.emails.send({
         from: 'info@isyurtlari.com.tr',
