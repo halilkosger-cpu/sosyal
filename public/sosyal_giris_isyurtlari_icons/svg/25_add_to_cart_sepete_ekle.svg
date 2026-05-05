@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Sepete Ekle">
+  <title>Sepete Ekle</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M152 292H238L300 630H694C742 630 782 596 792 550L842 352H308" stroke="#0F2040"/>
+    <circle cx="374" cy="780" r="54" stroke="#0F2040"/>
+    <circle cx="680" cy="780" r="54" stroke="#0F2040"/>
+    <line x1="572" y1="472" x2="734" y2="472" stroke="#FF6000"/>
+    <line x1="653" y1="392" x2="653" y2="552" stroke="#FF6000"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Kolay İade">
+  <title>Kolay İade</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M282 318L522 206L750 318V620L510 742L282 620V318Z" stroke="#0F2040"/>
+    <path d="M282 318L510 444L750 318" stroke="#0F2040"/>
+    <line x1="510" y1="444" x2="510" y2="742" stroke="#0F2040"/>
+    <path d="M396 264L626 390V510" stroke="#FF6000"/>
+    <path d="M760 632C736 748 626 824 510 800C436 784 376 738 344 672" stroke="#FF6000"/>
+    <path d="M350 560L344 672L458 656" stroke="#FF6000"/>
+  </g>
+</svg>

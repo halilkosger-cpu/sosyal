@@ -1,0 +1,53 @@
+ChatGPT'ye Gönderilecek Refinement Prompt'u
+===========================================
+
+Kopyala → ChatGPT Pro'ya yapıştır → Enter'e bas
+
+---
+
+Lütfen aşağıdaki ikonları refactor et. Ana hedef: Orange accent (#FF6000) daha belirgin hale getirmek.
+
+KURALLAR:
+- Her ikonda en az 1 ana eleman #FF6000 (turuncu) olmalı
+- Diğer elementler #0F2040 (navy) kalsa
+- Oran: %60-70 navy, %30-40 orange (aksan)
+- Stroke weight: 2px (tutarlı kalsa)
+- Rounded corners: 15-25% (değişmesin)
+
+REFACTOR EDİLMESİ GEREKEN İKONLAR:
+
+SAYFA 1:
+1. Gıda → Yaprak turuncu, tabak navy
+2. Ahşap → Testere/baltası turuncu, ağaç navy
+3. Hakkımızda → Kalp turuncu, insan navy
+4. Meslek Eğitimi → Işık ampülü turuncu, kişi navy
+5. Sosyal Proje → En az 1 daire/bağlantı turuncu
+
+SAYFA 2:
+6. Adalet Bakanlığı → Kalp turuncu, terazı navy
+7. Reentegrasyon → Merkez spiral turuncu, dış spiral navy
+8. Bu Hafta Özel → Şimşek turuncu, saat navy
+
+SAYFA 3:
+9. Havale/EFT → Ok/yön turuncu, kart navy
+10. Hızlı Kargo → Ok/hareket turuncu, kutu navy
+11. Kolay İade → Ok turuncu, kutu navy
+12. Sosyal Katkı → Kalp turuncu, el navy
+
+KALABİLECEK İKONLAR (Zaten iyi):
+- Tekstil, Mobilya, Alışveriş Sepeti, Kampanya/İndirim, Istihdam Desteği, Eğitim Hedefi, BAŞARILI (Roket), Alışverişe Devam Et, Havale Bilgileri, Dokuma, Bu Ürün Kimden Geliyor
+
+ÖRNEK (Gıda İkonu):
+❌ ESKI: Yaprak navy, tabak navy → Çok sade, orange yok
+✅ YENİ: Yaprak turuncu (belirgin), tabak navy → Daha canlı, marka aligned
+
+ÖRNEK (Adalet İkonu):
+❌ ESKI: Terazı navy, kalp navy → Duygusuz görünüyor
+✅ YENİ: Terazı navy (adalet), kalp turuncu (insaniyet) → Perfect balance
+
+Tamamında:
+- SVG kod + görsel versiyon çıkar
+- Tüm 27 ikonu bir kez daha kontrol et (tutarlılık)
+- Figma linki verirsen daha iyi (edit kolaylığı)
+
+Başla! Bu refinement'tan sonra ikonlar mükemmel olacak.

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Müşteri Destek">
+  <title>Müşteri Destek</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M222 540V446C222 286 352 156 512 156C672 156 802 286 802 446V540" stroke="#0F2040"/>
+    <rect x="148" y="492" width="132" height="184" rx="36" stroke="#0F2040"/>
+    <rect x="744" y="492" width="132" height="184" rx="36" stroke="#0F2040"/>
+    <path d="M802 676C802 766 734 828 620 842" stroke="#0F2040"/>
+    <circle cx="576" cy="842" r="34" stroke="#0F2040"/>
+    <path d="M512 408C474 356 390 376 390 448C390 528 512 592 512 592C512 592 634 528 634 448C634 376 550 356 512 408Z" stroke="#FF6000"/>
+  </g>
+</svg>

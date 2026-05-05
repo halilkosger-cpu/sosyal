@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Eğitim Hedefi">
+  <title>Eğitim Hedefi</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M130 724L368 360L520 530L650 394L894 724H130Z" stroke="#0F2040"/>
+    <path d="M420 658C470 596 506 536 518 472C534 390 496 340 448 296" stroke="#FF6000"/>
+    <line x1="512" y1="188" x2="512" y2="336" stroke="#0F2040"/>
+    <path d="M512 188H710L660 260L710 332H512" stroke="#FF6000"/>
+  </g>
+</svg>

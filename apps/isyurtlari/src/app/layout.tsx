@@ -33,19 +33,42 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   ...defaultMetadata,
+  title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+  description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Türkiye geneline hızlı kargo, güvenli ödeme.',
   keywords: [
     'işyurtları online mağaza',
     'işyurtları ürün satış',
-    'sosyal giriş ürünleri',
+    'sosyal girişim ürünleri',
     'hükümlü ürünleri',
     'rehabilitasyon ürünleri',
-    'sosyal girişim ürünleri',
+    'sosyal girişimim ürünleri',
     'el yapımı ürünler türkiye',
     'doğal katkısız gıda',
     'hükümlü destekle',
     'sosyal sorumluluk',
     'rehabilitasyon projesi',
   ],
+  openGraph: {
+    ...defaultMetadata.openGraph,
+    type: 'website',
+    url: 'https://isyurtlari.com.tr',
+    title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+    description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler. Gıda, tekstil, ahşap ve el sanatları.',
+    images: [
+      {
+        url: 'https://isyurtlari.com.tr/logo.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'İsyurtları Logo',
+      },
+    ],
+  },
+  twitter: {
+    ...defaultMetadata.twitter,
+    card: 'summary_large_image',
+    title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+    description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler.',
+  },
 };
 
 const categories = [
@@ -229,7 +252,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white font-bold">Kurumsal</h3>
                 <ul className="space-y-2">
                   <li><Link href="/hakkimizda" className="text-gray-300 hover:text-white text-sm transition font-medium">Hakkımızda</Link></li>
-                  <li><Link href="/guvenlı-aliveri" className="text-gray-300 hover:text-white text-sm transition font-medium">Güvenli Alışveriş</Link></li>
+                  <li><Link href="/guvenli-alisveris" className="text-gray-300 hover:text-white text-sm transition font-medium">Güvenli Alışveriş</Link></li>
                   <li><Link href="/kvkk" className="text-gray-300 hover:text-white text-sm transition font-medium">KVKK</Link></li>
                   <li><Link href="/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Mesafeli Satış Sözleşmesi</Link></li>
                 </ul>

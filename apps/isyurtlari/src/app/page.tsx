@@ -105,8 +105,8 @@ export default function HomePage() {
               <span>{content.home.hero.badge}</span>
             </div>
             <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.05] mb-6 tracking-normal">
-              {content.home.hero.title}<br />
-              <span className="font-bold text-[#FF7A1A]">{content.home.hero.titleHighlight}</span> {content.home.hero.titleSuffix}
+              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri<br />
+              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Online Mağazası
             </h1>
             <p className="text-white/75 text-[17px] md:text-[19px] mb-9 max-w-2xl leading-8 font-normal">
               {content.home.hero.subtitle}

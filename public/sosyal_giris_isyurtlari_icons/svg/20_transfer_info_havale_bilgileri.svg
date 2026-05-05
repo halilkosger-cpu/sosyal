@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Havale Bilgileri">
+  <title>Havale Bilgileri</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M234 154H640L790 304V760C790 808 752 846 704 846H234V154Z" stroke="#0F2040"/>
+    <path d="M640 154V304H790" stroke="#0F2040"/>
+    <line x1="302" y1="380" x2="528" y2="380" stroke="#FF6000"/>
+    <line x1="302" y1="464" x2="608" y2="464" stroke="#0F2040"/>
+    <line x1="302" y1="548" x2="552" y2="548" stroke="#0F2040"/>
+    <line x1="302" y1="632" x2="482" y2="632" stroke="#0F2040"/>
+    <circle cx="798" cy="478" r="72" stroke="#0F2040"/>
+    <line x1="798" y1="446" x2="798" y2="480" stroke="#0F2040"/>
+    <line x1="798" y1="526" x2="798" y2="526" stroke="#0F2040"/>
+    <rect x="668" y="662" width="210" height="150" rx="24" stroke="#0F2040"/>
+    <path d="M718 662V604C718 552 760 510 812 510C864 510 906 552 906 604V662" stroke="#0F2040"/>
+    <line x1="772" y1="732" x2="772" y2="760" stroke="#FF6000"/>
+  </g>
+</svg>

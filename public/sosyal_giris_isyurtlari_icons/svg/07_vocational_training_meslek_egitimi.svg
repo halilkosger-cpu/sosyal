@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Meslek Eğitimi">
+  <title>Meslek Eğitimi</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <circle cx="312" cy="278" r="66" stroke="#0F2040"/>
+    <path d="M206 630V490C206 440 246 400 296 400H370C418 400 446 430 464 470" stroke="#0F2040"/>
+    <path d="M360 548C436 548 474 486 530 410" stroke="#0F2040"/>
+    <rect x="160" y="670" width="628" height="78" rx="18" stroke="#0F2040"/>
+    <line x1="236" y1="748" x2="236" y2="842" stroke="#0F2040"/>
+    <line x1="710" y1="748" x2="710" y2="842" stroke="#0F2040"/>
+    <rect x="600" y="546" width="96" height="124" rx="18" stroke="#0F2040"/>
+    <path d="M660 268C660 214 704 170 758 170C812 170 856 214 856 268C856 304 836 334 806 354V392H710V354C680 334 660 304 660 268Z" stroke="#FF6000"/>
+    <line x1="722" y1="438" x2="794" y2="438" stroke="#FF6000"/>
+    <line x1="730" y1="480" x2="786" y2="480" stroke="#FF6000"/>
+    <line x1="758" y1="102" x2="758" y2="74" stroke="#FF6000"/>
+    <line x1="648" y1="148" x2="628" y2="128" stroke="#FF6000"/>
+    <line x1="868" y1="148" x2="888" y2="128" stroke="#FF6000"/>
+  </g>
+</svg>

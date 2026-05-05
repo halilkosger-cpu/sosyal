@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Sipariş Takibi">
+  <title>Sipariş Takibi</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M230 332L464 220L698 332V620L464 742L230 620V332Z" stroke="#0F2040"/>
+    <path d="M230 332L464 454L698 332" stroke="#0F2040"/>
+    <line x1="464" y1="454" x2="464" y2="742" stroke="#0F2040"/>
+    <path d="M350 274L580 396V512" stroke="#FF6000"/>
+    <path d="M774 276C850 276 912 338 912 414C912 532 774 666 774 666C774 666 636 532 636 414C636 338 698 276 774 276Z" stroke="#FF6000"/>
+    <circle cx="774" cy="414" r="42" stroke="#FF6000"/>
+  </g>
+</svg>

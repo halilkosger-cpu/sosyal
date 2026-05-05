@@ -1,0 +1,67 @@
+# ChatGPT Pro - İkon Tasarım İsteği (Kısa Versiyon)
+
+Senin tasarlamana ihtiyacım olan ikonlar, "Sosyal Giriş İşyurtları" adlı sosyal girişim e-ticaret platformu için. Hükümlülerin rehabilitasyonunu destekleyen bu proje, modern, insancıl ve güven verici ikonlar gerektiriyor.
+
+## MARKA RENKLERİ & STIL:
+- Ana Renk: #FF6000 (turuncu), Accent: #CC4E00
+- Background: #0F2040 (navy/dark)
+- Stil: Apple SF Symbols + Feather Icons tarzı - geometric, minimal, stroke-based
+- Format: SVG, 2px stroke, rounded corners, organik + geometric fusion
+- YAPMAYACAKLAR: Filled areas, 3D effects, complex shadows, gradients
+
+## İKON LİSTESİ & KONSEPTLER:
+
+### KATEGORILER:
+1. **Gıda** - Yaprak + tabak, doğallık, organik şekiller
+2. **Tekstil** - Dokuma tezgahı veya kumaş rullosu, zanaat hissi
+3. **Ahşap** - Ağaç + testere veya marangozluk aracı, kalite
+4. **Dokuma** - İplikler, tezgah, akışkan formlar, yaratıcılık
+5. **Mobilya** - Modern sandalye + masa silueti, tasarımcı esintisi
+
+### MARKA & SORUMLULUK:
+6. **Hakkımızda** - Kalp + insan, açık kitap, samimi bağlantı
+7. **Meslek Eğitimi** - Kişi + ışık, tezgah, dinamik ileriye momentum
+8. **Sosyal Proje** - Birleşen eller, ağ, kapsayıcılık, dayanışma
+9. **Adalet Bakanlığı** - Terazı + kalp, güvenilir ama sıcak
+10. **Istihdam Desteği** - İnsan + grafik, ramp, kariyer fırsat
+11. **Reentegrasyon** - Spiral ok, umut verici dönüş, yeniden başlama
+12. **Eğitim Hedefi** - Ok + hedef, tepe, ilham verici ilerleme
+13. **Bu Ürün Kimden Geliyor** - Kişi + ürün, enerji transferi, insani hikaye
+
+### E-TİCARET:
+14. **Alışveriş Sepeti** - Modern sepet silueti (market sepeti değil)
+15. **Kampanya/İndirim** - Şimşek + etiket, dinamik tasarruf, % ile
+16. **Bu Hafta Özel** - Şimşek + daire, saat + heyecan, aciliyet
+17. **Havale/EFT** - Banka kartı + ok, para transferi, güvenli dijital
+18. **BAŞARILI (Ödeme Sonrası)** - Roket uçuşu, onay + yıldızlar, kutlama
+19. **Alışverişe Devam Et** - Açık kapı, ok, davetkar mağaza giriş
+20. **Havale Bilgileri** - Belge + bilgi, kilitli zarf, verified check
+
+### GÜVEN İKONLARI:
+21. **Hızlı Kargo** - Kutu + ok, hareket, hız
+22. **Kolay İade** - Kutu + geri ok, rahatlık
+23. **Sosyal Katkı** - Kalp + el, insani dokunuş, sıcaklık
+
+## TASARIM TALİMATLARI:
+- Tüm ikonlar 1024x1024px base size (48px'te net görülmeli)
+- Stroke weight: 2px (scale'de 1.5-2px görünsün)
+- Renk: #0F2040 (default/outline), #FF6000 (highlight), #FFFFFF (light)
+- Max 4-5 şekil per icon (basit, okunabilir)
+- Rounded corners: 15-25% radius
+- Tutarlı stroke weight, negative space'i kullan
+- 2024+ tasarım trendleri, iOS-inspired minimalizm
+
+## ÇIKTI:
+- SVG dosyası (48px, 64px, 128px PNG versions de)
+- Dark navy outline + orange highlight versiyonları
+- Tutarlı design language (tüm ikonlar aynı yerde çıkmış gibi görünmeli)
+- Figma export tercih edilir (edit kolay olsun)
+
+## BELİRLEMELER:
+✓ Sosyal proje = insancıl, sıcak, güven verici
+✓ Modern = geometric ama accessible
+✓ Tutarlılık = tüm ikonlar aynı tasarım dilini konuşmalı
+✓ Türkiye = kültüre uygun, şekiller sağlıklı olmalı
+✓ Erişilebilir = renk körlerine karşı kontrastlı, 48px'te net
+
+Başla! 23 ikon için hazırız. Bitirdikten sonra SVG + PNG exports ve Figma linkini paylaş.

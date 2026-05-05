@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Alışverişe Devam Et">
+  <title>Alışverişe Devam Et</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M268 212H612V812H268V212Z" stroke="#0F2040"/>
+    <path d="M612 276H764V746H612" stroke="#0F2040"/>
+    <circle cx="540" cy="512" r="20" stroke="#0F2040"/>
+    <line x1="220" y1="812" x2="820" y2="812" stroke="#0F2040"/>
+    <path d="M628 512H824M748 436L824 512L748 588" stroke="#FF6000"/>
+  </g>
+</svg>

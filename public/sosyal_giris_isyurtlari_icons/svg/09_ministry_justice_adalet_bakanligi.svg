@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Adalet Bakanlığı">
+  <title>Adalet Bakanlığı</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <line x1="512" y1="282" x2="512" y2="742" stroke="#0F2040"/>
+    <line x1="246" y1="322" x2="778" y2="322" stroke="#0F2040"/>
+    <line x1="384" y1="824" x2="640" y2="824" stroke="#0F2040"/>
+    <path d="M440 742H584C610 742 632 764 632 790V824H392V790C392 764 414 742 440 742Z" stroke="#0F2040"/>
+    <path d="M276 322L156 604H396L276 322Z" stroke="#0F2040"/>
+    <path d="M748 322L628 604H868L748 322Z" stroke="#0F2040"/>
+    <path d="M156 604C172 678 380 678 396 604" stroke="#0F2040"/>
+    <path d="M628 604C644 678 852 678 868 604" stroke="#0F2040"/>
+    <path d="M512 292C464 228 360 254 360 344C360 440 512 512 512 512C512 512 664 440 664 344C664 254 560 228 512 292Z" stroke="#FF6000"/>
+  </g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Havale / EFT">
+  <title>Havale / EFT</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <rect x="164" y="260" width="560" height="338" rx="44" stroke="#0F2040"/>
+    <line x1="164" y1="360" x2="724" y2="360" stroke="#0F2040"/>
+    <rect x="224" y="430" width="92" height="60" rx="12" stroke="#FF6000"/>
+    <line x1="230" y1="532" x2="300" y2="532" stroke="#0F2040"/>
+    <line x1="360" y1="532" x2="430" y2="532" stroke="#0F2040"/>
+    <line x1="490" y1="532" x2="560" y2="532" stroke="#0F2040"/>
+    <circle cx="764" cy="594" r="126" stroke="#FF6000"/>
+    <path d="M710 594H818M774 550L818 594L774 638" stroke="#FF6000"/>
+  </g>
+</svg>

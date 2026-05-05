@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Başarılı">
+  <title>Başarılı</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M392 594C376 506 408 386 502 292C594 200 710 162 792 174C804 256 766 372 674 464C580 558 460 610 392 594Z" stroke="#0F2040"/>
+    <circle cx="616" cy="350" r="56" stroke="#FF6000"/>
+    <path d="M392 594L288 650L334 524" stroke="#0F2040"/>
+    <path d="M512 704L570 598L440 642" stroke="#0F2040"/>
+    <path d="M346 690C296 714 250 756 218 820" stroke="#0F2040"/>
+    <path d="M444 666C418 728 374 774 312 806" stroke="#FF6000"/>
+    <path d="M754 138L802 236" stroke="#FF6000"/>
+    <polygon points="820,336 844,392 904,392 858,430 876,490 820,454 764,490 782,430 736,392 796,392" stroke="#FF6000"/>
+  </g>
+</svg>

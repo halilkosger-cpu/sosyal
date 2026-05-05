@@ -1,0 +1,51 @@
+ChatGPT'ye Gönderilecek Figma İsteği
+====================================
+
+Aşağıdaki metni ChatGPT linki açıp, chat box'ına yapıştır ve Enter'e bas:
+
+---
+
+Lütfen tüm 27 SVG ikonunun Figma dosyasını oluştur.
+
+Figma'da:
+- Her ikon ayrı artboard'da olsun
+- SVG olarak export edilebilsin
+- PNG (48px, 64px, 128px) olarak da export edilebilsin
+
+Sonra Figma dosyasının linki (share linki) ver.
+
+Örnek: https://www.figma.com/file/xxxxx/...
+
+Figma linki alınca, SVG ve PNG'leri indirebilirim.
+
+Başla!
+
+---
+
+VEYA (Figma yoksa):
+
+Lütfen tüm 27 SVG ikonunun SVG kodlarını ZIP dosyası olarak indir.
+Download linki ver → Direkt SVG dosyalarını alabilirim.
+
+---
+
+EN BASIT (Eğer ikisi de yoksa):
+
+Tüm SVG kodlarını bir metin dosyasında birleştir:
+
+---
+// food.svg
+<svg>...</svg>
+
+// textile.svg
+<svg>...</svg>
+
+// wood.svg
+<svg>...</svg>
+
+... (27 tane)
+---
+
+Bu formatta ver → Copy-paste yapabilirim.
+
+Başla!

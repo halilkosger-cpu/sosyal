@@ -70,7 +70,15 @@
       "Bash(npm:*)",
       "Bash(pnpm build:*)",
       "Read(//c/sosyal/apps/isyurtlari/**)",
-      "Bash(find .:*)"
+      "Bash(find .:*)",
+      "Bash(pandoc \"C:\\\\sosyal\\\\PRISTINE_Marketing_Strategy.md\" -o \"C:\\\\sosyal\\\\PRISTINE_Marketing_Strategy.docx\")",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "PowerShell(New-Item *)",
+      "WebFetch(domain:localhost)",
+      "PowerShell(head *)",
+      "PowerShell(vercel *)",
+      "WebFetch(domain:www.isyurtlari.com.tr)",
+      "PowerShell(Move-Item *)"
     ]
   },
   "model": "claude-haiku-4-5-20251001"

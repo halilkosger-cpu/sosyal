@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Reentegrasyon">
+  <title>Reentegrasyon</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M816 620C766 760 620 850 466 826C300 800 188 644 214 478C242 304 406 186 580 214C706 236 806 336 828 462" stroke="#0F2040"/>
+    <path d="M828 462L894 384M828 462L746 434" stroke="#0F2040"/>
+    <path d="M636 562C610 636 532 684 452 670C366 656 308 574 322 488C336 398 422 336 512 352C578 364 630 416 642 482" stroke="#FF6000"/>
+    <path d="M642 482C650 532 614 588 554 604" stroke="#FF6000"/>
+  </g>
+</svg>

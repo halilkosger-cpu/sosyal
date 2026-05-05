@@ -1,0 +1,36 @@
+ORANGE ACCENT REFINEMENT
+========================
+Kopyala → ChatGPT'ye yapıştır → Enter
+
+---
+
+Lütfen 27 ikonun refactor versiyonunu yap. Orange accent (#FF6000) daha belirgin hale getir.
+
+KURAL: Her ikonda MIN 1 ana eleman #FF6000 olmalı. Oran: 60-70% navy (#0F2040), 30-40% orange
+
+REFACTOR EDILECEK (12-13 ikon):
+
+SAYFA 1:
+1. Gıda → Yaprak TURUNCU
+2. Ahşap → Testere TURUNCU
+3. Hakkımızda → Kalp TURUNCU
+4. Meslek Eğitimi → Işık TURUNCU
+5. Sosyal Proje → 1 daire TURUNCU
+
+SAYFA 2:
+6. Adalet Bakanlığı → Kalp TURUNCU
+7. Reentegrasyon → Merkez spiral TURUNCU
+8. Bu Hafta Özel → Şimşek TURUNCU
+
+SAYFA 3:
+9. Havale/EFT → Ok TURUNCU
+10. Hızlı Kargo → Ok TURUNCU
+11. Kolay İade → Ok TURUNCU
+12. Sosyal Katkı → Kalp TURUNCU
+
+KALSANLAR (DEĞİŞTİRME):
+- Tekstil, Mobilya, Istihdam Desteği, Eğitim Hedefi, BAŞARILI, Alışveriş Sepeti, Kampanya, Dokuma, vb
+
+ÇIKTI: 27 refactored ikon + SVG kodları
+
+Başla!

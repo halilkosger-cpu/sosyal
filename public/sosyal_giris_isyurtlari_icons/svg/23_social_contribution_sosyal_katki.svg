@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Sosyal Katkı">
+  <title>Sosyal Katkı</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M154 684C236 600 320 576 410 628H594C634 628 666 660 666 700C666 740 634 772 594 772H456" stroke="#0F2040"/>
+    <path d="M666 692L794 570C826 540 876 542 906 574C936 606 934 656 902 686L734 846C690 888 630 912 570 912H328C266 912 222 890 154 842" stroke="#0F2040"/>
+    <path d="M512 282C460 212 346 240 346 338C346 444 512 522 512 522C512 522 678 444 678 338C678 240 564 212 512 282Z" stroke="#FF6000"/>
+  </g>
+</svg>

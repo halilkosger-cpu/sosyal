@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="İstihdam Desteği">
+  <title>İstihdam Desteği</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <circle cx="318" cy="230" r="72" stroke="#0F2040"/>
+    <path d="M178 612V476C178 410 232 356 298 356H356C422 356 476 410 476 476V612" stroke="#0F2040"/>
+    <path d="M256 760L430 586H624L816 394" stroke="#0F2040"/>
+    <path d="M698 394H816V512" stroke="#0F2040"/>
+    <path d="M312 756L492 576L568 576" stroke="#FF6000"/>
+  </g>
+</svg>

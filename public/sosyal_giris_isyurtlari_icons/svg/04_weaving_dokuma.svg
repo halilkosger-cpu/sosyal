@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Dokuma">
+  <title>Dokuma</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="44">
+    <path d="M164 322C264 322 264 392 364 392S464 322 564 322S664 392 764 392" stroke="#0F2040"/>
+    <path d="M164 512C264 512 264 582 364 582S464 512 564 512S664 582 764 582" stroke="#0F2040"/>
+    <path d="M164 702C264 702 264 772 364 772S464 702 564 702S664 772 764 772" stroke="#0F2040"/>
+    <path d="M364 262V820" stroke="#0F2040"/>
+    <path d="M564 262V820" stroke="#0F2040"/>
+    <path d="M724 292C658 340 658 432 724 480" stroke="#FF6000"/>
+    <path d="M202 716C264 716 282 684 312 658" stroke="#FF6000"/>
+  </g>
+</svg>
