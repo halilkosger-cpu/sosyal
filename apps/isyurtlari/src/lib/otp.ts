@@ -2,7 +2,6 @@
 // In production, use Redis
 const otpStore = new Map<string, { code: string; expiresAt: number; attempts: number }>();
 
-const OTP_LENGTH = 6;
 const OTP_EXPIRY = 10 * 60 * 1000; // 10 minutes
 const MAX_ATTEMPTS = 5;
 
