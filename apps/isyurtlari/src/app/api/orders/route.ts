@@ -113,7 +113,7 @@ async function sendOrderEmail(
 
       await resend.emails.send({
         from: 'info@isyurtlari.com.tr',
-        to: body.email,
+        to: customerEmail,
         subject: `✅ Siparişiniz Onaylandı - #${orderNumber}`,
         html: customerEmailHtml,
       });
