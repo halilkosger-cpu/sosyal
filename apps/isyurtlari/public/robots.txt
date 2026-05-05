@@ -15,7 +15,7 @@ Allow: /kategori/
 Allow: /kampanya/
 Allow: /hakkimizda
 Allow: /bize-ulasin
-Allow: /guvenlı-aliveri
+Allow: /guvenli-alisveris
 Allow: /kvkk
 Allow: /gizlilik-sozlesmesi
 Allow: /mesafeli-satis-sozlesmesi
