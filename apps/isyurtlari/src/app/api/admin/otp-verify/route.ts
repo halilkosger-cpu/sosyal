@@ -7,9 +7,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-productio
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
 
 export async function POST(req: NextRequest) {
+  let email = 'unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+
   try {
-    const { email, code } = await req.json();
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const body = await req.json();
+    email = body.email;
+    const code = body.code;
 
     if (!email || !code) {
       return NextResponse.json(
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error) {
     console.error('OTP verification error:', error);
-    logAudit('OTP_VERIFY', email || 'unknown', 'failed', String(error), ip);
+    logAudit('OTP_VERIFY', email, 'failed', String(error), ip);
     return NextResponse.json(
       { error: 'Doğrulama başarısız' },
       { status: 500 }
