@@ -7,9 +7,12 @@ import { logAudit } from '@/lib/audit-log';
 const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
+  let email = 'unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+
   try {
-    const { email } = await req.json();
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const body = await req.json();
+    email = body.email;
 
     if (!email) {
       return NextResponse.json({ error: 'Email gereklidir' }, { status: 400 });
@@ -85,7 +88,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('OTP request error:', error);
-    logAudit('OTP_REQUEST', email || 'unknown', 'failed', String(error), ip);
+    logAudit('OTP_REQUEST', email, 'failed', String(error), ip);
     return NextResponse.json(
       { error: 'Giriş kodu gönderme başarısız' },
       { status: 500 }
