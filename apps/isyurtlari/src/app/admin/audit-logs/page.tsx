@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LuActivity, LuCheckCircle, LuXCircle, LuLoader, LuFilter } from 'react-icons/lu';
+import { LuActivity, LuCheck, LuX, LuLoader, LuFilter } from 'react-icons/lu';
 
 interface AuditLog {
   timestamp: string;
@@ -127,12 +127,12 @@ export default function AuditLogsPage() {
                       <div className="flex items-center gap-2">
                         {log.status === 'success' ? (
                           <>
-                            <LuCheckCircle className="text-green-600" size={18} />
+                            <LuCheck className="text-green-600 bg-green-100 rounded-full p-1" size={18} />
                             <span className="text-green-700 font-medium">Başarılı</span>
                           </>
                         ) : (
                           <>
-                            <LuXCircle className="text-red-600" size={18} />
+                            <LuX className="text-red-600 bg-red-100 rounded-full p-1" size={18} />
                             <span className="text-red-700 font-medium">Başarısız</span>
                           </>
                         )}
