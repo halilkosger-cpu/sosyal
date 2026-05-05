@@ -28,7 +28,7 @@ export const content = {
       {
         value: '70.000+',
         title: 'Hükümlü Çalışmakta',
-        description: 'Sosyal Giriş İşyurtlarında aktif olarak istihdam',
+        description: 'Sosyal Girişim İşyurtlarında aktif olarak istihdam',
       },
       {
         value: '500+',
@@ -47,7 +47,7 @@ export const content = {
         description: 'Meslek eğitimi ve yeniden başlama',
       },
       {
-        title: 'Sosyal Giriş Onaylı',
+        title: 'Sosyal Girişim Onaylı',
         description: 'Resmi program ve kalite güvencesi',
       },
       {

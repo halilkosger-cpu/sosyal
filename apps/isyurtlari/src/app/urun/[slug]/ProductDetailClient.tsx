@@ -49,7 +49,7 @@ const productValues: Record<string, string[]> = {
   'zeytinyag': [
     'Doğal zeytinyağı - hiçbir kimyasal katkı veya rafine işlem yapılmadan',
     'Geleneksel soğuk presyon yöntemiyle el emeğiyle üretilmiştir',
-    'Sosyal Giriş Beslenme Eğitimi Alan Hükümlüler Tarafından İşlenmiş',
+    'Sosyal Girişim Beslenme Eğitimi Alan Hükümlüler Tarafından İşlenmiş',
     'Kar amacı gütmeden sosyal sorumluluk projesi kapsamında',
     'Her satın alma, hükümlülerin yeniden sosyal hayata kazanılmasına destek olur'
   ],
@@ -57,19 +57,19 @@ const productValues: Record<string, string[]> = {
     'Saf ve pastörize sütünden geleneksel yöntemlerle yapılan peynir',
     'Hiçbir koruyucu madde, sentetik katkı veya boyar madde içermez',
     'Beslenme & Aşçılık Eğitimi Alan Hükümlüler Tarafından El Emeğiyle Üretildi',
-    'Sosyal Giriş Onaylı Sosyal Girişim Ürünü',
+    'Sosyal Girişim Onaylı Sosyal Girişimim Ürünü',
     'Devlet garantili, doğal ve sağlıklı üretim sürecine sahip'
   ],
   'badem': [
     'Doğal ve taze badem - kimyasal pestisit veya katkı madde kullanılmadan',
     'Seçilmiş, temizlenmiş ve doğal yöntemlerle işlenmiştir',
     'Beslenme Eğitim Programı Katılımcıları Tarafından El Emeğiyle Hazırlanmış',
-    'Kar amacı gütmeyen Sosyal Giriş sosyal projesi',
+    'Kar amacı gütmeyen Sosyal Girişim sosyal projesi',
     'Her alışveriş, hükümlülerin rehabilitasyon ve reintegrasyon programlarını destekler'
   ],
   'pirinc': [
     'Kaliteli, temiz ve doğal pirinç - hiçbir kimyasal işlem yapılmaksızın',
-    'Sosyal Giriş İşyurtlarında depolanan, kontrol edilen ürün',
+    'Sosyal Girişim İşyurtlarında depolanan, kontrol edilen ürün',
     'Beslenme Eğitimi Alan Hükümlüler Tarafından Paketlenmiştir',
     'Kar amacı gütmeden sunulan kaliteli beslenme ürünü',
     'Devlet tarafından onaylanmış ve güvence altına alınan sosyal girişim'
@@ -78,13 +78,13 @@ const productValues: Record<string, string[]> = {
     'Doğal sütten üretilen, hiçbir yapay maddesi olmayan tereyağ',
     'Geleneksel yöntemlerle el emeğiyle üretilmiştir',
     'Beslenme & Aşçılık Eğitim Programının Başarılı Ürünü',
-    'Sosyal Giriş Sosyal Sorumluluk Projesi',
+    'Sosyal Girişim Sosyal Sorumluluk Projesi',
     'Her satın alma doğal ve sağlıklı üretimi teşvik eder'
   ],
   'biber-receli': [
     'Seçilmiş, taze biber ve doğal şeker ile yapılan reçel',
     'Pestisite maruz kalmamış kaynaklardan el emeğiyle hazırlanmıştır',
-    'Sosyal Giriş Beslenme Eğitim Program Mezunları Tarafından Yapılmış',
+    'Sosyal Girişim Beslenme Eğitim Program Mezunları Tarafından Yapılmış',
     'Koruyucu ve katkı madde kullanılmaksızın geleneksel yöntemle konserve edilmiş',
     'Devlet destekli sosyal girişim - her satın alma bireyin yeniden başlamasını sağlar'
   ],
@@ -93,26 +93,26 @@ const productValues: Record<string, string[]> = {
     'İşyurtlarında higienik koşullarda işlenen, kalite kontrol geçmiş ürün',
     'Beslenme Eğitimi Alan Hükümlüler Tarafından Hazırlanmıştır',
     'Pestisit ve kimyasal işlem olmaksızın doğal sunumu korunmuştur',
-    'Kar amacı gütmeyen Sosyal Giriş Sosyal Girişimi'
+    'Kar amacı gütmeyen Sosyal Girişim Sosyal Girişimimi'
   ],
   'havlu-beyaz': [
     'Doğal pamuk kumaştan dokumacılık eğitimi alan hükümlüler tarafından yapılan havlu',
     'Hiçbir sentetik boya veya zararlı kimyasal kullanılmadan renglendirilmiş',
     'Derzillik ve Tekstil Meslek Eğitim Programının Başarılı Ürünü',
-    'Sosyal Giriş Onaylı - Sağlık ve Çevre Dostu Üretim',
+    'Sosyal Girişim Onaylı - Sağlık ve Çevre Dostu Üretim',
     'El emeğinin göz kamaştırıcı sonucu, her kullanımda rehabilitasyon programını desteklersiniz'
   ],
   'ahsap-sandalye': [
     'Doğal ve seçilmiş ahşap kullanılarak Marangozluk Eğitim Alan Hükümlüler Tarafından Yapılan Sandalye',
     'Hiçbir sentetik boya veya toksik kimyasal sürü kullanılmamıştır, tamamen doğal işlenmedir',
-    'Sosyal Giriş El Sanatları Programı - Yüksek Kalite Garantisi',
+    'Sosyal Girişim El Sanatları Programı - Yüksek Kalite Garantisi',
     'Çevre dostu, karbon ayakizi düşük, yerel üretim ürünü',
     'Her satın alma, çatılı ve sosyal yardım alan hükümlüyü destekler'
   ],
   'geleneksel-hali': [
     'Geleneksel dokuma tekniklerini kullanan Dokuma Terapisi Programı Katılımcıları Tarafından El Emeğiyle Yapılan Halı',
     'Doğal renklendirilmiş, sentetik boya ve kimyasal işlem uygulanmamış',
-    'Sosyal Giriş Sosyal Girişimi - Sanat ve Terapi Programı Ürünü',
+    'Sosyal Girişim Sosyal Girişimimi - Sanat ve Terapi Programı Ürünü',
     'Her iplik, hükümlünün sanat terapisi ve rehabilitasyon sürecinin parçasıdır',
     'Devlet koruması altında, etik ve sosyal sorumluluk ilkesiyle üretilmiş'
   ],
@@ -120,7 +120,7 @@ const productValues: Record<string, string[]> = {
 
 const getProductValues = (slug: string): string[] => {
   return productValues[slug] || [
-    'Sosyal Giriş Tarafından Onaylanmış El Yapımı Ürün',
+    'Sosyal Girişim Tarafından Onaylanmış El Yapımı Ürün',
     'Hiçbir Kimyasal Katkı Veya Yapay Madde İçermez',
     'Kar Amacı Gütmeden, Sosyal Sorumluluk İlkesiyle Üretilmiştir',
     'Hükümlülerin Meslek Eğitimi ve Rehabilitasyonunu Destekler',
@@ -396,7 +396,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-3 gap-3 mt-6">
               {[
                 { Icon: IconVocationalTraining, text: 'Meslek Eğitimi' },
-                { Icon: IconSuccess,            text: 'Sosyal Giriş' },
+                { Icon: IconSuccess,            text: 'Sosyal Girişim' },
                 { Icon: IconSocialContribution, text: 'Sosyal Proje' },
               ].map(({ Icon, text }) => (
                 <div key={text} className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col items-center gap-1.5 text-center shadow-sm">

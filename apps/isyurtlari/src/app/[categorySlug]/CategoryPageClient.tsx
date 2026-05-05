@@ -77,7 +77,7 @@ export default function CategoryPage() {
   useEffect(() => {
     if (products.length > 0) {
       const categoryName = products[0]?.category.name ?? 'Ürünler';
-      document.title = `${categoryName} | Sosyal Giriş`;
+      document.title = `${categoryName} | Sosyal Girişim`;
     }
   }, [products]);
 
@@ -325,7 +325,7 @@ export default function CategoryPage() {
               <div className="bg-white rounded-2xl p-16 text-center col-span-full">
                 <Icon className="w-24 h-24 object-contain mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
-                <p className="text-gray-400 mb-2">Sosyal Giriş'in eğitim programları devam etmektedir.</p>
+                <p className="text-gray-400 mb-2">Sosyal Girişim'in eğitim programları devam etmektedir.</p>
                 <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
                 <Link href="/" className="bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
                   Diğer Kategorileri Keşfet

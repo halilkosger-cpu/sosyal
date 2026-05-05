@@ -32,7 +32,7 @@ export default function DistanceSalesPage() {
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">Satıcı (İşletmeci):</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
                 <strong>Şirket Adı:</strong> isyurtlari.com.tr<br/>
-                <strong>Türü:</strong> Adalet Bakanlığı Sosyal Girişimi<br/>
+                <strong>Türü:</strong> Hükümlü Sosyal Girişimi<br/>
                 <strong>Web Sitesi:</strong> https://isyurtlari.com.tr<br/>
               </p>
 

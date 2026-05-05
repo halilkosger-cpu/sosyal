@@ -239,13 +239,13 @@ export async function POST(req: NextRequest) {
         trainingHoursFunded,
         prisonersSupportedCount,
         totalItemsCount,
-        missionMessage: `🎉 Tebrikler! Sosyal Giriş'e katkı sağladın: ${trainingHoursFunded} saat meslek eğitimi ve ${prisonersSupportedCount} hükümlünün yeniden başlamasını destekledin.`,
+        missionMessage: `🎉 Tebrikler! Sosyal Girişim'e katkı sağladın: ${trainingHoursFunded} saat meslek eğitimi ve ${prisonersSupportedCount} hükümlünün yeniden başlamasını destekledin.`,
       },
       paymentRequired: body.paymentMethod === 'CREDIT_CARD',
       bankDetails:
         body.paymentMethod === 'TRANSFER'
           ? {
-              accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Giriş',
+              accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Girişim',
               iban: process.env.BANK_ACCOUNT_IBAN || 'TR...',
               branch: process.env.BANK_ACCOUNT_BRANCH || 'Ankara Şubesi',
               accountNo: process.env.BANK_ACCOUNT_NO || '...',
@@ -291,7 +291,7 @@ export async function GET(req: NextRequest) {
       orderItems: order.items || [],
       bankDetails: order.paymentMethod === 'TRANSFER'
         ? {
-            accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Giriş',
+            accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Girişim',
             iban: process.env.BANK_ACCOUNT_IBAN || 'TR...',
             branch: process.env.BANK_ACCOUNT_BRANCH || 'Ankara Şubesi',
             accountNo: process.env.BANK_ACCOUNT_NO || '...',

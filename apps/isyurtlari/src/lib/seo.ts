@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const SITE_URL = 'https://isyurtlari.com.tr';
 export const SITE_NAME = 'isyurtlari.com.tr';
-export const SITE_TITLE = 'Sosyal Giriş İşyurtları Online Mağaza';
+export const SITE_TITLE = 'Sosyal Girişim İşyurtları Online Mağaza';
 export const SITE_DESCRIPTION =
   'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ürünler ve sosyal girişim alışveriş deneyimi.';
 
@@ -53,7 +53,7 @@ export const defaultMetadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} | Sosyal Giriş`,
+    title: `${SITE_NAME} | Sosyal Girişim`,
     description: SITE_DESCRIPTION,
     images: [defaultOpenGraphImage],
   },
@@ -79,7 +79,7 @@ export const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
-  name: 'Sosyal Giriş İşyurtları',
+  name: 'Sosyal Girişim İşyurtları',
   alternateName: SITE_NAME,
   url: SITE_URL,
   logo: defaultOpenGraphImage,

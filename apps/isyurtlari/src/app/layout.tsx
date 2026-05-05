@@ -33,7 +33,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+  title: 'İsyurtları | Sosyal Girişim Online Mağaza',
   description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Türkiye geneline hızlı kargo, güvenli ödeme.',
   keywords: [
     'işyurtları online mağaza',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     ...defaultMetadata.openGraph,
     type: 'website',
     url: 'https://isyurtlari.com.tr',
-    title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+    title: 'İsyurtları | Sosyal Girişim Online Mağaza',
     description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler. Gıda, tekstil, ahşap ve el sanatları.',
     images: [
       {
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   twitter: {
     ...defaultMetadata.twitter,
     card: 'summary_large_image',
-    title: 'İsyurtları | Sosyal Giriş Online Mağaza',
+    title: 'İsyurtları | Sosyal Girişim Online Mağaza',
     description: 'Hükümlülerin el emeğiyle üretilen doğal ürünler.',
   },
 };
