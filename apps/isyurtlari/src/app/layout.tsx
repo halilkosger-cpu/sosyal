@@ -156,7 +156,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Logo */}
               <Link href="/" className="flex-shrink-0">
                 <div className="bg-white rounded-lg px-3 py-1 flex items-center gap-2">
-                  <Image src="/logo.jpg" alt="İsyurtları" width={200} height={72} className="object-contain h-[72px] w-auto" priority />
+                  <Image
+                    src="/logo.jpg"
+                    alt="İsyurtları"
+                    width={160}
+                    height={60}
+                    className="object-contain h-[60px] w-auto"
+                    priority
+                    sizes="(max-width: 640px) 120px, 160px"
+                  />
                 </div>
               </Link>
 
@@ -297,7 +305,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <p className="text-gray-400 text-sm">
                 © 2026 isyurtlari.com.tr - Tüm hakları saklıdır.
               </p>
-              <Image src="/logo_band_white@1X.png" alt="Payment Methods - Visa, Mastercard, iyzico" width={280} height={40} className="h-8 w-auto" />
+              <Image src="/logo_band_white@1X.png" alt="Payment Methods - Visa, Mastercard, iyzico" width={280} height={40} className="h-8 w-auto" sizes="(max-width: 640px) 200px, 280px" />
             </div>
           </div>
         </footer>
