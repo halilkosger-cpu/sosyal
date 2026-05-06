@@ -9,8 +9,10 @@ interface CartItem {
 
 export default function CartBadge() {
   const [count, setCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // İlk yükleme
     const updateCount = () => {
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -35,6 +37,8 @@ export default function CartBadge() {
       window.removeEventListener('cartUpdated', handleStorageChange);
     };
   }, []);
+
+  if (!mounted || count === 0) return null;
 
   return (
     <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">

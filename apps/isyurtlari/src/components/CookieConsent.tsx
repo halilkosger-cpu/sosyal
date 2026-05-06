@@ -18,11 +18,16 @@ const updateAnalyticsConsent = (analyticsStorage: 'granted' | 'denied') => {
 
 export default function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const hasConsent = localStorage.getItem('cookieConsent');
     if (!hasConsent) {
-      setShowBanner(true);
+      // Defer showing banner to avoid layout shift during hydration
+      requestAnimationFrame(() => {
+        setShowBanner(true);
+      });
     }
   }, []);
 
@@ -40,7 +45,7 @@ export default function CookieConsent() {
     setShowBanner(false);
   };
 
-  if (!showBanner) return null;
+  if (!mounted || !showBanner) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
@@ -49,7 +54,7 @@ export default function CookieConsent() {
           <h3 className="font-bold text-sm mb-1 text-gray-900">Çerez Politikası</h3>
           <p className="text-xs text-gray-600">
             Site deneyiminizi iyileştirmek için çerezler kullanıyoruz.
-            <Link href="/gizlilik-sozlesmesi" className="text-[#FF6000] hover:underline ml-1">Detaylı bilgi</Link>
+            <Link href="/gizlilik-sozlesmesi" className="text-[#FF6000] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
