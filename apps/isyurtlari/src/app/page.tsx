@@ -167,7 +167,7 @@ export default function HomePage() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
                 <IconWeekSpecial className="w-5 h-5 object-contain" />
-                <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
+                <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Kampanyadaki Ürünler</h2>
             </div>
@@ -204,7 +204,7 @@ export default function HomePage() {
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
                                 <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#CC4E00]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
                           </Link>
@@ -243,7 +243,7 @@ export default function HomePage() {
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
                                 <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#FF6000]">₺{discountedPrice.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#CC4E00]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
                           </Link>
@@ -263,7 +263,7 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 py-8">
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest mb-1">Meslek Eğitim Programları</p>
+            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1">Meslek Eğitim Programları</p>
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Hangi Alanda Destek Olmak İstiyorsunuz?</h2>
           </div>
         </div>
@@ -352,10 +352,10 @@ export default function HomePage() {
       <section className="max-w-screen-xl mx-auto px-4 pb-8">
         <div className="flex items-end justify-between mb-5">
           <div>
-            <p className="text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
+            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
-          <Link href="/gida" className="flex items-center gap-1 text-[#FF6000] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
+          <Link href="/gida" className="flex items-center gap-1 text-[#CC4E00] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
             Tüm Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
           </Link>
         </div>
@@ -390,13 +390,13 @@ export default function HomePage() {
                 </div>
                 <div className="p-3.5">
                   <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-1">{product.category?.name}</p>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6000] transition-colors leading-snug">{product.name}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#CC4E00] transition-colors leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-0.5 mt-1.5 mb-2">
-                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#FF6000]" />)}
+                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#CC4E00]" />)}
                     <span className="text-[10px] text-gray-700 font-semibold ml-1">5.0</span>
                   </div>
                   {product.price > 0 ? (
-                    <p className="text-lg font-bold text-[#FF6000] tracking-tight">₺{product.price.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-[#CC4E00] tracking-tight">₺{product.price.toFixed(2)}</p>
                   ) : (
                     <p className="text-xs text-gray-600 italic font-medium">Fiyat belirleniyor</p>
                   )}

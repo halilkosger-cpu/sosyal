@@ -3,6 +3,14 @@ import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Inter, Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
+
+let SpeedInsights: any = null;
+try {
+  const module = require('@vercel/speed-insights/next');
+  SpeedInsights = module.SpeedInsights;
+} catch (e) {
+  // @vercel/speed-insights not installed
+}
 import CartBadge from '@/components/CartBadge';
 import CookieConsent from '@/components/CookieConsent';
 import SearchSuggest from '@/components/SearchSuggest';
@@ -311,6 +319,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </footer>
 
         <CookieConsent />
+        {SpeedInsights && <SpeedInsights />}
       </body>
     </html>
   );
