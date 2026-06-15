@@ -66,39 +66,7 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  webpack: (config, { isServer, dev }) => {
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        usedExports: true,
-        sideEffects: false,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk
-            vendor: {
-              filename: 'chunks/vendor.js',
-              chunks: 'all',
-              reuseExistingChunk: true,
-              priority: 20,
-              test: /node_modules\/(?!@isyurtlari)/,
-              name(module) {
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                return `vendor/${packageName.replace('@', '')}`;
-              },
-            },
-            common: {
-              minChunks: 2,
-              priority: 10,
-              reuseExistingChunk: true,
-              name: 'common',
-            },
-          },
-        },
-      };
-    }
+  webpack: (config) => {
     return config;
   },
 }
