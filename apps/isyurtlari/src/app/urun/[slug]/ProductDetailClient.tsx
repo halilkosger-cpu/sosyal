@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { LuHouse, LuBadgeCheck, LuHeart } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import {
@@ -234,8 +235,7 @@ export default function ProductDetailPage() {
           {/* ─── IMAGE ─── */}
           <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
             {product.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <Image src={product.imageUrl} alt={product.name} fill className="object-cover" loading="lazy" quality={85} sizes="(max-width: 768px) 100vw, 50vw" />
             ) : (
               <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
             )}

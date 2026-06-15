@@ -11,8 +11,15 @@ module.exports = {
         'gold-500': '#d4af37',
         'navy-800': '#1a2a4e',
       },
+      fontFamily: {
+        sans: ['var(--font-plus-jakarta-sans)', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['monospace'],
+      },
     },
   },
   plugins: [],
   darkMode: 'class',
+  corePlugins: {
+    preflight: true,
+  },
 }

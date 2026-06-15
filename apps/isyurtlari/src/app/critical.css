@@ -1,0 +1,59 @@
+/* Critical CSS - Inline for LCP optimization */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #f5f6f8;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: radial-gradient(circle at 12% -10%, rgba(255, 96, 0, 0.09), transparent 28rem),
+              linear-gradient(180deg, #f7f8fa 0%, #eef1f5 100%);
+  color: #111827;
+}
+
+/* Hero section - critical for LCP */
+.store-hero-band {
+  background: #0F2040;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Navigation */
+nav {
+  background: #FF6000;
+  color: white;
+}
+
+/* Links */
+a {
+  transition: color 0.2s;
+}
+
+/* Buttons */
+.btn-primary {
+  background: #FF6000;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: #e55500;
+}
+
+/* Loading states */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

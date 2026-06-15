@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { LuShoppingCart, LuHouse, LuX } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
@@ -364,13 +365,14 @@ export default function CategoryPage() {
                 {/* Image */}
                 <div className={`relative h-48 bg-gradient-to-br ${meta?.imgBg ?? 'from-orange-100 to-amber-100'} flex items-center justify-center overflow-hidden`}>
                   {product.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={product.imageUrl}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       loading="lazy"
-                      decoding="async"
+                      quality={80}
                     />
                   ) : (
                     <Icon className="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300" />
