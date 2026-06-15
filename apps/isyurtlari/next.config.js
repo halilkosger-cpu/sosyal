@@ -7,13 +7,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@isyurtlari/database'],
   },
-  // Target modern browsers only to reduce polyfills
-  targets: {
-    chrome: 90,
-    firefox: 88,
-    safari: 14,
-    edge: 90,
-  },
 
   compress: true,
 
