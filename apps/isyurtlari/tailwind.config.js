@@ -12,8 +12,17 @@ module.exports = {
         'navy-800': '#1a2a4e',
       },
       fontFamily: {
-        sans: ['var(--font-plus-jakarta-sans)', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-plus-jakarta-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-space-grotesk)', 'ui-serif', 'serif'],
         mono: ['monospace'],
+      },
+      fontSize: {
+        'xs': ['12px', { lineHeight: '16px', fontWeight: '400' }],
+        'sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+        'base': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+        'lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+        'xl': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        '2xl': ['24px', { lineHeight: '32px', fontWeight: '600' }],
       },
     },
   },

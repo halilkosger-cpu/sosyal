@@ -21,7 +21,7 @@ import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['700'],
   display: 'swap',
   variable: '--font-space-grotesk',
   preload: true,

@@ -15,7 +15,8 @@
   }
 
   body {
-    font-family: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-plus-jakarta-sans), system-ui, -apple-system, sans-serif;
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background:
@@ -25,7 +26,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-inter), sans-serif;
+    font-family: var(--font-space-grotesk), system-ui, sans-serif;
     font-weight: 700;
   }
 
