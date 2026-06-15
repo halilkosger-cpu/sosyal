@@ -7,6 +7,15 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@isyurtlari/database'],
   },
+  // Target modern browsers only to reduce polyfills
+  targets: {
+    chrome: 90,
+    firefox: 88,
+    safari: 14,
+    edge: 90,
+  },
+
+  compress: true,
 
   async headers() {
     return [
@@ -33,6 +42,20 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'geolocation=(), microphone=(), camera=()',
           },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Cache static assets
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
         ],
       },
     ];
@@ -50,7 +73,39 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    if (!dev && !isServer) {
+      config.optimization = {
+        ...config.optimization,
+        usedExports: true,
+        sideEffects: false,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor chunk
+            vendor: {
+              filename: 'chunks/vendor.js',
+              chunks: 'all',
+              reuseExistingChunk: true,
+              priority: 20,
+              test: /node_modules\/(?!@isyurtlari)/,
+              name(module) {
+                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                return `vendor/${packageName.replace('@', '')}`;
+              },
+            },
+            common: {
+              minChunks: 2,
+              priority: 10,
+              reuseExistingChunk: true,
+              name: 'common',
+            },
+          },
+        },
+      };
+    }
     return config;
   },
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Inter, Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 
 let SpeedInsights: any = null;
@@ -12,8 +13,8 @@ try {
   // @vercel/speed-insights not installed
 }
 import CartBadge from '@/components/CartBadge';
-import CookieConsent from '@/components/CookieConsent';
-import SearchSuggest from '@/components/SearchSuggest';
+const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
+const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
 import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture, IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
 import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import './globals.css';
@@ -118,18 +119,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
+          async
         />
 
         <Script
           id="gtag-config"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-KTWVN830XT');
+              gtag('config', 'G-KTWVN830XT', { 'anonymize_ip': true });
             `,
           }}
         />
