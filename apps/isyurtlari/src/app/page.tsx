@@ -104,7 +104,7 @@ export default function HomePage() {
               </span>
               <span>{content.home.hero.badge}</span>
             </div>
-            <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.05] mb-6 tracking-normal">
+            <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.2] md:leading-[1.1] mb-6 tracking-normal">
               Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri<br />
               <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Online Mağazası
             </h1>
