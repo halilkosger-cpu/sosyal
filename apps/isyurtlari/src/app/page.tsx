@@ -106,11 +106,11 @@ export default function HomePage() {
               <span>{content.home.hero.badge}</span>
             </div>
             <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.2] md:leading-[1.1] mb-6 tracking-normal">
-              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri<br />
-              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Online Mağazası
+              Cezaevi & Hapishane Hükümlülerinin El Emeğiyle<br />
+              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Sosyal Girişim Online Mağazası
             </h1>
             <p className="text-white/75 text-[17px] md:text-[19px] mb-9 max-w-2xl leading-8 font-normal">
-              {content.home.hero.subtitle}
+              {content.home.hero.subtitle} Cezaevi eğitim programlarının başarılı ürünlerini Türkiye geneline hızlı kargo ile teslim ediyoruz.
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
               <Link href="/gida" className="bg-[#FF6000] hover:bg-[#e55500] text-white font-bold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-3 text-sm">

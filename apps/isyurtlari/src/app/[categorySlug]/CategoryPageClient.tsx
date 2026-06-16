@@ -34,21 +34,21 @@ interface Product {
   campaign?: Campaign;
 }
 
-const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string; bg: string; banner: string; purpose: string; impact: string; imgBg: string }> = {
+const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string; bg: string; banner: string; purpose: string; impact: string; imgBg: string; seoTitle: string }> = {
   // Eski slug format
-  'gida-urunleri':        { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100' },
-  'tekstil-urunleri':     { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100' },
-  'ahsap-urunler':        { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
-  'dokuma':               { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'Dokuma & Sanat Terapisi', impact: 'Dokuma ve sanat terapisi', imgBg: 'from-violet-200 to-purple-100' },
-  'mobilya-urunleri':     { Icon: IconFurniture, iconColor: '#be123c', bg: 'bg-rose-100',   banner: 'from-rose-600 to-pink-500',      purpose: 'Mobilya Tasarım Eğitimi', impact: 'Mobilya tasarım eğitimi', imgBg: 'from-rose-200 to-pink-100' },
-  'demir-metal-urunleri': { Icon: IconFurniture, iconColor: '#334155', bg: 'bg-slate-100',  banner: 'from-slate-600 to-gray-500',     purpose: 'Metal İşleri Ustası Programı', impact: 'Metal işleri eğitimi', imgBg: 'from-slate-200 to-gray-100' },
+  'gida-urunleri':        { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100', seoTitle: 'İsyurtları Gıda Ürünleri | Cezaevi Sosyal Girişim' },
+  'tekstil-urunleri':     { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim Ürünleri' },
+  'ahsap-urunler':        { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100', seoTitle: 'İsyurtları Ahşap Ürünleri | Cezaevi Marangozluk' },
+  'dokuma':               { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'Dokuma & Sanat Terapisi', impact: 'Dokuma ve sanat terapisi', imgBg: 'from-violet-200 to-purple-100', seoTitle: 'İsyurtları Dokuma Ürünleri | Hapishane El Sanatları' },
+  'mobilya-urunleri':     { Icon: IconFurniture, iconColor: '#be123c', bg: 'bg-rose-100',   banner: 'from-rose-600 to-pink-500',      purpose: 'Mobilya Tasarım Eğitimi', impact: 'Mobilya tasarım eğitimi', imgBg: 'from-rose-200 to-pink-100', seoTitle: 'İsyurtları Mobilya Ürünleri | Cezaevi Tasarım' },
+  'demir-metal-urunleri': { Icon: IconFurniture, iconColor: '#334155', bg: 'bg-slate-100',  banner: 'from-slate-600 to-gray-500',     purpose: 'Metal İşleri Ustası Programı', impact: 'Metal işleri eğitimi', imgBg: 'from-slate-200 to-gray-100', seoTitle: 'İsyurtları Metal Ürünleri | Hapishane Ustası' },
   // Yeni slug format (seed script'ten)
-  'gida':                 { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100' },
-  'tekstil':              { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100' },
-  'ahsap':                { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100' },
-  'temizlik':             { Icon: IconWeaving,   iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: 'Kozmetik üretim eğitimi', imgBg: 'from-cyan-200 to-blue-100' },
-  'hediyelik':            { Icon: IconWeaving,   iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: 'El sanatları becerisi', imgBg: 'from-red-200 to-pink-100' },
-  'peyzaj-cicek':         { Icon: IconWood,      iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: 'Peyzaj tasarım eğitimi', imgBg: 'from-green-200 to-emerald-100' },
+  'gida':                 { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100', seoTitle: 'İsyurtları Gıda Ürünleri | Cezaevi Sosyal Girişim' },
+  'tekstil':              { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim' },
+  'ahsap':                { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100', seoTitle: 'İsyurtları Ahşap Ürünleri | Cezaevi Marangozluk' },
+  'temizlik':             { Icon: IconWeaving,   iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: 'Kozmetik üretim eğitimi', imgBg: 'from-cyan-200 to-blue-100', seoTitle: 'İsyurtları Temizlik Ürünleri | Hapishane Kozmetik' },
+  'hediyelik':            { Icon: IconWeaving,   iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: 'El sanatları becerisi', imgBg: 'from-red-200 to-pink-100', seoTitle: 'İsyurtları Hediyelik Ürünler | Cezaevi El Sanatları' },
+  'peyzaj-cicek':         { Icon: IconWood,      iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: 'Peyzaj tasarım eğitimi', imgBg: 'from-green-200 to-emerald-100', seoTitle: 'İsyurtları Peyzaj & Çiçek | Hapishane Tasarım' },
 };
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
@@ -139,10 +139,10 @@ export default function CategoryPage() {
             <div className="flex-1">
               <h1 className="text-4xl font-extrabold">{loading ? '...' : categoryName}</h1>
               <p className="text-white/90 text-sm mt-2 font-medium">
-                {meta?.purpose || 'Meslek Eğitim Programı'}
+                {meta?.purpose || 'Meslek Eğitim Programı'} • İsyurtları Cezaevi Ürünleri
               </p>
               <p className="text-white/70 text-sm mt-1">
-                {loading ? '' : `${products.length} hükümlü tarafından el yapımı ürün`}
+                {loading ? '' : `${products.length} cezaevi hükümlüsü tarafından el yapımı, doğal ürün`}
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function CategoryPage() {
           {/* Mission Message */}
           <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm">
             <p className="text-white text-sm leading-relaxed">
-              <span className="font-semibold">Bu kategorideki her satın alma:</span> Hükümlülerin {meta?.purpose?.toLowerCase() || 'meslek eğitimi'}ne destek olur ve yeniden başlama yolculuklarında onları destekler.
+              <span className="font-semibold">Bu kategorideki her satın alma:</span> Cezaevi ve hapishane hükümlülerinin {meta?.purpose?.toLowerCase() || 'meslek eğitimi'}ne destek olur, rehabilitasyon ve topluma yeniden kazanılmalarında kilit rol oynar. İsyurtları sosyal girişim ürünleri satın alarak insani dönüşüme katkı sağlayın.
             </p>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default function CategoryPage() {
         {!loading && products.length > 0 && (
           <div className="mb-6 bg-white border border-orange-200 rounded-2xl p-4 shadow-sm">
             <p className="text-sm text-gray-700">
-              <span className="font-semibold text-[#CC4E00]">Sosyal etki:</span> Bu kategorideki ürünleri satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan hükümlülerin yeniden başlamasına ve topluma kazanılmasına katkı sağlıyorsunuz.
+              <span className="font-semibold text-[#CC4E00]">Sosyal etki:</span> İsyurtları'ndan cezaevi ve hapishane hükümlülerinin ürünlerini satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan insanların rehabilitasyonuna ve topluma yeniden kazanılmasına direkt katkı sağlıyorsunuz. Türkiye'de sosyal girişim ile fark yaratın.
             </p>
           </div>
         )}

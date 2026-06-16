@@ -279,6 +279,9 @@ export default function ProductDetailPage() {
             {/* Description */}
             <p className="text-gray-500 leading-relaxed mb-6 text-sm">
               {product.description}
+              <span className="text-gray-600 font-medium block mt-3">
+                💡 Bu ürün cezaevi hükümlülerinin {categoryPurpose[product.category.slug]?.purpose.toLowerCase() || 'meslek eğitimi'} görerek el emeğiyle üretmişlerdir. Her satın alma, topluma yeniden kazanılmalarına destek olur.
+              </span>
             </p>
 
             {/* Production Values */}
