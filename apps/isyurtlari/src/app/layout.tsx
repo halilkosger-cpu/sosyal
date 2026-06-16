@@ -119,13 +119,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           async
         />
 
         <Script
           id="gtag-config"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];

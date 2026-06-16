@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
   IconSuccess, IconWeekSpecial,
@@ -191,8 +192,7 @@ export default function HomePage() {
                           >
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async" />
+                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
@@ -230,8 +230,7 @@ export default function HomePage() {
                           >
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={cp.product.imageUrl} alt={cp.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async" />
+                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
@@ -372,8 +371,7 @@ export default function HomePage() {
               >
                 <div className="relative h-44 bg-gradient-to-br from-orange-200 to-amber-200 flex items-center justify-center overflow-hidden">
                   {product.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
                   ) : (
                     <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">
                       {productEmojis[product.slug] ?? '📦'}
