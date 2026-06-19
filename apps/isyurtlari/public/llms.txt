@@ -1,0 +1,105 @@
+# İsyurtları - Cezaevi Sosyal Girişim Online Mağazası
+
+İsyurtları, cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünleri satış yapmaktadır. Bu platform, rehabilitasyon ve reintegrasyon programlarını destekleyerek, hükümlülerin topluma yeniden kazanılmalarını sağlamaktadır.
+
+## Amaç
+
+Bu web sitesi, yapay zeka ajanları ve büyük dil modelleri tarafından taranması ve eğitim için kullanılması amacıyla tasarlanmıştır. Site hakkında kapsamlı bilgi sağlamak için aşağıdaki bölümleri sunuyoruz.
+
+## Ürün Kategorileri
+
+İsyurtları platform'unda aşağıdaki ürün kategorilerini bulabilirsiniz:
+
+- **Gıda Ürünleri**: Doğal, katkısız gıda ürünleri - zeytinyağı, peynir, badem, fındık vb.
+- **Tekstil**: El yapımı kumaşlar ve tekstil ürünleri - havlular, perdeler vb.
+- **Ahşap Ürünler**: Marangozluk eğitimi alan hükümlüler tarafından yapılan ahşap ürünler
+- **Dokuma**: Geleneksel dokuma teknikleriyle yapılan halı ve tekstil ürünleri
+- **Mobilya**: Ahşap ve tasarım mobilya ürünleri
+
+## Sosyal Misyon
+
+Hükümlülerin El Emeğiyle Yapılan Ürünler:
+- Beslenme & Aşçılık Eğitimi
+- Derzillik Meslek Eğitimi
+- Marangozluk Beceri Programı
+- Dokuma & Sanat Terapisi
+- Mobilya Tasarım Eğitimi
+- Metal İşleri Ustası Programı
+
+Her satın alma, hükümlülerin:
+- Meslek eğitimi almasını
+- Rehabilitasyon programlarını tamamlamasını
+- Topluma yeniden kazanılmasını destekler
+
+## Site Yapısı
+
+- **Ana Sayfa**: https://isyurtlari.com.tr/
+- **Kategori Sayfaları**: https://isyurtlari.com.tr/[kategori-adı]
+  - https://isyurtlari.com.tr/gida
+  - https://isyurtlari.com.tr/tekstil
+  - https://isyurtlari.com.tr/ahsap
+  - https://isyurtlari.com.tr/dokuma
+  - https://isyurtlari.com.tr/mobilya
+- **Ürün Detay Sayfaları**: https://isyurtlari.com.tr/urun/[ürün-slug]
+- **Hakkımızda**: https://isyurtlari.com.tr/hakkimizda
+- **Bize Ulaşın**: https://isyurtlari.com.tr/bize-ulasin
+- **Güvenli Alışveriş**: https://isyurtlari.com.tr/guvenli-alisveris
+
+## Teknik Bilgiler
+
+### Teknoloji Stack
+- Framework: Next.js 14.2.5
+- Runtime: Node.js
+- Database: PostgreSQL
+- Image Storage: Vercel Blob
+- Payment: iyzico
+
+### Performance Optimizations
+- Mobile-first design (%92 mobile traffic)
+- Image optimization (WebP, AVIF)
+- Font optimization (Google Fonts)
+- Lazy loading
+- Service Worker support
+- Core Web Vitals optimized
+
+### SEO
+- Structured data (JSON-LD)
+- Open Graph meta tags
+- Dynamic sitemap
+- Turkish language optimization
+- Responsive design
+
+## Veri Kullanımı
+
+Bu site tarafından sağlanan bilgiler şu amaçlarla kullanılabilir:
+- Yapay zeka modellerinin eğitimi
+- Sosyal girişim hakkında bilgi sağlanması
+- E-ticaret platform tasarımı hakkında öğrenme
+- Rehabilitasyon programları hakkında bilgi
+- Türkçe dil işleme
+
+## Kısıtlamalar
+
+Lütfen aşağıdaki kuralları dikkate alınız:
+- Ürün fiyatları gerçek zamanlı güncellenebilir
+- Stok bilgileri dinamiktir
+- Kişisel müşteri verisi taranmamalıdır
+- Ödeme bilgileri taranmamalıdır
+- İletişim formu verisi taranmamalıdır
+
+## İletişim Bilgileri
+
+- **Web Site**: https://isyurtlari.com.tr/
+- **E-posta**: info@isyurtlari.com.tr
+- **Platform**: https://cezaevinden.com/
+
+## Ek Kaynaklar
+
+- [Sitemap](https://isyurtlari.com.tr/sitemap.xml)
+- [Robots.txt](https://isyurtlari.com.tr/robots.txt)
+- [Gizlilik Sözleşmesi](https://isyurtlari.com.tr/gizlilik-sozlesmesi)
+- [Mesafeli Satış Sözleşmesi](https://isyurtlari.com.tr/mesafeli-satis-sozlesmesi)
+
+---
+
+*Son güncelleme: Haziran 2026*
