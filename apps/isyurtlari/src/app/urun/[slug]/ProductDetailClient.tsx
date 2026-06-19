@@ -235,7 +235,7 @@ export default function ProductDetailPage() {
           {/* ─── IMAGE ─── */}
           <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
             {product.imageUrl ? (
-              <Image src={product.imageUrl} alt={product.name} fill className="object-cover" loading="lazy" quality={85} sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src={product.imageUrl} alt={product.name} fill className="object-cover" loading="lazy" quality={80} sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
             ) : (
               <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
             )}

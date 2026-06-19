@@ -20,27 +20,30 @@ import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
+  subsets: ['latin-ext'],
   weight: ['700'],
   display: 'swap',
   variable: '--font-space-grotesk',
   preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
+  subsets: ['latin-ext'],
   weight: ['400', '600', '700'],
   display: 'swap',
   variable: '--font-plus-jakarta-sans',
   preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 const inter = Inter({
-  subsets: ['latin'],
+  subsets: ['latin-ext'],
   weight: ['400', '700'],
   display: 'swap',
   variable: '--font-inter',
   preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 export const metadata: Metadata = {
@@ -102,9 +105,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+        <meta name="theme-color" content="#FF6000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://mclmi5w9lcfqj48x.public.blob.vercel-storage.com" />
         <Script
           id="gtag-consent-init"
           strategy="lazyOnload"

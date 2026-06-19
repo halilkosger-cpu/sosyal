@@ -192,7 +192,7 @@ export default function HomePage() {
                           >
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
-                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" />
+                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" quality={75} placeholder="empty" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
@@ -230,7 +230,7 @@ export default function HomePage() {
                           >
                             <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
                               {cp.product.imageUrl ? (
-                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" />
+                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" quality={75} placeholder="empty" />
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
@@ -371,7 +371,7 @@ export default function HomePage() {
               >
                 <div className="relative h-44 bg-gradient-to-br from-orange-200 to-amber-200 flex items-center justify-center overflow-hidden">
                   {product.imageUrl ? (
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-300" />
+                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-300" quality={75} placeholder="empty" />
                   ) : (
                     <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">
                       {productEmojis[product.slug] ?? '📦'}

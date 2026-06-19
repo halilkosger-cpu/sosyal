@@ -133,3 +133,61 @@
   animation: scroll-left 50s linear infinite;
   will-change: transform;
 }
+
+/* ─── MOBILE OPTIMIZATIONS ─── */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+  button, a, [role='button'] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .btn-primary {
+    @apply py-3;
+  }
+}
+
+/* Optimize for low-end devices */
+@media (max-width: 640px) {
+  /* Disable expensive animations on mobile */
+  .group-hover\:scale-105 {
+    transition-duration: 150ms;
+  }
+
+  /* Optimize font rendering */
+  body {
+    text-rendering: optimizeSpeed;
+  }
+
+  /* Reduce shadow complexity */
+  .shadow-md {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Optimize card animations */
+  .store-card-hover {
+    transform: translateZ(0);
+  }
+}
+
+/* Network-sensitive animations */
+@media (prefers-reduced-data: reduce) {
+  .animate-scroll {
+    animation: none;
+  }
+
+  img {
+    transition: none;
+  }
+}

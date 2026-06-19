@@ -10,6 +10,13 @@ const nextConfig = {
 
   compress: true,
 
+  // Mobile optimization
+  productionBrowserSourceMaps: false,
+  optimizeFonts: true,
+
+  // Image optimization for mobile
+  optimizeImages: true,
+
   async headers() {
     return [
       {
@@ -37,13 +44,33 @@ const nextConfig = {
           },
           {
             key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
+      // Aggressive caching for static assets
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
         ],
       },
-      // Cache static assets
+      // Cache images aggressively
       {
-        source: '/static/:path*',
+        source: '/_next/image(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Cache fonts
+      {
+        source: '/fonts/:path*',
         headers: [
           {
             key: 'Cache-Control',
