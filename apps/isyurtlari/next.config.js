@@ -82,6 +82,7 @@ const nextConfig = {
   },
 
   images: {
+    unoptimized: true, // DEĞİŞİKLİK BURADA: Vercel limitlerini durdurmak için eklendi
     remotePatterns: [
       {
         protocol: 'https',
