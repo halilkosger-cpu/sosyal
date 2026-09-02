@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import PreOrderBadge from '@/components/PreOrderBadge';
+import AddToCartButton from '@/components/AddToCartButton';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { LuShoppingCart, LuHouse, LuX } from 'react-icons/lu';
+import { LuHouse, LuX } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import {
   IconFood,
@@ -437,13 +438,17 @@ export default function CategoryPage() {
                     )}
                     <div className="flex items-center gap-2">
                       <FavoriteButton productId={product.id} size="sm" />
-                      <button
-                        onClick={(e) => { e.preventDefault(); }}
-                        className="w-8 h-8 bg-[#FF6000] hover:bg-[#e55500] text-white rounded-lg flex items-center justify-center transition-colors"
-                        aria-label="Sepete ekle"
-                      >
-                        <LuShoppingCart size={15} strokeWidth={2} />
-                      </button>
+                      <AddToCartButton
+                        product={{
+                          id: product.id,
+                          name: product.name,
+                          price: product.campaign?.discountedPrice ?? product.price,
+                          slug: product.slug,
+                          imageUrl: product.imageUrl,
+                          quantity: product.quantity,
+                          campaign: product.campaign ?? null,
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
