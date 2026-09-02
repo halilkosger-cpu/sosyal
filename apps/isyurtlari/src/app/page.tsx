@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PreOrderBadge from '@/components/PreOrderBadge';
+import HeroBackgroundVideo from '@/components/HeroBackgroundVideo';
 import {
   IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
   IconSuccess, IconWeekSpecial,
@@ -93,6 +94,7 @@ export default function HomePage() {
 
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden bg-[#0F2040]">
+        <HeroBackgroundVideo />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOFYwaDQydjQySDE4YzAtOS45NCA4LjA2LTE4IDE4LTE4eiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvZz48L3N2Zz4=')] opacity-30" />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF6000] opacity-[0.07] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
 
