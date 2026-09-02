@@ -15,6 +15,8 @@ const hasDatabaseUrl = () => {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_QUANTITY = 500;
+// En az 10 rakam; bosluk, parantez, tire ve +90 gibi yazimlara izin verir
+const PHONE_RE = /^[+()\d\s-]{10,20}$/;
 
 export async function POST(req: NextRequest) {
   if (!hasDatabaseUrl()) {
@@ -33,15 +35,23 @@ export async function POST(req: NextRequest) {
     const quantity = Number(body.quantity);
 
     // ─── Doğrulama ───
-    if (!productId || !name || !email) {
+    if (!productId || !name || !email || !phone) {
       return NextResponse.json(
-        { error: 'Ad, e-posta ve ürün bilgisi zorunludur' },
+        { error: 'Ad, e-posta, cep telefonu ve ürün bilgisi zorunludur' },
         { status: 400 }
       );
     }
 
     if (!EMAIL_RE.test(email)) {
       return NextResponse.json({ error: 'Geçerli bir e-posta adresi girin' }, { status: 400 });
+    }
+
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (!PHONE_RE.test(phone) || phoneDigits.length < 10) {
+      return NextResponse.json(
+        { error: 'Geçerli bir cep telefonu girin (örn. 05XX XXX XX XX)' },
+        { status: 400 }
+      );
     }
 
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
@@ -86,7 +96,7 @@ export async function POST(req: NextRequest) {
     const preOrder = existing
       ? await prisma.preOrder.update({
           where: { id: existing.id },
-          data: { quantity, name, phone: phone || null, note: note || null },
+          data: { quantity, name, phone, note: note || null },
         })
       : await prisma.preOrder.create({
           data: {
@@ -94,7 +104,7 @@ export async function POST(req: NextRequest) {
             quantity,
             name,
             email,
-            phone: phone || null,
+            phone,
             note: note || null,
           },
         });

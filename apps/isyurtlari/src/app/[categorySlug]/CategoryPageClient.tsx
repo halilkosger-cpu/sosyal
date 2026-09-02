@@ -135,7 +135,7 @@ export default function CategoryPage() {
 
           <div className="flex items-start gap-4 mb-6">
             <div className="w-24 h-24 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-20 h-20 object-contain drop-shadow-md" />
+              <Icon className="w-24 h-24 object-contain drop-shadow-md" />
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-extrabold">{loading ? '...' : categoryName}</h1>
@@ -360,7 +360,7 @@ export default function CategoryPage() {
             {sorted.map((product) => (
               <Link
                 key={product.id}
-                href={`/urun/${product.slug}`}
+                href={`/urun/${product.slug}${product.quantity === 0 ? '?on-talep=1' : ''}`}
                 className="group store-card store-card-hover rounded-2xl overflow-hidden flex flex-col"
               >
                 {/* Image */}

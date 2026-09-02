@@ -85,11 +85,11 @@ export default function HeroBackgroundVideo() {
         playsInline
         preload="none"
         tabIndex={-1}
-        className="w-full h-full object-cover opacity-[0.85]"
+        className="w-full h-full object-cover opacity-100"
       />
       {/* Başlığın okunabilirliği için karartma solda yoğun, sağda hafif.
           Hero metni solda olduğu için video asıl sağ tarafta görünür. */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0F2040] via-[#0F2040]/70 to-[#0F2040]/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0F2040] via-[#0F2040]/55 to-transparent" />
     </div>
   );
 }

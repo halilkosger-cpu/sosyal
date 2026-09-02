@@ -153,7 +153,7 @@ export default function HomePage() {
                   className={`group bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-600 to-gray-500'} rounded-2xl p-5 h-44 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
                 >
                   <div className="w-20 h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Icon className="w-16 h-16 object-contain drop-shadow-sm" />
+                    <Icon className="w-20 h-20 object-contain drop-shadow-sm" />
                   </div>
                   <p className="text-white font-semibold text-sm">{cat.name}</p>
                 </Link>
@@ -287,7 +287,7 @@ export default function HomePage() {
                   title={cfg?.purpose}
                 >
                   <div className="w-20 h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                    <Icon className="w-16 h-16 object-contain drop-shadow-sm" />
+                    <Icon className="w-20 h-20 object-contain drop-shadow-sm" />
                   </div>
                   <p className="text-white text-xs font-semibold leading-tight mb-1">{cat.name}</p>
                   <p className="text-white/70 text-[10px] leading-tight">{cfg?.purpose}</p>
@@ -369,7 +369,7 @@ export default function HomePage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {products.filter(p => p.category).map((product) => (
-              <Link key={product.id} href={`/urun/${product.slug}`}
+              <Link key={product.id} href={`/urun/${product.slug}${product.quantity === 0 ? '?on-talep=1' : ''}`}
                 className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
               >
                 <div className="relative h-44 bg-gradient-to-br from-orange-200 to-amber-200 flex items-center justify-center overflow-hidden">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LuBadgeCheck, LuBell } from 'react-icons/lu';
 
 interface PreOrderFormProps {
@@ -19,6 +19,21 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
+
+  const kokRef = useRef<HTMLDivElement | null>(null);
+
+  // Urun kartindaki "On Talep Ver" rozetinden gelindiginde (?on-talep=1)
+  // formu kendiliginden ac ve gorunur alana kaydir; kullanici ikinci kez
+  // tiklamak zorunda kalmasin. window uzerinden okuyoruz ki sayfanin
+  // statik/dinamik render bicimi degisirse de calismaya devam etsin.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('on-talep') !== '1') return;
+    setOpen(true);
+    const z = window.setTimeout(() => {
+      kokRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 250);
+    return () => window.clearTimeout(z);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -84,13 +99,14 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
     'w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#FF6000] focus:ring-1 focus:ring-[#FF6000]';
 
   return (
+    <div ref={kokRef}>
     <form onSubmit={handleSubmit} className="rounded-xl border-2 border-[#FF6000] bg-orange-50/50 p-5 space-y-4">
       <div>
         <h3 className="font-bold text-gray-900 flex items-center gap-2">
           <LuBell size={18} strokeWidth={2} className="text-[#FF6000]" /> Ön Talep Formu
         </h3>
         <p className="text-xs text-gray-600 mt-1">
-          Ürün stoğa girdiğinde size e-posta ile haber vereceğiz.
+          Ürün stoğa girdiğinde size e-posta ile haber vereceğiz. Gerekirse telefonla da ulaşabilmemiz için numaranızı istiyoruz.
         </p>
       </div>
 
@@ -158,11 +174,12 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
 
       <div>
         <label htmlFor="preorder-phone" className="block text-xs font-medium text-gray-700 mb-1">
-          Telefon <span className="text-gray-400 font-normal">(isteğe bağlı)</span>
+          Cep Telefonu <span className="text-red-500">*</span>
         </label>
         <input
           id="preorder-phone"
           type="tel"
+          required
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           className={inputClass}
@@ -212,5 +229,6 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
         Ön talep sizi satın almaya mecbur bırakmaz.
       </p>
     </form>
+    </div>
   );
 }
