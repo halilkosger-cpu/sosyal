@@ -1,9 +1,13 @@
 import { prisma } from '@isyurtlari/database';
+import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   const products = await prisma.product.findMany({
     include: { category: true },
     orderBy: { createdAt: 'desc' },
@@ -12,6 +16,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   const { name, slug, description, categoryId, price, quantity, imageUrl } = await req.json();
 
   if (!name || !slug || !description || !categoryId) {

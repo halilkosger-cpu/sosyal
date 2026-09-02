@@ -1,6 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminRequest } from '@/lib/admin-auth';
+import { adminGuard } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +15,9 @@ const hasDatabaseUrl = () => {
 
 /** Ön talepleri listeler. ?productId= ve ?status= ile filtrelenebilir. */
 export async function GET(req: NextRequest) {
-  if (!isAdminRequest(req)) {
-    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
-  }
+  const red = adminGuard(req);
+  if (red) return red;
+
 
   if (!hasDatabaseUrl()) {
     return NextResponse.json({ preOrders: [], summary: [] }, { headers: NO_CACHE });
@@ -73,9 +73,9 @@ export async function GET(req: NextRequest) {
 
 /** Bir ön talebin durumunu günceller (ör. CONVERTED / CANCELLED). */
 export async function PATCH(req: NextRequest) {
-  if (!isAdminRequest(req)) {
-    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
-  }
+  const red = adminGuard(req);
+  if (red) return red;
+
 
   if (!hasDatabaseUrl()) {
     return NextResponse.json({ error: 'Servis kullanılamıyor' }, { status: 503 });

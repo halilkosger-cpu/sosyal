@@ -1,10 +1,14 @@
 import { put } from '@vercel/blob';
+import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminGuard } from '@/lib/admin-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const campaigns = await prisma.campaign.findMany({
       include: { products: { include: { product: true } } },
@@ -16,6 +20,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const { name, startDate, endDate, products } = await req.json();
 

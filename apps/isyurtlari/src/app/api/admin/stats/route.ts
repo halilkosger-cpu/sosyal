@@ -1,9 +1,13 @@
 import { prisma } from '@isyurtlari/database';
-import { NextResponse } from 'next/server';
+import { adminGuard } from '@/lib/admin-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const [products, categories, orders, pendingOrders] = await Promise.all([
       prisma.product.count(),

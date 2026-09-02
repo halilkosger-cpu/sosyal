@@ -1,7 +1,11 @@
 import { prisma } from '@isyurtlari/database';
+import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   const product = await prisma.product.findUnique({
     where: { id: params.id },
     include: { category: true },
@@ -11,6 +15,9 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   const data = await req.json();
   const product = await prisma.product.update({
     where: { id: params.id },
@@ -27,7 +34,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(product);
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   await prisma.product.delete({ where: { id: params.id } });
   return NextResponse.json({ ok: true });
 }

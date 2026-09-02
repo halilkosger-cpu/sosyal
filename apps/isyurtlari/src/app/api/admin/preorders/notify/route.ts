@@ -2,7 +2,7 @@ import { prisma } from '@isyurtlari/database';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { emailTemplates } from '@/lib/email-templates';
-import { isAdminRequest } from '@/lib/admin-auth';
+import { adminGuard } from '@/lib/admin-auth';
 import { logAudit } from '@/lib/audit-log';
 
 export const dynamic = 'force-dynamic';
@@ -19,9 +19,9 @@ const hasDatabaseUrl = () => {
  * Admin panelinden elle tetiklenir — otomatik çalışmaz.
  */
 export async function POST(req: NextRequest) {
-  if (!isAdminRequest(req)) {
-    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
-  }
+  const red = adminGuard(req);
+  if (red) return red;
+
 
   if (!hasDatabaseUrl()) {
     return NextResponse.json({ error: 'Servis kullanılamıyor' }, { status: 503 });

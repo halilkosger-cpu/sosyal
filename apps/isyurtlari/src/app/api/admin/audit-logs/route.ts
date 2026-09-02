@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminGuard } from '@/lib/admin-auth';
 import { getAuditLogs, getAuditLogsByEmail } from '@/lib/audit-log';
 
 export async function GET(req: NextRequest) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');

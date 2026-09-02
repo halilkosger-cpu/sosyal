@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminGuard } from '@/lib/admin-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     const { name, startDate, endDate, active, products } = await req.json();
 
@@ -37,7 +41,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
     await prisma.campaign.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
