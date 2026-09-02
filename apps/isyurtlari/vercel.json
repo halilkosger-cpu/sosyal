@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx prisma generate --schema=../../packages/database/prisma/schema.prisma && next build",
+  "buildCommand": "node ./scripts/vercel-db-setup.js && npx prisma generate --schema=../../packages/database/prisma/schema.prisma && next build",
   "installCommand": "cd ../.. && pnpm install",
   "devCommand": "pnpm dev"
 }
