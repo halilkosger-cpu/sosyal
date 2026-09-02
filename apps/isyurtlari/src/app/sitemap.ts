@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@isyurtlari/database';
 
 const hasDatabaseUrl = () => {
@@ -7,7 +8,7 @@ const hasDatabaseUrl = () => {
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.isyurtlari.com.tr';
+  const baseUrl = SITE_URL;
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

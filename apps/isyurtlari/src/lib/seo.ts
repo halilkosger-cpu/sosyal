@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = 'https://www.isyurtlari.com.tr';
+// Kanonik adres www'SUZ surumdur. Sebep: Google'in indeksi ve siralamasi
+// bu adreste; Search Console mulku de www'suz. Site su an www'dan servis
+// edilip apex'ten 307 (GECICI) yonlendirme yapiyor - geciciligi nedeniyle
+// Google kaynak adresi indekste tutuyor. Yonlendirme yonu Vercel'de
+// tersine cevrilmeli: www -> apex, 308 (kalici).
+export const SITE_URL = 'https://isyurtlari.com.tr';
 export const SITE_NAME = 'isyurtlari.com.tr';
 export const SITE_TITLE = 'Sosyal Girişim İşyurtları Online Mağaza';
 export const SITE_DESCRIPTION =

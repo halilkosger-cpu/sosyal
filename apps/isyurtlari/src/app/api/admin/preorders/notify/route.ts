@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { absoluteUrl } from '@/lib/seo';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { emailTemplates } from '@/lib/email-templates';
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, sent: 0, failed: 0, message: 'Bekleyen ön talep yok' });
     }
 
-    const productUrl = `https://www.isyurtlari.com.tr/urun/${product.slug}`;
+    const productUrl = absoluteUrl(`/urun/${product.slug}`);
     const sentIds: string[] = [];
     const failed: string[] = [];
 

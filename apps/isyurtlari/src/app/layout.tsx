@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -73,12 +74,12 @@ export const metadata: Metadata = {
   openGraph: {
     ...defaultMetadata.openGraph,
     type: 'website',
-    url: 'https://www.isyurtlari.com.tr',
+    url: SITE_URL,
     title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
     description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Rehabilitasyon destekli sosyal girişim.',
     images: [
       {
-        url: 'https://www.isyurtlari.com.tr/logo.jpg',
+        url: `${SITE_URL}/logo.jpg`,
         width: 1200,
         height: 630,
         alt: 'İsyurtları - Cezaevi Sosyal Girişim Online Mağaza',
