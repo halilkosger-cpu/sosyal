@@ -307,8 +307,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Sipariş bulunamadı' }, { status: 404 });
     }
 
+    // Bu uc kimlik dogrulamasi istemiyor: misafir siparisi veren musteri de
+    // onay sayfasini gorebilmeli. Erisim, tahmin edilmesi zor siparis
+    // kimligine dayaniyor. Bu yuzden yaniti sayfanin ihtiyaci kadar
+    // tutuyoruz - `...order` ile tum kaydi dokmek userId, paymentId gibi
+    // sayfanin kullanmadigi alanlari da disari veriyordu.
     return NextResponse.json({
-      ...order,
+      id: order.id,
+      orderNumber: order.orderNumber,
+      status: order.status,
+      totalAmount: order.totalAmount,
+      paymentMethod: order.paymentMethod,
+      shippingAddress: order.shippingAddress,
+      notes: order.notes,
+      createdAt: order.createdAt,
       items: order.items || [],
       orderItems: order.items || [],
       bankDetails: order.paymentMethod === 'TRANSFER'
