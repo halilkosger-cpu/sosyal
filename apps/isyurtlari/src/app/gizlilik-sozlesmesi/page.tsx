@@ -1,3 +1,15 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Gizlilik Sözleşmesi',
+  description: 'İşyurtları gizlilik sözleşmesi: topladığımız bilgiler, çerez kullanımı, verilerin saklanması ve üçüncü taraflarla paylaşım koşulları.',
+  alternates: { canonical: '/gizlilik-sozlesmesi' },
+  openGraph: {
+    title: 'Gizlilik Sözleşmesi',
+    description: 'İşyurtları gizlilik sözleşmesi: topladığımız bilgiler, çerez kullanımı, verilerin saklanması ve üçüncü taraflarla paylaşım koşulları.',
+    url: '/gizlilik-sozlesmesi',
+  },
+};
 import Link from 'next/link';
 import { LuHouse } from 'react-icons/lu';
 

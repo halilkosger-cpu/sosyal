@@ -1,3 +1,15 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Hakkımızda — Hükümlü El Emeğiyle Sosyal Girişim',
+  description: 'İşyurtları; cezaevi ve hapishane hükümlülerinin meslek eğitimi alarak ürettiği ürünleri satışa sunan sosyal girişimdir. Her satın alma bir ikinci şansa dönüşür.',
+  alternates: { canonical: '/hakkimizda' },
+  openGraph: {
+    title: 'Hakkımızda — Hükümlü El Emeğiyle Sosyal Girişim',
+    description: 'İşyurtları; cezaevi ve hapishane hükümlülerinin meslek eğitimi alarak ürettiği ürünleri satışa sunan sosyal girişimdir. Her satın alma bir ikinci şansa dönüşür.',
+    url: '/hakkimizda',
+  },
+};
 import Link from 'next/link';
 import { LuHouse, LuShieldCheck, LuTarget, LuHeart, LuBadgeCheck, LuUsers, LuLeaf, LuBuilding2, LuArrowRight } from 'react-icons/lu';
 import { content } from '@/config/content';

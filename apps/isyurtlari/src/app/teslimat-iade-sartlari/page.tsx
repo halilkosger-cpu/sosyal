@@ -1,3 +1,15 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Teslimat ve İade Şartları',
+  description: 'İşyurtları teslimat süreleri, kargo koşulları, cayma hakkı ve iade süreci. Siparişiniz Türkiye geneline hızlı kargo ile gönderilir.',
+  alternates: { canonical: '/teslimat-iade-sartlari' },
+  openGraph: {
+    title: 'Teslimat ve İade Şartları',
+    description: 'İşyurtları teslimat süreleri, kargo koşulları, cayma hakkı ve iade süreci. Siparişiniz Türkiye geneline hızlı kargo ile gönderilir.',
+    url: '/teslimat-iade-sartlari',
+  },
+};
 import Link from 'next/link';
 import { LuHouse } from 'react-icons/lu';
 

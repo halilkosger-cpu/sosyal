@@ -109,8 +109,11 @@ export default function HomePage() {
               <span>{content.home.hero.badge}</span>
             </div>
             <h1 className="font-[var(--font-inter)] text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.2] md:leading-[1.1] mb-6 tracking-normal">
-              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri<br />
-              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Cezaevi & Hapishane Online Mağazası
+              {/* <br /> gorsel bir satir sonu; metin olarak okunmadigi icin
+                  arama motoru basligi "Ürünleriİsyurtları" diye bitisik
+                  goruyordu. Aradaki bosluk bunu duzeltiyor. */}
+              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri{' '}<br />
+              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
             </h1>
             <p className="text-white/75 text-[17px] md:text-[19px] mb-9 max-w-2xl leading-8 font-normal">
               {content.home.hero.subtitle} Cezaevi ve hapishane hükümlülerinin eğitim programlarından başarıyla çıktığı ürünleri Türkiye geneline hızlı kargo ile teslim ediyoruz.

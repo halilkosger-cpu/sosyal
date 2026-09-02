@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
 import {
@@ -41,10 +40,16 @@ const getCategory = async (slug: string) => {
   }
 };
 
-const getCategoryTitle = (categoryName: string) =>
-  categoryName.toLocaleLowerCase('tr-TR').endsWith(' ürünleri')
+// Baslik yalnizca kategori adindan olusunca cok kisa kaliyordu ("Gıda
+// Urunleri" = 13 karakter) ve arama sonucunda hicbir ayirt edici bilgi
+// tasimiyordu. Kok layout zaten " | isyurtlari.com.tr" ekliyor, o yuzden
+// marka adini burada tekrarlamiyoruz.
+const getCategoryTitle = (categoryName: string) => {
+  const taban = categoryName.toLocaleLowerCase('tr-TR').endsWith(' ürünleri')
     ? categoryName
     : `${categoryName} Ürünleri`;
+  return `${taban} — Cezaevi El Emeği, Doğal ve El Yapımı`;
+};
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const category = await getCategory(params.categorySlug);
@@ -106,7 +111,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
-      <Script
+      <script
         id={`category-structured-data-${params.categorySlug}`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

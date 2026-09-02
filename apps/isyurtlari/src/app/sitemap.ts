@@ -7,7 +7,7 @@ const hasDatabaseUrl = () => {
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://isyurtlari.com.tr';
+  const baseUrl = 'https://www.isyurtlari.com.tr';
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

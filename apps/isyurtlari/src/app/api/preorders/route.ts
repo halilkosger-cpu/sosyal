@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         });
 
     // ─── E-postalar (başarısızlık ön talebi iptal etmemeli) ───
-    const productUrl = `https://isyurtlari.com.tr/urun/${product.slug}`;
+    const productUrl = `https://www.isyurtlari.com.tr/urun/${product.slug}`;
 
     try {
       await resend.emails.send({

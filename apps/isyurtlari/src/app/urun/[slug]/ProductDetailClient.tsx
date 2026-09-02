@@ -140,12 +140,12 @@ interface Review {
   helpfulCount: number;
 }
 
-export default function ProductDetailPage() {
+export default function ProductDetailPage({ baslangicUrun = null }: { baslangicUrun?: Product | null }) {
   const params = useParams();
   const slug = params.slug as string;
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<Product | null>(baslangicUrun);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!baslangicUrun);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);

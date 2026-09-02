@@ -49,7 +49,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   ...defaultMetadata,
   title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri | Sosyal Girişim',
-  description: 'İsyurtları - cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Rehabilitasyon ve reintegrasyon destekli sosyal girişim. Türkiye geneline hızlı kargo, güvenli ödeme.',
+  // 155 karakteri asmiyor: Google arama sonucunda yaklasik bu uzunlukta
+  // kesiyor, oncesi 224 karakterdi ve sonu hic gorunmuyordu.
+  description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal gıda, tekstil ve ahşap ürünleri. Her satın alma meslek eğitimine destek olur.',
   keywords: [
     'işyurtları online mağaza',
     'cezaevi ürünleri',
@@ -71,12 +73,12 @@ export const metadata: Metadata = {
   openGraph: {
     ...defaultMetadata.openGraph,
     type: 'website',
-    url: 'https://isyurtlari.com.tr',
+    url: 'https://www.isyurtlari.com.tr',
     title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
     description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Rehabilitasyon destekli sosyal girişim.',
     images: [
       {
-        url: 'https://isyurtlari.com.tr/logo.jpg',
+        url: 'https://www.isyurtlari.com.tr/logo.jpg',
         width: 1200,
         height: 630,
         alt: 'İsyurtları - Cezaevi Sosyal Girişim Online Mağaza',
@@ -151,7 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        <Script
+        <script
           id="organization-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -159,7 +161,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        <Script
+        <script
           id="website-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{

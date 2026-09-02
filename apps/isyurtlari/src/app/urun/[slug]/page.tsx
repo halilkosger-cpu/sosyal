@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
 import {
@@ -138,6 +137,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
       }
     : null;
 
+  // Client bileseni ilk render'da dolu gelsin diye sunucudan cekilen urunu
+  // aktariyoruz. Boylece urun adi, aciklamasi ve <h1> sunucu HTML'inde yer
+  // aliyor; onceden yalnizca yukleme animasyonu render ediliyordu.
+  const baslangicUrun = product
+    ? {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        price: product.price,
+        quantity: product.quantity,
+        imageUrl: product.imageUrl ?? undefined,
+        category: { name: product.category.name, slug: product.category.slug },
+      }
+    : null;
+
   const jsonLd = [
     breadcrumbJsonLd([
       { name: 'Ana Sayfa', url: absoluteUrl('/') },
@@ -155,12 +170,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
-      <Script
+      <script
         id={`product-structured-data-${params.slug}`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductDetailClient />
+      <ProductDetailClient baslangicUrun={baslangicUrun} />
     </>
   );
 }

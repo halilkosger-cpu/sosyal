@@ -1,3 +1,15 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Mesafeli Satış Sözleşmesi',
+  description: 'İşyurtları mesafeli satış sözleşmesi: sipariş, ödeme, teslimat, cayma hakkı ve iade süreçlerine ilişkin taraf hak ve yükümlülükleri.',
+  alternates: { canonical: '/mesafeli-satis-sozlesmesi' },
+  openGraph: {
+    title: 'Mesafeli Satış Sözleşmesi',
+    description: 'İşyurtları mesafeli satış sözleşmesi: sipariş, ödeme, teslimat, cayma hakkı ve iade süreçlerine ilişkin taraf hak ve yükümlülükleri.',
+    url: '/mesafeli-satis-sozlesmesi',
+  },
+};
 import Link from 'next/link';
 import { LuHouse } from 'react-icons/lu';
 

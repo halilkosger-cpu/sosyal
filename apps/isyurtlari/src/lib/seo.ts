@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-export const SITE_URL = 'https://isyurtlari.com.tr';
+export const SITE_URL = 'https://www.isyurtlari.com.tr';
 export const SITE_NAME = 'isyurtlari.com.tr';
 export const SITE_TITLE = 'Sosyal Girişim İşyurtları Online Mağaza';
 export const SITE_DESCRIPTION =
