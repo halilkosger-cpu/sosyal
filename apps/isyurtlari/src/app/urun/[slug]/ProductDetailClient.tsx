@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LuHouse, LuBadgeCheck, LuHeart } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
+import PreOrderForm from '@/components/PreOrderForm';
 import {
   IconProductOrigin,
   IconVocationalTraining,
@@ -386,9 +387,7 @@ export default function ProductDetailPage() {
                 </Link>
               </div>
             ) : !inStock ? (
-              <button disabled className="w-full bg-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed">
-                Stokta Yok
-              </button>
+              <PreOrderForm productId={product.id} productName={product.name} />
             ) : (
               <button disabled className="w-full bg-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed">
                 Fiyat Bekleniyor

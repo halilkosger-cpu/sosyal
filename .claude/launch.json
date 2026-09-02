@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "isyurtlari",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "pnpm@9", "--filter", "isyurtlari", "dev"],
+      "port": 3001
+    }
+  ]
+}

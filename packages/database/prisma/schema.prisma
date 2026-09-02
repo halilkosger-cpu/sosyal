@@ -67,6 +67,7 @@ model User {
   orders           Order[]
   reviews          Review[]
   favorites        Favorite[]
+  preOrders        PreOrder[]
 
   @@index([email])
   @@index([username])
@@ -446,6 +447,7 @@ model Product {
   campaigns   CampaignProduct[]
   reviews     Review[]
   favorites   Favorite[]
+  preOrders   PreOrder[]
 
   @@index([categoryId])
   @@index([slug])
@@ -613,4 +615,34 @@ model Favorite {
 
   @@unique([userId, productId])
   @@index([userId])
+}
+
+// ─── E-TİCARET: ÖN TALEP ──────────────────────────────────────
+enum PreOrderStatus {
+  WAITING    // Stok bekleniyor
+  NOTIFIED   // Stoğa girdi, müşteriye haber verildi
+  CONVERTED  // Müşteri siparişe dönüştürdü
+  CANCELLED  // İptal / vazgeçildi
+}
+
+model PreOrder {
+  id         String         @id @default(cuid())
+  productId  String
+  userId     String?        // Üye değilse null (misafir ön talebi)
+  quantity   Int            @default(1)
+  name       String
+  email      String
+  phone      String?
+  note       String?        // Müşterinin eklemek istediği not
+  status     PreOrderStatus @default(WAITING)
+  notifiedAt DateTime?      // Stok bildirimi gönderildiği an
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId],    references: [id], onDelete: SetNull)
+
+  @@index([productId, status])
+  @@index([email])
+  @@index([createdAt])
 }

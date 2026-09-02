@@ -214,6 +214,136 @@ export const emailTemplates = {
     </body>
     </html>
   `,
+
+  preOrderConfirmation: (data: {
+    name: string;
+    productName: string;
+    quantity: number;
+    productUrl: string;
+  }) => `
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Ön Talebiniz Alındı</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #FF6000 0%, #ff7f2e 100%); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px 20px; background: #f9f9f9; }
+        .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #FF6000; }
+        .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #999; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>📋 Ön Talebiniz Alındı</h1>
+        </div>
+
+        <div class="content">
+          <div class="section">
+            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p style="margin-top: 15px;">
+              <strong>${data.productName}</strong> ürünü için
+              <strong>${data.quantity} adet</strong> ön talebiniz kaydedildi.
+            </p>
+            <p style="margin-top: 15px;">
+              Ürün stoğa girdiği anda size bu e-posta adresinden haber vereceğiz.
+              Ön talep bir satın alma değildir; sizden şu aşamada herhangi bir ödeme alınmaz.
+            </p>
+          </div>
+
+          <div class="section">
+            <p style="margin-bottom: 15px;"><strong>Ürünü görüntüle:</strong></p>
+            <a href="${data.productUrl}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold;">
+              ${data.productName}
+            </a>
+          </div>
+
+          <div class="section">
+            <p style="font-size: 14px; color: #666;">
+              Ön talebinizden vazgeçmek isterseniz bu e-postayı yanıtlamanız yeterlidir.<br>
+              📧 info@isyurtlari.com.tr<br>
+              🕒 Pazartesi - Cuma 09:00 - 18:00
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+
+  preOrderBackInStock: (data: {
+    name: string;
+    productName: string;
+    quantity: number;
+    productUrl: string;
+  }) => `
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Beklediğiniz Ürün Stokta</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px 20px; background: #f9f9f9; }
+        .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #16a34a; }
+        .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #999; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎉 Beklediğiniz Ürün Stokta!</h1>
+        </div>
+
+        <div class="content">
+          <div class="section">
+            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p style="margin-top: 15px;">
+              <strong>${data.productName}</strong> ürünü için verdiğiniz
+              <strong>${data.quantity} adetlik</strong> ön talebi hatırlıyor musunuz?
+              Ürün yeniden stoğumuza girdi.
+            </p>
+            <p style="margin-top: 15px;">
+              Ürünlerimiz hükümlülerin el emeğiyle üretildiği için sınırlı sayıda oluyor
+              ve hızla tükenebiliyor. Siparişinizi kısa sürede tamamlamanızı öneririz.
+            </p>
+          </div>
+
+          <div class="section" style="text-align: center;">
+            <a href="${data.productUrl}" style="display: inline-block; background: #16a34a; color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+              Siparişimi Tamamla →
+            </a>
+          </div>
+
+          <div class="section">
+            <p style="font-size: 14px; color: #666;">
+              Bu bildirimi <strong>${data.productName}</strong> için ön talep verdiğiniz için aldınız.<br>
+              📧 info@isyurtlari.com.tr<br>
+              🕒 Pazartesi - Cuma 09:00 - 18:00
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
 };
 
 export type TemplateKey = keyof typeof emailTemplates;
