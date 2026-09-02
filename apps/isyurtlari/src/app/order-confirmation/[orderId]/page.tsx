@@ -21,6 +21,8 @@ interface OrderData {
     missionMessage: string;
   };
   bankDetails?: {
+    bankName: string;
+    eksik?: boolean;
     accountName: string;
     iban: string;
     branch: string;
@@ -191,16 +193,30 @@ export default function OrderConfirmationPage() {
               <div className="bg-amber-50 rounded-2xl border border-amber-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">🏦 Havale Bilgileri</h2>
 
+                {order.bankDetails?.eksik ? (
+                  <div className="bg-white rounded-xl p-6 border border-amber-300">
+                    <p className="font-semibold text-gray-900 mb-2">Banka bilgileri henüz tanımlanmamış</p>
+                    <p className="text-sm text-gray-700">
+                      Siparişiniz <strong>{order.orderNumber}</strong> numarasıyla kaydedildi.
+                      Ödeme yapabilmeniz için hesap bilgilerini en kısa sürede
+                      e-posta ile ileteceğiz. Dilerseniz{' '}
+                      <a href="mailto:info@isyurtlari.com.tr" className="text-[#FF6000] font-semibold underline">
+                        info@isyurtlari.com.tr
+                      </a>{' '}
+                      adresinden bize ulaşabilirsiniz.
+                    </p>
+                  </div>
+                ) : (
                 <div className="space-y-4 bg-white rounded-xl p-6">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Hesap Adı</p>
-                    <p className="font-semibold text-gray-900">{order.bankDetails?.accountName || "Sosyal Giriş"}</p>
+                    <p className="font-semibold text-gray-900">{order.bankDetails?.accountName || '—'}</p>
                   </div>
 
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">IBAN</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-mono font-bold text-gray-900">{order.bankDetails?.iban || 'TR...'}</p>
+                      <p className="font-mono font-bold text-gray-900">{order.bankDetails?.iban || '—'}</p>
                       <button
                         onClick={() => copyToClipboard(order.bankDetails?.iban || '')}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
@@ -215,11 +231,11 @@ export default function OrderConfirmationPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Şube</p>
-                      <p className="font-semibold text-gray-900">{order.bankDetails?.branch || 'Ankara'}</p>
+                      <p className="font-semibold text-gray-900">{order.bankDetails?.branch || '—'}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Hesap No</p>
-                      <p className="font-semibold text-gray-900">{order.bankDetails?.accountNo || '...'}</p>
+                      <p className="font-semibold text-gray-900">{order.bankDetails?.accountNo || '—'}</p>
                     </div>
                   </div>
 
@@ -230,6 +246,7 @@ export default function OrderConfirmationPage() {
                     </p>
                   </div>
                 </div>
+                )}
               </div>
             )}
 

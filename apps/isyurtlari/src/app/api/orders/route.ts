@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { bankaBilgileri, bankaBilgisiTam } from '@/lib/bank';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
@@ -15,9 +16,10 @@ async function sendOrderEmail(
 ) {
   try {
     const recipientEmail = process.env.EMAIL_RECIPIENT || 'halil.kosger@gmail.com';
-    const bankName = process.env.BANK_NAME || 'T.C. Garanti Bankası';
-    const accountName = process.env.BANK_ACCOUNT_NAME || 'Zülfikar Solak';
-    const iban = process.env.BANK_ACCOUNT_IBAN || 'TR...';
+    const banka = bankaBilgileri();
+    const bankName = banka.bankName;
+    const accountName = banka.accountName;
+    const iban = banka.iban;
 
     const itemsHtml = items
       .map(
@@ -267,10 +269,8 @@ export async function POST(req: NextRequest) {
       bankDetails:
         body.paymentMethod === 'TRANSFER'
           ? {
-              accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Girişim',
-              iban: process.env.BANK_ACCOUNT_IBAN || 'TR...',
-              branch: process.env.BANK_ACCOUNT_BRANCH || 'Ankara Şubesi',
-              accountNo: process.env.BANK_ACCOUNT_NO || '...',
+              ...bankaBilgileri(),
+              eksik: !bankaBilgisiTam(),
               message: `Lütfen havale açıklamasına sipariş numarasını yazınız: ${orderNumber}`,
             }
           : undefined,
@@ -313,10 +313,8 @@ export async function GET(req: NextRequest) {
       orderItems: order.items || [],
       bankDetails: order.paymentMethod === 'TRANSFER'
         ? {
-            accountName: process.env.BANK_ACCOUNT_NAME || 'Sosyal Girişim',
-            iban: process.env.BANK_ACCOUNT_IBAN || 'TR...',
-            branch: process.env.BANK_ACCOUNT_BRANCH || 'Ankara Şubesi',
-            accountNo: process.env.BANK_ACCOUNT_NO || '...',
+            ...bankaBilgileri(),
+            eksik: !bankaBilgisiTam(),
           }
         : undefined,
     });
