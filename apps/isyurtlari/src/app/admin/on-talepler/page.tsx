@@ -41,7 +41,7 @@ export default function AdminPreOrdersPage() {
   const [message, setMessage]     = useState<string | null>(null);
 
   const load = () => {
-    fetch('/api/admin/preorders')
+    fetch('/api/admin/preorders', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         setPreOrders(Array.isArray(d.preOrders) ? d.preOrders : []);

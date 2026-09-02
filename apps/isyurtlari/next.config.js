@@ -42,9 +42,30 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'geolocation=(), microphone=(), camera=()',
           },
+        ],
+      },
+
+      // Sayfalar: onceki onbellek davranisi aynen korunuyor.
+      // API'ler bilerek disarida birakildi: '/:path*' hepsini kapsadigi icin
+      // /api/admin/* ve /api/user/* cevaplari da 1 saat `public` onbellege
+      // aliniyordu -> admin paneli bayat veri gosteriyor, ayrica musteri
+      // bilgisi tasiyan cevaplar paylasimli onbelleklere acik kaliyordu.
+      {
+        source: '/((?!api/).*)',
+        headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
+      // API cevaplari asla onbellege alinmamali
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0, must-revalidate',
           },
         ],
       },

@@ -4,6 +4,10 @@ import { isAdminRequest } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
+// Admin verisi tarayici onbelleginde kalmamali: stok bildirimi sonrasi
+// liste bayat gorunuyordu.
+const NO_CACHE = { 'Cache-Control': 'no-store, max-age=0' };
+
 const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;
   return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
@@ -16,7 +20,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (!hasDatabaseUrl()) {
-    return NextResponse.json({ preOrders: [], summary: [] });
+    return NextResponse.json({ preOrders: [], summary: [] }, { headers: NO_CACHE });
   }
 
   const productId = req.nextUrl.searchParams.get('productId');
@@ -64,7 +68,7 @@ export async function GET(req: NextRequest) {
     })
     .sort((a, b) => b.waitingCount - a.waitingCount);
 
-  return NextResponse.json({ preOrders, summary });
+  return NextResponse.json({ preOrders, summary }, { headers: NO_CACHE });
 }
 
 /** Bir ön talebin durumunu günceller (ör. CONVERTED / CANCELLED). */
