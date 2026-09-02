@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import PreOrderBadge from '@/components/PreOrderBadge';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -381,7 +382,10 @@ export default function CategoryPage() {
 
                   {product.quantity === 0 && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Tükendi</span>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Tükendi</span>
+                        <PreOrderBadge />
+                      </div>
                     </div>
                   )}
                   {product.quantity > 0 && (

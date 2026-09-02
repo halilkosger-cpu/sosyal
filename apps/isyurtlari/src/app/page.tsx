@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import PreOrderBadge from '@/components/PreOrderBadge';
 import {
   IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
   IconSuccess, IconWeekSpecial,
@@ -379,7 +380,10 @@ export default function HomePage() {
                   )}
                   {product.quantity === 0 && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-red-500 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className="bg-red-500 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
+                        <PreOrderBadge />
+                      </div>
                     </div>
                   )}
                   {product.quantity > 0 && (
