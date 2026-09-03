@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
-  LuLogOut, LuMenu, LuFlame, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage,
+  LuLogOut, LuMenu, LuFlame, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -20,6 +20,7 @@ const navItems = [
   { href: '/admin/on-talepler', label: 'Ön Talepler', Icon: LuBell          },
   { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
   { href: '/admin/audit-logs', label: 'Audit Logs',  Icon: LuActivity       },
+  { href: '/admin/yedek',      label: 'Yedek',       Icon: LuDatabase       },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
