@@ -34,6 +34,30 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(product);
 }
 
+/**
+ * Yalnizca gorsel adresini gunceller.
+ *
+ * PUT kullanilamaz: tum alanlari yaziyor ve `Number(undefined) || 0` ifadeleri
+ * yuzunden eksik gonderilen fiyat ve stok sifirlaniyor. Toplu gorsel
+ * optimizasyonu icin guvenli olan bu uc.
+ */
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
+  const { imageUrl } = await req.json();
+  if (typeof imageUrl !== 'string' || !/^https:\/\/[^\s]+$/.test(imageUrl)) {
+    return NextResponse.json({ error: 'Geçerli bir görsel adresi gerekli' }, { status: 400 });
+  }
+
+  const product = await prisma.product.update({
+    where: { id: params.id },
+    data: { imageUrl },
+    select: { id: true, name: true, imageUrl: true },
+  });
+  return NextResponse.json(product);
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const red = adminGuard(req);
   if (red) return red;

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
-  LuLogOut, LuMenu, LuFlame, LuMail, LuActivity, LuBell, LuTag as LuPrice,
+  LuLogOut, LuMenu, LuFlame, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/admin',            label: 'Dashboard',   Icon: LuLayoutDashboard },
   { href: '/admin/urunler',    label: 'Ürünler',     Icon: LuPackage         },
   { href: '/admin/fiyatlar',   label: 'Fiyatlar',    Icon: LuPrice           },
+  { href: '/admin/gorseller',  label: 'Görseller',   Icon: LuImage           },
   { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
   { href: '/admin/kampanyalar', label: 'Kampanyalar', Icon: LuFlame         },
   { href: '/admin/siparisler', label: 'Siparişler',  Icon: LuShoppingBag    },
