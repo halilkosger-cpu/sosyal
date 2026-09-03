@@ -44,6 +44,58 @@ const getCategory = async (slug: string) => {
 // Urunleri" = 13 karakter) ve arama sonucunda hicbir ayirt edici bilgi
 // tasimiyordu. Kok layout zaten " | isyurtlari.com.tr" ekliyor, o yuzden
 // marka adini burada tekrarlamiyoruz.
+/**
+ * Kategorideki urunleri sunucuda ceker. Onceden CategoryPageClient bunlari
+ * useEffect icinde API'den aliyordu; sonuc olarak sunucu HTML'inde tek bir
+ * urun adi bile bulunmuyordu, yalnizca iskelet animasyonu vardi.
+ */
+const getCategoryProducts = async (slug: string) => {
+  if (!hasDatabaseUrl()) return null;
+
+  try {
+    const now = new Date();
+    const urunler = await prisma.product.findMany({
+      where: { category: { slug } },
+      include: {
+        category: { select: { name: true, slug: true } },
+        campaigns: {
+          where: { campaign: { active: true, startDate: { lte: now }, endDate: { gte: now } } },
+          include: { campaign: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return urunler.map((u) => {
+      // Not: indirim orani Campaign'de degil CampaignProduct uzerinde.
+      const kp = u.campaigns[0];
+      return {
+        id: u.id,
+        name: u.name,
+        slug: u.slug,
+        description: u.description,
+        price: u.price,
+        quantity: u.quantity,
+        imageUrl: u.imageUrl ?? undefined,
+        category: { name: u.category.name, slug: u.category.slug },
+        ...(kp
+          ? {
+              campaign: {
+                id: kp.campaign.id,
+                name: kp.campaign.name,
+                discount: kp.discount,
+                discountedPrice: Math.round(u.price * (1 - kp.discount / 100) * 100) / 100,
+              },
+            }
+          : {}),
+      };
+    });
+  } catch (error) {
+    console.error('Category products error:', error);
+    return null;
+  }
+};
+
 const getCategoryTitle = (categoryName: string) => {
   const taban = categoryName.toLocaleLowerCase('tr-TR').endsWith(' ürünleri')
     ? categoryName
@@ -86,7 +138,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const category = await getCategory(params.categorySlug);
+  const [category, urunler] = await Promise.all([
+    getCategory(params.categorySlug),
+    getCategoryProducts(params.categorySlug),
+  ]);
   const categoryName = category?.name ?? 'Ürünler';
   const title = getCategoryTitle(categoryName);
   const canonical = absoluteUrl(`/${params.categorySlug}`);
@@ -116,7 +171,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CategoryPageClient />
+      <CategoryPageClient baslangicUrunler={urunler} />
     </>
   );
 }

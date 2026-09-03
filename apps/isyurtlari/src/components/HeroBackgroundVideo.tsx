@@ -29,8 +29,13 @@ export default function HeroBackgroundVideo() {
     if (conn?.saveData) return;
     if (conn?.effectiveType && /^(slow-)?2g$/.test(conn.effectiveType)) return;
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const dosya = isMobile ? '/video/hero-mobile.mp4' : '/video/hero-desktop.mp4';
+    // Mobilde video hic yuklenmiyor, yalnizca poster gorunuyor.
+    // Trafigin ~%92'si mobil; video orada 326 KB veri demekti. Ayrica surekli
+    // oynadigi icin Lighthouse'un Speed Index olcumunu bozuyordu - ekran
+    // hicbir zaman "tamamlanmis" sayilmiyor, olculen deger 15,1 sn cikmisti.
+    if (window.matchMedia('(max-width: 767px)').matches) return;
+
+    const dosya = '/video/hero-desktop.mp4';
 
     let iptal = false;
     const yukle = () => {

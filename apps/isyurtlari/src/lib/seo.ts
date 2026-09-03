@@ -50,8 +50,8 @@ export const defaultMetadata: Metadata = {
     images: [
       {
         url: defaultOpenGraphImage,
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: SITE_NAME,
       },
     ],

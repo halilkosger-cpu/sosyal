@@ -47,5 +47,5 @@ export function middleware(req: NextRequest) {
 export const config = {
   // Statik dosyalar disinda her istekte calisir: host kontrolu tum sayfalari
   // kapsamali, yalnizca /admin'i degil.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.jpg|video/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.jpg|logo.webp|video/).*)'],
 };

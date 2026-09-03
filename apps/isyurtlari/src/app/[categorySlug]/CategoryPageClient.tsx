@@ -55,11 +55,11 @@ const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string;
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
 
-export default function CategoryPage() {
+export default function CategoryPage({ baslangicUrunler = null }: { baslangicUrunler?: Product[] | null }) {
   const params = useParams();
   const categorySlug = params.categorySlug as string;
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(baslangicUrunler ?? []);
+  const [loading, setLoading] = useState(!baslangicUrunler);
   const [sort, setSort] = useState<SortOption>('default');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
@@ -67,6 +67,8 @@ export default function CategoryPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   useEffect(() => {
+    // Sunucudan hazir geldiyse tekrar istek atmaya gerek yok
+    if (baslangicUrunler) return;
     fetch(`/api/products?category=${categorySlug}`)
       .then((res) => res.json())
       .then((data) => {
@@ -74,15 +76,10 @@ export default function CategoryPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [categorySlug]);
-
-  // Update page title with mission messaging
-  useEffect(() => {
-    if (products.length > 0) {
-      const categoryName = products[0]?.category.name ?? 'Ürünler';
-      document.title = `${categoryName} | Sosyal Girişim`;
-    }
-  }, [products]);
+  }, [categorySlug, baslangicUrunler]);
+  // Not: burada document.title ezilmemeli. generateMetadata ile kurulan
+  // baslik JavaScript calisinca siliniyordu; arama motoru ve erisilebilirlik
+  // denetimleri bu yuzden basligi bulamiyordu.
 
   // Calculate max price from products with price (minimum 5000 TL)
   const maxPriceAvailable = products.length > 0 ? Math.max(...products.filter(p => p.price > 0).map(p => p.price), 5000) : 5000;

@@ -1,10 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Inter, Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
+import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 
 let SpeedInsights: any = null;
 try {
@@ -34,15 +34,6 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ['400', '600', '700'],
   display: 'swap',
   variable: '--font-plus-jakarta-sans',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
-});
-
-const inter = Inter({
-  subsets: ['latin-ext'],
-  weight: ['400', '700'],
-  display: 'swap',
-  variable: '--font-inter',
   preload: true,
   fallback: ['system-ui', 'arial'],
 });
@@ -80,8 +71,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${SITE_URL}/logo.jpg`,
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: 'İsyurtları - Cezaevi Sosyal Girişim Online Mağaza',
       },
     ],
@@ -94,6 +85,18 @@ export const metadata: Metadata = {
   },
 };
 
+// Elle yazilan <meta name="viewport"> ile Next'in urettigi cakisiyordu;
+// sayfada iki tane viewport etiketi olusuyordu. Dogru yol bu export.
+// maximum-scale=5 korunuyor: kullanicinin yakinlastirabilmesi erisilebilirlik
+// gereginden.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#FF6000',
+};
+
 const categories = [
   { name: 'Gıda',    slug: 'gida',        Icon: IconFood    },
   { name: 'Tekstil', slug: 'tekstil',      Icon: IconTextile },
@@ -104,11 +107,10 @@ const categories = [
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable} ${inter.variable}`}>
+    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
         <meta name="theme-color" content="#FF6000" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -182,14 +184,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Logo */}
               <Link href="/" className="flex-shrink-0">
                 <div className="bg-white rounded-lg px-3 py-1 flex items-center gap-2">
+                  {/* logo.jpg 1024x1024 kare ve 54 KB idi; width/height ise
+                      160x60 yaziliydi. Tarayici once 160x60 yer ayirip sonra
+                      CSS ile 60x60'a cektigi icin duzen kaymasi oluyordu.
+                      images.unoptimized acik oldugundan (Vercel donusum kotasi)
+                      dosya oldugu gibi servis ediliyor - bu yuzden onceden
+                      kucultulmus WebP kullaniliyor: 54 KB -> 12.5 KB.
+                      logo.jpg og:image icin oldugu gibi duruyor. */}
                   <Image
-                    src="/logo.jpg"
+                    src="/logo.webp"
                     alt="İsyurtları"
-                    width={160}
+                    width={60}
                     height={60}
                     className="object-contain h-[60px] w-auto"
                     priority
-                    sizes="(max-width: 640px) 120px, 160px"
                   />
                 </div>
               </Link>
