@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LuChevronLeft, LuSave, LuUpload, LuX } from 'react-icons/lu';
+import { gorseliKucult } from '@/lib/gorsel';
 
 interface Category { id: string; name: string; }
 
@@ -45,8 +46,11 @@ export default function EditProductPage() {
     setUploading(true);
     setError('');
 
+    // Yuklemeden once tarayicida kucult - bkz. lib/gorsel.ts
+    const { dosya: kucuk } = await gorseliKucult(file);
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', kucuk);
 
     try {
       const res = await fetch('/api/admin/upload', {

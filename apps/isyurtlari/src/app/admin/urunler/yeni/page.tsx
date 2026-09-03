@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LuChevronLeft, LuSave, LuUpload, LuX } from 'react-icons/lu';
+import { gorseliKucult } from '@/lib/gorsel';
 
 interface Category { id: string; name: string; slug: string; }
 
@@ -47,8 +48,13 @@ export default function NewProductPage() {
     setUploading(true);
     setError('');
 
+    // Yuklemeden once tarayicida kucult. images.unoptimized acik oldugu icin
+    // Blob'a ne konursa ziyaretciye aynen o gidiyor; elle yuklenen fotograflar
+    // 1200x800 ve 500-600 KB geliyordu.
+    const { dosya: kucuk } = await gorseliKucult(file);
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', kucuk);
 
     try {
       const res = await fetch('/api/admin/upload', {
