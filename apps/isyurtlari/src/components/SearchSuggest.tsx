@@ -142,13 +142,17 @@ export default function SearchSuggest() {
 
   const showPanel = open && canSearch;
 
+  // Formdaki min-w-0 sart: input'un varsayilan icsel genisligi (~186px) formun
+  // min-content olcusunu belirliyor. Form, basliktaki satirin flex ogesi ve
+  // min-width varsayilani auto oldugu icin bu olcunun altina inemiyordu. Dar
+  // ekranlarda satir tasiyor ve sepet ikonunu ekranin disina itiyordu.
   return (
     <form
       ref={rootRef}
       action="/ara"
       method="GET"
       onSubmit={handleSubmit}
-      className="relative flex-1 flex"
+      className="relative flex min-w-0 flex-1"
       role="search"
     >
       <input

@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["--yes", "pnpm@9", "--filter", "isyurtlari", "dev"],
       "port": 3001
+    },
+    {
+      "name": "isyurtlari-uretim",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "pnpm@9", "--filter", "isyurtlari", "exec", "next", "start", "-p", "3002"],
+      "port": 3002
     }
   ]
 }

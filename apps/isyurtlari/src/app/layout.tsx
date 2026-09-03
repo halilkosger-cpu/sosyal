@@ -179,7 +179,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           {/* Main nav row */}
           <div className="bg-[#FF6000]">
-            <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center gap-4">
+            <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center gap-2 md:gap-4">
 
               {/* Logo */}
               <Link href="/" className="flex-shrink-0">
