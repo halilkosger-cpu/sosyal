@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
+import { kategorileriGetir } from '@/lib/kategoriler';
 import {
   SITE_NAME,
   absoluteUrl,
@@ -138,9 +139,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const [category, urunler] = await Promise.all([
+  const [category, urunler, kategoriler] = await Promise.all([
     getCategory(params.categorySlug),
     getCategoryProducts(params.categorySlug),
+    kategorileriGetir(),
   ]);
   const categoryName = category?.name ?? 'Ürünler';
   const title = getCategoryTitle(categoryName);
@@ -171,7 +173,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CategoryPageClient baslangicUrunler={urunler} />
+      <CategoryPageClient baslangicUrunler={urunler} kategoriler={kategoriler} />
     </>
   );
 }

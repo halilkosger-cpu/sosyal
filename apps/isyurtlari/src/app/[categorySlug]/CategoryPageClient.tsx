@@ -16,6 +16,8 @@ import {
   IconFurniture,
   IconProductOrigin,
 } from '@/components/Icons';
+import { kisaAd, type Kategori } from '@/lib/kategori-gorunum';
+import KategoriIkon from '@/components/KategoriIkon';
 
 interface Campaign {
   id: string;
@@ -55,7 +57,13 @@ const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string;
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
 
-export default function CategoryPage({ baslangicUrunler = null }: { baslangicUrunler?: Product[] | null }) {
+export default function CategoryPage({
+  baslangicUrunler = null,
+  kategoriler = [],
+}: {
+  baslangicUrunler?: Product[] | null;
+  kategoriler?: Kategori[];
+}) {
   const params = useParams();
   const categorySlug = params.categorySlug as string;
   const [products, setProducts] = useState<Product[]>(baslangicUrunler ?? []);
@@ -187,6 +195,44 @@ export default function CategoryPage({ baslangicUrunler = null }: { baslangicUru
                 >
                   <LuX size={20} />
                 </button>
+              )}
+
+              {/* ─── KATEGORILER ─── */}
+              {kategoriler.length > 0 && (
+                <div className="mb-8 pb-8 border-b border-gray-200">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Kategoriler</h3>
+                  <nav className="space-y-1" aria-label="Kategoriler">
+                    {kategoriler.map((k) => {
+                      const secili = k.slug === categorySlug;
+                      return (
+                        <Link
+                          key={k.slug}
+                          href={`/${k.slug}`}
+                          aria-current={secili ? 'page' : undefined}
+                          className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                            secili
+                              ? 'bg-orange-50 font-bold text-[#CC4E00]'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-[#FF6000]'
+                          }`}
+                        >
+                          <KategoriIkon
+                            slug={k.slug}
+                            imageUrl={k.imageUrl}
+                            className="h-6 w-6 flex-shrink-0"
+                          />
+                          <span className="min-w-0 flex-1 truncate">{kisaAd(k.name)}</span>
+                          <span
+                            className={`flex-shrink-0 text-xs font-semibold ${
+                              secili ? 'text-[#CC4E00]' : 'text-gray-400'
+                            }`}
+                          >
+                            {k.urunSayisi}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </nav>
+                </div>
               )}
 
               <h3 className="text-lg font-bold text-gray-900 mb-6">Filtrele</h3>

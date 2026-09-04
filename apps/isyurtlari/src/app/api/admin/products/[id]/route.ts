@@ -1,5 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
+import { kategorileriTazele } from '@/lib/kategoriler';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -63,5 +64,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   if (red) return red;
 
   await prisma.product.delete({ where: { id: params.id } });
+
+  // Kenar cubugundaki kategori urun sayilari guncellensin.
+  kategorileriTazele();
+
   return NextResponse.json({ ok: true });
 }

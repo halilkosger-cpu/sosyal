@@ -2,7 +2,10 @@ import { put } from '@vercel/blob';
 import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
+// SVG ve WebP kategori ikonlari icin eklendi: mevcut kategori ikonlarinin
+// tamami zaten SVG ve <img> ile gosteriliyor. Tarayici <img> icindeki SVG'de
+// script calistirmadigi icin bu yol guvenli olanidir.
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
@@ -38,7 +41,11 @@ export async function POST(req: NextRequest) {
     // Convert file to buffer for Vercel Blob
     const bytes = await file.arrayBuffer();
     const timestamp = Date.now();
-    const filename = `products/${timestamp}-${file.name}`;
+    // Kategori ikonlari urun gorsellerinden ayri klasorde dursun; toplu
+    // gorsel optimizasyonu urunleri tararken ikonlara dokunmasin.
+    const istenenKlasor = formData.get('klasor');
+    const klasor = istenenKlasor === 'kategoriler' ? 'kategoriler' : 'products';
+    const filename = `${klasor}/${timestamp}-${file.name}`;
 
     console.log('Vercel Blob\'a yükleniyor:', filename);
     const blob = await put(filename, bytes, { access: 'public' });

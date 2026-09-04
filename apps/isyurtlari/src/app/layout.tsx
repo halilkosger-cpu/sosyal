@@ -16,8 +16,11 @@ try {
 import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
-import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture, IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
+import { IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
 import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
+import { kategorileriGetir } from '@/lib/kategoriler';
+import { kisaAd } from '@/lib/kategori-gorunum';
+import KategoriIkon from '@/components/KategoriIkon';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -97,15 +100,13 @@ export const viewport: Viewport = {
   themeColor: '#FF6000',
 };
 
-const categories = [
-  { name: 'Gıda',    slug: 'gida',        Icon: IconFood    },
-  { name: 'Tekstil', slug: 'tekstil',      Icon: IconTextile },
-  { name: 'Ahşap',   slug: 'ahsap',       Icon: IconWood    },
-  { name: 'Dokuma',  slug: 'dokuma',      Icon: IconWeaving },
-  { name: 'Mobilya', slug: 'mobilya',     Icon: IconFurniture },
-];
+// Kategori listesi artik veritabanindan geliyor. Burada elle yazili duran
+// bes kategori vardi; admin panelinden eklenen kategoriler sitede hic
+// gorunmuyor, "dokuma" ve "mobilya" ise veritabaninda karsiligi olmadigi icin
+// 404 veren olu bag olarak duruyordu.
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const categories = await kategorileriGetir();
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
       <head>
@@ -243,8 +244,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     href={`/${cat.slug}`}
                     className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#FF6000] hover:bg-orange-50 border-b-2 border-transparent hover:border-[#FF6000] transition-all whitespace-nowrap flex-shrink-0"
                   >
-                    <cat.Icon className="w-7 h-7" />
-                    {cat.name}
+                    <KategoriIkon slug={cat.slug} imageUrl={cat.imageUrl} className="w-7 h-7" />
+                    {kisaAd(cat.name)}
                   </Link>
                 ))}
                 <div className="ml-auto flex-shrink-0">

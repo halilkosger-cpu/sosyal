@@ -1,9 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LuPlus, LuTrash2, LuTag } from 'react-icons/lu';
+import { LuPlus, LuTrash2, LuTag, LuUpload, LuX } from 'react-icons/lu';
+interface Category { id: string; name: string; slug: string; description?: string; imageUrl?: string | null; _count: { products: number }; }
 
-interface Category { id: string; name: string; slug: string; description?: string; _count: { products: number }; }
+const KABUL_EDILEN = 'image/png,image/jpeg,image/webp,image/svg+xml';
+const AZAMI_IKON_KB = 512;
+
+/**
+ * Secilen ikonu Blob deposuna yukler ve adresini dondurur.
+ *
+ * Urun gorsellerinden farkli olarak ikon kucultulmuyor: lib/gorsel.ts canvas
+ * uzerinden JPEG'e cevirdigi icin seffaf arka plani siyah/beyaza dondururdu ve
+ * SVG'nin keskinligini kaybettirirdi. Ikonlar zaten kucuk oldugundan yerine
+ * bir boyut siniri koyuldu.
+ */
+async function ikonuYukle(dosya: File): Promise<string> {
+  if (dosya.size > AZAMI_IKON_KB * 1024) {
+    throw new Error(`İkon ${AZAMI_IKON_KB} KB'dan küçük olmalı (seçilen: ${Math.round(dosya.size / 1024)} KB)`);
+  }
+
+  const govde = new FormData();
+  govde.append('file', dosya);
+  govde.append('klasor', 'kategoriler');
+
+  const res = await fetch('/api/admin/upload', { method: 'POST', body: govde });
+  const veri = await res.json();
+  if (!res.ok) throw new Error(veri.error || 'İkon yüklenemedi');
+  return veri.url as string;
+}
 
 function slugify(t: string) {
   return t.toLowerCase()
@@ -18,6 +43,7 @@ export default function AdminCategoriesPage() {
   const [saving, setSaving]         = useState(false);
   const [form, setForm]             = useState({ name: '', slug: '', description: '' });
   const [error, setError]           = useState('');
+  const [ikonYukleniyor, setIkonYukleniyor] = useState<string | null>(null);
 
   const load = () => {
     fetch('/api/admin/categories').then((r) => r.json()).then((d) => {
@@ -58,11 +84,52 @@ export default function AdminCategoriesPage() {
     load();
   };
 
+  const ikonKaydet = async (id: string, imageUrl: string | null) => {
+    const res = await fetch(`/api/admin/categories/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl }),
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || 'İkon kaydedilemedi');
+    }
+  };
+
+  const handleIkonSec = async (id: string, dosya: File | undefined) => {
+    if (!dosya) return;
+    setIkonYukleniyor(id);
+    setError('');
+    try {
+      await ikonKaydet(id, await ikonuYukle(dosya));
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'İkon yüklenemedi');
+    }
+    setIkonYukleniyor(null);
+  };
+
+  const handleIkonKaldir = async (id: string, name: string) => {
+    if (!confirm(`"${name}" kategorisinin ikonu kaldırılsın mı? Varsayılan ikona döner.`)) return;
+    setIkonYukleniyor(id);
+    setError('');
+    try {
+      await ikonKaydet(id, null);
+      load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'İkon kaldırılamadı');
+    }
+    setIkonYukleniyor(null);
+  };
+
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-4xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Kategoriler</h1>
-        <p className="text-gray-500 text-sm mt-1">{categories.length} kategori</p>
+        <p className="text-gray-500 text-sm mt-1">
+          {categories.length} kategori · Eklediğiniz kategori sitede üst çubukta ve kategori
+          sayfalarının solunda anında görünür.
+        </p>
       </div>
 
       {/* Add form */}
@@ -92,11 +159,16 @@ export default function AdminCategoriesPage() {
                 placeholder="Opsiyonel açıklama" />
             </div>
           </div>
-          <button type="submit" disabled={saving}
-            className="bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-2"
-          >
-            <LuPlus size={15} /> {saving ? 'Ekleniyor...' : 'Ekle'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button type="submit" disabled={saving}
+              className="bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-2"
+            >
+              <LuPlus size={15} /> {saving ? 'Ekleniyor...' : 'Ekle'}
+            </button>
+            <p className="text-xs text-gray-400">
+              İkonu ekledikten sonra aşağıdaki listeden yükleyebilirsiniz.
+            </p>
+          </div>
         </form>
       </div>
 
@@ -111,6 +183,7 @@ export default function AdminCategoriesPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kategori</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">İkon</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Slug</th>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Ürün</th>
                 <th className="px-5 py-3" />
@@ -121,10 +194,51 @@ export default function AdminCategoriesPage() {
                 <tr key={cat.id} className="hover:bg-gray-50">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
-                        <LuTag size={14} color="#FF6000" />
+                      <div className="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {cat.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={cat.imageUrl} alt="" className="w-7 h-7 object-contain" />
+                        ) : (
+                          <LuTag size={14} color="#FF6000" />
+                        )}
                       </div>
                       <span className="font-semibold text-gray-900">{cat.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-1.5">
+                      <label
+                        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                          ikonYukleniyor === cat.id
+                            ? 'bg-gray-100 text-gray-400'
+                            : 'cursor-pointer bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-[#FF6000]'
+                        }`}
+                      >
+                        <LuUpload size={13} />
+                        {ikonYukleniyor === cat.id
+                          ? 'Yükleniyor...'
+                          : cat.imageUrl ? 'Değiştir' : 'İkon Yükle'}
+                        <input
+                          type="file"
+                          accept={KABUL_EDILEN}
+                          disabled={ikonYukleniyor === cat.id}
+                          onChange={(e) => {
+                            handleIkonSec(cat.id, e.target.files?.[0]);
+                            e.target.value = '';
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                      {cat.imageUrl && (
+                        <button
+                          onClick={() => handleIkonKaldir(cat.id, cat.name)}
+                          disabled={ikonYukleniyor === cat.id}
+                          title="İkonu kaldır"
+                          className="w-7 h-7 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                          <LuX size={13} />
+                        </button>
+                      )}
                     </div>
                   </td>
                   <td className="px-5 py-3.5 hidden sm:table-cell">
