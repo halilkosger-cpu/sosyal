@@ -3,19 +3,27 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LuHeart, LuShoppingCart, LuArrowLeft } from 'react-icons/lu';
+import { favorileriGetir, favoriyiCikar, FAVORI_OLAYI } from '@/lib/favoriler';
+import { sepeteEkle } from '@/lib/cart';
 
-interface Favorite {
+/**
+ * Favoriler sayfasi.
+ *
+ * Onceden /api/favorites'i sahte bir "userId" ile cagiriyordu; o uc gercek
+ * User kaydi bekledigi ve sitede musteri hesabi olmadigi icin sayfa hicbir
+ * zaman favori gosteremiyordu.
+ *
+ * Favoriler artik tarayicida (lib/favoriler.ts). Sayfa yalnizca urun
+ * kimliklerini okuyup detaylari acik urun ucundan tamamliyor.
+ */
+interface Urun {
   id: string;
-  productId: string;
-  createdAt: string;
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    price: number;
-    imageUrl?: string;
-    category: { name: string; slug: string };
-  };
+  name: string;
+  slug: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string | null;
+  category?: { name: string; slug: string };
 }
 
 const productEmojis: Record<string, string> = {
@@ -24,59 +32,53 @@ const productEmojis: Record<string, string> = {
 };
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [favorites, setFavorites] = useState<Urun[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulated user (future: from session/auth)
-    const mockUserId = localStorage.getItem('userId') || 'guest-user-' + Date.now();
-    setUserId(mockUserId);
-    localStorage.setItem('userId', mockUserId);
-
-    // Fetch favorites
-    fetch(`/api/favorites?userId=${mockUserId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFavorites(Array.isArray(data) ? data : []);
+    const yukle = () => {
+      const kimlikler = favorileriGetir();
+      if (kimlikler.length === 0) {
+        setFavorites([]);
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+        return;
+      }
+
+      fetch('/api/products')
+        .then((res) => res.json())
+        .then((veri: Urun[]) => {
+          const hepsi = Array.isArray(veri) ? veri : [];
+          // Sirasi favoriye eklenme sirasini korusun
+          setFavorites(
+            kimlikler
+              .map((id) => hepsi.find((u) => u.id === id))
+              .filter((u): u is Urun => Boolean(u))
+          );
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    };
+
+    yukle();
+    window.addEventListener(FAVORI_OLAYI, yukle);
+    return () => window.removeEventListener(FAVORI_OLAYI, yukle);
   }, []);
 
-  const handleRemoveFavorite = async (productId: string) => {
-    if (!userId) return;
-
-    try {
-      await fetch(`/api/favorites?userId=${userId}&productId=${productId}`, {
-        method: 'DELETE',
-      });
-      setFavorites(favorites.filter((f) => f.productId !== productId));
-    } catch (error) {
-      console.error('Error removing favorite:', error);
-    }
+  const handleRemoveFavorite = (productId: string) => {
+    favoriyiCikar(productId);
+    setFavorites((mevcut) => mevcut.filter((u) => u.id !== productId));
   };
 
-  const handleAddToCart = (product: any) => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find((i: any) => i.id === product.id);
-
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        slug: product.slug,
-        imageUrl: product.imageUrl,
-        campaign: null,
-      });
-    }
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-    window.dispatchEvent(new Event('cartUpdated'));
+  const handleAddToCart = (product: Urun) => {
+    // lib/cart.ts stok/fiyat kontrolunu yapiyor ve GA olayini gonderiyor
+    sepeteEkle({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      slug: product.slug,
+      imageUrl: product.imageUrl,
+      quantity: product.quantity,
+    });
   };
 
   return (
@@ -119,49 +121,59 @@ export default function FavoritesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {favorites.map((favorite) => (
-              <div key={favorite.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col">
+            {favorites.map((urun) => (
+              <div key={urun.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col">
                 {/* Image */}
                 <div className="relative h-40 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center overflow-hidden">
-                  {favorite.product.imageUrl ? (
+                  {urun.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={favorite.product.imageUrl}
-                      alt={favorite.product.name}
+                      src={urun.imageUrl}
+                      alt={urun.name}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-6xl">{productEmojis[favorite.product.slug] ?? '📦'}</span>
+                    <span className="text-6xl">{productEmojis[urun.slug] ?? '📦'}</span>
                   )}
                 </div>
 
                 {/* Info */}
                 <div className="p-4 flex flex-col flex-1">
                   <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
-                    {favorite.product.category.name}
+                    {urun.category?.name ?? 'Ürün'}
                   </p>
                   <Link
-                    href={`/urun/${favorite.product.slug}`}
+                    href={`/urun/${urun.slug}`}
                     className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#CC4E00] transition mb-3"
                   >
-                    {favorite.product.name}
+                    {urun.name}
                   </Link>
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-                    <span className="text-lg font-bold text-[#CC4E00]">
-                      ₺{favorite.product.price.toFixed(2)}
-                    </span>
-                    <button
-                      onClick={() => handleAddToCart(favorite.product)}
-                      className="w-8 h-8 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-lg flex items-center justify-center transition"
-                      title="Sepete ekle"
-                    >
-                      <LuShoppingCart size={15} strokeWidth={2} />
-                    </button>
+                    {urun.price > 0 ? (
+                      <span className="text-lg font-bold text-[#CC4E00]">₺{urun.price.toFixed(2)}</span>
+                    ) : (
+                      <span className="text-xs italic text-gray-400">Fiyat belirleniyor</span>
+                    )}
+                    {/* Stogu veya fiyati olmayan urun sepete eklenemez */}
+                    {urun.quantity > 0 && urun.price > 0 ? (
+                      <button
+                        onClick={() => handleAddToCart(urun)}
+                        className="w-8 h-8 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-lg flex items-center justify-center transition"
+                        title="Sepete ekle"
+                        aria-label={urun.name + ' sepete ekle'}
+                      >
+                        <LuShoppingCart size={15} strokeWidth={2} />
+                      </button>
+                    ) : (
+                      <span className="text-xs font-semibold text-red-600">
+                        {urun.quantity > 0 ? '' : 'Tükendi'}
+                      </span>
+                    )}
                   </div>
 
                   <button
-                    onClick={() => handleRemoveFavorite(favorite.productId)}
+                    onClick={() => handleRemoveFavorite(urun.id)}
                     className="w-full mt-3 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2 rounded-lg transition text-sm"
                   >
                     <LuHeart size={14} fill="currentColor" /> Favorilerden Çıkar

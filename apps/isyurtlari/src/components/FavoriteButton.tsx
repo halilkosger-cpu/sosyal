@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LuHeart } from 'react-icons/lu';
+import { favoriMi, favoriDegistir, FAVORI_OLAYI } from '@/lib/favoriler';
 
 interface FavoriteButtonProps {
   productId: string;
@@ -9,91 +10,77 @@ interface FavoriteButtonProps {
   showLabel?: boolean;
 }
 
+/**
+ * Favori (kalp) butonu.
+ *
+ * Onceden her tiklama veritabanina yaziyordu ve HIC CALISMIYORDU: gonderilen
+ * "userId" istemcide uretilen sahte bir degerdi, Favorite.userId ise gercek
+ * User tablosuna bagliydi ve o tablo bos. Her istek 500 donuyordu.
+ *
+ * Ayrica bildirim metni tersti: favoriye eklerken "Favorilerden cikarildi"
+ * yaziyordu, cunku eski durum degeri okunuyordu.
+ *
+ * Favoriler artik sepetle ayni mantikla tarayicida tutuluyor.
+ */
 export default function FavoriteButton({ productId, size = 'md', showLabel = false }: FavoriteButtonProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [showToast, setShowToast] = useState(false);
+  const [favori, setFavori] = useState(false);
+  const [bildirim, setBildirim] = useState<string | null>(null);
 
-  const sizeClasses = {
+  const boyutlar = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
     lg: 'w-10 h-10',
   };
 
   useEffect(() => {
-    const mockUserId = localStorage.getItem('userId') || 'guest-user-' + Date.now();
-    setUserId(mockUserId);
-    localStorage.setItem('userId', mockUserId);
+    const guncelle = () => setFavori(favoriMi(productId));
+    guncelle();
 
-    // Check if product is in favorites
-    fetch(`/api/favorites?userId=${mockUserId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const isFav = Array.isArray(data) && data.some((fav: any) => fav.productId === productId);
-        setIsFavorite(isFav);
-      })
-      .catch(() => {});
+    // Ayni urun sayfada birden fazla yerde gorunebiliyor (kart + detay);
+    // birinde degisince digeri de guncellensin.
+    window.addEventListener(FAVORI_OLAYI, guncelle);
+    return () => window.removeEventListener(FAVORI_OLAYI, guncelle);
   }, [productId]);
 
-  const handleToggle = async (e: React.MouseEvent) => {
+  const tikla = (e: React.MouseEvent) => {
+    // Kart butunuyle bir <Link>; tiklamanin yukari kabarmasini durduruyoruz.
     e.preventDefault();
     e.stopPropagation();
 
-    if (!userId || loading) return;
-
-    setLoading(true);
-
-    try {
-      const method = isFavorite ? 'DELETE' : 'POST';
-
-      if (method === 'POST') {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, productId }),
-        });
-      } else {
-        // For DELETE, use the query string approach
-        await fetch(`/api/favorites?userId=${userId}&productId=${productId}`, {
-          method: 'DELETE',
-        });
-      }
-
-      setIsFavorite(!isFavorite);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-    } finally {
-      setLoading(false);
-    }
+    const yeniDurum = favoriDegistir(productId);
+    setFavori(yeniDurum);
+    setBildirim(yeniDurum ? 'Favorilere eklendi' : 'Favorilerden çıkarıldı');
+    setTimeout(() => setBildirim(null), 2000);
   };
 
   return (
     <>
       <button
-        onClick={handleToggle}
-        disabled={loading}
-        className={`${sizeClasses[size]} flex items-center justify-center rounded-lg transition ${
-          isFavorite
+        onClick={tikla}
+        aria-pressed={favori}
+        className={`${boyutlar[size]} flex items-center justify-center rounded-lg transition ${
+          favori
             ? 'bg-red-100 hover:bg-red-200 text-red-600'
             : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-        } disabled:opacity-50 disabled:cursor-not-allowed`}
-        title={isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+        }`}
+        title={favori ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+        aria-label={favori ? 'Favorilerden çıkar' : 'Favorilere ekle'}
       >
-        <LuHeart size={size === 'sm' ? 14 : size === 'md' ? 18 : 22} fill={isFavorite ? 'currentColor' : 'none'} />
+        <LuHeart size={size === 'sm' ? 14 : size === 'md' ? 18 : 22} fill={favori ? 'currentColor' : 'none'} />
       </button>
 
       {showLabel && (
-        <span className="text-xs font-medium text-gray-600 mt-1 block">
-          {isFavorite ? '❤️ Favoride' : '🤍 Favorilere Ekle'}
+        <span className="mt-1 block text-xs font-medium text-gray-600">
+          {favori ? 'Favoride' : 'Favorilere Ekle'}
         </span>
       )}
 
-      {showToast && (
-        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-4 py-3 rounded-lg text-sm z-50">
-          {isFavorite ? '❤️ Favorilere eklendi' : '🤍 Favorilerden çıkarıldı'}
+      {bildirim && (
+        <div
+          role="status"
+          className="fixed bottom-4 right-4 z-50 rounded-lg bg-gray-900 px-4 py-3 text-sm text-white"
+        >
+          {bildirim}
         </div>
       )}
     </>
