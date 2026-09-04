@@ -49,7 +49,7 @@ export default function EmailPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="bg-[#CC4E00]/10 p-3 rounded-lg">
-            <LuMail className="text-[#CC4E00]" size={24} />
+            <LuMail className="text-[#BA4700]" size={24} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Email Gönder</h1>

@@ -89,7 +89,7 @@ export default function SiparisSorgulaPage() {
         <div className="mx-auto max-w-screen-md px-4 py-6">
           <Link
             href="/"
-            className="mb-4 flex items-center gap-2 font-medium text-[#CC4E00] transition hover:text-[#A63F00]"
+            className="mb-4 flex items-center gap-2 font-medium text-[#BA4700] transition hover:text-[#8F3700]"
           >
             <LuArrowLeft size={18} /> Geri
           </Link>
@@ -185,7 +185,7 @@ export default function SiparisSorgulaPage() {
                   )}
                   <Link
                     href={`/urun/${k.product.slug}`}
-                    className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#CC4E00]"
+                    className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#BA4700]"
                   >
                     {k.product.name}
                   </Link>
@@ -202,7 +202,7 @@ export default function SiparisSorgulaPage() {
                 {siparis.paymentMethod === 'TRANSFER' ? 'Havale / EFT' : 'Kredi Kartı'}
                 {' · Kargo karşı ödemeli'}
               </span>
-              <span className="text-xl font-bold text-[#CC4E00]">
+              <span className="text-xl font-bold text-[#BA4700]">
                 ₺{siparis.totalAmount.toFixed(2)}
               </span>
             </div>

@@ -103,7 +103,7 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
     <form onSubmit={handleSubmit} className="rounded-xl border-2 border-[#FF6000] bg-orange-50/50 p-5 space-y-4">
       <div>
         <h3 className="font-bold text-gray-900 flex items-center gap-2">
-          <LuBell size={18} strokeWidth={2} className="text-[#CC4E00]" /> Ön Talep Formu
+          <LuBell size={18} strokeWidth={2} className="text-[#BA4700]" /> Ön Talep Formu
         </h3>
         <p className="text-xs text-gray-600 mt-1">
           Ürün stoğa girdiğinde size e-posta ile haber vereceğiz. Gerekirse telefonla da ulaşabilmemiz için numaranızı istiyoruz.

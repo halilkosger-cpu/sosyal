@@ -101,7 +101,7 @@ export default function AdminProductsPage() {
                   <td className="px-5 py-3.5 hidden md:table-cell">
                     <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">{product.category.name}</span>
                   </td>
-                  <td className="px-5 py-3.5 font-semibold text-[#CC4E00]">
+                  <td className="px-5 py-3.5 font-semibold text-[#BA4700]">
                     {product.price > 0 ? `₺${product.price.toFixed(2)}` : <span className="text-gray-400 font-normal italic text-xs">Belirsiz</span>}
                   </td>
                   <td className="px-5 py-3.5 hidden sm:table-cell">

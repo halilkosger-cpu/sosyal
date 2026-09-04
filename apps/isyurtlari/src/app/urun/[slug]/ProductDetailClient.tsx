@@ -244,11 +244,11 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
               <LuHouse size={14} strokeWidth={2} /> Ana Sayfa
             </Link>
             <span>/</span>
-            <Link href={`/${product.category.slug}`} className="hover:text-[#CC4E00] transition-colors">
+            <Link href={`/${product.category.slug}`} className="hover:text-[#BA4700] transition-colors">
               {product.category.name}
             </Link>
             <span>/</span>
@@ -281,7 +281,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
             <div className="flex items-center gap-3 mb-3">
               <Link
                 href={`/${product.category.slug}`}
-                className="bg-orange-100 text-[#CC4E00] text-xs font-bold px-3 py-1 rounded-full hover:bg-orange-200 transition-colors"
+                className="bg-orange-100 text-[#BA4700] text-xs font-bold px-3 py-1 rounded-full hover:bg-orange-200 transition-colors"
               >
                 {product.category.name}
               </Link>
@@ -321,7 +321,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
               <ul className="space-y-3">
                 {getProductValues(slug).map((value, idx) => (
                   <li key={idx} className="flex gap-3">
-                    <span className="text-[#CC4E00] font-bold text-lg leading-none mt-0.5">✓</span>
+                    <span className="text-[#BA4700] font-bold text-lg leading-none mt-0.5">✓</span>
                     <span className="text-sm text-gray-700 leading-relaxed">{value}</span>
                   </li>
                 ))}
@@ -354,7 +354,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
               {hasPrice ? (
                 <>
                   <p className="text-sm text-gray-400 mb-1">{product.campaign ? 'İndirimli Fiyat' : 'Fiyat'}</p>
-                  <p className="text-4xl font-extrabold text-[#CC4E00]">
+                  <p className="text-4xl font-extrabold text-[#BA4700]">
                     ₺{product.campaign ? product.campaign.discountedPrice.toFixed(2) : product.price.toFixed(2)}
                   </p>
                   <p className="text-xs text-gray-400 mt-2">KDV dahil · Ücretsiz kargo</p>
@@ -408,7 +408,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
 
                 <Link
                   href="/sepet"
-                  className="w-full border-2 border-[#FF6000] text-[#CC4E00] hover:bg-orange-50 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm"
+                  className="w-full border-2 border-[#FF6000] text-[#BA4700] hover:bg-orange-50 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   Sepete Git →
                 </Link>
@@ -575,7 +575,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                     )}
                     <p className="text-sm text-gray-700 leading-relaxed mb-3">{review.text}</p>
                     <div className="flex items-center gap-4 text-xs">
-                      <button className="text-gray-500 hover:text-[#CC4E00] font-medium transition-colors">
+                      <button className="text-gray-500 hover:text-[#BA4700] font-medium transition-colors">
                         👍 Faydalı ({review.helpfulCount})
                       </button>
                     </div>

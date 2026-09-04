@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
               <LuHouse size={14} /> Ana Sayfa
             </Link>
             <span>/</span>
@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
                 <li>Verilerinizin işlenmesine itiraz etme</li>
               </ul>
               <p className="text-gray-700 leading-relaxed">
-                Bu haklarınızı kullanmak için lütfen <Link href="/bize-ulasin" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
+                Bu haklarınızı kullanmak için lütfen <Link href="/bize-ulasin" className="text-[#BA4700] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
               </p>
             </section>
 
@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
             <section className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Gizlilik Hakkında Sorularınız mı var?</h3>
               <p className="text-gray-700">
-                Kişisel verilerinizin işlenmesi veya gizliliğiniz hakkında sorularınız varsa lütfen <Link href="/bize-ulasin" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
+                Kişisel verilerinizin işlenmesi veya gizliliğiniz hakkında sorularınız varsa lütfen <Link href="/bize-ulasin" className="text-[#BA4700] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
               </p>
             </section>
 

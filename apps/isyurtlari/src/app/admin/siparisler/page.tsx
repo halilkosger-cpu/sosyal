@@ -111,7 +111,7 @@ export default function AdminOrdersPage() {
                     <p className="text-xs text-gray-500 mt-1">{order.user?.name || 'Misafir'} · {order.user?.email || 'Bilinmiyor'}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-[#CC4E00]">₺{order.totalAmount.toFixed(2)}</p>
+                    <p className="font-bold text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</p>
                     <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</p>
                   </div>
                 </div>

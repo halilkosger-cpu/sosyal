@@ -175,7 +175,7 @@ export default function CategoryPage({
         {!loading && products.length > 0 && (
           <div className="mb-6 bg-white border border-orange-200 rounded-2xl p-4 shadow-sm">
             <p className="text-sm text-gray-700">
-              <span className="font-semibold text-[#CC4E00]">Sosyal etki:</span> İsyurtları'ndan cezaevi ve hapishane hükümlülerinin ürünlerini satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan insanların rehabilitasyonuna ve topluma yeniden kazanılmasına direkt katkı sağlıyorsunuz. Türkiye'de sosyal girişim ile fark yaratın.
+              <span className="font-semibold text-[#BA4700]">Sosyal etki:</span> İsyurtları'ndan cezaevi ve hapishane hükümlülerinin ürünlerini satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan insanların rehabilitasyonuna ve topluma yeniden kazanılmasına direkt katkı sağlıyorsunuz. Türkiye'de sosyal girişim ile fark yaratın.
             </p>
           </div>
         )}
@@ -217,8 +217,8 @@ export default function CategoryPage({
                           aria-current={secili ? 'page' : undefined}
                           className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
                             secili
-                              ? 'bg-orange-50 font-bold text-[#CC4E00]'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-[#CC4E00]'
+                              ? 'bg-orange-50 font-bold text-[#BA4700]'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-[#BA4700]'
                           }`}
                         >
                           <KategoriIkon
@@ -229,7 +229,7 @@ export default function CategoryPage({
                           <span className="min-w-0 flex-1 truncate">{kisaAd(k.name)}</span>
                           <span
                             className={`flex-shrink-0 text-xs font-semibold ${
-                              secili ? 'text-[#CC4E00]' : 'text-gray-400'
+                              secili ? 'text-[#BA4700]' : 'text-gray-400'
                             }`}
                           >
                             {k.urunSayisi}
@@ -287,7 +287,7 @@ export default function CategoryPage({
                       value="all"
                       checked={stockFilter === 'all'}
                       onChange={() => setStockFilter('all')}
-                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tümü</span>
                   </label>
@@ -298,7 +298,7 @@ export default function CategoryPage({
                       value="in-stock"
                       checked={stockFilter === 'in-stock'}
                       onChange={() => setStockFilter('in-stock')}
-                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Stokta Var</span>
                   </label>
@@ -309,7 +309,7 @@ export default function CategoryPage({
                       value="out-of-stock"
                       checked={stockFilter === 'out-of-stock'}
                       onChange={() => setStockFilter('out-of-stock')}
-                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tükendi</span>
                   </label>
@@ -397,7 +397,7 @@ export default function CategoryPage({
                     setMaxPrice(5000);
                     setStockFilter('all');
                   }}
-                  className="text-[#CC4E00] font-medium hover:text-[#A63F00] transition-colors"
+                  className="text-[#BA4700] font-medium hover:text-[#8F3700] transition-colors"
                 >
                   Filtreleri Temizle
                 </button>
@@ -459,7 +459,7 @@ export default function CategoryPage({
 
                 {/* Info */}
                 <div className="p-3 flex flex-col flex-1">
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] group-hover:text-[#CC4E00] transition-colors leading-snug">
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] group-hover:text-[#BA4700] transition-colors leading-snug">
                     {product.name}
                   </h3>
                   <p className="text-xs text-gray-400 line-clamp-2 mb-3 flex-1 leading-relaxed">
@@ -477,7 +477,7 @@ export default function CategoryPage({
                             </span>
                           </>
                         ) : (
-                          <span className="text-lg font-extrabold text-[#CC4E00]">
+                          <span className="text-lg font-extrabold text-[#BA4700]">
                             ₺{product.price.toFixed(2)}
                           </span>
                         )}

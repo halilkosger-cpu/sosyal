@@ -203,7 +203,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <Link
                     key={cat.slug}
                     href={`/${cat.slug}`}
-                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#CC4E00] hover:bg-orange-50 border-b-2 border-transparent hover:border-[#FF6000] transition-all whitespace-nowrap flex-shrink-0"
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#BA4700] hover:bg-orange-50 border-b-2 border-transparent hover:border-[#FF6000] transition-all whitespace-nowrap flex-shrink-0"
                   >
                     <KategoriIkon slug={cat.slug} imageUrl={cat.imageUrl} className="w-7 h-7" />
                     {kisaAd(cat.name)}
@@ -212,7 +212,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <div className="ml-auto flex-shrink-0">
                   <Link
                     href="/hakkimizda"
-                    className="flex items-center gap-1 px-4 py-3 text-sm text-gray-500 hover:text-[#CC4E00] transition-colors whitespace-nowrap"
+                    className="flex items-center gap-1 px-4 py-3 text-sm text-gray-500 hover:text-[#BA4700] transition-colors whitespace-nowrap"
                   >
                     Hakkımızda
                   </Link>
@@ -287,7 +287,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div>
                 <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">İletişim</h3>
                 <p className="text-gray-300 text-sm font-bold mb-1">E-posta:</p>
-                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-300 text-sm mb-3 font-medium hover:text-[#CC4E00] transition-colors">info@isyurtlari.com.tr</a>
+                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-300 text-sm mb-3 font-medium hover:text-[#BA4700] transition-colors">info@isyurtlari.com.tr</a>
                 <div className="flex gap-3 mt-4">
                   {['Twitter', 'Instagram', 'Facebook'].map((s) => (
                     <a key={s} href="#" aria-label={s} className="w-8 h-8 bg-gray-700 hover:bg-[#CC4E00] rounded-full flex items-center justify-center text-xs font-semibold text-white transition-colors">

@@ -54,7 +54,7 @@ export default function CookieConsent() {
           <h3 className="font-bold text-sm mb-1 text-gray-900">Çerez Politikası</h3>
           <p className="text-xs text-gray-600">
             Site deneyiminizi iyileştirmek için çerezler kullanıyoruz.
-            <Link href="/gizlilik-sozlesmesi" className="text-[#CC4E00] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
+            <Link href="/gizlilik-sozlesmesi" className="text-[#BA4700] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">

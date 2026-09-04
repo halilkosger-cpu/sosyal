@@ -78,7 +78,7 @@
   }
 
   .store-eyebrow {
-    @apply text-[#CC4E00] text-[11px] font-bold uppercase tracking-widest;
+    @apply text-[#BA4700] text-[11px] font-bold uppercase tracking-widest;
   }
 
   .store-input {

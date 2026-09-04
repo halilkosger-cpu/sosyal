@@ -133,7 +133,7 @@ export default function AdminGorsellerPage() {
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Görsel Optimizasyonu</h1>
         <p className="text-gray-500 text-sm mt-1">
           {satirlar.length} görselli ürün · toplam {(toplamEski / 1024).toFixed(1)} MB ·{' '}
-          <strong className={hedefler.length ? 'text-[#CC4E00]' : ''}>{hedefler.length}</strong> tanesi {ESIK_KB} KB üzerinde
+          <strong className={hedefler.length ? 'text-[#BA4700]' : ''}>{hedefler.length}</strong> tanesi {ESIK_KB} KB üzerinde
         </p>
       </div>
 
@@ -183,7 +183,7 @@ export default function AdminGorsellerPage() {
                     {s.eskiKB === null ? (
                       <span className="text-gray-300">—</span>
                     ) : (
-                      <span className={s.eskiKB > ESIK_KB ? 'text-[#CC4E00] font-semibold' : 'text-gray-600'}>
+                      <span className={s.eskiKB > ESIK_KB ? 'text-[#BA4700] font-semibold' : 'text-gray-600'}>
                         {s.eskiKB} KB
                       </span>
                     )}

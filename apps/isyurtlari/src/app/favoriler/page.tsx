@@ -86,7 +86,7 @@ export default function FavoritesPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#CC4E00] hover:text-[#A63F00] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#BA4700] hover:text-[#8F3700] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <div className="flex items-center gap-3">
@@ -144,14 +144,14 @@ export default function FavoritesPage() {
                   </p>
                   <Link
                     href={`/urun/${urun.slug}`}
-                    className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#CC4E00] transition mb-3"
+                    className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#BA4700] transition mb-3"
                   >
                     {urun.name}
                   </Link>
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
                     {urun.price > 0 ? (
-                      <span className="text-lg font-bold text-[#CC4E00]">₺{urun.price.toFixed(2)}</span>
+                      <span className="text-lg font-bold text-[#BA4700]">₺{urun.price.toFixed(2)}</span>
                     ) : (
                       <span className="text-xs italic text-gray-400">Fiyat belirleniyor</span>
                     )}

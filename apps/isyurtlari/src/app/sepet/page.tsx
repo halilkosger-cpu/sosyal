@@ -95,7 +95,7 @@ export default function CartPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/" className="text-[#CC4E00] hover:text-[#CC4E00] font-medium inline-flex items-center gap-2">
+          <Link href="/" className="text-[#BA4700] hover:text-[#BA4700] font-medium inline-flex items-center gap-2">
             <IconContinueShopping className="w-5 h-5 object-contain" /> Alışverişe devam et
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Sepetim</h1>
@@ -135,7 +135,7 @@ export default function CartPage() {
                   <div className="flex-1">
                     <Link
                       href={`/urun/${item.slug}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-[#CC4E00] transition"
+                      className="text-lg font-semibold text-gray-900 hover:text-[#BA4700] transition"
                     >
                       {item.name}
                     </Link>
@@ -153,7 +153,7 @@ export default function CartPage() {
                           </span>
                         </>
                       ) : (
-                        <span className="text-[#CC4E00] font-bold text-lg">
+                        <span className="text-[#BA4700] font-bold text-lg">
                           ₺{item.price.toFixed(2)}
                         </span>
                       )}

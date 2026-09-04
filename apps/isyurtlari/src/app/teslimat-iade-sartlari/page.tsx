@@ -20,7 +20,7 @@ export default function ShippingReturnsPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
               <LuHouse size={14} /> Ana Sayfa
             </Link>
             <span>/</span>
@@ -101,7 +101,7 @@ export default function ShippingReturnsPage() {
             <section className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Sorularınız mı var?</h3>
               <p className="text-gray-700 mb-4">
-                Teslimat, iade veya değişim hakkında sorularınız varsa lütfen <Link href="/bize-ulasin" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
+                Teslimat, iade veya değişim hakkında sorularınız varsa lütfen <Link href="/bize-ulasin" className="text-[#BA4700] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
               </p>
             </section>
 

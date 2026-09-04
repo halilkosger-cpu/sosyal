@@ -22,7 +22,7 @@ export default function AboutPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
               <LuHouse size={14} /> Ana Sayfa
             </Link>
             <span>/</span>
@@ -45,7 +45,7 @@ export default function AboutPage() {
                   "ürünleriylegerçek" seklinde bitisik okunuyordu - hem arama
                   motoru hem ekran okuyucu icin. */}
               {content.about.hero.title}{' '}<br />
-              <span className="text-[#CC4E00]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
+              <span className="text-[#BA4700]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
             </h1>
             <p className="text-sky-200 text-lg leading-relaxed max-w-xl">
               {content.about.hero.description}
@@ -60,7 +60,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
             {content.about.stats.map(({ value, label }) => (
               <div key={label} className="py-8 px-6 text-center">
-                <p className="text-3xl font-bold text-[#CC4E00]">{value}</p>
+                <p className="text-3xl font-bold text-[#BA4700]">{value}</p>
                 <p className="text-sm text-gray-500 mt-1">{label}</p>
               </div>
             ))}

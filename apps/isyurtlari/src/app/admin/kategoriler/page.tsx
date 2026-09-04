@@ -211,7 +211,7 @@ export default function AdminCategoriesPage() {
                         className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
                           ikonYukleniyor === cat.id
                             ? 'bg-gray-100 text-gray-400'
-                            : 'cursor-pointer bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-[#CC4E00]'
+                            : 'cursor-pointer bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-[#BA4700]'
                         }`}
                       >
                         <LuUpload size={13} />

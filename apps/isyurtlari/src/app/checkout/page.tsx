@@ -183,7 +183,7 @@ export default function CheckoutPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/sepet" className="text-[#CC4E00] hover:text-[#CC4E00] font-medium">
+          <Link href="/sepet" className="text-[#BA4700] hover:text-[#BA4700] font-medium">
             Sepete geri dön
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Ödeme</h1>

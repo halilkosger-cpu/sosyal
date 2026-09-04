@@ -221,7 +221,7 @@ export default function HomeClient({
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-white text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
@@ -229,7 +229,7 @@ export default function HomeClient({
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
                                 <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#CC4E00]">₺{discountedPrice.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#BA4700]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
                           </Link>
@@ -259,7 +259,7 @@ export default function HomeClient({
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-white text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
@@ -267,7 +267,7 @@ export default function HomeClient({
                               <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
                               <div className="flex flex-col gap-0.5">
                                 <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#CC4E00]">₺{discountedPrice.toFixed(2)}</p>
+                                <p className="text-base font-bold text-[#BA4700]">₺{discountedPrice.toFixed(2)}</p>
                               </div>
                             </div>
                           </Link>
@@ -381,7 +381,7 @@ export default function HomeClient({
             <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
-          <Link href="/gida" className="flex items-center gap-1 text-[#CC4E00] hover:text-[#cc4e00] text-sm font-semibold transition-colors">
+          <Link href="/gida" className="flex items-center gap-1 text-[#BA4700] hover:text-[#8F3700] text-sm font-semibold transition-colors">
             Tüm Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
           </Link>
         </div>
@@ -413,18 +413,18 @@ export default function HomeClient({
                     </div>
                   )}
                   {product.quantity > 0 && (
-                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
+                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
                   )}
                 </div>
                 <div className="p-3.5">
                   <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-1">{product.category?.name}</p>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#CC4E00] transition-colors leading-snug">{product.name}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#BA4700] transition-colors leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-0.5 mt-1.5 mb-2">
-                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#CC4E00]" />)}
+                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#BA4700]" />)}
                     <span className="text-[10px] text-gray-700 font-semibold ml-1">5.0</span>
                   </div>
                   {product.price > 0 ? (
-                    <p className="text-lg font-bold text-[#CC4E00] tracking-tight">₺{product.price.toFixed(2)}</p>
+                    <p className="text-lg font-bold text-[#BA4700] tracking-tight">₺{product.price.toFixed(2)}</p>
                   ) : (
                     <p className="text-xs text-gray-600 italic font-medium">Fiyat belirleniyor</p>
                   )}

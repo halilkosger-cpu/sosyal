@@ -123,7 +123,7 @@ export default function AdminFiyatlarPage() {
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Fiyatlar</h1>
         <p className="text-gray-500 text-sm mt-1">
           {urunler.length} ürün ·{' '}
-          <strong className={fiyatsizSayisi > 0 ? 'text-[#CC4E00]' : ''}>{fiyatsizSayisi}</strong>{' '}
+          <strong className={fiyatsizSayisi > 0 ? 'text-[#BA4700]' : ''}>{fiyatsizSayisi}</strong>{' '}
           ürünün fiyatı girilmemiş
         </p>
       </div>
@@ -206,7 +206,7 @@ export default function AdminFiyatlarPage() {
                         {d.eskiFiyat > 0 ? `₺${tl(d.eskiFiyat)}` : 'fiyatsız'}
                       </td>
                       <td className="px-3 py-2 text-center text-gray-400">→</td>
-                      <td className="px-3 py-2 text-right font-bold text-[#CC4E00] whitespace-nowrap">
+                      <td className="px-3 py-2 text-right font-bold text-[#BA4700] whitespace-nowrap">
                         ₺{tl(d.yeniFiyat)}
                       </td>
                     </tr>
@@ -289,7 +289,7 @@ export default function AdminFiyatlarPage() {
                       {u.price > 0 ? (
                         <span className="text-gray-900">₺{tl(u.price)}</span>
                       ) : (
-                        <span className="text-[#CC4E00] text-xs font-semibold">girilmemiş</span>
+                        <span className="text-[#BA4700] text-xs font-semibold">girilmemiş</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5 text-right">

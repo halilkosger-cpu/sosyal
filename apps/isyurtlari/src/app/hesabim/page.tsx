@@ -45,7 +45,7 @@ export default function MyAccountPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#CC4E00] hover:text-[#A63F00] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#BA4700] hover:text-[#8F3700] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <div className="flex items-center gap-3">
