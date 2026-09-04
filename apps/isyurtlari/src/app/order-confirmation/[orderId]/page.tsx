@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight } from 'react-icons/lu';
+import { siparisTamamlandi } from '@/lib/analiz';
 
 interface OrderData {
   id: string;
@@ -49,9 +50,25 @@ export default function OrderConfirmationPage() {
 
     fetch(`/api/orders?id=${orderId}`)
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: OrderData) => {
         setOrder(data);
         setLoading(false);
+
+        // GA4 purchase. siparisTamamlandi() ayni siparis numarasi icin ikinci
+        // kez gondermez: musteri sayfayi yenilerse ciro iki kat gorunurdu ve
+        // bu GA'da sonradan duzeltilemiyor.
+        if (data?.orderNumber) {
+          siparisTamamlandi({
+            siparisNo: data.orderNumber,
+            tutar: data.totalAmount,
+            kalemler: (data.orderItems || []).map((k) => ({
+              item_id: k.product.slug,
+              item_name: k.product.name,
+              price: k.price,
+              quantity: k.quantity,
+            })),
+          });
+        }
       })
       .catch((err) => {
         console.error('Error fetching order:', err);

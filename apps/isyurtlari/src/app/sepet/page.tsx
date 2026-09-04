@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { IconCart, IconProductOrigin, IconContinueShopping } from '@/components/Icons';
+import { sepettenCikarildi } from '@/lib/analiz';
 
 interface Campaign {
   id: string;
@@ -44,10 +45,21 @@ export default function CartPage() {
   };
 
   const removeItem = (id: string) => {
+    const cikarilan = cart.find((item) => item.id === id);
     const updated = cart.filter((item) => item.id !== id);
     setCart(updated);
     localStorage.setItem('cart', JSON.stringify(updated));
     window.dispatchEvent(new Event('cartUpdated'));
+
+    // GA4 remove_from_cart: hunide nerede vazgecildigini gorebilmek icin
+    if (cikarilan) {
+      sepettenCikarildi({
+        item_id: cikarilan.id,
+        item_name: cikarilan.name,
+        price: getItemPrice(cikarilan),
+        quantity: cikarilan.quantity,
+      });
+    }
   };
 
   const clearCart = () => {

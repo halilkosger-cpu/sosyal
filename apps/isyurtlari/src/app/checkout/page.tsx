@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { LuInfo } from 'react-icons/lu';
+import { odemeyeBaslandi } from '@/lib/analiz';
 import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
@@ -46,6 +47,18 @@ export default function CheckoutPage() {
     }
     setCart(savedCart);
     setPageLoading(false);
+
+    // GA4 begin_checkout. Sepet bos olsaydi zaten yukarida /sepet'e
+    // yonlendirilmis olurduk, yani buraya yalnizca gercek bir odeme baslangici
+    // ulasiyor.
+    odemeyeBaslandi(
+      savedCart.map((u: CartItem) => ({
+        item_id: u.id,
+        item_name: u.name,
+        price: u.campaign?.discountedPrice ?? u.price,
+        quantity: u.quantity,
+      }))
+    );
   }, [router]);
 
   // Calculate prices with campaign discounts

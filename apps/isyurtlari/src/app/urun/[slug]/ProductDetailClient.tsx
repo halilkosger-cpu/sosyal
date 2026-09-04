@@ -7,6 +7,8 @@ import Image from 'next/image';
 import { LuHouse, LuBadgeCheck, LuHeart } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
+import { sepeteEkle } from '@/lib/cart';
+import { urunGoruntulendi } from '@/lib/analiz';
 import {
   IconProductOrigin,
   IconVocationalTraining,
@@ -160,6 +162,19 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       .catch(() => setLoading(false));
   }, [slug]);
 
+  // GA4 view_item. Urun kimligine bagli: ayni sayfada urun degisirse yeniden
+  // gonderilir, ama her render'da degil.
+  useEffect(() => {
+    if (!product) return;
+    urunGoruntulendi({
+      item_id: product.id,
+      item_name: product.name,
+      item_category: product.category.name,
+      price: product.campaign?.discountedPrice ?? product.price,
+      quantity: 1,
+    });
+  }, [product?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     setReviewsLoading(true);
     fetch(`/api/products/${slug}/reviews`)
@@ -168,24 +183,36 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       .catch(() => setReviewsLoading(false));
   }, [slug]);
 
+  /**
+   * Sepete ekleme artik lib/cart.ts'teki sepeteEkle() uzerinden yapiliyor.
+   *
+   * Buradaki kopya mantik iki soruna yol aciyordu:
+   *  - Kampanya fiyati yok sayiliyordu. Urun kartlarindaki buton indirimli
+   *    fiyati (campaign.discountedPrice) sepete yazarken bu sayfa tam fiyati
+   *    yaziyordu; ayni indirimli urun, nereden eklendigine gore farkli fiyata
+   *    sepete giriyordu.
+   *  - Stok ve fiyat kontrolu yoktu; sepeteEkle() bu kontrolu yapiyor.
+   *
+   * GA'nin add_to_cart olayi da sepeteEkle() icinde gonderiliyor.
+   */
   const handleAddToCart = () => {
     if (!product) return;
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find((i: { id: string }) => i.id === product.id);
-    if (existing) { existing.quantity += quantity; }
-    else {
-      cart.push({
+
+    const eklendi = sepeteEkle(
+      {
         id: product.id,
         name: product.name,
-        price: product.price,
-        quantity,
+        price: product.campaign?.discountedPrice ?? product.price,
         slug: product.slug,
         imageUrl: product.imageUrl,
-        campaign: product.campaign || null,
-      });
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    window.dispatchEvent(new Event('cartUpdated'));
+        quantity: product.quantity,
+        campaign: product.campaign ?? null,
+      },
+      quantity
+    );
+
+    if (!eklendi) return;
+
     setAdded(true);
     setQuantity(1);
     setTimeout(() => setAdded(false), 3000);

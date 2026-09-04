@@ -3,6 +3,7 @@
  * degisiklikten sonra 'cartUpdated' olayi tetiklenmeli ki ustteki
  * CartBadge sayiyi guncellesin.
  */
+import { sepeteEklendi } from './analiz';
 
 export interface SepetUrunu {
   id: string;
@@ -56,6 +57,17 @@ export function sepeteEkle(urun: SepeteEklenebilirUrun, adet = 1): boolean {
 
     localStorage.setItem('cart', JSON.stringify(sepet));
     window.dispatchEvent(new Event('cartUpdated'));
+
+    // Sepete ekleme sitede birkac yerden yapiliyor (urun sayfasi, kategori
+    // kartlari, arama onerileri) ama hepsi bu fonksiyondan geciyor; GA olayini
+    // burada gondermek her yeri tek seferde kapsiyor.
+    sepeteEklendi({
+      item_id: urun.id,
+      item_name: urun.name,
+      price: urun.price,
+      quantity: adet,
+    });
+
     return true;
   } catch {
     // localStorage kapali veya dolu olabilir

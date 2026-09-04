@@ -24,10 +24,22 @@ const GA_KIMLIGI = 'G-KTWVN830XT';
  * Genel sayfalarda davranis aynen korunuyor: betikler yine lazyOnload ile
  * yukleniyor ve analytics_storage cerez onayina bagli kaliyor.
  */
+/**
+ * Gelistirme makinesinde olcum yapilmaz: localhost'ta yapilan denemeler
+ * (ozellikle satin alma akisi testleri) canli GA hesabina gercek ciro olarak
+ * yaziliyordu ve bu veri sonradan temizlenemiyor.
+ */
+function gelistirmeOrtami() {
+  if (typeof window === 'undefined') return false;
+  const a = window.location.hostname;
+  return a === 'localhost' || a === '127.0.0.1' || a.endsWith('.local');
+}
+
 export default function Olcumler() {
   const yol = usePathname();
 
   if (yol?.startsWith('/admin')) return null;
+  if (gelistirmeOrtami()) return null;
 
   return (
     <>
