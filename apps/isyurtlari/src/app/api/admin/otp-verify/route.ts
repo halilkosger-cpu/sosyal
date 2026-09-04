@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { verifyOTP, getRemainingAttempts } from '@/lib/otp';
+import { verifyOTP, getRemainingAttempts, kodlariTemizle } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
@@ -20,6 +21,17 @@ export async function POST(req: NextRequest) {
         { error: 'Email ve kod gereklidir' },
         { status: 400 }
       );
+    }
+
+    // Hiz siniri: dakikada 10 dogrulama denemesi.
+    //
+    // Kodun kendi deneme sayaci (5) tek bir kod icin gecerli; bu sinir ise
+    // surekli yeni kod isteyip denemeyi de yavaslatiyor. Sayac veritabaninda
+    // oldugu icin sunucusuz ortamda gercekten isliyor.
+    const sinir = await hizSiniriGuard(req, 'otp-verify', 10, 60);
+    if (sinir) {
+      logAudit('OTP_VERIFY', email, 'failed', 'Rate limit exceeded', ip);
+      return sinir;
     }
 
     if (email !== ADMIN_EMAIL) {
@@ -63,6 +75,9 @@ export async function POST(req: NextRequest) {
     });
 
     logAudit('OTP_VERIFY', email, 'success', 'Admin login successful', ip);
+
+    // Suresi gecmis kodlari ara sira temizle
+    await kodlariTemizle();
 
     return res;
   } catch (error) {

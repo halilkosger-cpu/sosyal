@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { generateOTP, storeOTP } from '@/lib/otp';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { logAudit } from '@/lib/audit-log';
 
 const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
@@ -25,14 +25,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
     }
 
-    // Rate limiting: 5 requests per minute per email
-    const rateLimit = checkRateLimit(`otp-request:${email}`, 5, 60 * 1000);
-    if (!rateLimit.allowed) {
+    // Hiz siniri: dakikada 5 kod istegi.
+    //
+    // Onceden bellekteki sayac kullaniliyordu; sunucusuz ortamda her istek
+    // ayri bir ornekte islenebildigi icin sayac surekli sifirlaniyor ve sinir
+    // pratikte islemiyordu. Sayac artik veritabaninda, tum ornekler icin
+    // ortak.
+    const sinir = await hizSiniriGuard(req, 'otp-request', 5, 60);
+    if (sinir) {
       logAudit('OTP_REQUEST', email, 'failed', 'Rate limit exceeded', ip);
-      return NextResponse.json(
-        { error: 'Çok fazla istek. Lütfen 1 dakika bekleyin.' },
-        { status: 429 }
-      );
+      return sinir;
     }
 
     // Generate OTP

@@ -1,79 +1,74 @@
-import { setRedisValue, getRedisValue, deleteRedisValue, USE_REDIS } from './redis';
+import { createHash, randomInt, timingSafeEqual } from 'crypto';
+import { prisma } from '@isyurtlari/database';
 
-// Fallback in-memory store for development
-const otpStore = new Map<string, { code: string; expiresAt: number; attempts: number }>();
+/**
+ * Yonetici girisi icin tek kullanimlik kod.
+ *
+ * Kod onceden bellekte (REDIS_URL tanimliysa Redis'te) tutuluyordu. Uygulama
+ * sunucusuz calisiyor ve REDIS_URL tanimli degil; bu yuzden kodu ureten ornek
+ * ile dogrulayan ornek farkli olabiliyordu. Iki sonucu vardi:
+ *   - Giris bazen sebepsiz "hatali kod" veriyordu.
+ *   - Deneme sayaci her ornekte sifirdan basladigi icin 5 deneme siniri
+ *     gercekte islemiyordu.
+ *
+ * Kod artik veritabaninda, ozeti alinarak saklaniyor.
+ */
 
-const OTP_EXPIRY = 10 * 60; // 10 minutes in seconds
-const MAX_ATTEMPTS = 5;
+const GECERLILIK_DK = 10;
+const AZAMI_DENEME = 5;
 
+const ozetle = (kod: string) => createHash('sha256').update(kod).digest('hex');
+
+/**
+ * Kriptografik olarak guvenli 6 haneli kod.
+ *
+ * Math.random() kullanilmiyordu; tahmin edilebilir bir uretecin giris kodu
+ * uretmesi dogru degil.
+ */
 export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return String(randomInt(0, 1_000_000)).padStart(6, '0');
 }
 
 export async function storeOTP(email: string, code: string): Promise<void> {
-  const otpData = JSON.stringify({
-    code,
-    attempts: 0,
-  });
+  const sonKullanma = new Date(Date.now() + GECERLILIK_DK * 60 * 1000);
 
-  if (USE_REDIS) {
-    await setRedisValue(`otp:${email}`, otpData, OTP_EXPIRY);
-  } else {
-    // Fallback: in-memory storage
-    otpStore.set(email, {
-      code,
-      expiresAt: Date.now() + OTP_EXPIRY * 1000,
-      attempts: 0,
-    });
-  }
+  await prisma.otpKodu.upsert({
+    where: { email },
+    create: { email, kodOzeti: ozetle(code), sonKullanma, denemeSayisi: 0 },
+    // Yeni kod istendiginde deneme sayaci sifirlanir.
+    update: { kodOzeti: ozetle(code), sonKullanma, denemeSayisi: 0, olusturma: new Date() },
+  });
 }
 
 export async function verifyOTP(email: string, code: string): Promise<boolean> {
-  let storedOTP: { code: string; attempts: number } | null = null;
+  const kayit = await prisma.otpKodu.findUnique({ where: { email } });
+  if (!kayit) return false;
 
-  if (USE_REDIS) {
-    const data = await getRedisValue(`otp:${email}`);
-    if (!data) return false;
-    storedOTP = JSON.parse(data);
-  } else {
-    const inMemory = otpStore.get(email);
-    if (!inMemory || Date.now() > inMemory.expiresAt) {
-      otpStore.delete(email);
-      return false;
-    }
-    storedOTP = {
-      code: inMemory.code,
-      attempts: inMemory.attempts,
-    };
-  }
-
-  if (!storedOTP) return false;
-
-  if (storedOTP.attempts >= MAX_ATTEMPTS) {
-    if (USE_REDIS) {
-      await deleteRedisValue(`otp:${email}`);
-    } else {
-      otpStore.delete(email);
-    }
+  if (kayit.sonKullanma < new Date()) {
+    await prisma.otpKodu.delete({ where: { email } }).catch(() => {});
     return false;
   }
 
-  storedOTP.attempts++;
-
-  // Update attempts
-  if (USE_REDIS) {
-    await setRedisValue(`otp:${email}`, JSON.stringify(storedOTP), OTP_EXPIRY);
-  } else {
-    const inMemory = otpStore.get(email)!;
-    inMemory.attempts = storedOTP.attempts;
+  if (kayit.denemeSayisi >= AZAMI_DENEME) {
+    await prisma.otpKodu.delete({ where: { email } }).catch(() => {});
+    return false;
   }
 
-  if (storedOTP.code === code) {
-    if (USE_REDIS) {
-      await deleteRedisValue(`otp:${email}`);
-    } else {
-      otpStore.delete(email);
-    }
+  // Deneme sayaci karsilastirmadan ONCE artiriliyor: karsilastirma sirasinda
+  // bir hata olusursa bile deneme sayilmis olur.
+  await prisma.otpKodu.update({
+    where: { email },
+    data: { denemeSayisi: { increment: 1 } },
+  });
+
+  // Sabit surede karsilastirma: kodun ne kadarinin dogru oldugu, yanit
+  // suresinden anlasilamasin.
+  const gelen = Buffer.from(ozetle(String(code)));
+  const beklenen = Buffer.from(kayit.kodOzeti);
+  const dogru = gelen.length === beklenen.length && timingSafeEqual(gelen, beklenen);
+
+  if (dogru) {
+    await prisma.otpKodu.delete({ where: { email } }).catch(() => {});
     return true;
   }
 
@@ -81,28 +76,20 @@ export async function verifyOTP(email: string, code: string): Promise<boolean> {
 }
 
 export async function deleteOTP(email: string): Promise<void> {
-  if (USE_REDIS) {
-    await deleteRedisValue(`otp:${email}`);
-  } else {
-    otpStore.delete(email);
-  }
+  await prisma.otpKodu.delete({ where: { email } }).catch(() => {});
 }
 
 export async function getRemainingAttempts(email: string): Promise<number> {
-  let storedOTP: { code: string; attempts: number } | null = null;
+  const kayit = await prisma.otpKodu.findUnique({
+    where: { email },
+    select: { denemeSayisi: true },
+  });
+  if (!kayit) return AZAMI_DENEME;
+  return Math.max(0, AZAMI_DENEME - kayit.denemeSayisi);
+}
 
-  if (USE_REDIS) {
-    const data = await getRedisValue(`otp:${email}`);
-    if (!data) return MAX_ATTEMPTS;
-    storedOTP = JSON.parse(data);
-  } else {
-    const inMemory = otpStore.get(email);
-    if (!inMemory) return MAX_ATTEMPTS;
-    storedOTP = {
-      code: inMemory.code,
-      attempts: inMemory.attempts,
-    };
-  }
-
-  return MAX_ATTEMPTS - (storedOTP?.attempts || 0);
+/** Suresi gecmis kodlari siler. Dusuk olasilikla tetiklenir. */
+export async function kodlariTemizle(olasilik = 0.05): Promise<void> {
+  if (Math.random() > olasilik) return;
+  await prisma.otpKodu.deleteMany({ where: { sonKullanma: { lt: new Date() } } }).catch(() => {});
 }

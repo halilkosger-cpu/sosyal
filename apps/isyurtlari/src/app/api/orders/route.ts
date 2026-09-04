@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
 import { siparisToplami } from '@/lib/fiyat';
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
 // Email sending function
 async function sendOrderEmail(
@@ -133,7 +134,20 @@ interface OrderRequest {
 const TRAINING_HOURS_PER_ITEM = 5;
 const PRISONERS_PER_ITEM = 0.5; // 1 prisoner supported per 2 items
 
+/** Islem icinde stok yetmediginde firlatilir; islemin geri alinmasini saglar. */
+class StokYetersiz extends Error {
+  constructor(public urunAdi: string) {
+    super('Yetersiz stok: ' + urunAdi);
+  }
+}
+
 export async function POST(req: NextRequest) {
+  // Hiz siniri: ayni adresten saatte 10 siparis. Her siparis iki e-posta
+  // gonderiyor ve stok dusuyor; sinirsiz birakilmasi kotayi tuketebilir ve
+  // sahte siparislerle stogu kilitleyebilirdi.
+  const sinir = await hizSiniriGuard(req, 'siparis', 10, 3600);
+  if (sinir) return sinir;
+
   try {
     const body: OrderRequest = await req.json();
     // Not: istek govdesi musteri adi, e-posta, telefon ve adres iceriyor;
@@ -203,83 +217,113 @@ export async function POST(req: NextRequest) {
       kalemler.reduce((t, k) => t + k.birimFiyat * k.adet, 0)
     );
 
-    // Generate order number (simple sequential format: SG-2024-001)
-    const latestOrder = await prisma.order.findFirst({
-      orderBy: { createdAt: 'desc' },
-      take: 1,
-    });
-
-    let nextNumber = 1;
-    if (latestOrder?.orderNumber) {
-      const match = latestOrder.orderNumber.match(/SG-\d+-(\d+)/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-    const year = new Date().getFullYear();
-    const orderNumber = `SG-${year}-${String(nextNumber).padStart(3, '0')}`;
-
     // Calculate impact metrics
     const totalItemsCount = kalemler.reduce((sum, k) => sum + k.adet, 0);
     const trainingHoursFunded = totalItemsCount * TRAINING_HOURS_PER_ITEM;
     const prisonersSupportedCount = Math.ceil(totalItemsCount * PRISONERS_PER_ITEM);
 
-    // Create order first (guest checkout - no userId)
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        status: 'PENDING',
-        totalAmount: gercekToplam,
-        paymentMethod: body.paymentMethod,
-        shippingAddress: body.shippingAddress,
-        notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
-      },
-    });
+    /**
+     * Siparis, kalemleri, stok dususu ve odeme kaydi tek islemde yaziliyor.
+     *
+     * Onceden hepsi ayri ayri yapiliyordu ve iki sorun vardi:
+     *
+     * 1) Asiri satis. Stok kontrolu ile stok dususu arasinda baska bir siparis
+     *    araya girebiliyordu; ayni anda gelen iki siparis son urunu ikisi
+     *    birden satabiliyordu. Dusum artik "yeterli stok varsa dus" seklinde
+     *    tek ifadeyle yapiliyor (updateMany + quantity >= adet kosulu); kosul
+     *    tutmazsa hicbir satir guncellenmiyor ve islem geri aliniyor.
+     *
+     * 2) Yarim kalan siparis. Araya bir hata girerse siparis yazilmis ama
+     *    stok dusulmemis ya da odeme kaydi olusmamis olabiliyordu. Artik ya
+     *    hepsi yazilir ya hicbiri.
+     */
+    const siparisiOlustur = async (orderNumber: string) =>
+      prisma.$transaction(async (tx) => {
+        for (const k of kalemler) {
+          const sonuc = await tx.product.updateMany({
+            where: { id: k.id, quantity: { gte: k.adet } },
+            data: { quantity: { decrement: k.adet } },
+          });
+          if (sonuc.count === 0) {
+            throw new StokYetersiz(k.ad);
+          }
+        }
 
-    // Create order items
-    await Promise.all(
-      kalemler.map((k) =>
-        prisma.orderItem.create({
+        const order = await tx.order.create({
           data: {
-            orderId: order.id,
-            productId: k.id,
-            quantity: k.adet,
-            price: k.birimFiyat,
+            orderNumber,
+            status: 'PENDING',
+            totalAmount: gercekToplam,
+            paymentMethod: body.paymentMethod,
+            shippingAddress: body.shippingAddress,
+            notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
+            items: {
+              create: kalemler.map((k) => ({
+                productId: k.id,
+                quantity: k.adet,
+                price: k.birimFiyat,
+              })),
+            },
           },
-        })
-      )
-    );
+          include: { items: { include: { product: true } } },
+        });
 
-    // Fetch order with items
-    const orderWithItems = await prisma.order.findUnique({
-      where: { id: order.id },
-      include: {
-        items: {
-          include: {
-            product: true,
+        await tx.payment.create({
+          data: {
+            amount: gercekToplam,
+            currency: 'TRY',
+            method: body.paymentMethod,
+            status: 'PENDING',
+            description: `Sipariş #${orderNumber}`,
           },
-        },
-      },
-    });
+        });
 
-    // Update product stock
-    for (const k of kalemler) {
-      await prisma.product.update({
-        where: { id: k.id },
-        data: { quantity: { decrement: k.adet } },
+        return order;
       });
+
+    /**
+     * Siparis numarasi uretimi.
+     *
+     * Numara "en son siparisi bul, bir artir" seklinde uretiliyor; ayni anda
+     * gelen iki siparis ayni numarayi uretebiliyor ve orderNumber benzersiz
+     * oldugu icin ikincisi hata aliyordu. Cakisma durumunda birkac kez
+     * yeniden deneniyor.
+     */
+    let orderWithItems: Awaited<ReturnType<typeof siparisiOlustur>> | null = null;
+    let orderNumber = '';
+
+    for (let deneme = 0; deneme < 5; deneme++) {
+      const sonSiparis = await prisma.order.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { orderNumber: true },
+      });
+
+      const eslesme = sonSiparis?.orderNumber?.match(/SG-\d+-(\d+)/);
+      const sonraki = (eslesme ? parseInt(eslesme[1], 10) : 0) + 1 + deneme;
+      orderNumber = `SG-${new Date().getFullYear()}-${String(sonraki).padStart(3, '0')}`;
+
+      try {
+        orderWithItems = await siparisiOlustur(orderNumber);
+        break;
+      } catch (e) {
+        if (e instanceof StokYetersiz) {
+          return NextResponse.json(
+            { error: `${e.urunAdi} için yeterli stok kalmadı` },
+            { status: 409 }
+          );
+        }
+        // P2002 = benzersizlik ihlali; numara kapilmis, bir sonrakini dene
+        if ((e as { code?: string })?.code === 'P2002' && deneme < 4) continue;
+        throw e;
+      }
     }
 
-    // Create payment record
-    await prisma.payment.create({
-      data: {
-        amount: gercekToplam,
-        currency: 'TRY',
-        method: body.paymentMethod,
-        status: 'PENDING',
-        description: `Sipariş #${orderNumber}`,
-      },
-    });
+    if (!orderWithItems) {
+      return NextResponse.json(
+        { error: 'Sipariş numarası üretilemedi, lütfen tekrar deneyin' },
+        { status: 503 }
+      );
+    }
 
     // Send email notification
     await sendOrderEmail(

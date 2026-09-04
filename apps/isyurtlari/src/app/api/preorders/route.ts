@@ -3,7 +3,7 @@ import { absoluteUrl } from '@/lib/seo';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { emailTemplates } from '@/lib/email-templates';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { hizSiniriGuard, sayaclariTemizle } from '@/lib/hiz-siniri';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Servis şu anda kullanılamıyor' }, { status: 503 });
   }
 
-  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  // Istemci adresi artik hizSiniriGuard icinde okunuyor.
 
   try {
     const body = await req.json();
@@ -62,14 +62,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Rate limiting: aynı IP'den dakikada en fazla 5 ön talep
-    const rateLimit = checkRateLimit(`preorder:${ip}`, 5, 60 * 1000);
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Çok fazla istek gönderdiniz. Lütfen 1 dakika bekleyin.' },
-        { status: 429 }
-      );
-    }
+    // Hiz siniri: ayni adresten dakikada en fazla 5 on talep.
+    // Sayac veritabaninda; bellekteki sayac sunucusuz ortamda her istek ayri
+    // ornekte islenebildigi icin surekli sifirlaniyordu.
+    const sinir = await hizSiniriGuard(req, 'on-talep', 5, 60);
+    if (sinir) return sinir;
+
+    // Suresi gecmis sayac satirlarini ara sira temizle; tablo sinirsiz
+    // buyumesin.
+    await sayaclariTemizle();
 
     // ─── Ürün kontrolü ───
     const product = await prisma.product.findUnique({

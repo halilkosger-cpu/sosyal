@@ -646,3 +646,37 @@ model PreOrder {
   @@index([email])
   @@index([createdAt])
 }
+
+/// Herkese acik formlar icin istek sayaci (hiz siniri).
+///
+/// Uygulama sunucusuz calisiyor: her istek ayri bir ornekte islenebiliyor, bu
+/// yuzden bellekte tutulan bir sayac guvenilir degil. Sayac paylasilan tek
+/// yerde, veritabaninda tutuluyor.
+model IstekSayaci {
+  /// "<uc adi>:<ip>" bicimi. Ornek: "on-talep:203.0.113.9"
+  anahtar          String   @id
+  adet             Int      @default(0)
+  pencereBaslangic DateTime @default(now())
+
+  @@index([pencereBaslangic])
+}
+
+/// Yonetici girisi icin tek kullanimlik kod.
+///
+/// Onceden bu kod bellekte (ya da REDIS_URL tanimliysa Redis'te) tutuluyordu.
+/// Uygulama sunucusuz calistigi ve REDIS_URL tanimli olmadigi icin kodu ureten
+/// ornek ile dogrulayan ornek farkli olabiliyordu: giris bazen "hatali kod"
+/// veriyor, deneme sayaci da her ornekte sifirdan basladigi icin 5 deneme
+/// siniri gercekte islemiyordu.
+///
+/// Kodun kendisi degil SHA-256 ozeti saklaniyor: veritabani okunsa bile
+/// yururlukteki kod ele gecmesin.
+model OtpKodu {
+  email        String   @id
+  kodOzeti     String
+  denemeSayisi Int      @default(0)
+  sonKullanma  DateTime
+  olusturma    DateTime @default(now())
+
+  @@index([sonKullanma])
+}
