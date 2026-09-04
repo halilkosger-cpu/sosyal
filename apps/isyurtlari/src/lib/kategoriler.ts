@@ -1,4 +1,4 @@
-import { unstable_cache, revalidateTag } from 'next/cache';
+import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@isyurtlari/database';
 import { hasDatabaseUrl } from './seo';
 import type { Kategori } from './kategori-gorunum';
@@ -54,6 +54,16 @@ export const kategorileriGetir = unstable_cache(
   { tags: [KATEGORI_ETIKETI], revalidate: 300 }
 );
 
-export function kategorileriTazele() {
+/**
+ * Kategori ya da urun degistiginde cagrilir.
+ *
+ * Iki ayri onbellegi tazeler:
+ *  - Kategori listesi etiketi: baslik cubugu ve kategori kenar cubugu
+ *  - /sitemap.xml: derleme aninda uretilen statik dosya. Icerik admin
+ *    panelinden ekleniyor ve haftalarca deploy olmayabilir; tazelenmezse
+ *    yeni kategori ve urunler bir sonraki deploy'a kadar sitemap'e girmez.
+ */
+export function icerikTazele() {
   revalidateTag(KATEGORI_ETIKETI);
+  revalidatePath('/sitemap.xml');
 }

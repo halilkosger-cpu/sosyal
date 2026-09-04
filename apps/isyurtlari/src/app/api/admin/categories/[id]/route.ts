@@ -1,6 +1,6 @@
-import { prisma } from '@isyurtlari/database';
+﻿import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
-import { kategorileriTazele } from '@/lib/kategoriler';
+import { icerikTazele } from '@/lib/kategoriler';
 import { gecerliGorselAdresi } from '@/lib/dogrulama';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     select: { id: true, name: true, slug: true, imageUrl: true },
   });
 
-  kategorileriTazele();
+  icerikTazele();
 
   return NextResponse.json(category);
 }
@@ -36,7 +36,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   await prisma.productCategory.delete({ where: { id: params.id } });
 
   // Silinen kategori baslik cubugunda olu bag olarak kalmasin.
-  kategorileriTazele();
+  icerikTazele();
 
   return NextResponse.json({ ok: true });
 }

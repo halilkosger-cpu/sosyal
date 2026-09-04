@@ -50,8 +50,13 @@ const nextConfig = {
       // /api/admin/* ve /api/user/* cevaplari da 1 saat `public` onbellege
       // aliniyordu -> admin paneli bayat veri gosteriyor, ayrica musteri
       // bilgisi tasiyan cevaplar paylasimli onbelleklere acik kaliyordu.
+      //
+      // sitemap.xml de disarida: artik her istekte uretiliyor ve Next kendi
+      // Cache-Control basligini koyuyor. Buradaki kural da eklenince yanitta
+      // iki farkli max-age yan yana geliyordu ("max-age=3600, ..., max-age=0")
+      // ve hangisinin gecerli oldugu belirsiz kaliyordu.
       {
-        source: '/((?!api/).*)',
+        source: '/((?!api/|sitemap\\.xml).*)',
         headers: [
           {
             key: 'Cache-Control',

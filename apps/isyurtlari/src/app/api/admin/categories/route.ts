@@ -1,6 +1,6 @@
-import { prisma } from '@isyurtlari/database';
+﻿import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
-import { kategorileriTazele } from '@/lib/kategoriler';
+import { icerikTazele } from '@/lib/kategoriler';
 import { gecerliGorselAdresi } from '@/lib/dogrulama';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   // Baslik cubugu ve kategori kenar cubugu onbellekli okuyor; yeni kategorinin
   // sitede beklemeden gorunmesi icin listeyi tazeliyoruz.
-  kategorileriTazele();
+  icerikTazele();
 
   return NextResponse.json(category, { status: 201 });
 }

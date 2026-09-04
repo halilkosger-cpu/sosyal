@@ -1,6 +1,25 @@
-import { MetadataRoute } from 'next';
+﻿import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@isyurtlari/database';
+
+/**
+ * Sitemap her istekte veritabanindan uretilir.
+ *
+ * Varsayilan davranis derleme aninda bir kez uretip statik servis etmekti; bu
+ * yuzden admin panelinden eklenen kategori ve urunler bir sonraki deploy'a
+ * kadar sitemap'e girmiyordu. Icerik siteye deploy olmadan eklendigi icin bu
+ * kabul edilemez.
+ *
+ * Once daha ucuz iki yol denendi, ikisi de calismadi:
+ *  - `export const revalidate`: uretilen sitemap.xml.meta dosyasina hicbir
+ *    revalidate degeri yazilmiyor, rota statik kalmaya devam ediyor.
+ *  - `revalidatePath('/sitemap.xml')`: tam statik uretilen rotanin prerender
+ *    kaydi olmadigi icin tazeleme bir sey yapmiyor (olculdu: damga degismedi).
+ *
+ * Maliyet dusuk: yanit CDN'de bir saat onbellekleniyor (next.config.js), yani
+ * pratikte bolge basina saatte iki sorgu.
+ */
+export const dynamic = 'force-dynamic';
 
 const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;

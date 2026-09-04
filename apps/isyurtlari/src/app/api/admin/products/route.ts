@@ -1,6 +1,6 @@
-import { prisma } from '@isyurtlari/database';
+﻿import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
-import { kategorileriTazele } from '@/lib/kategoriler';
+import { icerikTazele } from '@/lib/kategoriler';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     data: { name, slug, description, categoryId, price: Number(price) || 0, quantity: Number(quantity) || 0, imageUrl: imageUrl || null },
   });
   // Kenar cubugu kategori basina urun sayisi gosteriyor; onbellek tazelensin.
-  kategorileriTazele();
+  icerikTazele();
 
   return NextResponse.json(product, { status: 201 });
 }
