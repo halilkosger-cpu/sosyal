@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
 import { kategorileriGetir } from '@/lib/kategoriler';
@@ -19,25 +20,42 @@ type CategoryPageProps = {
   };
 };
 
-const getCategory = async (slug: string) => {
-  if (!hasDatabaseUrl()) return null;
+const kategoriyiSorgula = (slug: string) =>
+  prisma.productCategory.findUnique({
+    where: { slug },
+    select: {
+      name: true,
+      slug: true,
+      description: true,
+      imageUrl: true,
+      products: {
+        select: { id: true },
+      },
+    },
+  });
+
+/**
+ * Kategoriyi getirir. `yok` yalnizca sorgu basarili olup kayit bulunamadigini
+ * belirtir; veritabanina hic ulasilamadiysa `erisilemedi` doner.
+ *
+ * Bu rota [categorySlug] oldugu icin sitedeki TUM ust seviye adresleri
+ * yakaliyor. Ayrim yapilmasaydi gecici bir baglanti hatasi butun kategori
+ * sayfalarina 404 verdirirdi.
+ */
+type KategoriSonucu =
+  | { durum: 'bulundu'; kategori: NonNullable<Awaited<ReturnType<typeof kategoriyiSorgula>>> }
+  | { durum: 'yok' }
+  | { durum: 'erisilemedi' };
+
+const getCategory = async (slug: string): Promise<KategoriSonucu> => {
+  if (!hasDatabaseUrl()) return { durum: 'erisilemedi' };
 
   try {
-    return await prisma.productCategory.findUnique({
-      where: { slug },
-      select: {
-        name: true,
-        slug: true,
-        description: true,
-        imageUrl: true,
-        products: {
-          select: { id: true },
-        },
-      },
-    });
+    const kategori = await kategoriyiSorgula(slug);
+    return kategori ? { durum: 'bulundu', kategori } : { durum: 'yok' };
   } catch (error) {
-    console.error('Category metadata error:', error);
-    return null;
+    console.error('Category query error:', error);
+    return { durum: 'erisilemedi' };
   }
 };
 
@@ -105,8 +123,20 @@ const getCategoryTitle = (categoryName: string) => {
 };
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const category = await getCategory(params.categorySlug);
-  const categoryName = category?.name ?? 'Ürünler';
+  const sonuc = await getCategory(params.categorySlug);
+
+  if (sonuc.durum !== 'bulundu') {
+    // Olmayan kategori 404 donuyor; kendine isaret eden canonical uretmemeli.
+    return {
+      title: 'Kategori Bulunamadı',
+      description: 'Aradığınız kategori bulunamadı.',
+      robots: { index: false, follow: false },
+      alternates: { canonical: null },
+    };
+  }
+
+  const category = sonuc.kategori;
+  const categoryName = category.name;
   const title = getCategoryTitle(categoryName);
   const description = truncate(
     category?.description ||
@@ -139,11 +169,29 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const [category, urunler, kategoriler] = await Promise.all([
+  const [sonuc, urunler, kategoriler] = await Promise.all([
     getCategory(params.categorySlug),
     getCategoryProducts(params.categorySlug),
     kategorileriGetir(),
   ]);
+
+  /**
+   * Bu rota sitedeki tum ust seviye adresleri yakaliyor. Olmayan bir kategori
+   * icin bos sayfa HTTP 200 ile donuyordu: /rastgele-bir-sey, /.env, eski her
+   * bag "Ürünler Ürünleri" baslikli ayni bos sayfayi 200 ile veriyordu.
+   *
+   * Bu, sinirsiz sayida adres uretebilen bir soft 404'tu. Google bunlari
+   * indeksleyebilir, hepsi ayni baslikla yinelenen icerik olurdu ve tarama
+   * butcesi bosa giderdi.
+   *
+   * Veritabanina ulasilamadigi durumda 404 DONULMUYOR - gecici bir arizada
+   * butun kategorileri indeksten dusurmek cok daha pahaliya mal olurdu.
+   */
+  if (sonuc.durum === 'yok') {
+    notFound();
+  }
+
+  const category = sonuc.durum === 'bulundu' ? sonuc.kategori : null;
   const categoryName = category?.name ?? 'Ürünler';
   const title = getCategoryTitle(categoryName);
   const canonical = absoluteUrl(`/${params.categorySlug}`);
