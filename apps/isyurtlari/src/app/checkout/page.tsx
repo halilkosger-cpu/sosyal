@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { LuInfo } from 'react-icons/lu';
 import { odemeyeBaslandi } from '@/lib/analiz';
+import { siparisToplami } from '@/lib/fiyat';
 import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
@@ -69,11 +70,14 @@ export default function CheckoutPage() {
     return item.price;
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
   const originalSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Vergi orani lib/fiyat.ts'te; siparis ucu de ayni hesabi kullaniyor ki
+  // musteriye gosterilen tutar ile siparise yazilan tutar ayrismasin.
+  const { araToplam: subtotal, vergi: tax, toplam: total } = siparisToplami(
+    cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0)
+  );
   const totalDiscount = originalSubtotal - subtotal;
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -382,10 +386,20 @@ export default function CheckoutPage() {
                   <span>KDV (%10)</span>
                   <span>₺{tax.toFixed(2)}</span>
                 </div>
+                {/* Kargo tutara dahil degil: gonderiler karsi odemeli. Musteri
+                    bunu siparisi onaylamadan once bilmeli. */}
+                <div className="flex justify-between text-gray-600">
+                  <span>Kargo</span>
+                  <span className="font-semibold text-gray-700">Karşı ödemeli</span>
+                </div>
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                   <span>Toplam</span>
                   <span>₺{total.toFixed(2)}</span>
                 </div>
+                <p className="text-xs leading-relaxed text-gray-500">
+                  Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına
+                  ödenir.
+                </p>
               </div>
             </div>
           </div>

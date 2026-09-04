@@ -3,6 +3,7 @@ import { bankaBilgileri, bankaBilgisiTam } from '@/lib/bank';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
+import { siparisToplami } from '@/lib/fiyat';
 
 // Email sending function
 async function sendOrderEmail(
@@ -135,29 +136,72 @@ const PRISONERS_PER_ITEM = 0.5; // 1 prisoner supported per 2 items
 export async function POST(req: NextRequest) {
   try {
     const body: OrderRequest = await req.json();
-    console.log('Order API - Body received:', body);
+    // Not: istek govdesi musteri adi, e-posta, telefon ve adres iceriyor;
+    // gunluge basilmiyor.
 
     // Validate input
     if (!body.customerName || !body.email || !body.phone || !body.shippingAddress || !body.items || body.items.length === 0) {
-      console.log('Order API - Validation error: missing fields');
       return NextResponse.json({ error: 'Gerekli alanlar eksik' }, { status: 400 });
     }
 
-    console.log('Order API - Validation passed, starting inventory check');
+    /**
+     * Fiyat sunucuda hesaplaniyor.
+     *
+     * Onceden siparis, istemciden gelen item.price ve body.totalAmount
+     * degerleriyle olusturuluyordu; stok kontrolu icin urun veritabanindan
+     * cekiliyor ama fiyati hic karsilastirilmiyordu. Yani istegi elle
+     * duzenleyen biri herhangi bir urunu istedigi fiyata - ornegin 1 TL -
+     * satin alabilirdi. Istemciden gelen fiyat artik tamamen yok sayiliyor.
+     *
+     * Kampanya indirimi de burada uygulaniyor, boylece sepette gorulen fiyat
+     * ile siparise yazilan fiyat ayni kaynaktan geliyor.
+     */
+    const simdi = new Date();
+    const kalemler: { id: string; adet: number; birimFiyat: number; ad: string }[] = [];
 
-    // Validate inventory
     for (const item of body.items) {
-      const product = await prisma.product.findUnique({ where: { id: item.id } });
+      const adet = Math.floor(Number(item.quantity));
+      if (!Number.isFinite(adet) || adet < 1) {
+        return NextResponse.json({ error: 'Geçersiz ürün adedi' }, { status: 400 });
+      }
+
+      const product = await prisma.product.findUnique({
+        where: { id: item.id },
+        include: {
+          campaigns: {
+            where: {
+              campaign: { active: true, startDate: { lte: simdi }, endDate: { gte: simdi } },
+            },
+            include: { campaign: true },
+          },
+        },
+      });
+
       if (!product) {
         return NextResponse.json({ error: `Ürün bulunamadı: ${item.id}` }, { status: 400 });
       }
-      if (product.quantity < item.quantity) {
+      if (product.price <= 0) {
+        return NextResponse.json(
+          { error: `${product.name} için fiyat belirlenmemiş` },
+          { status: 400 }
+        );
+      }
+      if (product.quantity < adet) {
         return NextResponse.json(
           { error: `${product.name} için yeterli stok yok (Mevcut: ${product.quantity})` },
           { status: 400 }
         );
       }
+
+      const indirim = product.campaigns[0]?.discount ?? 0;
+      const birimFiyat = Math.round(product.price * (1 - indirim / 100) * 100) / 100;
+
+      kalemler.push({ id: product.id, adet, birimFiyat, ad: product.name });
     }
+
+    const { toplam: gercekToplam } = siparisToplami(
+      kalemler.reduce((t, k) => t + k.birimFiyat * k.adet, 0)
+    );
 
     // Generate order number (simple sequential format: SG-2024-001)
     const latestOrder = await prisma.order.findFirst({
@@ -176,7 +220,7 @@ export async function POST(req: NextRequest) {
     const orderNumber = `SG-${year}-${String(nextNumber).padStart(3, '0')}`;
 
     // Calculate impact metrics
-    const totalItemsCount = body.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalItemsCount = kalemler.reduce((sum, k) => sum + k.adet, 0);
     const trainingHoursFunded = totalItemsCount * TRAINING_HOURS_PER_ITEM;
     const prisonersSupportedCount = Math.ceil(totalItemsCount * PRISONERS_PER_ITEM);
 
@@ -185,7 +229,7 @@ export async function POST(req: NextRequest) {
       data: {
         orderNumber,
         status: 'PENDING',
-        totalAmount: body.totalAmount,
+        totalAmount: gercekToplam,
         paymentMethod: body.paymentMethod,
         shippingAddress: body.shippingAddress,
         notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
@@ -194,13 +238,13 @@ export async function POST(req: NextRequest) {
 
     // Create order items
     await Promise.all(
-      body.items.map((item) =>
+      kalemler.map((k) =>
         prisma.orderItem.create({
           data: {
             orderId: order.id,
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
+            productId: k.id,
+            quantity: k.adet,
+            price: k.birimFiyat,
           },
         })
       )
@@ -219,20 +263,20 @@ export async function POST(req: NextRequest) {
     });
 
     // Update product stock
-    for (const item of body.items) {
+    for (const k of kalemler) {
       await prisma.product.update({
-        where: { id: item.id },
-        data: { quantity: { decrement: item.quantity } },
+        where: { id: k.id },
+        data: { quantity: { decrement: k.adet } },
       });
     }
 
     // Create payment record
     await prisma.payment.create({
       data: {
-        amount: body.totalAmount,
+        amount: gercekToplam,
         currency: 'TRY',
         method: body.paymentMethod,
-        status: body.paymentMethod === 'CREDIT_CARD' ? 'PENDING' : 'PENDING',
+        status: 'PENDING',
         description: `Sipariş #${orderNumber}`,
       },
     });
@@ -244,7 +288,7 @@ export async function POST(req: NextRequest) {
       body.email,
       body.phone,
       body.shippingAddress,
-      body.totalAmount,
+      gercekToplam,
       orderWithItems?.items || []
     );
 

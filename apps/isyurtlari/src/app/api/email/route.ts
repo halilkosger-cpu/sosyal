@@ -1,9 +1,22 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { adminGuard } from '@/lib/admin-auth';
 
 const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
 
+/**
+ * Serbest e-posta gonderimi. YALNIZCA admin paneli kullanir (/admin/email).
+ *
+ * Bu uc kimlik dogrulamasi yapmiyordu: internetteki herkes govdeye alici,
+ * konu ve HTML koyup info@isyurtlari.com.tr adresinden e-posta
+ * gonderebiliyordu. Yani acik bir posta rolesiydi - dolandiricilik amacli
+ * kimlige burunme, alan adinin gonderim itibarinin yanmasi ve Resend
+ * hesabinin askiya alinmasi riski vardi.
+ */
 export async function POST(request: NextRequest) {
+  const red = adminGuard(request);
+  if (red) return red;
+
   try {
     const { to, subject, html, text } = await request.json();
 
