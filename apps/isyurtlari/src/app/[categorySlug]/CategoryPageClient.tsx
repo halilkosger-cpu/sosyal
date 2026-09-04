@@ -16,7 +16,7 @@ import {
   IconFurniture,
   IconProductOrigin,
 } from '@/components/Icons';
-import { kisaAd, type Kategori } from '@/lib/kategori-gorunum';
+import { kisaAd, yedekGecis, type Kategori } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
 
 interface Campaign {
@@ -53,6 +53,10 @@ const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string;
   'temizlik':             { Icon: IconWeaving,   iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: 'Kozmetik üretim eğitimi', imgBg: 'from-cyan-200 to-blue-100', seoTitle: 'İsyurtları Temizlik Ürünleri | Hapishane Kozmetik' },
   'hediyelik':            { Icon: IconWeaving,   iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: 'El sanatları becerisi', imgBg: 'from-red-200 to-pink-100', seoTitle: 'İsyurtları Hediyelik Ürünler | Cezaevi El Sanatları' },
   'peyzaj-cicek':         { Icon: IconWood,      iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: 'Peyzaj tasarım eğitimi', imgBg: 'from-green-200 to-emerald-100', seoTitle: 'İsyurtları Peyzaj & Çiçek | Hapishane Tasarım' },
+  // Veritabanindaki slug 'peyzaj'; tabloda yalnizca 'peyzaj-cicek' vardi ve
+  // sayfa bu yuzden gri afisle aciliyordu. 'sanat-zanaat' hic yoktu.
+  'peyzaj':               { Icon: IconWood,      iconColor: '#059669', bg: 'bg-green-100',  banner: 'from-green-600 to-emerald-500',  purpose: 'Peyzaj & Çiçek Tasarımı', impact: 'Peyzaj tasarım eğitimi', imgBg: 'from-green-200 to-emerald-100', seoTitle: 'İsyurtları Peyzaj & Çiçek | Hapishane Tasarım' },
+  'sanat-zanaat':         { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'El Sanatları & Yaratıcı Üretim', impact: 'El sanatları becerisi', imgBg: 'from-violet-200 to-purple-100', seoTitle: 'İsyurtları Sanat & Zanaat | Cezaevi El Sanatları' },
 };
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
@@ -127,7 +131,9 @@ export default function CategoryPage({
     <div className="store-shell">
 
       {/* ─── CATEGORY BANNER ─── */}
-      <div className={`bg-gradient-to-r ${meta?.banner ?? 'from-gray-600 to-gray-500'} text-white`}>
+      {/* Tabloda karsiligi olmayan kategori gri afisle acilmasin: slug'a gore
+          belirlenmis bir renk kullaniliyor. */}
+      <div className={`bg-gradient-to-r ${meta?.banner ?? yedekGecis(categorySlug)} text-white`}>
         <div className="max-w-screen-xl mx-auto px-4 py-12">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-white/70 text-sm mb-6">

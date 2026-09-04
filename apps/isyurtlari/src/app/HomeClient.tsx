@@ -11,6 +11,7 @@ import {
   IconTransfer, IconFastShipping, IconSocialContribution,
 } from '@/components/Icons';
 import { content } from '@/config/content';
+import { yedekGecis } from '@/lib/kategori-gorunum';
 
 interface Category { id: string; name: string; slug: string; }
 interface Product  { id: string; name: string; slug: string; price: number; quantity: number; imageUrl?: string; category: { name: string; slug: string }; }
@@ -23,7 +24,7 @@ const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string
   'tekstil-urunleri':     { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Terzilik Meslek Eğitimi' },
   'ahsap-urunler':        { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
   'dokuma':               { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'Dokuma & Sanat Terapisi' },
-  'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',      purpose: 'Furniture Tasarım Eğitimi' },
+  'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',      purpose: 'Mobilya Tasarım Eğitimi' },
   'demir-metal-urunleri': { Icon: IconFurniture, gradient: 'from-slate-600 to-slate-400',    purpose: 'Metal İşleri Ustası Programı' },
   // Yeni slug format (seed script'ten)
   'gida':                 { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
@@ -31,7 +32,11 @@ const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string
   'ahsap':                { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
   'temizlik':             { Icon: IconWeaving,  gradient: 'from-cyan-500 to-blue-400',      purpose: 'Temizlik & Kozmetik Eğitimi' },
   'hediyelik':            { Icon: IconWeaving,  gradient: 'from-rose-500 to-pink-400',      purpose: 'El Sanatları & Tasarım' },
+  // Slug 'peyzaj-cicek' yaziliydi ama veritabanindaki slug 'peyzaj'; kart bu
+  // yuzden gri cikiyordu. 'sanat-zanaat' ise tabloda hic yoktu.
+  'peyzaj':               { Icon: IconWood,     gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
   'peyzaj-cicek':         { Icon: IconWood,     gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
+  'sanat-zanaat':         { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'El Sanatları & Yaratıcı Üretim' },
 };
 
 const productEmojis: Record<string, string> = {
@@ -159,13 +164,15 @@ export default function HomeClient({
               { slug: 'hediyelik',     name: 'Hediyelik'  },
               { slug: 'ahsap',     name: 'Ahşap Ürünler'  },
             ] : categories.slice(0, 4)).map((cat) => {
+              // Tabloda karsiligi olmayan kategori gri kalmasin: renk ve ikon
+              // yoksa slug'a gore belirlenmis yedekler kullaniliyor.
               const cfg = categoryConfig[cat.slug];
               const Icon = cfg?.Icon ?? IconFurniture;
               return (
                 <Link
                   key={cat.slug}
                   href={`/${cat.slug}`}
-                  className={`group bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-600 to-gray-500'} rounded-2xl p-5 h-44 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
+                  className={`group bg-gradient-to-br ${cfg?.gradient ?? yedekGecis(cat.slug)} rounded-2xl p-5 h-44 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
                 >
                   <div className="w-20 h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <Icon className="w-20 h-20 object-contain drop-shadow-sm" />
@@ -298,7 +305,7 @@ export default function HomeClient({
                 <Link
                   key={cat.id}
                   href={`/${cat.slug}`}
-                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? 'from-gray-500 to-gray-400'} p-4 flex flex-col items-center justify-center text-center min-h-[11rem] hover:scale-[1.04] hover:shadow-xl transition-all duration-200 shadow-md`}
+                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? yedekGecis(cat.slug)} p-4 flex flex-col items-center justify-center text-center min-h-[11rem] hover:scale-[1.04] hover:shadow-xl transition-all duration-200 shadow-md`}
                   title={cfg?.purpose}
                 >
                   <div className="w-20 h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">

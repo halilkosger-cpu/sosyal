@@ -37,6 +37,35 @@ export function kategoriIkonu(slug: string): ElementType {
   return IKONLAR[slug] ?? IconProductOrigin;
 }
 
+/**
+ * Kategori kartlarinin renk gecisi.
+ *
+ * Renkler HomeClient ve kategori sayfasinda slug'a gore elle yazili
+ * tablolardan geliyordu; tabloda karsiligi olmayan kategori GRI cikiyordu.
+ * "Peyzaj" ve "Sanat & Zanaat" bu yuzden diger bes kartin yaninda soluk
+ * duruyordu ve admin panelinden eklenen her yeni kategori de ayni hale
+ * dusecekti.
+ *
+ * Tabloda olmayan kategoriler artik slug'a gore belirlenmis bir renk aliyor:
+ * ayni kategori her zaman ayni rengi alir (rastgele degil), gri kalmaz.
+ */
+const YEDEK_GECISLER = [
+  'from-emerald-500 to-teal-400',
+  'from-blue-600 to-indigo-400',
+  'from-amber-500 to-yellow-400',
+  'from-violet-600 to-purple-400',
+  'from-rose-500 to-pink-400',
+  'from-cyan-500 to-blue-400',
+  'from-orange-500 to-amber-400',
+  'from-lime-600 to-green-400',
+];
+
+export function yedekGecis(slug: string): string {
+  let toplam = 0;
+  for (let i = 0; i < slug.length; i++) toplam = (toplam * 31 + slug.charCodeAt(i)) % 100000;
+  return YEDEK_GECISLER[toplam % YEDEK_GECISLER.length];
+}
+
 export type Kategori = {
   id: string;
   name: string;
