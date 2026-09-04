@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { SITE_URL } from '@/lib/seo';
-import Script from 'next/script';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 
-let SpeedInsights: any = null;
-try {
-  const module = require('@vercel/speed-insights/next');
-  SpeedInsights = module.SpeedInsights;
-} catch (e) {
-  // @vercel/speed-insights not installed
-}
+import Olcumler from '@/components/Olcumler';
 import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
@@ -121,41 +114,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://mclmi5w9lcfqj48x.public.blob.vercel-storage.com" />
-        <Script
-          id="gtag-consent-init"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-
-              const storedConsent = localStorage.getItem('cookieConsent');
-              gtag('consent', 'default', {
-                'analytics_storage': storedConsent === 'accepted' ? 'granted' : 'denied',
-                'ad_storage': 'denied'
-              });
-            `,
-          }}
-        />
-
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-KTWVN830XT"
-          strategy="lazyOnload"
-          async
-        />
-
-        <Script
-          id="gtag-config"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-KTWVN830XT', { 'anonymize_ip': true });
-            `,
-          }}
-        />
+        {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
+            (body'nin sonunda). Sebep: admin panelinde calismamalari gerekiyor,
+            bunun icin de yolu okuyabilen bir istemci bileseni sart. */}
 
         <script
           id="organization-schema"
@@ -346,7 +307,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </footer>
 
         <CookieConsent />
-        {SpeedInsights && <SpeedInsights />}
+        <Olcumler />
       </body>
     </html>
   );
