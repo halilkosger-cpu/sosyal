@@ -150,17 +150,28 @@ export default async function ProductPage({ params }: ProductPageProps) {
           name: 'İsyurtları - Cezaevi Sosyal Girişim',
           description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler',
         },
-        offers: {
-          '@type': 'Offer',
-          url: absoluteUrl(`/urun/${product.slug}`),
-          priceCurrency: 'TRY',
-          price: product.price.toFixed(2),
-          availability:
-            product.quantity > 0
-              ? 'https://schema.org/InStock'
-              : 'https://schema.org/OutOfStock',
-          itemCondition: 'https://schema.org/NewCondition',
-        },
+        // Fiyati girilmemis urunlerde `offers` hic yazilmiyor.
+        //
+        // Onceden price alani "0.00" olarak gonderiliyordu; urunlerin 48'inin
+        // fiyati henuz girilmedigi icin sitedeki Product isaretlemelerinin
+        // cogu bu haldeydi. Google sifir fiyatli bir teklifi gecersiz sayar ve
+        // o sayfalarin zengin sonuc hakki duser. Teklifsiz Product ise gecerli
+        // bir isaretlemedir; fiyat girilince teklif kendiliginden geri gelir.
+        ...(product.price > 0
+          ? {
+              offers: {
+                '@type': 'Offer',
+                url: absoluteUrl(`/urun/${product.slug}`),
+                priceCurrency: 'TRY',
+                price: product.price.toFixed(2),
+                availability:
+                  product.quantity > 0
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+                itemCondition: 'https://schema.org/NewCondition',
+              },
+            }
+          : {}),
         ...(product.reviews.length > 0
           ? {
               aggregateRating: {

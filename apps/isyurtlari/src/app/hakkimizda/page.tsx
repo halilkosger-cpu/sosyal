@@ -40,7 +40,11 @@ export default function AboutPage() {
               <LuBadgeCheck size={14} /> {content.about.hero.badge}
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-5 tracking-tight leading-tight">
-              {content.about.hero.title}<br />
+              {/* Bosluk sart: <br /> gorsel satir atlatiyor ama metin
+                  cikariminda bosluk uretmiyor. Bu yuzden sayfanin <h1>'i
+                  "ürünleriylegerçek" seklinde bitisik okunuyordu - hem arama
+                  motoru hem ekran okuyucu icin. */}
+              {content.about.hero.title}{' '}<br />
               <span className="text-[#FF6000]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
             </h1>
             <p className="text-sky-200 text-lg leading-relaxed max-w-xl">
