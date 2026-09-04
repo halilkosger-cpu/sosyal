@@ -48,8 +48,8 @@ export default function EmailPage() {
     <div className="max-w-2xl">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-[#FF6000]/10 p-3 rounded-lg">
-            <LuMail className="text-[#FF6000]" size={24} />
+          <div className="bg-[#CC4E00]/10 p-3 rounded-lg">
+            <LuMail className="text-[#CC4E00]" size={24} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Email Gönder</h1>
@@ -118,7 +118,7 @@ export default function EmailPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#E55A00] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="flex-1 bg-[#CC4E00] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#E55A00] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

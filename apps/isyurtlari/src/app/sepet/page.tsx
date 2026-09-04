@@ -95,7 +95,7 @@ export default function CartPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/" className="text-[#CC4E00] hover:text-[#FF6000] font-medium inline-flex items-center gap-2">
+          <Link href="/" className="text-[#CC4E00] hover:text-[#CC4E00] font-medium inline-flex items-center gap-2">
             <IconContinueShopping className="w-5 h-5 object-contain" /> Alışverişe devam et
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Sepetim</h1>
@@ -111,7 +111,7 @@ export default function CartPage() {
             <p className="text-gray-600 mb-6">Sosyal faydaya dönüşecek ürünleri keşfetmek için vitrine dönebilirsiniz.</p>
             <Link
               href="/"
-              className="inline-flex items-center justify-center bg-[#FF6000] text-white px-6 py-3 rounded-xl hover:bg-[#e55500] transition font-semibold"
+              className="inline-flex items-center justify-center bg-[#CC4E00] text-white px-6 py-3 rounded-xl hover:bg-[#A63F00] transition font-semibold"
             >
               Ürünleri keşfet
             </Link>
@@ -135,7 +135,7 @@ export default function CartPage() {
                   <div className="flex-1">
                     <Link
                       href={`/urun/${item.slug}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-[#FF6000] transition"
+                      className="text-lg font-semibold text-gray-900 hover:text-[#CC4E00] transition"
                     >
                       {item.name}
                     </Link>
@@ -153,7 +153,7 @@ export default function CartPage() {
                           </span>
                         </>
                       ) : (
-                        <span className="text-[#FF6000] font-bold text-lg">
+                        <span className="text-[#CC4E00] font-bold text-lg">
                           ₺{item.price.toFixed(2)}
                         </span>
                       )}
@@ -227,7 +227,7 @@ export default function CartPage() {
 
                 <button
                   onClick={() => router.push('/checkout')}
-                  className="w-full bg-[#FF6000] text-white py-3 rounded-xl font-semibold hover:bg-[#e55500] transition mb-3"
+                  className="w-full bg-[#CC4E00] text-white py-3 rounded-xl font-semibold hover:bg-[#A63F00] transition mb-3"
                 >
                   Ödemeye Geç
                 </button>

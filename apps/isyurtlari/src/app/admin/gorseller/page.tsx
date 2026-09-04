@@ -133,7 +133,7 @@ export default function AdminGorsellerPage() {
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Görsel Optimizasyonu</h1>
         <p className="text-gray-500 text-sm mt-1">
           {satirlar.length} görselli ürün · toplam {(toplamEski / 1024).toFixed(1)} MB ·{' '}
-          <strong className={hedefler.length ? 'text-[#FF6000]' : ''}>{hedefler.length}</strong> tanesi {ESIK_KB} KB üzerinde
+          <strong className={hedefler.length ? 'text-[#CC4E00]' : ''}>{hedefler.length}</strong> tanesi {ESIK_KB} KB üzerinde
         </p>
       </div>
 
@@ -156,7 +156,7 @@ export default function AdminGorsellerPage() {
       <button
         onClick={calistir}
         disabled={calisiyor || hedefler.length === 0}
-        className="mb-6 inline-flex items-center gap-2 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl font-bold transition-colors"
+        className="mb-6 inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl font-bold transition-colors"
       >
         {calisiyor ? <LuImage size={18} /> : <LuPlay size={18} />}
         {calisiyor ? 'İşleniyor…' : `${hedefler.length} görseli optimize et`}
@@ -183,7 +183,7 @@ export default function AdminGorsellerPage() {
                     {s.eskiKB === null ? (
                       <span className="text-gray-300">—</span>
                     ) : (
-                      <span className={s.eskiKB > ESIK_KB ? 'text-[#FF6000] font-semibold' : 'text-gray-600'}>
+                      <span className={s.eskiKB > ESIK_KB ? 'text-[#CC4E00] font-semibold' : 'text-gray-600'}>
                         {s.eskiKB} KB
                       </span>
                     )}

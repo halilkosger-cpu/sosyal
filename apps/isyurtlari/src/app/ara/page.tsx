@@ -66,7 +66,7 @@ export default function SearchPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#FF6000] hover:text-[#cc4e00] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#CC4E00] hover:text-[#cc4e00] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Arama Sonuçları</h1>
@@ -95,7 +95,7 @@ export default function SearchPage() {
             <p className="text-gray-500 text-lg">
               "<strong>{query}</strong>" ile eşleşen ürün bulunamadı
             </p>
-            <Link href="/" className="inline-block mt-4 text-[#FF6000] hover:text-[#cc4e00] font-semibold">
+            <Link href="/" className="inline-block mt-4 text-[#CC4E00] hover:text-[#cc4e00] font-semibold">
               Ana sayfaya dön
             </Link>
           </div>
@@ -125,12 +125,12 @@ export default function SearchPage() {
                     </span>
                   )}
                   {product.quantity > 0 && !product.campaign && (
-                    <span className="absolute top-2 right-2 bg-[#FF6000] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
+                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
                   )}
                 </div>
                 <div className="p-3.5">
                   <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">{product.category.name}</p>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6000] transition-colors leading-snug">{product.name}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#CC4E00] transition-colors leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-0.5 mt-1.5 mb-2">
                     {[1,2,3,4,5].map((s) => <LuStar key={s} size={10} fill="#FF6000" color="#FF6000" />)}
                     <span className="text-[10px] text-gray-400 ml-1">5.0</span>
@@ -145,7 +145,7 @@ export default function SearchPage() {
                               <p className="text-lg font-bold text-red-600 tracking-tight">₺{product.campaign.discountedPrice.toFixed(2)}</p>
                             </>
                           ) : (
-                            <p className="text-lg font-bold text-[#FF6000] tracking-tight">₺{product.price.toFixed(2)}</p>
+                            <p className="text-lg font-bold text-[#CC4E00] tracking-tight">₺{product.price.toFixed(2)}</p>
                           )}
                         </div>
                       ) : (

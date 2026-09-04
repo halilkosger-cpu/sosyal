@@ -11,7 +11,7 @@ import { LuBell } from 'react-icons/lu';
 export default function PreOrderBadge({ className = '' }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 bg-[#FF6000] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm whitespace-nowrap ${className}`}
+      className={`inline-flex items-center gap-1 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm whitespace-nowrap ${className}`}
     >
       <LuBell size={11} strokeWidth={2.5} aria-hidden="true" />
       Ön Talep Ver

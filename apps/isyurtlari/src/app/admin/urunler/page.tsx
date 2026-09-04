@@ -47,7 +47,7 @@ export default function AdminProductsPage() {
           <p className="text-gray-500 text-sm mt-1">{products.length} ürün</p>
         </div>
         <Link href="/admin/urunler/yeni"
-          className="bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-colors"
+          className="bg-[#CC4E00] hover:bg-[#A63F00] text-white font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-colors"
         >
           <LuPlus size={17} strokeWidth={2.5} /> Yeni Ürün
         </Link>
@@ -101,7 +101,7 @@ export default function AdminProductsPage() {
                   <td className="px-5 py-3.5 hidden md:table-cell">
                     <span className="bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-1 rounded-full">{product.category.name}</span>
                   </td>
-                  <td className="px-5 py-3.5 font-semibold text-[#FF6000]">
+                  <td className="px-5 py-3.5 font-semibold text-[#CC4E00]">
                     {product.price > 0 ? `₺${product.price.toFixed(2)}` : <span className="text-gray-400 font-normal italic text-xs">Belirsiz</span>}
                   </td>
                   <td className="px-5 py-3.5 hidden sm:table-cell">

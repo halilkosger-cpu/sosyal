@@ -84,7 +84,7 @@ export default function FavoritesPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#FF6000] hover:text-[#e55500] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#CC4E00] hover:text-[#A63F00] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <div className="flex items-center gap-3">
@@ -112,7 +112,7 @@ export default function FavoritesPage() {
             <p className="text-gray-600 mb-6">Beğendiğin ürünleri buraya kaydet ve daha sonra satın al</p>
             <Link
               href="/"
-              className="inline-block bg-[#FF6000] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e55500] transition"
+              className="inline-block bg-[#CC4E00] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#A63F00] transition"
             >
               Ürünleri Gözle
             </Link>
@@ -142,18 +142,18 @@ export default function FavoritesPage() {
                   </p>
                   <Link
                     href={`/urun/${favorite.product.slug}`}
-                    className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#FF6000] transition mb-3"
+                    className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#CC4E00] transition mb-3"
                   >
                     {favorite.product.name}
                   </Link>
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-                    <span className="text-lg font-bold text-[#FF6000]">
+                    <span className="text-lg font-bold text-[#CC4E00]">
                       ₺{favorite.product.price.toFixed(2)}
                     </span>
                     <button
                       onClick={() => handleAddToCart(favorite.product)}
-                      className="w-8 h-8 bg-[#FF6000] hover:bg-[#e55500] text-white rounded-lg flex items-center justify-center transition"
+                      className="w-8 h-8 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-lg flex items-center justify-center transition"
                       title="Sepete ekle"
                     >
                       <LuShoppingCart size={15} strokeWidth={2} />

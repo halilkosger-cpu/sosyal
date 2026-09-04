@@ -45,7 +45,7 @@ export default function MyAccountPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#FF6000] hover:text-[#e55500] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#CC4E00] hover:text-[#A63F00] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export default function MyAccountPage() {
             <p className="text-gray-600 mb-6">Hesabını görmek için giriş yapmalısın</p>
             <Link
               href="/"
-              className="inline-block bg-[#FF6000] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e55500] transition"
+              className="inline-block bg-[#CC4E00] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#A63F00] transition"
             >
               Ana Sayfaya Dön
             </Link>

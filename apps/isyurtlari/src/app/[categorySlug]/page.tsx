@@ -212,6 +212,35 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         `${categoryName} kategorisindeki el emeği sosyal girişim ürünleri.`,
       numberOfItems: category?.products.length,
     },
+    /**
+     * Kategorideki urunlerin listesi.
+     *
+     * Onceden yalnizca CollectionPage vardi: sayfa bir koleksiyon oldugunu
+     * soyluyor ama icinde ne oldugunu soylemiyordu. ItemList ile arama motoru
+     * kategoride hangi urunlerin bulundugunu ve siralarini goruyor; bu, arama
+     * sonucunda zengin gosterim sansini artiriyor.
+     *
+     * Yalnizca ad ve adres veriliyor; fiyat/stok gibi bilgiler urun
+     * sayfalarindaki Product isaretlemesinde zaten var ve tekrarlanmasi
+     * tutarsizlik riski yaratir.
+     */
+    ...(urunler && urunler.length > 0
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            '@id': `${canonical}#urunler`,
+            name: title,
+            numberOfItems: urunler.length,
+            itemListElement: urunler.slice(0, 60).map((u, sira) => ({
+              '@type': 'ListItem',
+              position: sira + 1,
+              name: u.name,
+              url: absoluteUrl(`/urun/${u.slug}`),
+            })),
+          },
+        ]
+      : []),
   ];
 
   return (

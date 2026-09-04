@@ -153,7 +153,7 @@ export default function AdminPreOrdersPage() {
               <div key={s.productId} className="bg-white rounded-xl border border-gray-200 p-4">
                 <p className="font-bold text-gray-900 text-sm">{s.productName}</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  <strong className="text-[#FF6000]">{s.waitingCount}</strong> kişi ·
+                  <strong className="text-[#CC4E00]">{s.waitingCount}</strong> kişi ·
                   toplam <strong>{s.totalQuantity}</strong> adet bekliyor
                 </p>
               </div>
@@ -170,7 +170,7 @@ export default function AdminPreOrdersPage() {
             onClick={() => setFilter(s)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
               filter === s
-                ? 'bg-[#FF6000] text-white border-[#FF6000]'
+                ? 'bg-[#CC4E00] text-white border-[#FF6000]'
                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -199,16 +199,16 @@ export default function AdminPreOrdersPage() {
                       <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${cfg.color}`}>
                         <cfg.Icon size={12} strokeWidth={2} /> {cfg.label}
                       </span>
-                      <span className="text-xs font-bold text-[#FF6000] bg-orange-50 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-[#CC4E00] bg-orange-50 px-2 py-0.5 rounded-full">
                         {p.quantity} adet
                       </span>
                     </div>
 
                     <p className="text-sm text-gray-700 mt-2">
                       <strong>{p.name}</strong> ·{' '}
-                      <a href={`mailto:${p.email}`} className="text-[#FF6000] hover:underline">{p.email}</a>
+                      <a href={`mailto:${p.email}`} className="text-[#CC4E00] hover:underline">{p.email}</a>
                       {p.phone && (
-                        <> · <a href={`tel:${p.phone}`} className="text-[#FF6000] hover:underline">{p.phone}</a></>
+                        <> · <a href={`tel:${p.phone}`} className="text-[#CC4E00] hover:underline">{p.phone}</a></>
                       )}
                     </p>
 

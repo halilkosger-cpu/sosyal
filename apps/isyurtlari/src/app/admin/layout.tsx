@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 active
-                  ? 'bg-[#FF6000] text-white shadow-lg shadow-orange-900/30'
+                  ? 'bg-[#CC4E00] text-white shadow-lg shadow-orange-900/30'
                   : 'text-blue-200 hover:bg-white/10 hover:text-white'
               }`}
             >

@@ -54,7 +54,7 @@ export default function CookieConsent() {
           <h3 className="font-bold text-sm mb-1 text-gray-900">Çerez Politikası</h3>
           <p className="text-xs text-gray-600">
             Site deneyiminizi iyileştirmek için çerezler kullanıyoruz.
-            <Link href="/gizlilik-sozlesmesi" className="text-[#FF6000] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
+            <Link href="/gizlilik-sozlesmesi" className="text-[#CC4E00] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
@@ -67,7 +67,7 @@ export default function CookieConsent() {
           </button>
           <button
             onClick={handleAccept}
-            className="px-4 py-2 text-sm font-semibold text-white bg-[#FF6000] hover:bg-[#CC4E00] rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-white bg-[#CC4E00] hover:bg-[#CC4E00] rounded-lg transition-colors"
             aria-label="Tüm çerezleri kabul et"
           >
             Kabul Et

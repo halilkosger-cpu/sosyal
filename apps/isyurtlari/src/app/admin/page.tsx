@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     { label: 'Toplam Ürün',      value: stats?.products,      Icon: LuPackage,     href: '/admin/urunler',    color: 'bg-blue-500'   },
     { label: 'Kategori',         value: stats?.categories,    Icon: LuTag,         href: '/admin/kategoriler', color: 'bg-violet-500' },
     { label: 'Toplam Sipariş',   value: stats?.orders,        Icon: LuShoppingBag, href: '/admin/siparisler', color: 'bg-emerald-500' },
-    { label: 'Bekleyen Sipariş', value: stats?.pendingOrders, Icon: LuClock,       href: '/admin/siparisler', color: 'bg-[#FF6000]'  },
+    { label: 'Bekleyen Sipariş', value: stats?.pendingOrders, Icon: LuClock,       href: '/admin/siparisler', color: 'bg-[#CC4E00]'  },
   ];
 
   return (

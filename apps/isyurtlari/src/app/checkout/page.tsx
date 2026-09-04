@@ -183,7 +183,7 @@ export default function CheckoutPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/sepet" className="text-[#CC4E00] hover:text-[#FF6000] font-medium">
+          <Link href="/sepet" className="text-[#CC4E00] hover:text-[#CC4E00] font-medium">
             Sepete geri dön
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-2">Ödeme</h1>
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+                className="w-full bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>

@@ -161,7 +161,7 @@ export default function AdminCategoriesPage() {
           </div>
           <div className="flex items-center gap-3">
             <button type="submit" disabled={saving}
-              className="bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-2"
+              className="bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-2"
             >
               <LuPlus size={15} /> {saving ? 'Ekleniyor...' : 'Ekle'}
             </button>
@@ -211,7 +211,7 @@ export default function AdminCategoriesPage() {
                         className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
                           ikonYukleniyor === cat.id
                             ? 'bg-gray-100 text-gray-400'
-                            : 'cursor-pointer bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-[#FF6000]'
+                            : 'cursor-pointer bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-[#CC4E00]'
                         }`}
                       >
                         <LuUpload size={13} />

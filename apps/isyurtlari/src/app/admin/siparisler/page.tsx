@@ -111,7 +111,7 @@ export default function AdminOrdersPage() {
                     <p className="text-xs text-gray-500 mt-1">{order.user?.name || 'Misafir'} · {order.user?.email || 'Bilinmiyor'}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold text-[#FF6000]">₺{order.totalAmount.toFixed(2)}</p>
+                    <p className="font-bold text-[#CC4E00]">₺{order.totalAmount.toFixed(2)}</p>
                     <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</p>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
                             <button key={s}
                               onClick={() => updateStatus(order.id, s)}
                               disabled={updating === order.id}
-                              className="bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                              className="bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
                             >
                               {statusConfig[s]?.label} olarak işaretle
                             </button>

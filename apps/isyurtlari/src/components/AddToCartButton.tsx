@@ -47,7 +47,7 @@ export default function AddToCartButton({ product }: { product: SepeteEklenebili
     <button
       onClick={tikla}
       className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-white ${
-        eklendi ? 'bg-green-600' : 'bg-[#FF6000] hover:bg-[#e55500]'
+        eklendi ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'
       }`}
       aria-label={eklendi ? 'Sepete eklendi' : 'Sepete ekle'}
       title={eklendi ? 'Sepete eklendi' : 'Sepete ekle'}

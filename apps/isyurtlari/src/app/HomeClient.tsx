@@ -20,14 +20,14 @@ interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string; purpose: string }> = {
   // Eski slug format (uyumluluk için)
   'gida-urunleri':        { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil-urunleri':     { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
+  'tekstil-urunleri':     { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Terzilik Meslek Eğitimi' },
   'ahsap-urunler':        { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
   'dokuma':               { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'Dokuma & Sanat Terapisi' },
   'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',      purpose: 'Furniture Tasarım Eğitimi' },
   'demir-metal-urunleri': { Icon: IconFurniture, gradient: 'from-slate-600 to-slate-400',    purpose: 'Metal İşleri Ustası Programı' },
   // Yeni slug format (seed script'ten)
   'gida':                 { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil':              { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Derzillik Meslek Eğitimi' },
+  'tekstil':              { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Terzilik Meslek Eğitimi' },
   'ahsap':                { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
   'temizlik':             { Icon: IconWeaving,  gradient: 'from-cyan-500 to-blue-400',      purpose: 'Temizlik & Kozmetik Eğitimi' },
   'hediyelik':            { Icon: IconWeaving,  gradient: 'from-rose-500 to-pink-400',      purpose: 'El Sanatları & Tasarım' },
@@ -87,7 +87,7 @@ export default function HomeClient({
       <div className="bg-[#0A1628] text-white border-b border-white/10 overflow-hidden">
         <div className="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center justify-center md:justify-between gap-4">
           <div className="hidden md:flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#FF6000]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#CC4E00]" />
             Sosyal etki
           </div>
           <p className="min-h-5 text-center text-sm md:text-[15px] font-medium tracking-[0.01em] text-white transition-all duration-500">
@@ -97,7 +97,7 @@ export default function HomeClient({
             {announcements.map((_, index) => (
               <span
                 key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${index === ticker ? 'w-6 bg-[#FF6000]' : 'w-1.5 bg-white/30'}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${index === ticker ? 'w-6 bg-[#CC4E00]' : 'w-1.5 bg-white/30'}`}
               />
             ))}
           </div>
@@ -108,7 +108,7 @@ export default function HomeClient({
       <section className="relative overflow-hidden bg-[#0F2040]">
         <HeroBackgroundVideo />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOFYwaDQydjQySDE4YzAtOS45NCA4LjA2LTE4IDE4LTE4eiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvZz48L3N2Zz4=')] opacity-30" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF6000] opacity-[0.07] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#CC4E00] opacity-[0.07] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
 
         <div className="relative max-w-screen-xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
@@ -131,7 +131,7 @@ export default function HomeClient({
               {content.home.hero.subtitle} Cezaevi ve hapishane hükümlülerinin eğitim programlarından başarıyla çıktığı ürünleri Türkiye geneline hızlı kargo ile teslim ediyoruz.
             </p>
             <div className="flex flex-wrap gap-3 mb-12">
-              <Link href="/gida" className="bg-[#FF6000] hover:bg-[#e55500] text-white font-bold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-3 text-sm">
+              <Link href="/gida" className="bg-[#CC4E00] hover:bg-[#A63F00] text-white font-bold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-3 text-sm">
                 <span>{content.home.hero.ctaPrimary}</span>
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/95">
                   <IconTransfer className="w-6 h-6 object-contain" />
@@ -214,7 +214,7 @@ export default function HomeClient({
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
@@ -252,7 +252,7 @@ export default function HomeClient({
                               ) : (
                                 <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
                               )}
-                              <div className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
+                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-xs font-bold px-3 py-1 rounded-full">
                                 -%{cp.discount}
                               </div>
                             </div>
@@ -317,12 +317,14 @@ export default function HomeClient({
       <section className="max-w-screen-xl mx-auto px-4 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link href="/gida" className="group col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F2040] to-[#1e4a90] p-8 flex items-center justify-between min-h-44 hover:shadow-xl transition-all">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#FF6000]/10 rounded-full translate-x-1/3 -translate-y-1/3" />
+            <div className="absolute top-0 right-0 w-72 h-72 bg-[#CC4E00]/10 rounded-full translate-x-1/3 -translate-y-1/3" />
             <div className="relative z-10">
-              <span className="bg-[#FF6000] text-gray-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3">Öne Çıkan</span>
+              {/* Beyaz metin: koyu turuncu uzerinde koyu gri 3.93 kontrast
+                  veriyordu, beyaz 4.51 veriyor. */}
+              <span className="bg-[#CC4E00] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3">Öne Çıkan</span>
               <h3 className="text-white text-3xl font-bold mb-1 tracking-tight">Gıda Ürünleri</h3>
               <p className="text-gray-400 text-sm mb-5">Doğal, taze, güvenilir</p>
-              <span className="inline-flex items-center gap-2 bg-white text-gray-900 text-xs font-semibold px-4 py-2.5 rounded-lg group-hover:bg-[#FF6000] group-hover:text-white transition-colors">
+              <span className="inline-flex items-center gap-2 bg-white text-gray-900 text-xs font-semibold px-4 py-2.5 rounded-lg group-hover:bg-[#CC4E00] group-hover:text-white transition-colors">
                 İncele <IconTransfer className="w-4 h-4" />
               </span>
             </div>
@@ -404,7 +406,7 @@ export default function HomeClient({
                     </div>
                   )}
                   {product.quantity > 0 && (
-                    <span className="absolute top-2 right-2 bg-[#FF6000] text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
+                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
                   )}
                 </div>
                 <div className="p-3.5">

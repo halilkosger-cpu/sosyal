@@ -231,7 +231,7 @@ export default function EditProductPage() {
             İptal
           </Link>
           <button type="submit" disabled={saving}
-            className="flex-1 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+            className="flex-1 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
           >
             <LuSave size={16} /> {saving ? 'Kaydediliyor...' : 'Güncelle'}
           </button>

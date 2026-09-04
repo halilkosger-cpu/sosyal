@@ -104,7 +104,7 @@ export default function CampaignsPage() {
         <h1 className="text-2xl font-bold">Kampanyalar</h1>
         <button
           onClick={() => setFormOpen(true)}
-          className="bg-[#FF6000] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#e55500] flex items-center gap-2"
+          className="bg-[#CC4E00] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#A63F00] flex items-center gap-2"
         >
           <LuPlus size={18} /> Yeni Kampanya
         </button>

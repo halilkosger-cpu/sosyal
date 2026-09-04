@@ -41,14 +41,14 @@ interface Product {
 const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string; bg: string; banner: string; purpose: string; impact: string; imgBg: string; seoTitle: string }> = {
   // Eski slug format
   'gida-urunleri':        { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100', seoTitle: 'İsyurtları Gıda Ürünleri | Cezaevi Sosyal Girişim' },
-  'tekstil-urunleri':     { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim Ürünleri' },
+  'tekstil-urunleri':     { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Terzilik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim Ürünleri' },
   'ahsap-urunler':        { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100', seoTitle: 'İsyurtları Ahşap Ürünleri | Cezaevi Marangozluk' },
   'dokuma':               { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'Dokuma & Sanat Terapisi', impact: 'Dokuma ve sanat terapisi', imgBg: 'from-violet-200 to-purple-100', seoTitle: 'İsyurtları Dokuma Ürünleri | Hapishane El Sanatları' },
   'mobilya-urunleri':     { Icon: IconFurniture, iconColor: '#be123c', bg: 'bg-rose-100',   banner: 'from-rose-600 to-pink-500',      purpose: 'Mobilya Tasarım Eğitimi', impact: 'Mobilya tasarım eğitimi', imgBg: 'from-rose-200 to-pink-100', seoTitle: 'İsyurtları Mobilya Ürünleri | Cezaevi Tasarım' },
   'demir-metal-urunleri': { Icon: IconFurniture, iconColor: '#334155', bg: 'bg-slate-100',  banner: 'from-slate-600 to-gray-500',     purpose: 'Metal İşleri Ustası Programı', impact: 'Metal işleri eğitimi', imgBg: 'from-slate-200 to-gray-100', seoTitle: 'İsyurtları Metal Ürünleri | Hapishane Ustası' },
   // Yeni slug format (seed script'ten)
   'gida':                 { Icon: IconFood,      iconColor: '#15803d', bg: 'bg-green-100',  banner: 'from-emerald-600 to-teal-500',   purpose: 'Beslenme & Aşçılık Eğitimi', impact: 'Aşçılık meslek eğitimi', imgBg: 'from-emerald-200 to-green-100', seoTitle: 'İsyurtları Gıda Ürünleri | Cezaevi Sosyal Girişim' },
-  'tekstil':              { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Derzillik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim' },
+  'tekstil':              { Icon: IconTextile,   iconColor: '#1d4ed8', bg: 'bg-blue-100',   banner: 'from-blue-600 to-indigo-500',    purpose: 'Terzilik Meslek Eğitimi', impact: 'Tekstil üretim becerisi', imgBg: 'from-blue-200 to-indigo-100', seoTitle: 'İsyurtları Tekstil Ürünleri | Hapishane Eğitim' },
   'ahsap':                { Icon: IconWood,      iconColor: '#b45309', bg: 'bg-amber-100',  banner: 'from-amber-600 to-yellow-500',   purpose: 'Marangozluk Beceri Programı', impact: 'Marangozluk eğitimi', imgBg: 'from-amber-200 to-yellow-100', seoTitle: 'İsyurtları Ahşap Ürünleri | Cezaevi Marangozluk' },
   'temizlik':             { Icon: IconWeaving,   iconColor: '#0891b2', bg: 'bg-cyan-100',   banner: 'from-cyan-600 to-blue-500',      purpose: 'Temizlik & Kozmetik Eğitimi', impact: 'Kozmetik üretim eğitimi', imgBg: 'from-cyan-200 to-blue-100', seoTitle: 'İsyurtları Temizlik Ürünleri | Hapishane Kozmetik' },
   'hediyelik':            { Icon: IconWeaving,   iconColor: '#dc2626', bg: 'bg-red-100',    banner: 'from-red-600 to-pink-500',      purpose: 'El Sanatları & Tasarım', impact: 'El sanatları becerisi', imgBg: 'from-red-200 to-pink-100', seoTitle: 'İsyurtları Hediyelik Ürünler | Cezaevi El Sanatları' },
@@ -212,7 +212,7 @@ export default function CategoryPage({
                           className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
                             secili
                               ? 'bg-orange-50 font-bold text-[#CC4E00]'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-[#FF6000]'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-[#CC4E00]'
                           }`}
                         >
                           <KategoriIkon
@@ -281,7 +281,7 @@ export default function CategoryPage({
                       value="all"
                       checked={stockFilter === 'all'}
                       onChange={() => setStockFilter('all')}
-                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tümü</span>
                   </label>
@@ -292,7 +292,7 @@ export default function CategoryPage({
                       value="in-stock"
                       checked={stockFilter === 'in-stock'}
                       onChange={() => setStockFilter('in-stock')}
-                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Stokta Var</span>
                   </label>
@@ -303,7 +303,7 @@ export default function CategoryPage({
                       value="out-of-stock"
                       checked={stockFilter === 'out-of-stock'}
                       onChange={() => setStockFilter('out-of-stock')}
-                      className="w-4 h-4 text-[#FF6000] cursor-pointer accent-[#FF6000]"
+                      className="w-4 h-4 text-[#CC4E00] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tükendi</span>
                   </label>
@@ -373,7 +373,7 @@ export default function CategoryPage({
                 <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
                 <p className="text-gray-400 mb-2">Sosyal Girişim'in eğitim programları devam etmektedir.</p>
                 <p className="text-gray-400 mb-6">Yakında bu kategoride el yapımı ürünler eklenecek.</p>
-                <Link href="/" className="bg-[#FF6000] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
+                <Link href="/" className="bg-[#CC4E00] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#A63F00] transition-colors">
                   Diğer Kategorileri Keşfet
                 </Link>
               </div>
@@ -391,7 +391,7 @@ export default function CategoryPage({
                     setMaxPrice(5000);
                     setStockFilter('all');
                   }}
-                  className="text-[#FF6000] font-medium hover:text-[#e55500] transition-colors"
+                  className="text-[#CC4E00] font-medium hover:text-[#A63F00] transition-colors"
                 >
                   Filtreleri Temizle
                 </button>
@@ -433,7 +433,7 @@ export default function CategoryPage({
                     </div>
                   )}
                   {product.quantity > 0 && (
-                    <span className="absolute top-2 left-2 bg-[#FF6000] text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                    <span className="absolute top-2 left-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded">
                       Stokta
                     </span>
                   )}
@@ -453,7 +453,7 @@ export default function CategoryPage({
 
                 {/* Info */}
                 <div className="p-3 flex flex-col flex-1">
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] group-hover:text-[#FF6000] transition-colors leading-snug">
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] group-hover:text-[#CC4E00] transition-colors leading-snug">
                     {product.name}
                   </h3>
                   <p className="text-xs text-gray-400 line-clamp-2 mb-3 flex-1 leading-relaxed">
@@ -471,7 +471,7 @@ export default function CategoryPage({
                             </span>
                           </>
                         ) : (
-                          <span className="text-lg font-extrabold text-[#FF6000]">
+                          <span className="text-lg font-extrabold text-[#CC4E00]">
                             ₺{product.price.toFixed(2)}
                           </span>
                         )}

@@ -153,7 +153,7 @@ export default function OrderConfirmationPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Toplam Tutar</span>
-                  <span className="font-bold text-2xl text-[#FF6000]">₺{order.totalAmount.toFixed(2)}</span>
+                  <span className="font-bold text-2xl text-[#CC4E00]">₺{order.totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -217,7 +217,7 @@ export default function OrderConfirmationPage() {
                       Siparişiniz <strong>{order.orderNumber}</strong> numarasıyla kaydedildi.
                       Ödeme yapabilmeniz için hesap bilgilerini en kısa sürede
                       e-posta ile ileteceğiz. Dilerseniz{' '}
-                      <a href="mailto:info@isyurtlari.com.tr" className="text-[#FF6000] font-semibold underline">
+                      <a href="mailto:info@isyurtlari.com.tr" className="text-[#CC4E00] font-semibold underline">
                         info@isyurtlari.com.tr
                       </a>{' '}
                       adresinden bize ulaşabilirsiniz.
@@ -276,7 +276,7 @@ export default function OrderConfirmationPage() {
                 </p>
                 <Link
                   href={`/payment/${order.id}`}
-                  className="inline-flex items-center gap-2 bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white font-semibold px-6 py-3 rounded-xl transition-colors"
                 >
                   Ödeme Sayfasına Git <LuArrowRight size={16} />
                 </Link>
@@ -307,8 +307,8 @@ export default function OrderConfirmationPage() {
                 className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors group"
               >
                 <div className="flex items-center gap-2">
-                  <LuHouse size={18} className="text-gray-600 group-hover:text-[#FF6000]" />
-                  <span className="font-medium text-gray-900 group-hover:text-[#FF6000]">Ana Sayfa</span>
+                  <LuHouse size={18} className="text-gray-600 group-hover:text-[#CC4E00]" />
+                  <span className="font-medium text-gray-900 group-hover:text-[#CC4E00]">Ana Sayfa</span>
                 </div>
                 <LuArrowRight size={16} className="text-gray-400" />
               </Link>
@@ -319,7 +319,7 @@ export default function OrderConfirmationPage() {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🛍️</span>
-                  <span className="font-medium text-gray-900 group-hover:text-[#FF6000]">Alışverişe Devam Et</span>
+                  <span className="font-medium text-gray-900 group-hover:text-[#CC4E00]">Alışverişe Devam Et</span>
                 </div>
                 <LuArrowRight size={16} className="text-gray-400" />
               </Link>

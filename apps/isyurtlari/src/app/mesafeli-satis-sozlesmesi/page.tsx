@@ -20,7 +20,7 @@ export default function DistanceSalesPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#FF6000] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
               <LuHouse size={14} /> Ana Sayfa
             </Link>
             <span>/</span>
@@ -112,7 +112,7 @@ export default function DistanceSalesPage() {
                 Teslimat süresi, kargo firması tarafından verilen müddetlerdir ve garanti değildir. Taşıma sırasında oluşan hasarlardan kargo firması sorumludur.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                Detaylı teslimat şartları için <Link href="/teslimat-iade-sartlari" className="text-[#FF6000] font-semibold hover:text-[#cc4e00]">Teslimat ve İade Şartları</Link> sayfasını ziyaret ediniz.
+                Detaylı teslimat şartları için <Link href="/teslimat-iade-sartlari" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">Teslimat ve İade Şartları</Link> sayfasını ziyaret ediniz.
               </p>
             </section>
 
@@ -123,7 +123,7 @@ export default function DistanceSalesPage() {
                 6502 sayılı Tüketicinin Korunması Hakkında Kanun'a göre, Alıcı teslim tarihinden itibaren 14 gün içinde herhangi bir neden belirtmeksizin satın almış olduğu ürünü iade edebilir. İade edilen ürün orijinal ambalajında, hasar görmemiş ve kullanılmamış durumda olmalıdır.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                Detaylı işlem adımları için <Link href="/teslimat-iade-sartlari" className="text-[#FF6000] font-semibold hover:text-[#cc4e00]">Teslimat ve İade Şartları</Link> sayfasını ziyaret ediniz.
+                Detaylı işlem adımları için <Link href="/teslimat-iade-sartlari" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">Teslimat ve İade Şartları</Link> sayfasını ziyaret ediniz.
               </p>
             </section>
 
@@ -142,7 +142,7 @@ export default function DistanceSalesPage() {
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Gizlilik</h2>
               <p className="text-gray-700 leading-relaxed">
-                Kişisel verilerinizin işlenmesi hakkında detaylı bilgiler için <Link href="/gizlilik-sozlesmesi" className="text-[#FF6000] font-semibold hover:text-[#cc4e00]">Gizlilik Sözleşmesi</Link> sayfasını ziyaret ediniz.
+                Kişisel verilerinizin işlenmesi hakkında detaylı bilgiler için <Link href="/gizlilik-sozlesmesi" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">Gizlilik Sözleşmesi</Link> sayfasını ziyaret ediniz.
               </p>
             </section>
 
@@ -166,7 +166,7 @@ export default function DistanceSalesPage() {
             <section className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Müşteri Destek</h3>
               <p className="text-gray-700 mb-4">
-                Mesafeli satış hakkında sorularınız için lütfen <Link href="/bize-ulasin" className="text-[#FF6000] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
+                Mesafeli satış hakkında sorularınız için lütfen <Link href="/bize-ulasin" className="text-[#CC4E00] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
               </p>
             </section>
 

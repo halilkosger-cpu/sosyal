@@ -89,7 +89,7 @@ export default function SiparisSorgulaPage() {
         <div className="mx-auto max-w-screen-md px-4 py-6">
           <Link
             href="/"
-            className="mb-4 flex items-center gap-2 font-medium text-[#FF6000] transition hover:text-[#e55500]"
+            className="mb-4 flex items-center gap-2 font-medium text-[#CC4E00] transition hover:text-[#A63F00]"
           >
             <LuArrowLeft size={18} /> Geri
           </Link>
@@ -141,7 +141,7 @@ export default function SiparisSorgulaPage() {
           <button
             type="submit"
             disabled={yukleniyor}
-            className="mt-4 flex items-center gap-2 rounded-xl bg-[#FF6000] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#e55500] disabled:bg-orange-300"
+            className="mt-4 flex items-center gap-2 rounded-xl bg-[#CC4E00] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#A63F00] disabled:bg-orange-300"
           >
             <LuSearch size={15} />
             {yukleniyor ? 'Sorgulanıyor...' : 'Sorgula'}
@@ -185,7 +185,7 @@ export default function SiparisSorgulaPage() {
                   )}
                   <Link
                     href={`/urun/${k.product.slug}`}
-                    className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#FF6000]"
+                    className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#CC4E00]"
                   >
                     {k.product.name}
                   </Link>
@@ -202,7 +202,7 @@ export default function SiparisSorgulaPage() {
                 {siparis.paymentMethod === 'TRANSFER' ? 'Havale / EFT' : 'Kredi Kartı'}
                 {' · Kargo karşı ödemeli'}
               </span>
-              <span className="text-xl font-bold text-[#FF6000]">
+              <span className="text-xl font-bold text-[#CC4E00]">
                 ₺{siparis.totalAmount.toFixed(2)}
               </span>
             </div>

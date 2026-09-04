@@ -94,7 +94,7 @@ export default function AdminYedekPage() {
       <button
         onClick={indir}
         disabled={calisiyor || dolu.length === 0}
-        className="mb-6 inline-flex items-center gap-2 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl font-bold transition-colors"
+        className="mb-6 inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl font-bold transition-colors"
       >
         {calisiyor ? <LuDatabase size={18} /> : <LuDownload size={18} />}
         {calisiyor ? `İndiriliyor… ${ilerleme}` : 'Tam yedeği indir (JSON)'}

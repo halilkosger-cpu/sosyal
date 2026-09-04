@@ -213,7 +213,7 @@ export default function SearchSuggest() {
                     </span>
                   </span>
                   <span className="flex-shrink-0 text-right">
-                    <span className="block text-sm font-extrabold text-[#FF6000]">
+                    <span className="block text-sm font-extrabold text-[#CC4E00]">
                       {product.price > 0 ? `₺${product.price.toFixed(2)}` : 'Fiyat bekleniyor'}
                     </span>
                     {product.quantity === 0 && (
@@ -231,7 +231,7 @@ export default function SearchSuggest() {
 
           <button
             type="submit"
-            className="flex w-full items-center justify-between border-t border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-orange-50 hover:text-[#FF6000]"
+            className="flex w-full items-center justify-between border-t border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-orange-50 hover:text-[#CC4E00]"
           >
             <span>"{trimmedQuery}" için tüm sonuçları gör</span>
             <span aria-hidden="true">→</span>

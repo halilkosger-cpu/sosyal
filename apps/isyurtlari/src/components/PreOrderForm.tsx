@@ -83,7 +83,7 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
         </div>
         <button
           onClick={() => setOpen(true)}
-          className="w-full bg-[#FF6000] hover:bg-[#e55500] text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base"
+          className="w-full bg-[#CC4E00] hover:bg-[#A63F00] text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base"
         >
           <LuBell size={18} strokeWidth={2} /> Ön Talep Ver
         </button>
@@ -103,7 +103,7 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
     <form onSubmit={handleSubmit} className="rounded-xl border-2 border-[#FF6000] bg-orange-50/50 p-5 space-y-4">
       <div>
         <h3 className="font-bold text-gray-900 flex items-center gap-2">
-          <LuBell size={18} strokeWidth={2} className="text-[#FF6000]" /> Ön Talep Formu
+          <LuBell size={18} strokeWidth={2} className="text-[#CC4E00]" /> Ön Talep Formu
         </h3>
         <p className="text-xs text-gray-600 mt-1">
           Ürün stoğa girdiğinde size e-posta ile haber vereceğiz. Gerekirse telefonla da ulaşabilmemiz için numaranızı istiyoruz.
@@ -218,7 +218,7 @@ export default function PreOrderForm({ productId, productName }: PreOrderFormPro
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors"
+          className="flex-1 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-colors"
         >
           {submitting ? 'Gönderiliyor…' : 'Ön Talebimi Gönder'}
         </button>

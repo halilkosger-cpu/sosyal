@@ -46,7 +46,7 @@
   }
 
   .btn-primary {
-    @apply bg-[#FF6000] text-white px-6 py-2 rounded-lg hover:bg-[#e55500] transition font-medium;
+    @apply bg-[#CC4E00] text-white px-6 py-2 rounded-lg hover:bg-[#A63F00] transition font-medium;
   }
 
   .btn-secondary {

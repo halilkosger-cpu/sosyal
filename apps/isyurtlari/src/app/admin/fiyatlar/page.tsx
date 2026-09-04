@@ -123,7 +123,7 @@ export default function AdminFiyatlarPage() {
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Fiyatlar</h1>
         <p className="text-gray-500 text-sm mt-1">
           {urunler.length} ürün ·{' '}
-          <strong className={fiyatsizSayisi > 0 ? 'text-[#FF6000]' : ''}>{fiyatsizSayisi}</strong>{' '}
+          <strong className={fiyatsizSayisi > 0 ? 'text-[#CC4E00]' : ''}>{fiyatsizSayisi}</strong>{' '}
           ürünün fiyatı girilmemiş
         </p>
       </div>
@@ -160,7 +160,7 @@ export default function AdminFiyatlarPage() {
           </a>
           <button
             onClick={() => dosyaRef.current?.click()}
-            className="inline-flex items-center gap-2 bg-[#FF6000] hover:bg-[#e55500] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors"
+            className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-colors"
           >
             <LuUpload size={16} /> Doldurulmuş dosyayı yükle
           </button>
@@ -289,7 +289,7 @@ export default function AdminFiyatlarPage() {
                       {u.price > 0 ? (
                         <span className="text-gray-900">₺{tl(u.price)}</span>
                       ) : (
-                        <span className="text-[#FF6000] text-xs font-semibold">girilmemiş</span>
+                        <span className="text-[#CC4E00] text-xs font-semibold">girilmemiş</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5 text-right">

@@ -23,7 +23,7 @@ export function IconFood({ className = 'w-6 h-6', ariaLabel = 'Gıda Ürünleri 
 export function IconTextile({ className = 'w-6 h-6', ariaLabel = 'Tekstil Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-textile">
-      <title>Tekstil Ürünleri - Derzillik Meslek Eğitimi</title>
+      <title>Tekstil Ürünleri - Terzilik Meslek Eğitimi</title>
       <desc>İşyurtlarında hükümlülerin dokudukları el yapımı tekstil ürünleri ikonu</desc>
       <g fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="44">
         <path d="M274 316H706C752 316 790 354 790 400C790 446 752 484 706 484H328" stroke="currentColor"/>

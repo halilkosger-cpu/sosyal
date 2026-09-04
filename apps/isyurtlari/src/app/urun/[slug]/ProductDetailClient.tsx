@@ -23,7 +23,7 @@ import {
 
 const categoryPurpose: Record<string, { purpose: string; trainingHours: number; skillDescription: string }> = {
   'gida-urunleri': { purpose: 'Beslenme & Aşçılık Eğitimi', trainingHours: 40, skillDescription: 'Profesyonel aşçılık ve beslenme bilgisi' },
-  'tekstil-urunleri': { purpose: 'Derzillik Meslek Eğitimi', trainingHours: 48, skillDescription: 'Kumaş işleme ve dikiş becerisi' },
+  'tekstil-urunleri': { purpose: 'Terzilik Meslek Eğitimi', trainingHours: 48, skillDescription: 'Kumaş işleme ve dikiş becerisi' },
   'ahsap-urunler': { purpose: 'Marangozluk Eğitimi', trainingHours: 60, skillDescription: 'Ahşap işçiliği ve tasarım becerisi' },
   'dokuma': { purpose: 'Dokuma & Sanat Terapisi', trainingHours: 50, skillDescription: 'Geleneksel dokuma teknikleri' },
   'mobilya-urunleri': { purpose: 'Mobilya Tasarım Eğitimi', trainingHours: 65, skillDescription: 'Furniture tasarım ve üretim becerisi' },
@@ -102,7 +102,7 @@ const productValues: Record<string, string[]> = {
   'havlu-beyaz': [
     'Doğal pamuk kumaştan dokumacılık eğitimi alan hükümlüler tarafından yapılan havlu',
     'Hiçbir sentetik boya veya zararlı kimyasal kullanılmadan renglendirilmiş',
-    'Derzillik ve Tekstil Meslek Eğitim Programının Başarılı Ürünü',
+    'Terzilik ve Tekstil Meslek Eğitim Programının Başarılı Ürünü',
     'Sosyal Girişim Onaylı - Sağlık ve Çevre Dostu Üretim',
     'El emeğinin göz kamaştırıcı sonucu, her kullanımda rehabilitasyon programını desteklersiniz'
   ],
@@ -228,7 +228,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center gap-4">
       <span className="text-6xl">😕</span>
       <p className="text-gray-600 font-medium">Ürün bulunamadı</p>
-      <Link href="/" className="bg-[#FF6000] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#e55500] transition-colors">
+      <Link href="/" className="bg-[#CC4E00] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#A63F00] transition-colors">
         Ana Sayfaya Dön
       </Link>
     </div>
@@ -244,11 +244,11 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#FF6000] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
               <LuHouse size={14} strokeWidth={2} /> Ana Sayfa
             </Link>
             <span>/</span>
-            <Link href={`/${product.category.slug}`} className="hover:text-[#FF6000] transition-colors">
+            <Link href={`/${product.category.slug}`} className="hover:text-[#CC4E00] transition-colors">
               {product.category.name}
             </Link>
             <span>/</span>
@@ -281,7 +281,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
             <div className="flex items-center gap-3 mb-3">
               <Link
                 href={`/${product.category.slug}`}
-                className="bg-orange-100 text-[#FF6000] text-xs font-bold px-3 py-1 rounded-full hover:bg-orange-200 transition-colors"
+                className="bg-orange-100 text-[#CC4E00] text-xs font-bold px-3 py-1 rounded-full hover:bg-orange-200 transition-colors"
               >
                 {product.category.name}
               </Link>
@@ -321,7 +321,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
               <ul className="space-y-3">
                 {getProductValues(slug).map((value, idx) => (
                   <li key={idx} className="flex gap-3">
-                    <span className="text-[#FF6000] font-bold text-lg leading-none mt-0.5">✓</span>
+                    <span className="text-[#CC4E00] font-bold text-lg leading-none mt-0.5">✓</span>
                     <span className="text-sm text-gray-700 leading-relaxed">{value}</span>
                   </li>
                 ))}
@@ -354,7 +354,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
               {hasPrice ? (
                 <>
                   <p className="text-sm text-gray-400 mb-1">{product.campaign ? 'İndirimli Fiyat' : 'Fiyat'}</p>
-                  <p className="text-4xl font-extrabold text-[#FF6000]">
+                  <p className="text-4xl font-extrabold text-[#CC4E00]">
                     ₺{product.campaign ? product.campaign.discountedPrice.toFixed(2) : product.price.toFixed(2)}
                   </p>
                   <p className="text-xs text-gray-400 mt-2">KDV dahil · Ücretsiz kargo</p>
@@ -400,7 +400,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                 ) : (
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-[#FF6000] hover:bg-[#e55500] text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base"
+                    className="w-full bg-[#CC4E00] hover:bg-[#A63F00] text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base"
                   >
                     <LuHeart size={18} strokeWidth={2} /> Destekle ve Sepete Ekle
                   </button>
@@ -408,7 +408,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
 
                 <Link
                   href="/sepet"
-                  className="w-full border-2 border-[#FF6000] text-[#FF6000] hover:bg-orange-50 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm"
+                  className="w-full border-2 border-[#FF6000] text-[#CC4E00] hover:bg-orange-50 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   Sepete Git →
                 </Link>
@@ -540,7 +540,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                       <div key={stars} className="flex items-center gap-3">
                         <span className="text-xs text-gray-600 min-w-fit">{stars}★ ({count})</span>
                         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#FF6000]" style={{ width: `${percent}%` }} />
+                          <div className="h-full bg-[#CC4E00]" style={{ width: `${percent}%` }} />
                         </div>
                       </div>
                     );
@@ -575,7 +575,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                     )}
                     <p className="text-sm text-gray-700 leading-relaxed mb-3">{review.text}</p>
                     <div className="flex items-center gap-4 text-xs">
-                      <button className="text-gray-500 hover:text-[#FF6000] font-medium transition-colors">
+                      <button className="text-gray-500 hover:text-[#CC4E00] font-medium transition-colors">
                         👍 Faydalı ({review.helpfulCount})
                       </button>
                     </div>
@@ -678,7 +678,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                         }
                       }}
                       disabled={submittingReview}
-                      className="flex-1 bg-[#FF6000] hover:bg-[#e55500] disabled:bg-orange-300 text-white font-medium py-2 rounded-lg transition"
+                      className="flex-1 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white font-medium py-2 rounded-lg transition"
                     >
                       {submittingReview ? 'Gönderiliyor...' : 'Yorumu Gönder'}
                     </button>
@@ -694,7 +694,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
             <p className="text-sm text-gray-600 mb-4">Bu ürünü satın aldıysanız deneyiminizi diğer müşterilerle paylaşın</p>
             <button
               onClick={() => setReviewFormOpen(true)}
-              className="bg-[#FF6000] hover:bg-[#e55500] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
+              className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
             >
               Yorum Yaz ⭐
             </button>

@@ -22,7 +22,7 @@ export default function AboutPage() {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#FF6000] flex items-center gap-1 transition-colors">
+            <Link href="/" className="hover:text-[#CC4E00] flex items-center gap-1 transition-colors">
               <LuHouse size={14} /> Ana Sayfa
             </Link>
             <span>/</span>
@@ -33,7 +33,7 @@ export default function AboutPage() {
 
       {/* ─── HERO ─── */}
       <section className="bg-[#0F2040] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF6000]/8 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#CC4E00]/8 rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
         <div className="relative max-w-screen-xl mx-auto px-4 py-16 md:py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-sky-300 text-xs font-semibold px-4 py-2 rounded-full mb-6 tracking-wide">
@@ -45,7 +45,7 @@ export default function AboutPage() {
                   "ürünleriylegerçek" seklinde bitisik okunuyordu - hem arama
                   motoru hem ekran okuyucu icin. */}
               {content.about.hero.title}{' '}<br />
-              <span className="text-[#FF6000]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
+              <span className="text-[#CC4E00]">{content.about.hero.titleHighlight}</span> {content.about.hero.titleSuffix}
             </h1>
             <p className="text-sky-200 text-lg leading-relaxed max-w-xl">
               {content.about.hero.description}
@@ -60,7 +60,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
             {content.about.stats.map(({ value, label }) => (
               <div key={label} className="py-8 px-6 text-center">
-                <p className="text-3xl font-bold text-[#FF6000]">{value}</p>
+                <p className="text-3xl font-bold text-[#CC4E00]">{value}</p>
                 <p className="text-sm text-gray-500 mt-1">{label}</p>
               </div>
             ))}
@@ -94,7 +94,7 @@ export default function AboutPage() {
               </p>
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm w-fit"
+                className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm w-fit"
               >
                 Ürünleri İncele <LuArrowRight size={15} />
               </Link>
@@ -169,7 +169,7 @@ export default function AboutPage() {
           </div>
           <Link
             href="/bize-ulasin"
-            className="flex-shrink-0 bg-[#FF6000] hover:bg-[#e55500] text-white font-semibold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] flex items-center gap-2 text-sm"
+            className="flex-shrink-0 bg-[#CC4E00] hover:bg-[#A63F00] text-white font-semibold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] flex items-center gap-2 text-sm"
           >
             {content.about.contact.cta} <LuArrowRight size={16} />
           </Link>
