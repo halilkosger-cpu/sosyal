@@ -55,8 +55,11 @@ const nextConfig = {
       // Cache-Control basligini koyuyor. Buradaki kural da eklenince yanitta
       // iki farkli max-age yan yana geliyordu ("max-age=3600, ..., max-age=0")
       // ve hangisinin gecerli oldugu belirsiz kaliyordu.
+      //
+      // /video ve ikon klasoru de disarida: asagida kendi uzun onbellek
+      // kurallari var, ikisi birden uygulansa yine iki max-age yan yana gelirdi.
       {
-        source: '/((?!api/|sitemap\\.xml).*)',
+        source: '/((?!api/|sitemap\\.xml|video/|sosyal_giris_isyurtlari_icons/).*)',
         headers: [
           {
             key: 'Cache-Control',
@@ -71,6 +74,31 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'no-store, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      // Hero videosu ve kategori ikonlari: iceriklerine gore adlandirilmadiklari
+      // icin /_next/static gibi bir yil onbelleklenemiyorlar, ama sayfa kurali
+      // (1 saat) onlar icin cok kisaydi. Geri gelen ziyaretci 724 KB'lik videoyu
+      // ve 27 ikonu her saat yeniden indiriyordu.
+      //
+      // 30 gun veriliyor, `immutable` bilerek konmuyor: dosya adi degismeden
+      // icerik degistirilirse zorlamali yenileme ile guncelleme alinabilsin.
+      {
+        source: '/video/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000',
+          },
+        ],
+      },
+      {
+        source: '/sosyal_giris_isyurtlari_icons/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000',
           },
         ],
       },
