@@ -435,6 +435,51 @@ export default function HomeClient({
         )}
       </section>
 
+      {/* ─── SEO ACIKLAMA METNI ───
+          Urun listesinin hemen altinda: arama motoru sayfanin ne sattigini ve
+          fiyatlarin nasil isledigini metinden okuyabilsin. Sayfadaki diger
+          metinler kisa etiketlerden ibaret; bu blok sayfaya gercek icerik
+          katiyor. Tasarim sitenin kart dilini kullaniyor (beyaz kart, yumusak
+          kenarlik, ayni tipografi olcegi). */}
+      <section className="max-w-screen-xl mx-auto px-4 pb-10">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight mb-4">
+            Cezaevi Satış Mağazası Fiyatları Hakkında
+          </h3>
+
+          <div className="space-y-4 text-[15px] leading-7 text-gray-700 max-w-4xl">
+            <p>
+              İsyurtları, Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde üretilen
+              ürünleri doğrudan alıcıyla buluşturan bir sosyal girişim platformudur. Sitedeki
+              <strong className="font-semibold text-gray-900"> işyurtları online satış</strong>{' '}
+              kataloğunda gıda, tekstil, ahşap, hediyelik, temizlik ve el sanatları kategorileri
+              yer alır. Her ürün, bir hükümlünün meslek eğitimi sürecinde ortaya çıkar; satın
+              aldığınız parça hem elinizde bir ürün hem de birinin yeniden başlamasına verilmiş
+              bir destektir.
+            </p>
+
+            <p>
+              Ürün sayfalarında gördüğünüz tutarlar KDV dahildir ve mağaza yönetim panelinden
+              değiştirildiği anda sitede yayına girer; yani karşınızdaki{' '}
+              <strong className="font-semibold text-gray-900">güncel fiyat listesi</strong>, o
+              anki geçerli fiyatlardır. Fiyatı henüz belirlenmemiş ürünlerde tutar yerine "Fiyat
+              belirleniyor" ifadesi görürsünüz ve bu ürünler sepete eklenemez. Gönderiler karşı
+              ödemeli yapılır: kargo ücreti sipariş toplamına dahil değildir, teslimat sırasında
+              kargo firmasına ödenir.
+            </p>
+
+            <p>
+              Aradığınız ürün o an stokta değilse ürün kartındaki "Ön Talep Ver" bağlantısını
+              kullanabilirsiniz; stok geldiğinde size haber veririz. Kategori sayfalarından fiyat
+              aralığına ve stok durumuna göre süzerek{' '}
+              <strong className="font-semibold text-gray-900">cezaevi ürünleri</strong> arasında
+              size uygun olanı bulabilir, siparişinizin durumunu sipariş numaranız ve e-posta
+              adresinizle Sipariş Sorgula sayfasından takip edebilirsiniz.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ─── SOCIAL IMPACT ─── */}
       <section className="max-w-screen-xl mx-auto px-4 pb-10">
         <div className="bg-[#0F2040] rounded-3xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
