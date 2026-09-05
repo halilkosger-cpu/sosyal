@@ -1,43 +1,24 @@
-import type { Metadata } from 'next';
 import { prisma } from '@isyurtlari/database';
 import HomeClient from './HomeClient';
-import { SITE_NAME, absoluteUrl, defaultOpenGraphImage, hasDatabaseUrl } from '@/lib/seo';
+import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
-const SAYFA_BASLIGI = 'Cezaevi Ürünleri Online Satış Mağazası ve 2026 Fiyatları';
-const SAYFA_ACIKLAMASI =
-  'İşyurtları cezaevi ürünleri online satış kataloğu ve güncel fiyat listesi. ' +
-  'En çok tercih edilen el emeği ürünlerin fiyatlarını inceleyin ve güvenle satın alın.';
-
 /**
- * Ana sayfanin kendi basligi.
+ * Ana sayfanin basligi ve aciklamasi BILEREK kok layout'tan miras aliniyor.
  *
- * Onceden ana sayfa kok layout'taki varsayilan basligi kullaniyordu. Baslik
- * `title.absolute` ile veriliyor: layout'ta "%s | isyurtlari.com.tr" sablonu
- * var, absolute olmasaydi site adi sonuna eklenip baslik uzayacakti.
+ * "Cezaevi Ürünleri Online Satış Mağazası ve 2026 Fiyatları" basligi hazirlandi
+ * ama uygulanmadi. Iki sebep:
  *
- * canonical bilerek yazilmadi; kok layout'tan '/' olarak miras aliniyor.
+ *  - Vaat tutmuyor. Baslik ve aciklama fiyat listesi vaat ediyor; 69 urunun
+ *    48'inin (%70) fiyati girilmemis ve satin alinabilir urun sayisi 2.
+ *    "fiyat" araması yapan ziyaretci sayfada fiyat bulamayip geri donerdi.
+ *  - Marka adi basliktan tamamen cikiyordu. Site "işyurtları" aramalarinda ilk
+ *    sirada; marka adini basliktan cikarmak o konumu riske atardi.
+ *
+ * Fiyatlar girildikten sonra marka adini koruyan bir surumle degistirilebilir:
+ *   "Cezaevi Ürünleri Fiyatları | İsyurtları Online Satış Mağazası"
  */
-export const metadata: Metadata = {
-  title: { absolute: SAYFA_BASLIGI },
-  description: SAYFA_ACIKLAMASI,
-  openGraph: {
-    title: SAYFA_BASLIGI,
-    description: SAYFA_ACIKLAMASI,
-    url: absoluteUrl('/'),
-    siteName: SITE_NAME,
-    type: 'website',
-    locale: 'tr_TR',
-    images: [{ url: defaultOpenGraphImage, width: 1200, height: 630, alt: SITE_NAME }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: SAYFA_BASLIGI,
-    description: SAYFA_ACIKLAMASI,
-    images: [defaultOpenGraphImage],
-  },
-};
 
 /**
  * Sikca sorulan sorular (FAQPage).
