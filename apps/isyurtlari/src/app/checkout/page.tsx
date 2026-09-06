@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { LuInfo } from 'react-icons/lu';
+import { LuInfo, LuMapPin, LuPlus } from 'react-icons/lu';
 import { odemeyeBaslandi } from '@/lib/analiz';
-import { siparisToplami } from '@/lib/fiyat';
+import { useMusteri } from '@/lib/musteri-istemci';
+import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
 import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
@@ -24,11 +25,36 @@ interface CartItem {
   slug: string;
   imageUrl?: string;
   campaign?: Campaign | null;
+  kdvOrani?: number | null;
+}
+
+interface Adres {
+  id: string;
+  title: string;
+  fullName: string;
+  phone: string;
+  city: string;
+  district: string;
+  neighborhood: string | null;
+  addressLine: string;
+  postalCode: string | null;
+  isDefaultShipping: boolean;
+}
+
+/** Kayitli adresi kart uzerinde tek satirda gosterir. */
+function adresOzeti(a: Adres): string {
+  return [a.addressLine, a.neighborhood, `${a.district} / ${a.city}`, a.postalCode]
+    .filter(Boolean)
+    .join(', ');
 }
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { musteri, yukleniyor: musteriYukleniyor } = useMusteri();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [adresler, setAdresler] = useState<Adres[]>([]);
+  /** Secili kayitli adres; 'yeni' ise asagidaki serbest metin alani kullaniliyor. */
+  const [seciliAdres, setSeciliAdres] = useState<string>('yeni');
   const [pageLoading, setPageLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
@@ -62,6 +88,44 @@ export default function CheckoutPage() {
     );
   }, [router]);
 
+  /**
+   * Giris yapmis musterinin bilgileri ve adres defteri.
+   *
+   * Onceden odeme sayfasi her seferinde ad, e-posta, telefon ve adresi
+   * bastan istiyordu - hesabi olan musteri icin bile. Artik hesaptaki
+   * bilgiler on dolduruluyor ve kayitli adres secilebiliyor.
+   */
+  useEffect(() => {
+    if (musteriYukleniyor || !musteri) return;
+
+    setFormData((onceki) => ({
+      ...onceki,
+      name: onceki.name || musteri.name,
+      email: onceki.email || musteri.email,
+      phone: onceki.phone || musteri.phone || '',
+    }));
+
+    let iptal = false;
+    fetch('/api/musteri/adresler', { cache: 'no-store' })
+      .then((yanit) => (yanit.ok ? yanit.json() : null))
+      .then((veri) => {
+        if (iptal || !veri) return;
+        const liste: Adres[] = Array.isArray(veri.adresler) ? veri.adresler : [];
+        setAdresler(liste);
+
+        // Varsayilan teslimat adresi secili gelsin; yoksa ilk adres.
+        const varsayilan = liste.find((a) => a.isDefaultShipping) ?? liste[0];
+        if (varsayilan) setSeciliAdres(varsayilan.id);
+      })
+      .catch(() => {
+        // Adres defteri okunamazsa serbest metin alani zaten duruyor.
+      });
+
+    return () => {
+      iptal = true;
+    };
+  }, [musteri, musteriYukleniyor]);
+
   // Calculate prices with campaign discounts
   const getItemPrice = (item: CartItem): number => {
     if (item.campaign) {
@@ -72,10 +136,19 @@ export default function CheckoutPage() {
 
   const originalSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  // Vergi orani lib/fiyat.ts'te; siparis ucu de ayni hesabi kullaniyor ki
+  // Tutar hesabi lib/fiyat.ts'te; siparis ucu de ayni fonksiyonu cagiriyor ki
   // musteriye gosterilen tutar ile siparise yazilan tutar ayrismasin.
-  const { araToplam: subtotal, vergi: tax, toplam: total } = siparisToplami(
-    cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0)
+  // Fiyatlar KDV dahil: kdv toplama eklenmiyor, icinden hesaplaniyor.
+  const {
+    urunToplami: subtotal,
+    kdv: tax,
+    kargo: shipping,
+    toplam: total,
+  } = siparisToplami(
+    cart.map((item) => ({
+      tutar: getItemPrice(item) * item.quantity,
+      kdvOrani: item.kdvOrani,
+    }))
   );
   const totalDiscount = originalSubtotal - subtotal;
 
@@ -88,8 +161,14 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError('');
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+    const kayitliAdresSecili = seciliAdres !== 'yeni' && adresler.some((a) => a.id === seciliAdres);
+
+    if (!formData.name || !formData.email || !formData.phone) {
       setError('Lütfen tüm alanları doldurunuz');
+      return;
+    }
+    if (!kayitliAdresSecili && !formData.address.trim()) {
+      setError('Teslimat adresi girin ya da kayıtlı adreslerinizden birini seçin');
       return;
     }
 
@@ -103,7 +182,15 @@ export default function CheckoutPage() {
           customerName: formData.name,
           email: formData.email,
           phone: formData.phone,
-          shippingAddress: formData.address,
+          /**
+           * Kayitli adres secildiyse yalnizca kimligi gonderiliyor; adresin
+           * metni sunucuda veritabanindaki kayittan uretiliyor. Istemciden
+           * gelen metne guvenilseydi, istegi elle duzenleyen biri kayitli
+           * adresle alakasi olmayan bir adres yazdirabilirdi.
+           */
+          ...(kayitliAdresSecili
+            ? { addressId: seciliAdres }
+            : { shippingAddress: formData.address }),
           items: cart.map((item) => ({
             id: item.id,
             quantity: item.quantity,
@@ -255,21 +342,95 @@ export default function CheckoutPage() {
 
               {/* Teslimat Adresi */}
               <div className="store-card rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Teslimat Adresi</h2>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Adres
-                  </label>
-                  <textarea
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="store-input"
-                    placeholder="Ev/İş adresi"
-                    required
-                  />
+                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                  <h2 className="text-xl font-bold text-gray-900">Teslimat Adresi</h2>
+                  {musteri && (
+                    <Link href="/adreslerim" className="text-sm font-medium text-[#BA4700] hover:text-[#8F3700] transition">
+                      Adres defterim
+                    </Link>
+                  )}
                 </div>
+
+                {/* Kayitli adresi olan musteri listeden seciyor; olmayan ya da
+                    baska bir adrese gonderecek olan icin serbest metin alani
+                    duruyor. Misafir odemesi de eskisi gibi calisiyor. */}
+                {adresler.length > 0 && (
+                  <div className="space-y-3 mb-5">
+                    {adresler.map((adres) => (
+                      <label
+                        key={adres.id}
+                        className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition ${
+                          seciliAdres === adres.id
+                            ? 'border-[#FF6000] bg-orange-50/60'
+                            : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="teslimatAdresi"
+                          checked={seciliAdres === adres.id}
+                          onChange={() => setSeciliAdres(adres.id)}
+                          className="mt-1 w-4 h-4 accent-[#FF6000] flex-shrink-0"
+                        />
+                        <span className="min-w-0 flex-1 text-sm">
+                          <span className="flex items-center gap-2 font-semibold text-gray-900">
+                            <LuMapPin size={14} className="text-[#BA4700] flex-shrink-0" />
+                            {adres.title}
+                          </span>
+                          <span className="block text-gray-700 mt-1">{adres.fullName} · {adres.phone}</span>
+                          <span className="block text-gray-600 mt-0.5 leading-relaxed">{adresOzeti(adres)}</span>
+                        </span>
+                      </label>
+                    ))}
+
+                    <label
+                      className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition ${
+                        seciliAdres === 'yeni'
+                          ? 'border-[#FF6000] bg-orange-50/60'
+                          : 'border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="teslimatAdresi"
+                        checked={seciliAdres === 'yeni'}
+                        onChange={() => setSeciliAdres('yeni')}
+                        className="w-4 h-4 accent-[#FF6000] flex-shrink-0"
+                      />
+                      <span className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                        <LuPlus size={14} className="text-[#BA4700]" />
+                        Farklı bir adrese gönder
+                      </span>
+                    </label>
+                  </div>
+                )}
+
+                {seciliAdres === 'yeni' && (
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                      Adres
+                    </label>
+                    <textarea
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      rows={4}
+                      className="store-input"
+                      placeholder="Mahalle, sokak, bina no, daire no, ilçe / il"
+                      required
+                    />
+                    {musteri && adresler.length === 0 && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        Bu adresi{' '}
+                        <Link href="/adreslerim" className="text-[#BA4700] hover:text-[#8F3700] font-medium underline">
+                          adres defterinize
+                        </Link>{' '}
+                        kaydederseniz sonraki siparişlerinizde baştan yazmanız gerekmez.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Ödeme Yöntemi */}
@@ -382,23 +543,26 @@ export default function CheckoutPage() {
                     <span>-₺{totalDiscount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-600">
-                  <span>KDV (%10)</span>
-                  <span>₺{tax.toFixed(2)}</span>
-                </div>
                 {/* Kargo tutara dahil degil: gonderiler karsi odemeli. Musteri
                     bunu siparisi onaylamadan once bilmeli. */}
                 <div className="flex justify-between text-gray-600">
                   <span>Kargo</span>
-                  <span className="font-semibold text-gray-700">Karşı ödemeli</span>
+                  <span className="font-semibold text-gray-700">
+                    {KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                   <span>Toplam</span>
                   <span>₺{total.toFixed(2)}</span>
                 </div>
+                {/* Fiyatlar KDV dahil oldugu icin KDV toplamin ustune
+                    eklenmiyor; sepette gorulen tutar ile burada tahsil edilen
+                    tutar ayni. */}
                 <p className="text-xs leading-relaxed text-gray-500">
-                  Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına
-                  ödenir.
+                  Fiyatlara KDV dahildir (₺{tax.toFixed(2)}).
+                  {KARGO_KARSI_ODEMELI
+                    ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.'
+                    : ''}
                 </p>
               </div>
             </div>

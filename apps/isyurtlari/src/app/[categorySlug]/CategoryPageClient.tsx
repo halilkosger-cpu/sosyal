@@ -1,13 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import PreOrderBadge from '@/components/PreOrderBadge';
-import AddToCartButton from '@/components/AddToCartButton';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import UrunKarti from '@/components/UrunKarti';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { LuHouse, LuX } from 'react-icons/lu';
-import FavoriteButton from '@/components/FavoriteButton';
 import {
   IconFood,
   IconTextile,
@@ -34,7 +31,7 @@ interface Product {
   price: number;
   quantity: number;
   imageUrl?: string;
-  category: { name: string; slug: string };
+  category: { name: string; slug: string; kdvOrani?: number };
   campaign?: Campaign;
 }
 
@@ -59,73 +56,151 @@ const categoryMeta: Record<string, { Icon: React.ElementType; iconColor: string;
   'sanat-zanaat':         { Icon: IconWeaving,   iconColor: '#7e22ce', bg: 'bg-purple-100', banner: 'from-violet-600 to-purple-500',  purpose: 'El Sanatları & Yaratıcı Üretim', impact: 'El sanatları becerisi', imgBg: 'from-violet-200 to-purple-100', seoTitle: 'İsyurtları Sanat & Zanaat | Cezaevi El Sanatları' },
 };
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
+type SortOption = 'varsayilan' | 'fiyat-artan' | 'fiyat-azalan' | 'isim' | 'yeni';
 
-export default function CategoryPage({
-  baslangicUrunler = null,
-  kategoriler = [],
-}: {
+interface Fasetler {
+  fiyat: { min: number; max: number };
+  stok: { var: number; yok: number };
+}
+
+interface ListeYaniti {
+  urunler: Product[];
+  toplam: number;
+  sayfa: number;
+  sayfaSayisi: number;
+  fasetler: Fasetler;
+}
+
+interface KategoriSayfasiProps {
   baslangicUrunler?: Product[] | null;
   kategoriler?: Kategori[];
-}) {
+}
+
+/**
+ * Süzgeçler adres çubuğundan okunuyor (useSearchParams). Next, bu kancayı
+ * kullanan her bileşenin bir Suspense sınırının altında olmasını istiyor;
+ * aksi halde derleme "should be wrapped in a suspense boundary" ile
+ * duruyor. Sarmalayıcı bu yüzden burada.
+ */
+export default function CategoryPage(props: KategoriSayfasiProps) {
+  return (
+    <Suspense fallback={<div className="store-shell min-h-screen" />}>
+      <KategoriIcerigi {...props} />
+    </Suspense>
+  );
+}
+
+function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: KategoriSayfasiProps) {
   const params = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const aramaParametreleri = useSearchParams();
   const categorySlug = params.categorySlug as string;
-  const [products, setProducts] = useState<Product[]>(baslangicUrunler ?? []);
+
+  /**
+   * Süzgeçler artık adres çubuğunda.
+   *
+   * Önceden fiyat aralığı, stok durumu ve sıralama bileşen durumundaydı ve
+   * süzme tamamen tarayıcıda yapılıyordu: uç tüm kategoriyi döndürüyor,
+   * kategori sayfası gelen diziyi kendi eliyordu. Üç sonucu vardı -
+   * filtrelenmiş sayfa paylaşılamıyor, geri tuşu çalışmıyor, arama motoru
+   * bu sayfaları hiç görmüyordu. Katalog büyüdükçe de her ziyaret tüm
+   * kataloğu indirmek anlamına geliyordu.
+   */
+  const sort = (aramaParametreleri.get('sirala') || 'varsayilan') as SortOption;
+  const stockFilter = aramaParametreleri.get('stok') || 'hepsi';
+  const sayfa = Math.max(1, Number(aramaParametreleri.get('sayfa')) || 1);
+  const urlMin = aramaParametreleri.get('minFiyat');
+  const urlMax = aramaParametreleri.get('maxFiyat');
+
+  const [veri, setVeri] = useState<ListeYaniti | null>(
+    baslangicUrunler
+      ? {
+          urunler: baslangicUrunler,
+          toplam: baslangicUrunler.length,
+          sayfa: 1,
+          sayfaSayisi: 1,
+          fasetler: { fiyat: { min: 0, max: 5000 }, stok: { var: 0, yok: 0 } },
+        }
+      : null
+  );
   const [loading, setLoading] = useState(!baslangicUrunler);
-  const [sort, setSort] = useState<SortOption>('default');
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(5000);
-  const [stockFilter, setStockFilter] = useState<'all' | 'in-stock' | 'out-of-stock'>('all');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  const products = veri?.urunler ?? [];
+  const sorted = products;
+
+  const fasetMin = veri?.fasetler.fiyat.min ?? 0;
+  const fasetMax = veri?.fasetler.fiyat.max ?? 5000;
+  const maxPriceAvailable = Math.max(fasetMax, 1);
+
+  /** Kaydırıcılar sürüklenirken akıcı kalsın diye yerel; bırakınca URL'e yazılıyor. */
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(5000);
+
   useEffect(() => {
-    // Sunucudan hazir geldiyse tekrar istek atmaya gerek yok
-    if (baslangicUrunler) return;
-    fetch(`/api/products?category=${categorySlug}`)
-      .then((res) => res.json())
+    setMinPrice(urlMin !== null ? Number(urlMin) : fasetMin);
+    setMaxPrice(urlMax !== null ? Number(urlMax) : fasetMax);
+  }, [urlMin, urlMax, fasetMin, fasetMax]);
+
+  /** Adres çubuğundaki bir parametreyi değiştirir; sayfayı başa alır. */
+  const parametreDegistir = useCallback(
+    (degisiklikler: Record<string, string | null>, sayfayiKoru = false) => {
+      const yeniParametreler = new URLSearchParams(aramaParametreleri.toString());
+      for (const [ad, deger] of Object.entries(degisiklikler)) {
+        if (deger === null || deger === '') yeniParametreler.delete(ad);
+        else yeniParametreler.set(ad, deger);
+      }
+      if (!sayfayiKoru) yeniParametreler.delete('sayfa');
+      const sorguDizesi = yeniParametreler.toString();
+      router.push(sorguDizesi ? `${pathname}?${sorguDizesi}` : pathname, { scroll: false });
+    },
+    [aramaParametreleri, pathname, router]
+  );
+
+  const fiyatiUygula = () => {
+    parametreDegistir({
+      minFiyat: minPrice > fasetMin ? String(Math.round(minPrice)) : null,
+      maxFiyat: maxPrice < fasetMax ? String(Math.round(maxPrice)) : null,
+    });
+  };
+
+  const suzgecleriTemizle = () =>
+    parametreDegistir({ minFiyat: null, maxFiyat: null, stok: null, sirala: null });
+
+  useEffect(() => {
+    let iptal = false;
+    setLoading(true);
+
+    const sorgu = new URLSearchParams({ kategori: categorySlug, sirala: sort, sayfa: String(sayfa) });
+    if (stockFilter !== 'hepsi') sorgu.set('stok', stockFilter);
+    if (urlMin !== null) sorgu.set('minFiyat', urlMin);
+    if (urlMax !== null) sorgu.set('maxFiyat', urlMax);
+
+    fetch(`/api/urunler?${sorgu}`, { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        setProducts(Array.isArray(data) ? data : []);
-        setLoading(false);
+        if (iptal || !data) return;
+        setVeri(data);
       })
-      .catch(() => setLoading(false));
-  }, [categorySlug, baslangicUrunler]);
+      .catch(() => {})
+      .finally(() => {
+        if (!iptal) setLoading(false);
+      });
+
+    return () => {
+      iptal = true;
+    };
+  }, [categorySlug, sort, sayfa, stockFilter, urlMin, urlMax]);
   // Not: burada document.title ezilmemeli. generateMetadata ile kurulan
   // baslik JavaScript calisinca siliniyordu; arama motoru ve erisilebilirlik
   // denetimleri bu yuzden basligi bulamiyordu.
 
-  // Calculate max price from products with price (minimum 5000 TL)
-  const maxPriceAvailable = products.length > 0 ? Math.max(...products.filter(p => p.price > 0).map(p => p.price), 5000) : 5000;
-
-  // Apply filters
-  const filtered = products.filter((product) => {
-    // Price filter
-    if (product.price > 0 && (product.price < minPrice || product.price > maxPrice)) {
-      return false;
-    }
-    // Stock filter
-    if (stockFilter === 'in-stock' && product.quantity === 0) return false;
-    if (stockFilter === 'out-of-stock' && product.quantity > 0) return false;
-    return true;
-  });
-
-  // Apply sorting
-  const sorted = [...filtered].sort((a, b) => {
-    if (sort === 'price-asc') return a.price - b.price;
-    if (sort === 'price-desc') return b.price - a.price;
-    if (sort === 'name') return a.name.localeCompare(b.name, 'tr');
-    return 0;
-  });
-
   const meta = categoryMeta[categorySlug];
   const Icon = meta?.Icon ?? IconProductOrigin;
   const categoryName = products[0]?.category.name ?? 'Ürünler';
-
-  // Initialize max price on first load
-  useEffect(() => {
-    if (products.length > 0 && maxPrice === 5000 && maxPriceAvailable > 5000) {
-      setMaxPrice(Math.ceil(maxPriceAvailable * 1.2));
-    }
-  }, [products, maxPriceAvailable]);
+  /** Kategorinin süzgeçsiz toplam ürün sayısı (afişteki sayı için). */
+  const kategoriToplam = (veri?.fasetler.stok.var ?? 0) + (veri?.fasetler.stok.yok ?? 0);
 
   return (
     <div className="store-shell">
@@ -155,7 +230,7 @@ export default function CategoryPage({
                 {meta?.purpose || 'Meslek Eğitim Programı'} • İsyurtları Cezaevi Ürünleri
               </p>
               <p className="text-white/70 text-sm mt-1">
-                {loading ? '' : `${products.length} cezaevi hükümlüsü tarafından el yapımı, doğal ürün`}
+                {loading ? '' : `${kategoriToplam} cezaevi hükümlüsü tarafından el yapımı, doğal ürün`}
               </p>
             </div>
           </div>
@@ -257,6 +332,8 @@ export default function CategoryPage({
                       max={maxPriceAvailable}
                       value={minPrice}
                       onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice))}
+                      onPointerUp={fiyatiUygula}
+                      onKeyUp={fiyatiUygula}
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF6000]"
                     />
                   </div>
@@ -270,6 +347,8 @@ export default function CategoryPage({
                       max={maxPriceAvailable}
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice))}
+                      onPointerUp={fiyatiUygula}
+                      onKeyUp={fiyatiUygula}
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#FF6000]"
                     />
                   </div>
@@ -284,9 +363,9 @@ export default function CategoryPage({
                     <input
                       type="radio"
                       name="stock"
-                      value="all"
-                      checked={stockFilter === 'all'}
-                      onChange={() => setStockFilter('all')}
+                      value="hepsi"
+                      checked={stockFilter === 'hepsi'}
+                      onChange={() => parametreDegistir({ stok: null })}
                       className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tümü</span>
@@ -295,34 +374,32 @@ export default function CategoryPage({
                     <input
                       type="radio"
                       name="stock"
-                      value="in-stock"
-                      checked={stockFilter === 'in-stock'}
-                      onChange={() => setStockFilter('in-stock')}
+                      value="var"
+                      checked={stockFilter === 'var'}
+                      onChange={() => parametreDegistir({ stok: 'var' })}
                       className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Stokta Var</span>
+                    <span className="ml-auto text-xs text-gray-400">{veri?.fasetler.stok.var ?? 0}</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <input
                       type="radio"
                       name="stock"
-                      value="out-of-stock"
-                      checked={stockFilter === 'out-of-stock'}
-                      onChange={() => setStockFilter('out-of-stock')}
+                      value="yok"
+                      checked={stockFilter === 'yok'}
+                      onChange={() => parametreDegistir({ stok: 'yok' })}
                       className="w-4 h-4 text-[#BA4700] cursor-pointer accent-[#FF6000]"
                     />
                     <span className="text-sm text-gray-700 group-hover:text-gray-900">Tükendi</span>
+                    <span className="ml-auto text-xs text-gray-400">{veri?.fasetler.stok.yok ?? 0}</span>
                   </label>
                 </div>
               </div>
 
               {/* Reset filters button */}
               <button
-                onClick={() => {
-                  setMinPrice(0);
-                  setMaxPrice(5000);
-                  setStockFilter('all');
-                }}
+                onClick={suzgecleriTemizle}
                 className="w-full text-sm text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors"
               >
                 Filtreleri Temizle
@@ -345,20 +422,21 @@ export default function CategoryPage({
               </button>
 
               <p className="text-sm text-gray-500 font-medium hidden md:block flex-1">
-                {loading ? '' : <><span className="text-gray-900 font-bold">{sorted.length}</span> ürün</>}
+                {loading ? '' : <><span className="text-gray-900 font-bold">{veri?.toplam ?? 0}</span> ürün</>}
               </p>
 
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 hidden sm:inline">Sırala:</span>
                 <select
                   value={sort}
-                  onChange={(e) => setSort(e.target.value as SortOption)}
+                  onChange={(e) => parametreDegistir({ sirala: e.target.value === 'varsayilan' ? null : e.target.value })}
                   className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer"
                 >
-                  <option value="default">Varsayılan</option>
-                  <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
-                  <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
-                  <option value="name">İsim: A-Z</option>
+                  <option value="varsayilan">Varsayılan</option>
+                  <option value="fiyat-artan">Fiyat: Düşükten Yükseğe</option>
+                  <option value="fiyat-azalan">Fiyat: Yüksekten Düşüğe</option>
+                  <option value="isim">İsim: A-Z</option>
+                  <option value="yeni">En yeniler</option>
                 </select>
               </div>
             </div>
@@ -373,7 +451,7 @@ export default function CategoryPage({
             )}
 
             {/* ─── EMPTY ─── */}
-            {!loading && filtered.length === 0 && products.length === 0 && (
+            {!loading && products.length === 0 && kategoriToplam === 0 && (
               <div className="bg-white rounded-2xl p-16 text-center col-span-full">
                 <Icon className="w-24 h-24 object-contain mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-700 mb-2">Bu kategoride henüz ürün bulunmamaktadır</h3>
@@ -386,17 +464,13 @@ export default function CategoryPage({
             )}
 
             {/* ─── NO RESULTS WITH FILTERS ─── */}
-            {!loading && filtered.length === 0 && products.length > 0 && (
+            {!loading && products.length === 0 && kategoriToplam > 0 && (
               <div className="bg-white rounded-2xl p-12 text-center col-span-full">
                 <span className="text-5xl block mb-4">🔍</span>
                 <h3 className="text-lg font-bold text-gray-700 mb-2">Filtrelerinizi eşleşen ürün bulunamadı</h3>
                 <p className="text-gray-400 mb-6">Lütfen filtrelerinizi ayarlayıp yeniden deneyin.</p>
                 <button
-                  onClick={() => {
-                    setMinPrice(0);
-                    setMaxPrice(5000);
-                    setStockFilter('all');
-                  }}
+                  onClick={suzgecleriTemizle}
                   className="text-[#BA4700] font-medium hover:text-[#8F3700] transition-colors"
                 >
                   Filtreleri Temizle
@@ -408,101 +482,42 @@ export default function CategoryPage({
             {!loading && sorted.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sorted.map((product) => (
-              <Link
+              <UrunKarti
                 key={product.id}
-                href={`/urun/${product.slug}${product.quantity === 0 ? '?on-talep=1' : ''}`}
-                className="group store-card store-card-hover rounded-2xl overflow-hidden flex flex-col"
-              >
-                {/* Image */}
-                <div className={`relative h-48 bg-gradient-to-br ${meta?.imgBg ?? 'from-orange-100 to-amber-100'} flex items-center justify-center overflow-hidden`}>
-                  {product.imageUrl ? (
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      loading="lazy"
-                      quality={70}
-                      placeholder="empty"
-                    />
-                  ) : (
-                    <Icon className="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300" />
-                  )}
-
-                  {product.quantity === 0 && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Tükendi</span>
-                        <PreOrderBadge />
-                      </div>
-                    </div>
-                  )}
-                  {product.quantity > 0 && (
-                    <span className="absolute top-2 left-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                      Stokta
-                    </span>
-                  )}
-
-                  {/* Campaign Badge */}
-                  {product.campaign && (
-                    <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                      %{product.campaign.discount} İndirim
-                    </span>
-                  )}
-
-                  {/* Impact Badge */}
-                  <span className="absolute bottom-2 right-2 bg-[#0F2040] text-white text-[10px] font-semibold px-2.5 py-1 rounded-full max-w-[150px] line-clamp-2">
-                    {meta?.impact || 'Eğitim desteği'}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="p-3 flex flex-col flex-1">
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1 min-h-[2.5rem] group-hover:text-[#BA4700] transition-colors leading-snug">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-gray-400 line-clamp-2 mb-3 flex-1 leading-relaxed">
-                    {product.description}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    {product.price > 0 ? (
-                      <div className="flex flex-col">
-                        {product.campaign ? (
-                          <>
-                            <span className="text-xs text-gray-400 line-through">₺{product.price.toFixed(2)}</span>
-                            <span className="text-lg font-extrabold text-red-600">
-                              ₺{product.campaign.discountedPrice.toFixed(2)}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-lg font-extrabold text-[#BA4700]">
-                            ₺{product.price.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400 italic">Fiyat belirleniyor</span>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <FavoriteButton productId={product.id} size="sm" />
-                      <AddToCartButton
-                        product={{
-                          id: product.id,
-                          name: product.name,
-                          price: product.campaign?.discountedPrice ?? product.price,
-                          slug: product.slug,
-                          imageUrl: product.imageUrl,
-                          quantity: product.quantity,
-                          campaign: product.campaign ?? null,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Link>
+                urun={product}
+                gorselYedek={<Icon className="w-24 h-24 object-contain" />}
+                gorselArkaPlani={meta?.imgBg ?? 'from-orange-100 to-amber-100'}
+                gorselYuksekligi="h-48"
+                gorselBoyutlari="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                aciklamaGoster
+                etkiRozeti={meta?.impact || 'Eğitim desteği'}
+                favoriButonu
+                sepetButonu
+              />
               ))}
+              </div>
+            )}
+
+            {/* ─── SAYFALAMA ─── */}
+            {!loading && (veri?.sayfaSayisi ?? 0) > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-10">
+                <button
+                  onClick={() => parametreDegistir({ sayfa: String(sayfa - 1) }, true)}
+                  disabled={sayfa <= 1}
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                >
+                  Önceki
+                </button>
+                <span className="text-sm text-gray-600">
+                  Sayfa {veri?.sayfa} / {veri?.sayfaSayisi}
+                </span>
+                <button
+                  onClick={() => parametreDegistir({ sayfa: String(sayfa + 1) }, true)}
+                  disabled={sayfa >= (veri?.sayfaSayisi ?? 1)}
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                >
+                  Sonraki
+                </button>
               </div>
             )}
           </div>

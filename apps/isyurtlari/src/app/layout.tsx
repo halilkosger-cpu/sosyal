@@ -14,6 +14,9 @@ import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { kisaAd } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
+import HesapMenusu from '@/components/HesapMenusu';
+const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
+const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -167,18 +170,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* Search bar */}
               <SearchSuggest />
 
-              {/* Account */}
-              <Link
-                href="https://cezaevinden.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden md:flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
-              >
-                <svg className="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-xs font-semibold">Platform</span>
-              </Link>
+              {/* Hesap. Buradaki kullanici simgesi daha once cezaevinden.com'a
+                  gidiyordu ve sitede musteri hesabi yoktu; artik gercek giris
+                  ve hesap menusu. Sosyal platform baglantisi alt bilgide. */}
+              <HesapMenusu />
 
               {/* Cart */}
               <Link
@@ -235,21 +230,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="bg-[#0D1B30]">
             <div className="max-w-screen-xl mx-auto px-4 py-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {/* Guven cubugundaki her vaat, kosullarini anlatan sayfaya
+                    bagli. Onceden bunlar tiklanamayan metinlerdi: "14 gun iade
+                    hakki" yaziyordu ama musteri iadenin nasil isledigini
+                    aramak zorundaydi. Vaadi sozlesmesinden bir tik uzakta
+                    tutmak hem dogru hem de cagri merkezini rahatlatiyor. */}
                 {[
-                  { Icon: IconFastShipping,       title: 'Hızlı Kargo', sub: 'Türkiye geneli teslimat' },
-                  { Icon: IconSecurePayment,      title: 'Güvenli Ödeme', sub: 'SSL ile şifreli işlem' },
-                  { Icon: IconEasyReturn,         title: 'Kolay İade', sub: '14 gün iade hakkı' },
-                  { Icon: IconSocialContribution, title: 'Sosyal Katkı', sub: 'Her alışveriş fark yaratır' },
+                  { Icon: IconFastShipping,       title: 'Hızlı Kargo',   sub: '2-7 iş günü içinde gönderim', href: '/teslimat-iade-sartlari' },
+                  { Icon: IconSecurePayment,      title: 'Güvenli Ödeme', sub: 'SSL ile şifreli işlem',       href: '/guvenli-alisveris' },
+                  { Icon: IconEasyReturn,         title: 'Kolay İade',    sub: '14 gün içinde cayma hakkı',   href: '/teslimat-iade-sartlari' },
+                  { Icon: IconSocialContribution, title: 'Sosyal Katkı',  sub: 'Her alışveriş fark yaratır',  href: '/hakkimizda' },
                 ].map((item) => (
-                  <div key={item.title} className="flex items-center gap-3">
+                  <Link key={item.title} href={item.href} className="flex items-center gap-3 group rounded-lg transition-colors hover:bg-white/5">
                     <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
                       <item.Icon className="w-9 h-9 object-contain" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">{item.title}</p>
+                      <p className="text-sm font-semibold text-white group-hover:text-orange-200 transition-colors">{item.title}</p>
                       <p className="text-xs text-gray-400">{item.sub}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -265,15 +265,29 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <li><Link href="/guvenli-alisveris" className="text-gray-300 hover:text-white text-sm transition font-medium">Güvenli Alışveriş</Link></li>
                   <li><Link href="/kvkk" className="text-gray-300 hover:text-white text-sm transition font-medium">KVKK</Link></li>
                   <li><Link href="/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Mesafeli Satış Sözleşmesi</Link></li>
+                  <li>
+                    <a href="https://cezaevinden.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-sm transition font-medium">
+                      Platform: cezaevinden.com
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">Kategoriler</h3>
+                {/* Bu liste elle yaziliydi: /gida, /tekstil, /mobilya, /ahsap.
+                    Ust menu ayni sorundan oturu zaten veritabanina baglanmisti
+                    (admin panelinden eklenen kategori gorunmuyor, silinen
+                    kategori 404 veren olu bag olarak kaliyordu) ama alt bilgi
+                    eski halinde kalmisti - "mobilya" slug'i su an tabloda
+                    yok. Artik ayni kaynaktan besleniyor. */}
                 <ul className="space-y-2">
-                  <li><Link href="/gida" className="text-gray-300 hover:text-white text-sm transition font-medium">Gıda Ürünleri</Link></li>
-                  <li><Link href="/tekstil" className="text-gray-300 hover:text-white text-sm transition font-medium">Tekstil</Link></li>
-                  <li><Link href="/mobilya" className="text-gray-300 hover:text-white text-sm transition font-medium">Mobilya</Link></li>
-                  <li><Link href="/ahsap" className="text-gray-300 hover:text-white text-sm transition font-medium">Ahşap Ürünler</Link></li>
+                  {categories.slice(0, 6).map((cat) => (
+                    <li key={cat.slug}>
+                      <Link href={`/${cat.slug}`} className="text-gray-300 hover:text-white text-sm transition font-medium">
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div>
@@ -308,6 +322,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <CookieConsent />
         <Olcumler />
+        {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
+        <SenkronKopru />
+        {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
+        <AltGezinme />
       </body>
     </html>
   );

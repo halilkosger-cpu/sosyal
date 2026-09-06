@@ -6,6 +6,8 @@ export const emailTemplates = {
     customerName: string;
     items: Array<{ name: string; quantity: number; price: number }>;
     total: number;
+    /** total ICINDEKI KDV. Fiyatlar KDV dahil; toplama ayrica eklenmez. */
+    kdv?: number;
     bankName: string;
     accountName: string;
     iban: string;
@@ -90,6 +92,10 @@ export const emailTemplates = {
                 </tr>
               </tbody>
             </table>
+            <p style="font-size: 12px; color: #777; margin-top: 10px;">
+              Fiyatlara KDV dahildir${typeof data.kdv === 'number' ? ` (₺${data.kdv.toFixed(2)})` : ''}.
+              Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.
+            </p>
           </div>
 
           <div class="section">

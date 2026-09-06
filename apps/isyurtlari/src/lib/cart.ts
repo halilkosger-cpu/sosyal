@@ -13,6 +13,15 @@ export interface SepetUrunu {
   slug: string;
   imageUrl?: string | null;
   campaign?: unknown;
+  /**
+   * Urunun kategorisinden gelen KDV orani (yuzde).
+   *
+   * Fiyatlar KDV dahil oldugu icin bu deger toplami degistirmiyor; sepette
+   * gosterilen "icindeki KDV" satirini dogru hesaplamaya yariyor. Alan
+   * eklenmeden once olusmus sepetlerde bulunmuyor, o yuzden isteğe bagli:
+   * yoksa lib/fiyat.ts varsayilan orani kullaniyor.
+   */
+  kdvOrani?: number | null;
 }
 
 export interface SepeteEklenebilirUrun {
@@ -23,6 +32,41 @@ export interface SepeteEklenebilirUrun {
   imageUrl?: string | null;
   quantity: number; // stok adedi
   campaign?: unknown;
+  kdvOrani?: number | null;
+}
+
+const ANAHTAR = 'cart';
+
+/**
+ * Sepet degistiginde tetiklenen olay.
+ *
+ * Ustteki CartBadge sayiyi bu olayla guncelliyor; SenkronKopru da bunu
+ * dinleyip degisikligi sunucuya gonderiyor. Ad bilerek degistirilmedi:
+ * sepet sayfasi ve odeme sayfasi da ayni olayi tetikliyor.
+ */
+export const SEPET_OLAYI = 'cartUpdated';
+
+/** Tarayicidaki sepeti okur. Bozuk veri varsa bos sepet doner. */
+export function sepetiOku(): SepetUrunu[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const ham = JSON.parse(localStorage.getItem(ANAHTAR) || '[]');
+    return Array.isArray(ham) ? ham : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Sepeti tumuyle degistirir ve degisiklik olayini tetikler. */
+export function sepetiYaz(sepet: SepetUrunu[]): boolean {
+  try {
+    localStorage.setItem(ANAHTAR, JSON.stringify(sepet));
+    window.dispatchEvent(new Event(SEPET_OLAYI));
+    return true;
+  } catch {
+    // localStorage kapali veya dolu olabilir
+    return false;
+  }
 }
 
 /** Urun sepete eklenebilir mi: stokta olmali ve fiyati girilmis olmali. */
@@ -38,7 +82,7 @@ export function sepeteEkle(urun: SepeteEklenebilirUrun, adet = 1): boolean {
   if (!sepeteEklenebilir(urun)) return false;
 
   try {
-    const sepet: SepetUrunu[] = JSON.parse(localStorage.getItem('cart') || '[]');
+    const sepet = sepetiOku();
     const mevcut = sepet.find((s) => s.id === urun.id);
 
     if (mevcut) {
@@ -52,11 +96,11 @@ export function sepeteEkle(urun: SepeteEklenebilirUrun, adet = 1): boolean {
         slug: urun.slug,
         imageUrl: urun.imageUrl ?? null,
         campaign: urun.campaign ?? null,
+        kdvOrani: urun.kdvOrani ?? null,
       });
     }
 
-    localStorage.setItem('cart', JSON.stringify(sepet));
-    window.dispatchEvent(new Event('cartUpdated'));
+    if (!sepetiYaz(sepet)) return false;
 
     // Sepete ekleme sitede birkac yerden yapiliyor (urun sayfasi, kategori
     // kartlari, arama onerileri) ama hepsi bu fonksiyondan geciyor; GA olayini

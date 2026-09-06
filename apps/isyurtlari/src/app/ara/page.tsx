@@ -1,165 +1,183 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { LuArrowLeft, LuStar } from 'react-icons/lu';
-import FavoriteButton from '@/components/FavoriteButton';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { LuArrowLeft, LuSearch } from 'react-icons/lu';
+import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 
-interface Campaign {
-  id: string;
-  name: string;
-  discount: number;
-  discountedPrice: number;
+/**
+ * Arama sonuçları.
+ *
+ * Sıralama ve sayfa numarası adres çubuğunda tutuluyor. Önceden bunlar
+ * bileşen durumundaydı: filtrelenmiş bir sonuç sayfası paylaşılamıyor,
+ * geri tuşu çalışmıyor ve arama motoru bu sayfaları hiç görmüyordu.
+ */
+
+interface Yanit {
+  urunler: KartUrunu[];
+  toplam: number;
+  sayfa: number;
+  sayfaSayisi: number;
 }
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  quantity: number;
-  imageUrl?: string;
-  category: { name: string; slug: string };
-  campaign?: Campaign;
-}
+const SIRALAMALAR = [
+  { deger: 'varsayilan', metin: 'En alakalı' },
+  { deger: 'fiyat-artan', metin: 'Fiyat: Düşükten Yükseğe' },
+  { deger: 'fiyat-azalan', metin: 'Fiyat: Yüksekten Düşüğe' },
+  { deger: 'isim', metin: 'İsim: A-Z' },
+  { deger: 'yeni', metin: 'En yeniler' },
+];
 
-const productEmojis: Record<string, string> = {
-  'badem':'🌰','biber-receli':'🫙','biber-salcasi':'🌶️','domates-salcasi':'🍅',
-  'findik':'🥜','incir-receli':'🍓','kuru-baklagil':'🫘','pirinc':'🍚',
-  'tereyag':'🧈','yesil-zeytin':'🫒','zeytinyag':'🫒','peynir':'🧀',
-  'havlu-beyaz':'🛁','havlu-renkli':'🛁','ahsap-sandalye':'🪑','ahsap-masa':'🪑',
-};
+function AramaSonuclari() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const sorgu = params.get('q') || '';
+  const sirala = params.get('sirala') || 'varsayilan';
+  const sayfa = Math.max(1, Number(params.get('sayfa')) || 1);
+
+  const [veri, setVeri] = useState<Yanit | null>(null);
+  const [yukleniyor, setYukleniyor] = useState(true);
+
+  /** Adres çubuğundaki tek bir parametreyi değiştirir, sayfayı başa alır. */
+  const parametreDegistir = useCallback(
+    (ad: string, deger: string | null, sayfayiKoru = false) => {
+      const yeni = new URLSearchParams(params.toString());
+      if (deger === null || deger === '') yeni.delete(ad);
+      else yeni.set(ad, deger);
+      if (!sayfayiKoru) yeni.delete('sayfa');
+      router.push(`${pathname}?${yeni.toString()}`, { scroll: false });
+    },
+    [params, pathname, router]
+  );
 
   useEffect(() => {
-    if (!query) {
-      setProducts([]);
-      setLoading(false);
+    if (!sorgu) {
+      setVeri(null);
+      setYukleniyor(false);
       return;
     }
 
-    const fetchResults = async () => {
-      try {
-        const res = await fetch(`/api/products?search=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        setProducts(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Arama hatası:', error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    let iptal = false;
+    setYukleniyor(true);
 
-    setLoading(true);
-    fetchResults();
-  }, [query]);
+    const arananlar = new URLSearchParams({ ara: sorgu, sirala, sayfa: String(sayfa) });
+
+    fetch(`/api/urunler?${arananlar}`, { cache: 'no-store' })
+      .then((y) => (y.ok ? y.json() : null))
+      .then((v) => {
+        if (iptal) return;
+        setVeri(v);
+      })
+      .catch(() => {
+        if (!iptal) setVeri(null);
+      })
+      .finally(() => {
+        if (!iptal) setYukleniyor(false);
+      });
+
+    return () => {
+      iptal = true;
+    };
+  }, [sorgu, sirala, sayfa]);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#BA4700] hover:text-[#cc4e00] font-medium mb-4 transition">
+          <Link href="/" className="flex items-center gap-2 text-[#BA4700] hover:text-[#8F3700] font-medium mb-4 transition">
             <LuArrowLeft size={18} /> Geri
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Arama Sonuçları</h1>
-          {query && (
+          {sorgu && !yukleniyor && (
             <p className="text-gray-600 text-sm mt-2">
-              "<strong>{query}</strong>" için <strong>{products.length}</strong> sonuç bulundu
+              &quot;<strong>{sorgu}</strong>&quot; için <strong>{veri?.toplam ?? 0}</strong> sonuç bulundu
             </p>
           )}
         </div>
       </div>
 
-      {/* Results */}
       <div className="max-w-screen-xl mx-auto px-4 py-8">
-        {!query ? (
+        {!sorgu ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Arama yapmak için arama çubuğunu kullanın</p>
+            <LuSearch size={32} className="mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-500 text-lg">Arama yapmak için üstteki arama çubuğunu kullanın</p>
           </div>
-        ) : loading ? (
+        ) : yukleniyor ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl h-72 animate-pulse" />
             ))}
           </div>
-        ) : products.length === 0 ? (
+        ) : !veri || veri.urunler.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">
-              "<strong>{query}</strong>" ile eşleşen ürün bulunamadı
+            <p className="text-gray-600 text-lg mb-2">
+              &quot;<strong>{sorgu}</strong>&quot; ile eşleşen ürün bulunamadı
             </p>
-            <Link href="/" className="inline-block mt-4 text-[#BA4700] hover:text-[#cc4e00] font-semibold">
+            <p className="text-sm text-gray-500 mb-6">
+              Daha kısa bir kelime deneyin ya da kategorilere göz atın.
+            </p>
+            <Link href="/" className="text-[#BA4700] hover:text-[#8F3700] font-semibold">
               Ana sayfaya dön
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.map((product) => (
-              <Link key={product.id} href={`/urun/${product.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
-              >
-                <div className="relative h-44 bg-gradient-to-br from-orange-200 to-amber-200 flex items-center justify-center overflow-hidden">
-                  {product.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                  ) : (
-                    <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">
-                      {productEmojis[product.slug] ?? '📦'}
-                    </span>
-                  )}
-                  {product.quantity === 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
-                    </div>
-                  )}
-                  {product.campaign && (
-                    <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                      %{product.campaign.discount}
-                    </span>
-                  )}
-                  {product.quantity > 0 && !product.campaign && (
-                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
-                  )}
-                </div>
-                <div className="p-3.5">
-                  <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider mb-1">{product.category.name}</p>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#BA4700] transition-colors leading-snug">{product.name}</h3>
-                  <div className="flex items-center gap-0.5 mt-1.5 mb-2">
-                    {[1,2,3,4,5].map((s) => <LuStar key={s} size={10} fill="#FF6000" color="#FF6000" />)}
-                    <span className="text-[10px] text-gray-400 ml-1">5.0</span>
-                  </div>
-                  <div className="flex items-end justify-between gap-2">
-                    <div>
-                      {product.price > 0 ? (
-                        <div>
-                          {product.campaign ? (
-                            <>
-                              <p className="text-xs text-gray-400 line-through tracking-tight">₺{product.price.toFixed(2)}</p>
-                              <p className="text-lg font-bold text-red-600 tracking-tight">₺{product.campaign.discountedPrice.toFixed(2)}</p>
-                            </>
-                          ) : (
-                            <p className="text-lg font-bold text-[#BA4700] tracking-tight">₺{product.price.toFixed(2)}</p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-gray-400 italic">Fiyat belirleniyor</p>
-                      )}
-                    </div>
-                    <FavoriteButton productId={product.id} size="sm" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <>
+            <div className="flex items-center justify-end mb-5">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                Sırala:
+                <select
+                  value={sirala}
+                  onChange={(e) => parametreDegistir('sirala', e.target.value)}
+                  className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:border-[#FF6000] focus:outline-none focus:ring-1 focus:ring-[#FF6000]"
+                >
+                  {SIRALAMALAR.map((s) => (
+                    <option key={s.deger} value={s.deger}>{s.metin}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {veri.urunler.map((urun) => (
+                <UrunKarti key={urun.id} urun={urun} kategoriGoster favoriButonu sepetButonu />
+              ))}
+            </div>
+
+            {veri.sayfaSayisi > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-10">
+                <button
+                  onClick={() => parametreDegistir('sayfa', String(sayfa - 1), true)}
+                  disabled={sayfa <= 1}
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                >
+                  Önceki
+                </button>
+                <span className="text-sm text-gray-600">
+                  Sayfa {veri.sayfa} / {veri.sayfaSayisi}
+                </span>
+                <button
+                  onClick={() => parametreDegistir('sayfa', String(sayfa + 1), true)}
+                  disabled={sayfa >= veri.sayfaSayisi}
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                >
+                  Sonraki
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
+  );
+}
+
+export default function AramaSayfasi() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <AramaSonuclari />
+    </Suspense>
   );
 }

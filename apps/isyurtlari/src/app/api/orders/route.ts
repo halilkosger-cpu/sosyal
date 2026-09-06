@@ -5,6 +5,8 @@ import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
 import { siparisToplami } from '@/lib/fiyat';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
+import { oturumdakiMusteri } from '@/lib/musteri-auth';
+import { adresiYazdir } from '@/lib/adres-dogrulama';
 
 // Email sending function
 async function sendOrderEmail(
@@ -14,7 +16,8 @@ async function sendOrderEmail(
   customerPhone: string,
   shippingAddress: string,
   totalAmount: number,
-  items: any[]
+  items: any[],
+  kdvTutari: number
 ) {
   try {
     const recipientEmail = process.env.EMAIL_RECIPIENT || 'halil.kosger@gmail.com';
@@ -61,6 +64,7 @@ async function sendOrderEmail(
 
       <h3 style="margin-top: 20px;">Ödeme Bilgileri:</h3>
       <p><strong>Toplam Tutar:</strong> <span style="font-size: 18px; color: #FF6000;">₺${totalAmount.toFixed(2)}</span></p>
+      <p style="color: #666; font-size: 13px;">Fiyatlara KDV dahildir (₺${kdvTutari.toFixed(2)}). Kargo karşı ödemelidir.</p>
       <p><strong>Ödeme Yöntemi:</strong> Havale/EFT</p>
 
       <h3>Havale Detayları:</h3>
@@ -97,6 +101,7 @@ async function sendOrderEmail(
           price: item.price,
         })),
         total: totalAmount,
+        kdv: kdvTutari,
         bankName,
         accountName,
         iban,
@@ -124,7 +129,10 @@ interface OrderRequest {
   customerName: string;
   email: string;
   phone: string;
-  shippingAddress: string;
+  /** Serbest metin adres. Kayitli adres secildiyse gonderilmiyor. */
+  shippingAddress?: string;
+  /** Musterinin adres defterindeki adresin kimligi. */
+  addressId?: string;
   items: { id: string; quantity: number; price: number }[];
   totalAmount: number;
   paymentMethod: 'CREDIT_CARD' | 'TRANSFER';
@@ -154,8 +162,11 @@ export async function POST(req: NextRequest) {
     // gunluge basilmiyor.
 
     // Validate input
-    if (!body.customerName || !body.email || !body.phone || !body.shippingAddress || !body.items || body.items.length === 0) {
+    if (!body.customerName || !body.email || !body.phone || !body.items || body.items.length === 0) {
       return NextResponse.json({ error: 'Gerekli alanlar eksik' }, { status: 400 });
+    }
+    if (!body.addressId && !body.shippingAddress?.trim()) {
+      return NextResponse.json({ error: 'Teslimat adresi gerekli' }, { status: 400 });
     }
 
     /**
@@ -170,8 +181,59 @@ export async function POST(req: NextRequest) {
      * Kampanya indirimi de burada uygulaniyor, boylece sepette gorulen fiyat
      * ile siparise yazilan fiyat ayni kaynaktan geliyor.
      */
+    /**
+     * Siparis bir musteri hesabina bagli mi?
+     *
+     * Giris yapmis musterinin siparisi hesabina yaziliyor; misafir siparisi
+     * eskisi gibi calismaya devam ediyor (customerId bos kaliyor). Bunu
+     * simdiden yazmak onemli: hesaba baglanmamis siparisleri sonradan
+     * eslestirmenin guvenilir bir yolu yok.
+     */
+    const musteri = await oturumdakiMusteri();
+
+    /**
+     * Teslimat adresi.
+     *
+     * Kayitli adres secildiyse metin VERITABANINDAKI kayittan uretiliyor,
+     * istemciden gelenden degil. Istemcinin gonderdigi metne guvenilseydi,
+     * istegi elle duzenleyen biri "kayitli adresim" diyip bambaska bir
+     * adres yazdirabilirdi. Adresin secen musteriye ait oldugu da burada
+     * dogrulaniyor.
+     */
+    let teslimatAdresi = (body.shippingAddress ?? '').trim();
+
+    if (body.addressId) {
+      if (!musteri) {
+        return NextResponse.json(
+          { error: 'Kayıtlı adres kullanmak için giriş yapmalısınız' },
+          { status: 401 }
+        );
+      }
+
+      const adres = await prisma.address.findFirst({
+        where: { id: body.addressId, customerId: musteri.id },
+      });
+
+      if (!adres) {
+        return NextResponse.json({ error: 'Seçilen adres bulunamadı' }, { status: 400 });
+      }
+
+      teslimatAdresi = adresiYazdir(adres);
+    }
+
+    if (!teslimatAdresi) {
+      return NextResponse.json({ error: 'Teslimat adresi gerekli' }, { status: 400 });
+    }
+
     const simdi = new Date();
-    const kalemler: { id: string; adet: number; birimFiyat: number; ad: string }[] = [];
+    const kalemler: {
+      id: string;
+      adet: number;
+      birimFiyat: number;   // kampanya indirimi uygulanmis, KDV dahil
+      listeFiyati: number;  // indirimsiz liste fiyati; indirim toplami icin
+      kdvOrani: number | null;
+      ad: string;
+    }[] = [];
 
     for (const item of body.items) {
       const adet = Math.floor(Number(item.quantity));
@@ -182,6 +244,10 @@ export async function POST(req: NextRequest) {
       const product = await prisma.product.findUnique({
         where: { id: item.id },
         include: {
+          // KDV orani kategoriden geliyor: fiyatlar KDV dahil oldugu icin bu
+          // oran toplami degistirmiyor, siparise yazilan KDV kirilimini
+          // dogru uretmeye yariyor.
+          category: { select: { kdvOrani: true } },
           campaigns: {
             where: {
               campaign: { active: true, startDate: { lte: simdi }, endDate: { gte: simdi } },
@@ -210,12 +276,35 @@ export async function POST(req: NextRequest) {
       const indirim = product.campaigns[0]?.discount ?? 0;
       const birimFiyat = Math.round(product.price * (1 - indirim / 100) * 100) / 100;
 
-      kalemler.push({ id: product.id, adet, birimFiyat, ad: product.name });
+      kalemler.push({
+        id: product.id,
+        adet,
+        birimFiyat,
+        listeFiyati: product.price,
+        kdvOrani: product.category?.kdvOrani ?? null,
+        ad: product.name,
+      });
     }
 
-    const { toplam: gercekToplam } = siparisToplami(
-      kalemler.reduce((t, k) => t + k.birimFiyat * k.adet, 0)
+    /**
+     * Tutar hesabi lib/fiyat.ts'te; sepet ve odeme sayfasi da ayni fonksiyonu
+     * cagiriyor, boylece musteriye gosterilen tutar ile siparise yazilan tutar
+     * tek kaynaktan geliyor.
+     *
+     * Fiyatlar KDV DAHILDIR: KDV toplama eklenmiyor, kalemlerin icinden kendi
+     * kategori oraniyla hesaplanip kirilim olarak saklaniyor. Onceden bu uc
+     * tum urunlere %10 EKLIYORDU; kartta 100 TL goren musteri 110 TL
+     * odiyordu ve bu, sitenin kendi "fiyatlar KDV dahildir" metinleriyle
+     * celisiyordu.
+     */
+    const tutar = siparisToplami(
+      kalemler.map((k) => ({ tutar: k.birimFiyat * k.adet, kdvOrani: k.kdvOrani }))
     );
+    const gercekToplam = tutar.toplam;
+    const indirimToplami =
+      Math.round(
+        kalemler.reduce((t, k) => t + (k.listeFiyati - k.birimFiyat) * k.adet, 0) * 100
+      ) / 100;
 
     // Calculate impact metrics
     const totalItemsCount = kalemler.reduce((sum, k) => sum + k.adet, 0);
@@ -253,9 +342,14 @@ export async function POST(req: NextRequest) {
           data: {
             orderNumber,
             status: 'PENDING',
+            customerId: musteri?.id ?? null,
             totalAmount: gercekToplam,
+            itemsTotal: tutar.urunToplami,
+            taxTotal: tutar.kdv,
+            shippingCost: tutar.kargo,
+            discountTotal: indirimToplami,
             paymentMethod: body.paymentMethod,
-            shippingAddress: body.shippingAddress,
+            shippingAddress: teslimatAdresi,
             notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
             items: {
               create: kalemler.map((k) => ({
@@ -331,9 +425,10 @@ export async function POST(req: NextRequest) {
       body.customerName,
       body.email,
       body.phone,
-      body.shippingAddress,
+      teslimatAdresi,
       gercekToplam,
-      orderWithItems?.items || []
+      orderWithItems?.items || [],
+      tutar.kdv
     );
 
     return NextResponse.json({
@@ -343,6 +438,10 @@ export async function POST(req: NextRequest) {
       orderNumber: orderWithItems?.orderNumber,
       status: orderWithItems?.status,
       totalAmount: orderWithItems?.totalAmount,
+      itemsTotal: orderWithItems?.itemsTotal,
+      taxTotal: orderWithItems?.taxTotal,
+      shippingCost: orderWithItems?.shippingCost,
+      discountTotal: orderWithItems?.discountTotal,
       paymentMethod: orderWithItems?.paymentMethod,
       shippingAddress: orderWithItems?.shippingAddress,
       items: orderWithItems?.items || [],
@@ -405,6 +504,10 @@ export async function GET(req: NextRequest) {
       orderNumber: order.orderNumber,
       status: order.status,
       totalAmount: order.totalAmount,
+      itemsTotal: order.itemsTotal,
+      taxTotal: order.taxTotal,
+      shippingCost: order.shippingCost,
+      discountTotal: order.discountTotal,
       paymentMethod: order.paymentMethod,
       shippingAddress: order.shippingAddress,
       notes: order.notes,

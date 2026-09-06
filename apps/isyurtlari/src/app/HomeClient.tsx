@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import PreOrderBadge from '@/components/PreOrderBadge';
+import UrunKarti from '@/components/UrunKarti';
 import HeroBackgroundVideo from '@/components/HeroBackgroundVideo';
 import {
   IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
@@ -392,44 +392,15 @@ export default function HomeClient({
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.filter(p => p.category).map((product) => (
-              <Link key={product.id} href={`/urun/${product.slug}${product.quantity === 0 ? '?on-talep=1' : ''}`}
-                className="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
-              >
-                <div className="relative h-44 bg-gradient-to-br from-orange-200 to-amber-200 flex items-center justify-center overflow-hidden">
-                  {product.imageUrl ? (
-                    <Image src={product.imageUrl} alt={product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-300" quality={75} placeholder="empty" />
-                  ) : (
-                    <span className="text-6xl group-hover:scale-110 transition-transform duration-300 select-none">
-                      {productEmojis[product.slug] ?? '📦'}
-                    </span>
-                  )}
-                  {product.quantity === 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="bg-red-500 text-gray-900 text-xs font-semibold px-3 py-1 rounded-full">Tükendi</span>
-                        <PreOrderBadge />
-                      </div>
-                    </div>
-                  )}
-                  {product.quantity > 0 && (
-                    <span className="absolute top-2 right-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded-md">YENİ</span>
-                  )}
-                </div>
-                <div className="p-3.5">
-                  <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider mb-1">{product.category?.name}</p>
-                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-[#BA4700] transition-colors leading-snug">{product.name}</h3>
-                  <div className="flex items-center gap-0.5 mt-1.5 mb-2">
-                    {[1,2,3,4,5].map((s) => <IconSuccess key={s} className="w-2.5 h-2.5 text-[#BA4700]" />)}
-                    <span className="text-[10px] text-gray-700 font-semibold ml-1">5.0</span>
-                  </div>
-                  {product.price > 0 ? (
-                    <p className="text-lg font-bold text-[#BA4700] tracking-tight">₺{product.price.toFixed(2)}</p>
-                  ) : (
-                    <p className="text-xs text-gray-600 italic font-medium">Fiyat belirleniyor</p>
-                  )}
-                </div>
-              </Link>
+            {products.filter(p => p.category).map((product, sira) => (
+              <UrunKarti
+                key={product.id}
+                urun={product}
+                kategoriGoster
+                favoriButonu={false}
+                gorselBoyutlari="(max-width: 768px) 50vw, 25vw"
+                gorselOncelikli={sira < 4}
+              />
             ))}
           </div>
         )}

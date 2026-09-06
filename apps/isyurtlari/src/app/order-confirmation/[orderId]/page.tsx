@@ -11,6 +11,12 @@ interface OrderData {
   orderNumber: string;
   status: string;
   totalAmount: number;
+  /** KDV dahil urun toplami. Bu alanlar eklenmeden onceki siparislerde bos. */
+  itemsTotal?: number | null;
+  /** totalAmount ICINDEKI KDV. Toplama ayrica eklenmez. */
+  taxTotal?: number | null;
+  shippingCost?: number | null;
+  discountTotal?: number | null;
   paymentMethod: string;
   shippingAddress: string;
   notes?: string;
@@ -155,6 +161,16 @@ export default function OrderConfirmationPage() {
                   <span className="text-gray-600">Toplam Tutar</span>
                   <span className="font-bold text-2xl text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</span>
                 </div>
+                {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden
+                    cikiyor. Eski siparislerde kirilim uretilmedigi icin
+                    taxTotal bos gelebilir; o durumda satir hic gosterilmiyor,
+                    uydurma bir rakam yazilmiyor. */}
+                {typeof order.taxTotal === 'number' && (
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Fiyatlara KDV dahildir (₺{order.taxTotal.toFixed(2)}). Kargo ücreti bu tutara
+                    dahil değildir; teslimat sırasında kargo firmasına ödenir.
+                  </p>
+                )}
               </div>
 
               {/* Order Items */}

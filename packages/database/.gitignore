@@ -1,0 +1,4 @@
+# Prisma, semanin yanindaki .env dosyasini kendiliginden okuyor.
+# Icinde DATABASE_URL var: depoya asla girmemeli.
+.env
+.env.local

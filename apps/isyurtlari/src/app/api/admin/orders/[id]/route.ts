@@ -7,9 +7,27 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (red) return red;
 
   const { status } = await req.json();
+
+  /**
+   * Teslim damgası.
+   *
+   * Cayma süresi SİPARİŞ tarihinden değil TESLİM tarihinden sayılıyor;
+   * durum DELIVERED'a çekildiğinde o anı kaydetmezsek 14 günlük pencere
+   * doğru hesaplanamaz. Bir kez yazılıyor: sipariş yanlışlıkla başka bir
+   * duruma alınıp tekrar DELIVERED yapılırsa süre baştan başlamamalı.
+   */
+  const mevcut = await prisma.order.findUnique({
+    where: { id: params.id },
+    select: { deliveredAt: true },
+  });
+
   const order = await prisma.order.update({
     where: { id: params.id },
-    data: { status },
+    data: {
+      status,
+      ...(status === 'DELIVERED' && !mevcut?.deliveredAt ? { deliveredAt: new Date() } : {}),
+    },
   });
+
   return NextResponse.json(order);
 }

@@ -14,8 +14,10 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   optimizeFonts: true,
 
-  // Image optimization for mobile
-  optimizeImages: true,
+  // Not: burada "optimizeImages: true" duruyordu. Next boyle bir secenek
+  // tanimiyor ve her derlemede "Unrecognized key(s) in object:
+  // 'optimizeImages'" uyarisi veriyordu; hicbir etkisi yoktu. Gorsel
+  // ayarlari asagidaki images bloğunda.
 
   async headers() {
     return [
@@ -58,8 +60,26 @@ const nextConfig = {
       //
       // /video ve ikon klasoru de disarida: asagida kendi uzun onbellek
       // kurallari var, ikisi birden uygulansa yine iki max-age yan yana gelirdi.
+      //
+      // _next/ de disarida ve bu ONEMLI. Buradaki desen onu kapsiyordu, yani
+      // /_next/static/chunks/*.js dosyalari da "1 saat sakla" basligiyla
+      // gidiyordu. Iki sonucu vardi:
+      //
+      //  1) Gelistirmede kirik sayfa. Kod degisince Next yeni parca adlariyla
+      //     yeni bir modul grafigi uretiyor, ama tarayici eski webpack.js'i
+      //     onbellekten servis etmeye devam ediyor; eski calisma zamani yeni
+      //     parcadaki modulu bulamayinca sayfa
+      //     "TypeError: Cannot read properties of undefined (reading 'call')"
+      //     ile duruyordu. .next klasorunu silmek ise yaramiyor - bayat dosya
+      //     diskte degil, tarayicida.
+      //
+      //  2) Canlida gereksiz indirme. _next/static dosyalarinin adi icerige
+      //     gore uretiliyor, yani icerik degisince ad da degisiyor. Next bu
+      //     yuzden onlara bir yil + immutable veriyor; buradaki kural o
+      //     basligin yanina ikinci bir Cache-Control ekleyip omru bir saate
+      //     dusuruyordu.
       {
-        source: '/((?!api/|sitemap\\.xml|video/|sosyal_giris_isyurtlari_icons/).*)',
+        source: '/((?!api/|_next/|sitemap\\.xml|video/|sosyal_giris_isyurtlari_icons/).*)',
         headers: [
           {
             key: 'Cache-Control',

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { IconCart, IconProductOrigin, IconContinueShopping } from '@/components/Icons';
 import { sepettenCikarildi } from '@/lib/analiz';
+import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
 
 interface Campaign {
   id: string;
@@ -21,6 +22,7 @@ interface CartItem {
   slug: string;
   imageUrl?: string;
   campaign?: Campaign | null;
+  kdvOrani?: number | null;
 }
 
 export default function CartPage() {
@@ -76,11 +78,24 @@ export default function CartPage() {
     return item.price;
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
   const originalSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Tutar hesabi lib/fiyat.ts'te: sepet, odeme sayfasi ve siparis ucu ayni
+  // fonksiyonu cagiriyor. Burada daha once "subtotal * 0.1" diye ayrica
+  // yazilmisti; iki yerde duran hesap birbirinden ayrisabiliyordu.
+  // Fiyatlar KDV dahil oldugu icin kdv toplama EKLENMIYOR, icinden cikiyor.
+  const {
+    urunToplami: subtotal,
+    kdv: tax,
+    kargo: shipping,
+    toplam: total,
+  } = siparisToplami(
+    cart.map((item) => ({
+      tutar: getItemPrice(item) * item.quantity,
+      kdvOrani: item.kdvOrani,
+    }))
+  );
   const totalDiscount = originalSubtotal - subtotal;
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
 
   if (loading) {
     return (
@@ -215,15 +230,27 @@ export default function CartPage() {
                     </div>
                   )}
                   <div className="flex justify-between text-gray-600">
-                    <span>KDV (%10)</span>
-                    <span>₺{tax.toFixed(2)}</span>
+                    <span>Kargo</span>
+                    <span className="font-semibold text-gray-700">
+                      {KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex justify-between text-xl font-bold text-gray-900 mb-6">
+                <div className="flex justify-between text-xl font-bold text-gray-900 mb-2">
                   <span>Toplam</span>
                   <span>₺{total.toFixed(2)}</span>
                 </div>
+
+                {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden
+                    cikiyor. Musteri odeme sayfasinda farkli bir tutarla
+                    karsilasmasin diye burada aciklaniyor. */}
+                <p className="text-xs leading-relaxed text-gray-500 mb-6">
+                  Fiyatlara KDV dahildir (₺{tax.toFixed(2)}).
+                  {KARGO_KARSI_ODEMELI
+                    ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.'
+                    : ''}
+                </p>
 
                 <button
                   onClick={() => router.push('/checkout')}

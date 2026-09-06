@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuHeart, LuShoppingCart, LuArrowLeft } from 'react-icons/lu';
+import { LuHeart, LuArrowLeft } from 'react-icons/lu';
 import { favorileriGetir, favoriyiCikar, FAVORI_OLAYI } from '@/lib/favoriler';
-import { sepeteEkle } from '@/lib/cart';
+import UrunKarti from '@/components/UrunKarti';
 
 /**
  * Favoriler sayfasi.
@@ -14,7 +14,12 @@ import { sepeteEkle } from '@/lib/cart';
  * zaman favori gosteremiyordu.
  *
  * Favoriler artik tarayicida (lib/favoriler.ts). Sayfa yalnizca urun
- * kimliklerini okuyup detaylari acik urun ucundan tamamliyor.
+ * kimliklerini okuyup detaylari urun ucundan tamamliyor.
+ *
+ * Bu sayfa onceden /api/products'i cagirip TUM katalogu indiriyor ve
+ * icinden favorileri ayikliyordu: on urun icin yuzlerce urunluk yanit.
+ * Artik /api/urunler'e yalnizca favori kimlikleri gonderiliyor; uc hem
+ * sadece o urunleri donuyor hem de gonderilen sirayi koruyor.
  */
 interface Urun {
   id: string;
@@ -23,62 +28,65 @@ interface Urun {
   price: number;
   quantity: number;
   imageUrl?: string | null;
-  category?: { name: string; slug: string };
+  category?: { name: string; slug: string; kdvOrani?: number } | null;
+  /** Kampanyali urunlerde indirimli fiyat kartta da gorunsun. */
+  campaign?: { discount: number; discountedPrice: number } | null;
+  puan?: number | null;
+  yorumSayisi?: number;
 }
 
-const productEmojis: Record<string, string> = {
-  'badem': '🌰', 'biber-receli': '🫙', 'peynir': '🧀', 'pirinc': '🍚',
-  'tereyag': '🧈', 'zeytinyag': '🫒', 'havlu-beyaz': '🛁', 'ahsap-sandalye': '🪑',
-};
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<Urun[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Favori listesi sekmeler arasinda degisebiliyor (FAVORI_OLAYI). Ust
+     * uste gelen istekler yaris kazanip eski listeyi ekrana basmasin diye
+     * her yuklemenin bir sirasi var; yalnizca en sonuncusu yaziyor.
+     */
+    let sonIstek = 0;
+    let iptal = false;
+
     const yukle = () => {
       const kimlikler = favorileriGetir();
+      const sira = ++sonIstek;
+
       if (kimlikler.length === 0) {
         setFavorites([]);
         setLoading(false);
         return;
       }
 
-      fetch('/api/products')
+      const adres = `/api/urunler?kimlikler=${encodeURIComponent(kimlikler.join(','))}&adet=${kimlikler.length}`;
+
+      fetch(adres, { cache: 'no-store' })
         .then((res) => res.json())
-        .then((veri: Urun[]) => {
-          const hepsi = Array.isArray(veri) ? veri : [];
-          // Sirasi favoriye eklenme sirasini korusun
-          setFavorites(
-            kimlikler
-              .map((id) => hepsi.find((u) => u.id === id))
-              .filter((u): u is Urun => Boolean(u))
-          );
+        .then((veri: { urunler?: Urun[] }) => {
+          if (iptal || sira !== sonIstek) return;
+          // Sira sunucuda korunuyor: gonderilen kimlik sirasi = favoriye
+          // eklenme sirasi.
+          setFavorites(Array.isArray(veri?.urunler) ? veri.urunler : []);
           setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch(() => {
+          if (iptal || sira !== sonIstek) return;
+          setLoading(false);
+        });
     };
 
     yukle();
     window.addEventListener(FAVORI_OLAYI, yukle);
-    return () => window.removeEventListener(FAVORI_OLAYI, yukle);
+    return () => {
+      iptal = true;
+      window.removeEventListener(FAVORI_OLAYI, yukle);
+    };
   }, []);
 
   const handleRemoveFavorite = (productId: string) => {
     favoriyiCikar(productId);
     setFavorites((mevcut) => mevcut.filter((u) => u.id !== productId));
-  };
-
-  const handleAddToCart = (product: Urun) => {
-    // lib/cart.ts stok/fiyat kontrolunu yapiyor ve GA olayini gonderiyor
-    sepeteEkle({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      slug: product.slug,
-      imageUrl: product.imageUrl,
-      quantity: product.quantity,
-    });
   };
 
   return (
@@ -122,64 +130,24 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {favorites.map((urun) => (
-              <div key={urun.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col">
-                {/* Image */}
-                <div className="relative h-40 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center overflow-hidden">
-                  {urun.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={urun.imageUrl}
-                      alt={urun.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-6xl">{productEmojis[urun.slug] ?? '📦'}</span>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="p-4 flex flex-col flex-1">
-                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-1">
-                    {urun.category?.name ?? 'Ürün'}
-                  </p>
-                  <Link
-                    href={`/urun/${urun.slug}`}
-                    className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-[#BA4700] transition mb-3"
-                  >
-                    {urun.name}
-                  </Link>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-                    {urun.price > 0 ? (
-                      <span className="text-lg font-bold text-[#BA4700]">₺{urun.price.toFixed(2)}</span>
-                    ) : (
-                      <span className="text-xs italic text-gray-400">Fiyat belirleniyor</span>
-                    )}
-                    {/* Stogu veya fiyati olmayan urun sepete eklenemez */}
-                    {urun.quantity > 0 && urun.price > 0 ? (
-                      <button
-                        onClick={() => handleAddToCart(urun)}
-                        className="w-8 h-8 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-lg flex items-center justify-center transition"
-                        title="Sepete ekle"
-                        aria-label={urun.name + ' sepete ekle'}
-                      >
-                        <LuShoppingCart size={15} strokeWidth={2} />
-                      </button>
-                    ) : (
-                      <span className="text-xs font-semibold text-red-600">
-                        {urun.quantity > 0 ? '' : 'Tükendi'}
-                      </span>
-                    )}
-                  </div>
-
+              <UrunKarti
+                key={urun.id}
+                urun={urun}
+                gorselYuksekligi="h-40"
+                gorselBoyutlari="(max-width: 768px) 50vw, 25vw"
+                kategoriGoster
+                favoriButonu={false}
+                sepetButonu
+                sarmalaLink={false}
+                altAlan={
                   <button
                     onClick={() => handleRemoveFavorite(urun.id)}
                     className="w-full mt-3 flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2 rounded-lg transition text-sm"
                   >
                     <LuHeart size={14} fill="currentColor" /> Favorilerden Çıkar
                   </button>
-                </div>
-              </div>
+                }
+              />
             ))}
           </div>
         )}

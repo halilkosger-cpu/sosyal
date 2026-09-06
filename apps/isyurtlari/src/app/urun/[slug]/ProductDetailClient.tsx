@@ -9,6 +9,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
 import { sepeteEkle } from '@/lib/cart';
 import { urunGoruntulendi } from '@/lib/analiz';
+import { useMusteri } from '@/lib/musteri-istemci';
 import {
   IconProductOrigin,
   IconVocationalTraining,
@@ -45,8 +46,14 @@ interface Product {
   price: number;
   quantity: number;
   imageUrl?: string;
-  category: { name: string; slug: string };
+  category: { name: string; slug: string; kdvOrani?: number };
   campaign?: Campaign;
+  /** Ana görsel başta olmak üzere ürün galerisi. */
+  galeri?: { url: string; alt: string }[];
+  ozellikler?: { ad: string; deger: string }[];
+  /** Onaylı yorumların ortalaması; yorum yoksa null. */
+  puan?: number | null;
+  yorumSayisi?: number;
 }
 
 const productValues: Record<string, string[]> = {
@@ -154,6 +161,11 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', text: '' });
   const [submittingReview, setSubmittingReview] = useState(false);
+  /** Galeride seçili görselin sırası. */
+  const [seciliGorsel, setSeciliGorsel] = useState(0);
+  /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
+  const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
+  const { musteri } = useMusteri();
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -207,6 +219,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
         imageUrl: product.imageUrl,
         quantity: product.quantity,
         campaign: product.campaign ?? null,
+        kdvOrani: product.category?.kdvOrani ?? null,
       },
       quantity
     );
@@ -237,6 +250,15 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
   const inStock = product.quantity > 0;
   const hasPrice = product.price > 0;
 
+  /** Uç galeri döndürmezse (eski önbellek, sunucudan gelen ilk veri) ana
+      görsele düşülüyor; sayfa hiçbir durumda görselsiz kalmıyor. */
+  const gorseller =
+    product.galeri && product.galeri.length > 0
+      ? product.galeri
+      : product.imageUrl
+        ? [{ url: product.imageUrl, alt: product.name }]
+        : [];
+
   return (
     <div className="store-shell">
 
@@ -260,16 +282,47 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       <div className="max-w-screen-xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* ─── IMAGE ─── */}
-          <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
-            {product.imageUrl ? (
-              <Image src={product.imageUrl} alt={product.name} fill className="object-cover" loading="lazy" quality={80} sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
-            ) : (
-              <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
-            )}
-            {!inStock && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <span className="bg-red-500 text-white text-lg font-bold px-6 py-2 rounded-full">Tükendi</span>
+          {/* ─── GÖRSEL GALERİSİ ───
+              Önceden tek görsel vardı. Galeri boşsa davranış aynı: ana
+              görsel gösteriliyor, küçük resim şeridi hiç çizilmiyor. */}
+          <div>
+            <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
+              {gorseller.length > 0 ? (
+                <Image
+                  src={gorseller[Math.min(seciliGorsel, gorseller.length - 1)].url}
+                  alt={gorseller[Math.min(seciliGorsel, gorseller.length - 1)].alt}
+                  fill
+                  className="object-cover"
+                  priority
+                  quality={80}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  placeholder="empty"
+                />
+              ) : (
+                <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
+              )}
+              {!inStock && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <span className="bg-red-500 text-white text-lg font-bold px-6 py-2 rounded-full">Tükendi</span>
+                </div>
+              )}
+            </div>
+
+            {gorseller.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                {gorseller.map((gorsel, sira) => (
+                  <button
+                    key={gorsel.url}
+                    onClick={() => setSeciliGorsel(sira)}
+                    aria-label={`${sira + 1}. görseli göster`}
+                    aria-current={sira === seciliGorsel}
+                    className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition ${
+                      sira === seciliGorsel ? 'border-[#FF6000]' : 'border-transparent hover:border-gray-300'
+                    }`}
+                  >
+                    <Image src={gorsel.url} alt="" fill className="object-cover" sizes="64px" placeholder="empty" />
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -311,6 +364,24 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                 💡 Bu ürün cezaevi hükümlülerinin {categoryPurpose[product.category.slug]?.purpose.toLowerCase() || 'meslek eğitimi'} görerek el emeğiyle üretmişlerdir. Her satın alma, topluma yeniden kazanılmalarına destek olur.
               </span>
             </p>
+
+            {/* ─── ÜRÜN ÖZELLİKLERİ ───
+                Ağırlık, malzeme, menşe gibi bilgiler. Girilmemişse blok hiç
+                çizilmiyor: boş bir "Özellikler" başlığı, bilgi olmadığını
+                söylemenin en kötü yolu. */}
+            {product.ozellikler && product.ozellikler.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
+                <h3 className="font-bold text-gray-900 mb-4">Ürün Özellikleri</h3>
+                <dl className="divide-y divide-gray-100">
+                  {product.ozellikler.map((ozellik) => (
+                    <div key={ozellik.ad} className="flex gap-4 py-2.5 text-sm">
+                      <dt className="w-40 flex-shrink-0 text-gray-500">{ozellik.ad}</dt>
+                      <dd className="flex-1 text-gray-900 font-medium">{ozellik.deger}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
 
             {/* Production Values */}
             <div className="bg-white border border-orange-200 rounded-2xl p-6 mb-6 shadow-sm">
@@ -357,7 +428,11 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                   <p className="text-4xl font-extrabold text-[#BA4700]">
                     ₺{product.campaign ? product.campaign.discountedPrice.toFixed(2) : product.price.toFixed(2)}
                   </p>
-                  <p className="text-xs text-gray-400 mt-2">KDV dahil · Ücretsiz kargo</p>
+                  {/* Burada "Ucretsiz kargo" yaziyordu; gonderiler karsi
+                      odemeli, yani kargo ucretsiz degil. Ayni sayfada ana
+                      sayfadaki aciklama ve sikca sorulan sorular dogru bilgiyi
+                      veriyordu - musteri iki farkli soz goruyordu. */}
+                  <p className="text-xs text-gray-400 mt-2">KDV dahil · Kargo karşı ödemeli</p>
                 </>
               ) : (
                 <div className="flex items-center gap-3">
@@ -645,34 +720,49 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
                     </button>
                     <button
                       onClick={async () => {
-                        if (!reviewForm.text.trim()) {
-                          alert('Yorum metni boş olamaz');
+                        setReviewMesaji(null);
+
+                        if (reviewForm.text.trim().length < 10) {
+                          setReviewMesaji({ tur: 'hata', metin: 'Yorum en az 10 karakter olmalı.' });
                           return;
                         }
+
                         setSubmittingReview(true);
                         try {
-                          const userId = localStorage.getItem('userId') || 'guest-' + Date.now();
+                          /**
+                           * Kimlik gönderilmiyor.
+                           *
+                           * Burada daha önce localStorage'dan okunan ya da
+                           * uydurulan bir "userId" ('guest-' + zaman damgası)
+                           * gövdeye konuyordu; uç da yazarı o alandan
+                           * okuyordu. Yani isteği düzenleyen biri başkasının
+                           * adına yorum bırakabiliyordu. Yazar artık sunucuda
+                           * oturumdan belirleniyor.
+                           */
                           const res = await fetch(`/api/products/${slug}/reviews`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                              userId,
                               rating: reviewForm.rating,
                               title: reviewForm.title || null,
                               text: reviewForm.text,
                             }),
                           });
 
+                          const veri = await res.json().catch(() => ({}));
+
                           if (res.ok) {
-                            alert('✅ Yorumunuz alındı! Admin onayı sonrasında yayımlanacak.');
+                            setReviewMesaji({
+                              tur: 'ok',
+                              metin: veri.mesaj || 'Yorumunuz alındı. İncelendikten sonra yayınlanacak.',
+                            });
                             setReviewFormOpen(false);
                             setReviewForm({ rating: 5, title: '', text: '' });
                           } else {
-                            const error = await res.json();
-                            alert('❌ ' + (error.error || 'Yorum gönderilemedi'));
+                            setReviewMesaji({ tur: 'hata', metin: veri.error || 'Yorum gönderilemedi' });
                           }
-                        } catch (error) {
-                          alert('❌ Bir hata oluştu');
+                        } catch {
+                          setReviewMesaji({ tur: 'hata', metin: 'Bağlantı hatası. Lütfen tekrar deneyin.' });
                         } finally {
                           setSubmittingReview(false);
                         }
@@ -688,19 +778,90 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
             </div>
           )}
 
-          {/* Write review CTA */}
+          {/* Yorum formunun sonucu. Onceden alert() ile gosteriliyordu; tarayici
+              kaplamasi hem sayfayi kilitliyor hem mesaji kaybediyordu. */}
+          {reviewMesaji && (
+            <div
+              className={`mt-8 rounded-2xl border px-5 py-4 text-sm ${
+                reviewMesaji.tur === 'ok'
+                  ? 'bg-green-50 border-green-200 text-green-800'
+                  : 'bg-red-50 border-red-200 text-red-700'
+              }`}
+            >
+              {reviewMesaji.metin}
+            </div>
+          )}
+
+          {/* Yorum yazma cagrisi.
+              Yorum yazmak icin giris sart: yazarin kimligi oturumdan
+              belirleniyor ve yalnizca urunu satin almis musteri yazabiliyor. */}
           <div className="mt-8 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-6 text-center">
             <h3 className="font-bold text-gray-900 mb-2">Siz de Yorum Yapın</h3>
-            <p className="text-sm text-gray-600 mb-4">Bu ürünü satın aldıysanız deneyiminizi diğer müşterilerle paylaşın</p>
-            <button
-              onClick={() => setReviewFormOpen(true)}
-              className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
-            >
-              Yorum Yaz ⭐
-            </button>
+            <p className="text-sm text-gray-600 mb-4">
+              {musteri
+                ? 'Bu ürünü satın aldıysanız deneyiminizi diğer müşterilerle paylaşın'
+                : 'Yorum yazmak için giriş yapın. Yalnızca satın aldığınız ürünlere yorum yazabilirsiniz.'}
+            </p>
+            {musteri ? (
+              <button
+                onClick={() => {
+                  setReviewMesaji(null);
+                  setReviewFormOpen(true);
+                }}
+                className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
+              >
+                Yorum Yaz
+              </button>
+            ) : (
+              <Link
+                href={`/giris?devam=/urun/${slug}`}
+                className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
+              >
+                Giriş Yap
+              </Link>
+            )}
           </div>
         </div>
       </div>
+
+      {/* ─── MOBİLDE SABİT SATIN ALMA BARI ───
+          Ürün sayfası uzun: açıklama, üretim değerleri, özellikler, yorumlar.
+          Mobilde aşağı inen müşteri fiyatı ve sepete ekleme düğmesini
+          kaybediyordu; geri dönmek için yukarı kaydırmak gerekiyordu.
+          Çubuk alt gezinmenin üstünde duruyor (bottom-16). */}
+      {hasPrice && inStock && (
+        <div
+          className="md:hidden fixed bottom-16 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3"
+          style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+        >
+          <div className="min-w-0 flex-1">
+            {product.campaign ? (
+              <>
+                <p className="text-[11px] text-gray-400 line-through leading-none">
+                  ₺{product.price.toFixed(2)}
+                </p>
+                <p className="text-lg font-bold text-red-600 leading-tight">
+                  ₺{product.campaign.discountedPrice.toFixed(2)}
+                </p>
+              </>
+            ) : (
+              <p className="text-lg font-bold text-[#BA4700] leading-tight">
+                ₺{product.price.toFixed(2)}
+              </p>
+            )}
+            <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli</p>
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold text-white transition-colors ${
+              added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'
+            }`}
+          >
+            {added ? 'Sepete eklendi' : 'Sepete Ekle'}
+          </button>
+        </div>
+      )}
 
       <div className="h-8" />
     </div>

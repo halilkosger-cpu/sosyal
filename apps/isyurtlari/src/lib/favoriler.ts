@@ -27,6 +27,16 @@ function oku(): string[] {
   }
 }
 
+/**
+ * Favori listesini tumuyle degistirir.
+ *
+ * Disari aciliyor: giris yapildiginda SenkronKopru, cihazdaki listeyle
+ * sunucudakini birlestirip sonucu buraya yaziyor.
+ */
+export function favorileriYaz(liste: string[]): void {
+  yaz(liste);
+}
+
 function yaz(liste: string[]): void {
   try {
     localStorage.setItem(ANAHTAR, JSON.stringify(liste));
