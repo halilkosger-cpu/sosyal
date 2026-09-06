@@ -163,6 +163,8 @@ export interface OturumdakiMusteri {
   name: string;
   phone: string | null;
   emailVerified: Date | null;
+  /** Ticari elektronik ileti izni. Null ise tanitim e-postasi gonderilmez. */
+  iletiIzniAt: Date | null;
 }
 
 /**
@@ -181,7 +183,16 @@ export async function oturumdakiMusteri(): Promise<OturumdakiMusteri | null> {
       where: { tokenHash: jetonOzeti(jeton) },
       include: {
         customer: {
-          select: { id: true, email: true, name: true, phone: true, emailVerified: true, status: true },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+            emailVerified: true,
+            status: true,
+            // Hesap sayfasindaki tanitim e-postasi tercihi bu alani okuyor.
+            iletiIzniAt: true,
+          },
         },
       },
     });

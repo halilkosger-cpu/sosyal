@@ -20,6 +20,8 @@ export interface Musteri {
   name: string;
   phone: string | null;
   emailVerified: string | null;
+  /** Ticari elektronik ileti izni. Null ise tanitim e-postasi gonderilmiyor. */
+  iletiIzniAt?: string | null;
 }
 
 export const MUSTERI_OLAYI = 'musteriDegisti';

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
+import { KARGO_FIRMALARI } from '@/lib/kargo';
 
 interface OrderItem { quantity: number; price: number; product?: { name: string }; }
 interface Order {
@@ -9,6 +10,9 @@ interface Order {
   paymentMethod: string; shippingAddress: string; createdAt: string;
   user?: { name: string; email: string } | null;
   items: OrderItem[];
+  kargoFirmasi?: string | null;
+  kargoTakipNo?: string | null;
+  shippedAt?: string | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; Icon: React.ElementType }> = {
@@ -37,15 +41,53 @@ export default function AdminOrdersPage() {
 
   useEffect(() => { load(); }, []);
 
-  const updateStatus = async (id: string, status: string) => {
+  /**
+   * Kargo bilgisi taslagi.
+   *
+   * Siparis basina firma + takip numarasi; kaydedilene kadar burada
+   * tutuluyor ki her tusta istek gitmesin.
+   */
+  const [kargoTaslak, setKargoTaslak] = useState<Record<string, { firma: string; takipNo: string }>>({});
+
+  const kargoAlanlari = (order: Order) =>
+    kargoTaslak[order.id] ?? {
+      firma: order.kargoFirmasi ?? '',
+      takipNo: order.kargoTakipNo ?? '',
+    };
+
+  const siparisGuncelle = async (id: string, govde: Record<string, unknown>) => {
     setUpdating(id);
-    await fetch(`/api/admin/orders/${id}`, {
+    const yanit = await fetch(`/api/admin/orders/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(govde),
     });
+    if (!yanit.ok) {
+      const veri = await yanit.json().catch(() => ({}));
+      alert(veri.error || 'Sipariş güncellenemedi');
+    }
     load();
     setUpdating(null);
+  };
+
+  const updateStatus = (id: string, status: string) => siparisGuncelle(id, { status });
+
+  /**
+   * Kargo bilgisi kaydedilirken siparis SHIPPED degilse otomatik olarak
+   * oraya cekiliyor: takip numarasi girildiyse gonderi zaten yola cikmis
+   * demektir, iki ayri tusa basmayi beklemek gereksiz.
+   */
+  const kargoKaydet = (order: Order) => {
+    const { firma, takipNo } = kargoAlanlari(order);
+    const durumIlerlesin =
+      takipNo.trim() !== '' && order.status !== 'SHIPPED' && order.status !== 'DELIVERED'
+        ? { status: 'SHIPPED' }
+        : {};
+    return siparisGuncelle(order.id, {
+      kargoFirmasi: firma || null,
+      kargoTakipNo: takipNo.trim() || null,
+      ...durumIlerlesin,
+    });
   };
 
   const filtered = filter === 'ALL' ? orders : orders.filter((o) => o.status === filter);
@@ -137,6 +179,54 @@ export default function AdminOrdersPage() {
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Teslimat Adresi</p>
                       <p className="text-sm text-gray-700">{order.shippingAddress}</p>
                     </div>
+
+                    {/* Kargo */}
+                    {order.status !== 'CANCELLED' && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                          Kargo Takibi
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <select
+                            value={kargoAlanlari(order).firma}
+                            onChange={(e) =>
+                              setKargoTaslak((o) => ({
+                                ...o,
+                                [order.id]: { ...kargoAlanlari(order), firma: e.target.value },
+                              }))
+                            }
+                            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+                          >
+                            <option value="">Kargo firması seçin</option>
+                            {KARGO_FIRMALARI.map((f) => (
+                              <option key={f.kod} value={f.kod}>{f.ad}</option>
+                            ))}
+                          </select>
+                          <input
+                            value={kargoAlanlari(order).takipNo}
+                            onChange={(e) =>
+                              setKargoTaslak((o) => ({
+                                ...o,
+                                [order.id]: { ...kargoAlanlari(order), takipNo: e.target.value },
+                              }))
+                            }
+                            placeholder="Takip numarası"
+                            className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono w-52"
+                          />
+                          <button
+                            onClick={() => kargoKaydet(order)}
+                            disabled={updating === order.id}
+                            className="bg-gray-900 hover:bg-gray-700 disabled:bg-gray-400 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                          >
+                            Kaydet
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1.5">
+                          Takip numarası girilirse sipariş "Gönderildi" durumuna geçer ve müşteri
+                          bu bilgiyi siparişlerim sayfasında görür.
+                        </p>
+                      </div>
+                    )}
 
                     {/* Status update */}
                     {order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && (

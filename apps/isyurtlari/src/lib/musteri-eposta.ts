@@ -144,3 +144,76 @@ export async function sifirlamaEpostasiGonder(
     console.error('Şifre sıfırlama e-postası gönderilemedi:', error);
   }
 }
+
+/**
+ * Terk edilmiş sepet hatırlatması.
+ *
+ * ─── DİĞER E-POSTALARDAN FARKI ───────────────────────────────────────
+ *
+ * Doğrulama ve şifre sıfırlama e-postaları müşterinin kendi isteğiyle
+ * tetiklenen "işlemsel" iletiler. Bu ise TİCARİ ELEKTRONİK İLETİ: müşteri
+ * istemeden gönderiliyor ve satın almaya yönlendiriyor. Türkiye'de
+ * 6563 sayılı kanun bunu önceden onaya bağlıyor ve her iletide kolay bir
+ * ret imkânı zorunlu kılıyor.
+ *
+ * Bu yüzden iki şey burada değil, çağıran tarafta güvence altında:
+ *  - İzin kontrolü (Customer.iletiIzniAt) - bkz. lib/terk-edilmis-sepet.ts
+ *  - Ret bağlantısı - imzalı ve kalıcı, bkz. lib/ileti-izni.ts
+ *
+ * Şablon da farklı: alt bilgide "bu isteği siz yapmadıysanız yok sayın"
+ * demek burada anlamsız; ret bağlantısı olmalı.
+ */
+export async function sepetHatirlatmaEpostasiGonder(
+  eposta: string,
+  ad: string,
+  urunAdlari: string[],
+  sepetBaglantisi: string,
+  retBaglantisi: string
+): Promise<boolean> {
+  const resend = resendIstemcisi();
+
+  const liste = urunAdlari
+    .slice(0, 5)
+    .map((u) => `<li style="margin:0 0 4px;">${u}</li>`)
+    .join('');
+  const kalan = urunAdlari.length > 5 ? `<p style="font-size:14px;color:#6b7280;margin:8px 0 0;">ve ${urunAdlari.length - 5} ürün daha</p>` : '';
+
+  if (!resend) {
+    console.log(`[sepet] Hatırlatma (${eposta}): ${sepetBaglantisi} | ret: ${retBaglantisi}`);
+    return true;
+  }
+
+  try {
+    await resend.emails.send({
+      from: GONDERICI,
+      to: eposta,
+      subject: 'Sepetinizde ürünler duruyor',
+      html: `
+  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1f2937;">
+    <h2 style="color:#CC4E00;font-size:20px;margin:0 0 16px;">Merhaba ${ad}</h2>
+    <p style="font-size:15px;line-height:1.6;margin:0 0 16px;">
+      Sepetinizde bıraktığınız ürünler hâlâ sizi bekliyor:
+    </p>
+    <ul style="font-size:15px;line-height:1.6;margin:0 0 8px;padding-left:20px;">${liste}</ul>
+    ${kalan}
+    <p style="margin:24px 0;">
+      <a href="${sepetBaglantisi}" style="display:inline-block;background:#CC4E00;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;font-size:15px;">Sepetime dön</a>
+    </p>
+    <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0 0 8px;">
+      Stoklar sınırlıdır; ürünlerin sepetinizde kalması ayrılmış olduğu anlamına gelmez.
+      Gönderiler karşı ödemelidir, kargo ücreti teslimat sırasında kargo firmasına ödenir.
+    </p>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
+    <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:0;">
+      Bu e-postayı, ticari elektronik ileti almayı kabul ettiğiniz için aldınız.
+      <a href="${retBaglantisi}" style="color:#6b7280;">Bu tür e-postaları almayı bırakmak için tıklayın.</a>
+      <br>isyurtlari.com.tr
+    </p>
+  </div>`,
+    });
+    return true;
+  } catch (error) {
+    console.error('Sepet hatırlatma e-postası gönderilemedi:', error);
+    return false;
+  }
+}

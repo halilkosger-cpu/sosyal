@@ -48,6 +48,11 @@ export async function POST(req: NextRequest) {
         paymentMethod: true,
         createdAt: true,
         notes: true,
+        // Kargo takibi: misafir siparisleri de gonderiyi izleyebilmeli.
+        kargoFirmasi: true,
+        kargoTakipNo: true,
+        shippedAt: true,
+        deliveredAt: true,
         items: {
           select: {
             id: true,

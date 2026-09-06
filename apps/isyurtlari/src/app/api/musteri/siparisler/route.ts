@@ -43,6 +43,11 @@ export async function GET(req: NextRequest) {
           paymentMethod: true,
           shippingAddress: true,
           createdAt: true,
+          // Kargo takibi
+          kargoFirmasi: true,
+          kargoTakipNo: true,
+          shippedAt: true,
+          deliveredAt: true,
           items: {
             select: {
               id: true,

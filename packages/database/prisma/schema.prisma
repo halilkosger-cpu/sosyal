@@ -648,6 +648,14 @@ model Cart {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  /// Terk edilmis sepet hatirlatmasinin gonderildigi an.
+  ///
+  /// Ayni sepet icin ikinci kez hatirlatma gonderilmesin diye tutuluyor.
+  /// Musteri sepete dokununca updatedAt ileri gidiyor; hatirlatma damgasi
+  /// updatedAt'in gerisinde kalinca sepet yeniden "hatirlatilabilir"
+  /// oluyor. Boylece her terk edilis icin en fazla bir e-posta gidiyor.
+  hatirlatmaGonderildiAt DateTime?
+
   user     User?     @relation(fields: [userId],     references: [id], onDelete: Cascade)
   customer Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items    CartItem[]
@@ -722,6 +730,19 @@ model Order {
   taxTotal        Float?
   /// Fatura adresi. Bos ise teslimat adresi ile ayni kabul edilir.
   billingAddress  String?
+
+  // ─── Kargo ────────────────────────────────────────────────────────
+  //
+  // Kargo karsi odemeli gonderiliyor, ama gonderinin nerede oldugunu
+  // musteriye soyleyen hicbir sey yoktu: siparis "Gonderildi" durumuna
+  // geciyor, musteri takip numarasini hicbir yerde goremiyordu.
+
+  /// Kargo firmasinin kodu (bkz. lib/kargo.ts). Ornek: "ptt", "yurtici".
+  kargoFirmasi    String?
+  /// Kargo takip / barkod numarasi.
+  kargoTakipNo    String?
+  /// Siparisin kargoya verildigi an. Durum SHIPPED'a cekildiginde yaziliyor.
+  shippedAt       DateTime?
 
   /// Siparisin teslim edildigi an.
   ///

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LuArrowLeft, LuUser, LuPackage, LuHeart, LuMapPin, LuRotateCcw, LuShieldCheck, LuLogOut, LuMailCheck } from 'react-icons/lu';
+import { LuArrowLeft, LuUser, LuPackage, LuHeart, LuMapPin, LuRotateCcw, LuShieldCheck, LuLogOut, LuMailCheck, LuMail } from 'react-icons/lu';
 import { cikisYap, useMusteri } from '@/lib/musteri-istemci';
 
 /**
@@ -18,6 +18,32 @@ export default function HesabimSayfasi() {
   const { musteri, yukleniyor } = useMusteri();
   const router = useRouter();
   const [cikiliyor, setCikiliyor] = useState(false);
+
+  /**
+   * Tanitim e-postasi tercihi.
+   *
+   * E-postadaki ret baglantisi yalniz KAPATABILIYOR (bkz.
+   * api/musteri/ileti-izni). Acma yolu burasi: yoksa bir kez listeden
+   * cikan musteri bir daha hicbir sekilde geri donemezdi.
+   */
+  const [izin, setIzin] = useState<boolean | null>(null);
+  const [izinIsleniyor, setIzinIsleniyor] = useState(false);
+
+  const izinDegistir = async (yeni: boolean) => {
+    setIzinIsleniyor(true);
+    try {
+      const yanit = await fetch('/api/musteri/ileti-izni', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ izin: yeni }),
+      });
+      if (yanit.ok) setIzin(yeni);
+    } catch {
+      // Sessiz gecmek yeterli: dugme eski halinde kalir.
+    } finally {
+      setIzinIsleniyor(false);
+    }
+  };
 
   if (yukleniyor) {
     return (
@@ -116,6 +142,43 @@ export default function HesabimSayfasi() {
                 </div>
               </div>
             )}
+
+            {/* Tanitim e-postasi tercihi */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <LuMail size={20} className="text-blue-700" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">E-posta Tercihleri</h2>
+              </div>
+
+              <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                Sepet hatırlatması ve kampanya duyurusu gibi tanıtım e-postaları. Sipariş
+                onayı, kargo bilgisi ve şifre sıfırlama e-postaları bu tercihten
+                etkilenmez; onlar tanıtım değil, siparişinizin işleyişidir.
+              </p>
+
+              {(() => {
+                const acik = izin ?? Boolean(musteri.iletiIzniAt);
+                return (
+                  <button
+                    onClick={() => izinDegistir(!acik)}
+                    disabled={izinIsleniyor}
+                    className={`text-sm font-semibold px-4 py-2.5 rounded-lg border transition disabled:opacity-50 ${
+                      acik
+                        ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                        : 'border-[#FF6000] bg-[#CC4E00] text-white hover:bg-[#A63F00]'
+                    }`}
+                  >
+                    {izinIsleniyor
+                      ? 'İşleniyor...'
+                      : acik
+                        ? 'Tanıtım e-postalarını durdur'
+                        : 'Tanıtım e-postalarını almak istiyorum'}
+                  </button>
+                );
+              })()}
+            </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center gap-3 mb-6">

@@ -18,6 +18,9 @@ import { useMusteri } from '@/lib/musteri-istemci';
  * Ayrica hesap acmak istemeyen musteri de siparisini takip edebilmeli.
  */
 
+import SiparisDurumu from '@/components/SiparisDurumu';
+import { SIPARIS_DURUM_METNI } from '@/lib/kargo';
+
 interface Kalem {
   id: string;
   quantity: number;
@@ -35,6 +38,11 @@ interface Siparis {
   createdAt: string;
   items: Kalem[];
   urunAdedi: number;
+  // Kargo takibi
+  kargoFirmasi?: string | null;
+  kargoTakipNo?: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
 }
 
 const durumStili: Record<string, { renk: string; arka: string; Ikon: React.ElementType }> = {
@@ -45,13 +53,14 @@ const durumStili: Record<string, { renk: string; arka: string; Ikon: React.Eleme
   CANCELLED: { renk: 'text-red-700', arka: 'bg-red-50 border-red-200', Ikon: LuPackage },
 };
 
-const durumMetni: Record<string, string> = {
-  PENDING: 'Ödeme Bekleniyor',
-  CONFIRMED: 'Ödeme Onaylandı',
-  SHIPPED: 'Gönderildi',
-  DELIVERED: 'Teslim Edildi',
-  CANCELLED: 'İptal Edildi',
-};
+/**
+ * Durum metinleri artik lib/kargo.ts'te, tek yerde.
+ *
+ * Buradaki tablo "Odeme Bekleniyor" / "Odeme Onaylandi" diyordu. Kargo
+ * karsi odemeli: musteri site uzerinden hicbir odeme yapmiyor, bekleyen
+ * bir odeme yok. Musteri "odemem mi eksik?" diye dusunuyordu.
+ */
+const durumMetni = SIPARIS_DURUM_METNI as Record<string, string>;
 
 function SiparisKarti({ siparis }: { siparis: Siparis }) {
   const stil = durumStili[siparis.status];
@@ -77,6 +86,14 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
           </span>
         </div>
       </div>
+
+      <SiparisDurumu
+        durum={siparis.status}
+        kargoKodu={siparis.kargoFirmasi}
+        takipNo={siparis.kargoTakipNo}
+        kargoyaVerilme={siparis.shippedAt}
+        teslimEdilme={siparis.deliveredAt}
+      />
 
       <div className="mb-4 space-y-3 border-b border-gray-200 pb-4">
         <p className="text-sm font-semibold text-gray-700">{siparis.urunAdedi} ürün</p>
