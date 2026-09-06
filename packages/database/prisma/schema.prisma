@@ -443,8 +443,20 @@ model Customer {
 
   /// KVKK aydinlatma metnine onay verildigi an. Onaysiz kayit olusturulmuyor.
   kvkkOnayAt    DateTime
-  /// Ticari elektronik ileti (pazarlama e-postasi) izni. Ayri ve istege bagli.
+  /// Ticari elektronik ileti (pazarlama e-postasi) izni verildigi an.
+  /// Ayri ve istege bagli; KVKK onayiyla ayni sey degil.
   iletiIzniAt   DateTime?
+  /// Iznin geri alindigi an.
+  ///
+  /// Ret, iletiIzniAt'i SIFIRLAYARAK degil ayri bir damgayla tutuluyor:
+  /// sifirlamak "izin hic verilmemis" ile "izin verilmis, sonra geri
+  /// alinmis" durumlarini ayirt edilemez hale getirir ve iznin ne zaman
+  /// alindigi kaydini siler. Ticari ileti mevzuati bu kayitlarin
+  /// saklanmasini bekliyor.
+  ///
+  /// Izin GECERLI sayilir: iletiIzniAt dolu VE (iletiRetAt bos VEYA
+  /// iletiRetAt < iletiIzniAt). Yani en son hangisi olduysa o gecerli.
+  iletiRetAt    DateTime?
 
   /// Sosyal platform hesabiyla eslesme. Simdilik kullanilmiyor; tek girise
   /// gecilirse doldurulacak.
@@ -723,7 +735,17 @@ model Order {
   /// KDV dahil urun toplami (kampanya indirimi uygulanmis hali).
   itemsTotal      Float?
   /// Kampanya indirimlerinin toplami. Bilgi amacli; totalAmount'a dahil degil.
+  ///
+  /// Kampanya indirimi urun fiyatinin ICINDE: kalem fiyati zaten indirimli
+  /// yaziliyor. Bu alan yalnizca "ne kadar kazandiniz" bilgisini tasiyor.
   discountTotal   Float         @default(0)
+
+  /// Kullanilan kupon kodu. Kupon sonradan silinse bile siparisin uzerinde
+  /// hangi kodun kullanildigi kalsin diye metin olarak da yaziliyor.
+  kuponKodu       String?
+  /// Kuponun sagladigi indirim. discountTotal'in aksine bu tutar
+  /// totalAmount'tan DUSULMUSTUR.
+  kuponIndirimi   Float         @default(0)
   /// Siparise eklenen kargo bedeli. Kargo karsi odemeli oldugu surece 0.
   shippingCost    Float         @default(0)
   /// itemsTotal ICINDEKI KDV. Toplama ayrica eklenmez.
@@ -754,6 +776,7 @@ model Order {
   user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   customer    Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
   items       OrderItem[]
+  kuponKullanimi KuponKullanimi?
   returns     Return[]
   payment     Payment?    @relation(fields: [paymentId], references: [id])
 
@@ -1049,4 +1072,81 @@ model DenetimKaydi {
   @@index([olusturulma])
   @@index([eposta, olusturulma])
   @@index([islem, olusturulma])
+}
+
+// ─── KUPONLAR ─────────────────────────────────────────────────
+enum KuponTuru {
+  YUZDE   // Sepetin yuzdesi
+  TUTAR   // Sabit TL indirimi
+}
+
+/// Indirim kuponu.
+///
+/// Kampanyalardan farki: kampanya urune bagli ve herkese acik, kupon ise
+/// bir KODA bagli ve kullanim hakki sinirli. Ikisi birlikte de calisabilir -
+/// kupon, kampanya indirimi uygulanmis tutarin uzerine iniyor.
+model Kupon {
+  id            String     @id @default(cuid())
+  /// Her zaman BUYUK harf ve bosluksuz saklaniyor; dogrulama da oyle
+  /// yapiliyor, boylece "yaz25" ile "YAZ25" ayni kupon.
+  kod           String     @unique
+  tur           KuponTuru
+  /// YUZDE ise oran (10 = %10), TUTAR ise TL.
+  deger         Float
+
+  /// Yuzde kuponlarda azami indirim tutari. Bos ise sinirsiz.
+  /// %20'lik bir kuponun 10.000 TL'lik sepette 2.000 TL indirim yapmasini
+  /// istemeyebilirsiniz.
+  azamiIndirim  Float?
+  /// Asgari sepet tutari (KDV dahil urun toplami).
+  asgariTutar   Float      @default(0)
+
+  aktif         Boolean    @default(true)
+  baslangic     DateTime?
+  bitis         DateTime?
+
+  /// Toplam kullanim hakki. Bos ise sinirsiz.
+  azamiKullanim Int?
+  /// Ayni kisinin kac kez kullanabilecegi.
+  musteriBasina Int        @default(1)
+  /// Yalnizca hesabi olan musteriler kullanabilsin mi?
+  ///
+  /// Misafir siparislerinde kisi ancak e-postayla ayirt edilebiliyor ve
+  /// e-posta degistirmek bedava; kisi basina sinir orada zayif kaliyor.
+  hesapZorunlu  Boolean    @default(true)
+
+  /// Yonetim panelinde gorunen serbest not.
+  aciklama      String?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  kullanimlar   KuponKullanimi[]
+
+  @@index([aktif, bitis])
+}
+
+/// Kuponun bir siparişte kullanimi.
+///
+/// Kullanim sayisi Kupon uzerinde bir sayacta tutulmuyor; satirlar
+/// sayiliyor. Sayac tutmak, siparis iptal edildiginde ya da yaris
+/// durumunda gercekle uyusmayan bir sayi birakirdi.
+model KuponKullanimi {
+  id         String   @id @default(cuid())
+  kuponId    String
+  /// Her siparise en fazla bir kupon.
+  orderId    String   @unique
+  customerId String?
+  /// Misafir siparislerinde kisi basina siniri uygulayabilmek icin.
+  eposta     String
+  /// Bu siparişte saglanan indirim.
+  indirim    Float
+  createdAt  DateTime @default(now())
+
+  kupon Kupon @relation(fields: [kuponId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([kuponId])
+  @@index([customerId])
+  @@index([eposta])
 }

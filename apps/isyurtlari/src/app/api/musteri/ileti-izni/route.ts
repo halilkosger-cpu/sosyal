@@ -43,10 +43,13 @@ export async function POST(req: NextRequest) {
        * Aynı bağlantıyla izin açılabilseydi, bir kez sızan bağlantı
        * müşteriyi tekrar tekrar listeye ekleyebilirdi. Açma işlemi
        * oturum ister.
+       *
+       * Ret, iletiIzniAt sıfırlanarak değil ayrı bir damgayla işleniyor:
+       * iznin ne zaman alındığı kaydı silinmemeli (bkz. schema.prisma).
        */
       await prisma.customer.updateMany({
         where: { id: customerId },
-        data: { iletiIzniAt: null },
+        data: { iletiRetAt: new Date() },
       });
 
       return NextResponse.json({ ok: true, izin: false });
@@ -58,7 +61,12 @@ export async function POST(req: NextRequest) {
 
     await prisma.customer.update({
       where: { id: musteri.id },
-      data: { iletiIzniAt: istenen ? new Date() : null },
+      data: istenen
+        // Yeniden izin: izin damgası bugüne çekiliyor, ret damgası olduğu
+        // gibi kalıyor - geçmişte bir kez çıkmış olması kaydı silinmiyor.
+        // "İzinli mi" sorusu ikisinin hangisinin daha yeni olduğuna bakıyor.
+        ? { iletiIzniAt: new Date() }
+        : { iletiRetAt: new Date() },
     });
 
     return NextResponse.json({ ok: true, izin: istenen });

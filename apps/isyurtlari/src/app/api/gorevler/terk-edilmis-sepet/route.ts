@@ -35,8 +35,16 @@ export async function GET(req: NextRequest) {
 
   const kuru = req.nextUrl.searchParams.get('kuru') === '1';
 
+  /**
+   * Bekleme penceresi yalnızca kuru çalışmada değiştirilebiliyor. Gerçek
+   * gönderimde serbest bırakılsaydı, "sepete son dokunuştan 6 saat sonra"
+   * kuralı bir sorgu parametresiyle devre dışı kalırdı.
+   */
+  const saatHam = Number(req.nextUrl.searchParams.get('saat'));
+  const saat = kuru && Number.isFinite(saatHam) && saatHam >= 0 ? saatHam : undefined;
+
   try {
-    const sonuc = await terkEdilmisSepetleriHatirlat(epostaTabanAdresi(req), kuru);
+    const sonuc = await terkEdilmisSepetleriHatirlat(epostaTabanAdresi(req), kuru, saat);
     return NextResponse.json({ ok: true, kuruCalisma: kuru, ...sonuc });
   } catch (error) {
     console.error('Terk edilmiş sepet görevi başarısız:', error);

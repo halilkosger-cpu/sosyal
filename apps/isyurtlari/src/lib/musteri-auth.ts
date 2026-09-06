@@ -163,8 +163,10 @@ export interface OturumdakiMusteri {
   name: string;
   phone: string | null;
   emailVerified: Date | null;
-  /** Ticari elektronik ileti izni. Null ise tanitim e-postasi gonderilmez. */
+  /** Ticari elektronik ileti izninin verildigi an. */
   iletiIzniAt: Date | null;
+  /** Iznin geri alindigi an. Izinden yeniyse izin gecersizdir. */
+  iletiRetAt: Date | null;
 }
 
 /**
@@ -190,8 +192,9 @@ export async function oturumdakiMusteri(): Promise<OturumdakiMusteri | null> {
             phone: true,
             emailVerified: true,
             status: true,
-            // Hesap sayfasindaki tanitim e-postasi tercihi bu alani okuyor.
+            // Hesap sayfasindaki tanitim e-postasi tercihi bu alanlari okuyor.
             iletiIzniAt: true,
+            iletiRetAt: true,
           },
         },
       },

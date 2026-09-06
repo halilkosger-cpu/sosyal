@@ -8,6 +8,7 @@ import { LuInfo, LuMapPin, LuPlus } from 'react-icons/lu';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
+import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
 import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
@@ -57,6 +58,11 @@ export default function CheckoutPage() {
   const [seciliAdres, setSeciliAdres] = useState<string>('yeni');
   const [pageLoading, setPageLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [kuponKodu, setKuponKodu] = useState('');
+  const [uygulananKupon, setUygulananKupon] = useState('');
+  const [kuponIndirimi, setKuponIndirimi] = useState(0);
+  const [kuponMesaji, setKuponMesaji] = useState('');
+  const [kuponIsleniyor, setKuponIsleniyor] = useState(false);
   const [error, setError] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('TRANSFER');
   const [formData, setFormData] = useState({
@@ -139,18 +145,85 @@ export default function CheckoutPage() {
   // Tutar hesabi lib/fiyat.ts'te; siparis ucu de ayni fonksiyonu cagiriyor ki
   // musteriye gosterilen tutar ile siparise yazilan tutar ayrismasin.
   // Fiyatlar KDV dahil: kdv toplama eklenmiyor, icinden hesaplaniyor.
-  const {
-    urunToplami: subtotal,
-    kdv: tax,
-    kargo: shipping,
-    toplam: total,
-  } = siparisToplami(
+  const { urunToplami: subtotal, kargo: shipping } = siparisToplami(
     cart.map((item) => ({
       tutar: getItemPrice(item) * item.quantity,
       kdvOrani: item.kdvOrani,
     }))
   );
   const totalDiscount = originalSubtotal - subtotal;
+
+  /**
+   * Kupon.
+   *
+   * Buradaki indirim yalnızca GÖSTERİM içindir. Sipariş ucu kuponu
+   * kendisi yeniden doğrulayıp indirimi kendisi hesaplıyor; gövdede
+   * yalnızca kod gönderiliyor. İstemcinin hesapladığı bir indirime
+   * güvenilseydi, isteği elle düzenleyen biri istediği indirimi
+   * yazdırabilirdi.
+   *
+   * Tutar da toplamdan çıkarılarak değil YENİDEN hesaplanıyor.
+   *
+   * Fiyatlar KDV dahil ve oran kategoriye göre değişebiliyor. İndirimi
+   * toplamdan düşüp KDV'yi indirimsiz tutar üzerinden gösterseydik,
+   * ödeme sayfası gerçekte tahsil edilmeyen bir KDV yazardı ve sipariş
+   * ucunun yazdığı kırılımla uyuşmazdı. Dağıtım sipariş ucundakiyle aynı
+   * fonksiyon (lib/kupon-hesap.ts).
+   */
+  const kuponluTutar = siparisToplami(
+    indirimiKalemlereDagit(
+      cart.map((item) => ({
+        tutar: getItemPrice(item) * item.quantity,
+        kdvOrani: item.kdvOrani,
+      })),
+      kuponIndirimi
+    ).map((k) => ({ tutar: k.indirimliTutar, kdvOrani: k.kdvOrani }))
+  );
+  const kuponluToplam = kuponluTutar.toplam;
+  const kuponluKdv = kuponluTutar.kdv;
+
+  const kuponuUygula = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const kod = kuponKodu.trim();
+    if (!kod) return;
+
+    setKuponIsleniyor(true);
+    setKuponMesaji('');
+    try {
+      const yanit = await fetch('/api/kupon/dogrula', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kod,
+          kalemler: cart.map((k) => ({ id: k.id, adet: k.quantity })),
+          eposta: formData.email || undefined,
+        }),
+      });
+      const veri = await yanit.json().catch(() => ({}));
+
+      if (!yanit.ok || !veri.gecerli) {
+        setKuponIndirimi(0);
+        setUygulananKupon('');
+        setKuponMesaji(veri.mesaj || veri.error || 'Kupon kullanılamıyor');
+        return;
+      }
+
+      setKuponIndirimi(Number(veri.indirim) || 0);
+      setUygulananKupon(veri.kod || kod.toUpperCase());
+      setKuponMesaji(veri.mesaj || '');
+    } catch {
+      setKuponMesaji('Kupon kontrol edilemedi');
+    } finally {
+      setKuponIsleniyor(false);
+    }
+  };
+
+  const kuponuKaldir = () => {
+    setKuponKodu('');
+    setUygulananKupon('');
+    setKuponIndirimi(0);
+    setKuponMesaji('');
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -196,8 +269,9 @@ export default function CheckoutPage() {
             quantity: item.quantity,
             price: getItemPrice(item),
           })),
-          totalAmount: total,
+          totalAmount: kuponluToplam,
           paymentMethod,
+          ...(uygulananKupon ? { kuponKodu: uygulananKupon } : {}),
         }),
       });
 
@@ -224,7 +298,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             orderId: data.orderId,
             orderNumber: data.orderNumber,
-            totalAmount: total,
+            totalAmount: kuponluToplam,
             customerEmail: formData.email,
             customerName: formData.name,
           }),
@@ -551,15 +625,62 @@ export default function CheckoutPage() {
                     {KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}
                   </span>
                 </div>
+                {kuponIndirimi > 0 && (
+                  <div className="flex justify-between text-green-700 font-bold">
+                    <span>Kupon ({uygulananKupon})</span>
+                    <span>-₺{kuponIndirimi.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {/* Kupon alanı */}
+                <div className="pt-3 border-t border-gray-200">
+                  {uygulananKupon ? (
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-green-700 font-semibold">
+                        {kuponMesaji || 'Kupon uygulandı'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={kuponuKaldir}
+                        className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline"
+                      >
+                        Kaldır
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex gap-2">
+                        <input
+                          value={kuponKodu}
+                          onChange={(e) => setKuponKodu(e.target.value)}
+                          placeholder="Kupon kodu"
+                          className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono uppercase"
+                        />
+                        <button
+                          type="button"
+                          onClick={kuponuUygula}
+                          disabled={kuponIsleniyor || !kuponKodu.trim()}
+                          className="text-sm font-semibold px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition"
+                        >
+                          {kuponIsleniyor ? '...' : 'Uygula'}
+                        </button>
+                      </div>
+                      {kuponMesaji && (
+                        <p className="text-xs text-red-600 mt-1.5">{kuponMesaji}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
                   <span>Toplam</span>
-                  <span>₺{total.toFixed(2)}</span>
+                  <span>₺{kuponluToplam.toFixed(2)}</span>
                 </div>
                 {/* Fiyatlar KDV dahil oldugu icin KDV toplamin ustune
                     eklenmiyor; sepette gorulen tutar ile burada tahsil edilen
                     tutar ayni. */}
                 <p className="text-xs leading-relaxed text-gray-500">
-                  Fiyatlara KDV dahildir (₺{tax.toFixed(2)}).
+                  Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}).
                   {KARGO_KARSI_ODEMELI
                     ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.'
                     : ''}

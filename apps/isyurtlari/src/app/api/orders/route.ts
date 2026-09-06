@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
 import { siparisToplami } from '@/lib/fiyat';
+import { indirimiKalemlereDagit, kuponuDogrula } from '@/lib/kupon';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { adresiYazdir } from '@/lib/adres-dogrulama';
@@ -136,11 +137,20 @@ interface OrderRequest {
   items: { id: string; quantity: number; price: number }[];
   totalAmount: number;
   paymentMethod: 'CREDIT_CARD' | 'TRANSFER';
+  /** Kupon kodu. İndirim istemciden ALINMIYOR; sunucuda hesaplanıyor. */
+  kuponKodu?: string;
 }
 
 // Constants for impact calculations
 const TRAINING_HOURS_PER_ITEM = 5;
 const PRISONERS_PER_ITEM = 0.5; // 1 prisoner supported per 2 items
+
+/** Islem icinde kuponun hakki dolduysa firlatilir. */
+class KuponTukendi extends Error {
+  constructor() {
+    super('Kupon kullanim hakki doldu');
+  }
+}
 
 /** Islem icinde stok yetmediginde firlatilir; islemin geri alinmasini saglar. */
 class StokYetersiz extends Error {
@@ -297,8 +307,54 @@ export async function POST(req: NextRequest) {
      * odiyordu ve bu, sitenin kendi "fiyatlar KDV dahildir" metinleriyle
      * celisiyordu.
      */
+    const fiyatKalemleri = kalemler.map((k) => ({
+      tutar: k.birimFiyat * k.adet,
+      kdvOrani: k.kdvOrani,
+    }));
+
+    /**
+     * ─── KUPON ──────────────────────────────────────────────────────
+     *
+     * Doğrulama BURADA yeniden yapılıyor. Ödeme sayfası kuponu daha önce
+     * doğrulamış olabilir ama o an ile bu an arasında kupon tükenmiş,
+     * süresi dolmuş ya da kapatılmış olabilir. Gövdeden yalnızca KOD
+     * alınıyor; indirim tutarı istemciden asla kabul edilmiyor.
+     *
+     * İndirim kalemlere orantılı dağıtılıyor: fiyatlar KDV dahil ve oran
+     * kategoriye göre değişebiliyor, indirimi toplamdan düşüp KDV'yi
+     * indirimsiz tutardan hesaplasaydık siparişe gerçekte tahsil
+     * edilmeyen bir KDV yazılırdı.
+     */
+    const kuponKodu = String(body.kuponKodu ?? '').trim();
+    let kuponIndirimi = 0;
+    let kuponKimligi: string | null = null;
+    let kuponYazilanKod: string | null = null;
+
+    if (kuponKodu) {
+      const indirimsizToplam = siparisToplami(fiyatKalemleri).urunToplami;
+      const kuponSonucu = await kuponuDogrula({
+        kod: kuponKodu,
+        urunToplami: indirimsizToplam,
+        customerId: musteri?.id ?? null,
+        eposta: body.email,
+      });
+
+      if (!kuponSonucu.gecerli) {
+        // Sipariş sessizce kuponsuz oluşturulmuyor: müşteri indirimli tutarı
+        // görüp onayladı, farklı bir tutar tahsil etmek doğru olmaz.
+        return NextResponse.json({ error: kuponSonucu.mesaj }, { status: 400 });
+      }
+
+      kuponIndirimi = kuponSonucu.indirim;
+      kuponKimligi = kuponSonucu.kupon?.id ?? null;
+      kuponYazilanKod = kuponSonucu.kupon?.kod ?? null;
+    }
+
     const tutar = siparisToplami(
-      kalemler.map((k) => ({ tutar: k.birimFiyat * k.adet, kdvOrani: k.kdvOrani }))
+      indirimiKalemlereDagit(fiyatKalemleri, kuponIndirimi).map((k) => ({
+        tutar: k.indirimliTutar,
+        kdvOrani: k.kdvOrani,
+      }))
     );
     const gercekToplam = tutar.toplam;
     const indirimToplami =
@@ -348,6 +404,8 @@ export async function POST(req: NextRequest) {
             taxTotal: tutar.kdv,
             shippingCost: tutar.kargo,
             discountTotal: indirimToplami,
+            kuponKodu: kuponYazilanKod,
+            kuponIndirimi,
             paymentMethod: body.paymentMethod,
             shippingAddress: teslimatAdresi,
             notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
@@ -361,6 +419,41 @@ export async function POST(req: NextRequest) {
           },
           include: { items: { include: { product: true } } },
         });
+
+        /**
+         * Kupon kullanımı sipariş ile AYNI işlemde yazılıyor.
+         *
+         * Ayrı yazılsaydı, araya bir hata girdiğinde kupon kullanılmış
+         * sayılmadan sipariş oluşabilir ya da tersi olabilirdi. Aynı anda
+         * gelen iki sipariş son kullanım hakkını birlikte tüketebilir;
+         * bunu tamamen kapatmak kupon satırını kilitlemeyi gerektirir ve
+         * bu ölçekte gereksiz. Sayım işlem içinde tekrar edilerek pencere
+         * milisaniyelere indiriliyor.
+         */
+        if (kuponKimligi) {
+          const kupon = await tx.kupon.findUnique({
+            where: { id: kuponKimligi },
+            select: { azamiKullanim: true },
+          });
+          if (typeof kupon?.azamiKullanim === 'number') {
+            const kullanilan = await tx.kuponKullanimi.count({
+              where: { kuponId: kuponKimligi },
+            });
+            if (kullanilan >= kupon.azamiKullanim) {
+              throw new KuponTukendi();
+            }
+          }
+
+          await tx.kuponKullanimi.create({
+            data: {
+              kuponId: kuponKimligi,
+              orderId: order.id,
+              customerId: musteri?.id ?? null,
+              eposta: String(body.email).toLowerCase(),
+              indirim: kuponIndirimi,
+            },
+          });
+        }
 
         await tx.payment.create({
           data: {
@@ -406,6 +499,12 @@ export async function POST(req: NextRequest) {
             { status: 409 }
           );
         }
+        if (e instanceof KuponTukendi) {
+          return NextResponse.json(
+            { error: 'Kuponun kullanım hakkı bu sırada doldu. Kuponu kaldırıp tekrar deneyin.' },
+            { status: 409 }
+          );
+        }
         // P2002 = benzersizlik ihlali; numara kapilmis, bir sonrakini dene
         if ((e as { code?: string })?.code === 'P2002' && deneme < 4) continue;
         throw e;
@@ -442,6 +541,8 @@ export async function POST(req: NextRequest) {
       taxTotal: orderWithItems?.taxTotal,
       shippingCost: orderWithItems?.shippingCost,
       discountTotal: orderWithItems?.discountTotal,
+      kuponKodu: orderWithItems?.kuponKodu,
+      kuponIndirimi: orderWithItems?.kuponIndirimi,
       paymentMethod: orderWithItems?.paymentMethod,
       shippingAddress: orderWithItems?.shippingAddress,
       items: orderWithItems?.items || [],
@@ -508,6 +609,8 @@ export async function GET(req: NextRequest) {
       taxTotal: order.taxTotal,
       shippingCost: order.shippingCost,
       discountTotal: order.discountTotal,
+      kuponKodu: order.kuponKodu,
+      kuponIndirimi: order.kuponIndirimi,
       paymentMethod: order.paymentMethod,
       shippingAddress: order.shippingAddress,
       notes: order.notes,

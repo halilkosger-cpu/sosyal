@@ -159,7 +159,13 @@ export default function HesabimSayfasi() {
               </p>
 
               {(() => {
-                const acik = izin ?? Boolean(musteri.iletiIzniAt);
+                /**
+                 * Izin gecerli mi? Ret ayri bir damgada tutuluyor; en son
+                 * hangisi olduysa o gecerli (bkz. schema.prisma).
+                 */
+                const verildi = musteri.iletiIzniAt ? Date.parse(musteri.iletiIzniAt) : 0;
+                const geriAlindi = musteri.iletiRetAt ? Date.parse(musteri.iletiRetAt) : 0;
+                const acik = izin ?? (verildi > 0 && verildi > geriAlindi);
                 return (
                   <button
                     onClick={() => izinDegistir(!acik)}

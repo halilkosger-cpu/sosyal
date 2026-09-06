@@ -1,4 +1,4 @@
-import { prisma } from '@isyurtlari/database';
+import { prisma, Prisma } from '@isyurtlari/database';
 import { sepetHatirlatmaEpostasiGonder } from '@/lib/musteri-eposta';
 import { iletiRetBaglantisi } from '@/lib/ileti-izni';
 
@@ -9,9 +9,10 @@ import { iletiRetBaglantisi } from '@/lib/ileti-izni';
  *
  * Buradaki asıl iş göndermek değil, GÖNDERMEMEK. Elemeler sırayla:
  *
- *  1. İzin. Bu bir ticari elektronik ileti; Customer.iletiIzniAt boşsa
- *     gönderilmez. Kayıt sırasında bu onay ayrı ve isteğe bağlı alınıyor -
- *     KVKK onayıyla aynı şey değil, karıştırılmamalı.
+ *  1. İzin. Bu bir ticari elektronik ileti; izin yoksa gönderilmez. Kayıt
+ *     sırasında bu onay ayrı ve isteğe bağlı alınıyor - KVKK onayıyla aynı
+ *     şey değil, karıştırılmamalı. İzin geri alınmış olabilir; ret damgası
+ *     izinden sonraysa izin geçersizdir (bkz. IZINLI_KOSULU).
  *  2. Doğrulanmamış e-posta. Adresin gerçekten müşteriye ait olduğunu
  *     bilmiyorsak pazarlama e-postası göndermeyiz.
  *  3. Kapalı hesap.
@@ -35,18 +36,52 @@ export const EN_COK_GUN = 7;
 /** Tek çalışmada gönderilecek azami e-posta. */
 export const CALISMA_BASINA_AZAMI = 50;
 
+/**
+ * Ticari ileti gönderilebilecek müşteri koşulu.
+ *
+ * İzin geri alınabiliyor ve ret ayrı bir damgada tutuluyor (izin kaydını
+ * silmemek için, bkz. schema.prisma). Bu yüzden "izinli" demek tek bir
+ * alana bakmak değil: izin damgası dolu olmalı VE ret damgası ya boş
+ * olmalı ya da izinden ÖNCE olmalı - müşteri çıkıp sonra geri dönmüş
+ * olabilir.
+ */
+export const IZINLI_KOSULU: Prisma.CustomerWhereInput = {
+  iletiIzniAt: { not: null },
+  emailVerified: { not: null },
+  status: 'ACTIVE',
+  // İki alanı birbiriyle karşılaştırma: Prisma'nın alan referansı.
+  OR: [{ iletiRetAt: null }, { iletiRetAt: { lt: prisma.customer.fields.iletiIzniAt } }],
+};
+
 export interface HatirlatmaSonucu {
   incelenen: number;
   gonderilen: number;
   atlanan: { sebep: string; adet: number }[];
+  /**
+   * Kuru çalışmada elemelerin nerede daraldığını gösterir.
+   *
+   * "Hiç e-posta gitmedi" tek başına iki farklı şey anlamına gelebiliyor:
+   * kural doğru çalışıp kimseyi seçmemiş olabilir ya da sorgu yanlış
+   * olabilir. Bu sayılar ikisini ayırt ediyor.
+   */
+  tani?: Record<string, number>;
 }
 
+/**
+ * `enAzSaat` yalnızca KURU ÇALIŞMADA değiştirilebiliyor (bkz. görev ucu).
+ *
+ * Kuralların gerçekten çalıştığını canlıda görmenin tek yolu, pencereyi
+ * daraltıp hangi sepetlerin uygun olduğuna bakmak. Gerçek gönderimde bunu
+ * serbest bırakmak, altı saatlik bekleme kuralını bir sorgu parametresiyle
+ * devre dışı bırakılabilir hale getirirdi.
+ */
 export async function terkEdilmisSepetleriHatirlat(
   tabanAdresi: string,
-  kuruCalisma = false
+  kuruCalisma = false,
+  enAzSaat = EN_AZ_SAAT
 ): Promise<HatirlatmaSonucu> {
   const simdi = Date.now();
-  const enGec = new Date(simdi - EN_AZ_SAAT * 3600_000);
+  const enGec = new Date(simdi - (kuruCalisma ? enAzSaat : EN_AZ_SAAT) * 3600_000);
   const enErken = new Date(simdi - EN_COK_GUN * 86400_000);
 
   const atlananlar = new Map<string, number>();
@@ -57,12 +92,8 @@ export async function terkEdilmisSepetleriHatirlat(
       customerId: { not: null },
       updatedAt: { lte: enGec, gte: enErken },
       items: { some: {} },
-      customer: {
-        // 1, 2, 3 numaralı elemeler sorguda: izinsiz kaydı hiç çekmiyoruz.
-        iletiIzniAt: { not: null },
-        emailVerified: { not: null },
-        status: 'ACTIVE',
-      },
+      // 1, 2, 3 numaralı elemeler sorguda: izinsiz kaydı hiç çekmiyoruz.
+      customer: IZINLI_KOSULU,
     },
     orderBy: { updatedAt: 'asc' },
     take: CALISMA_BASINA_AZAMI * 3,
@@ -80,6 +111,26 @@ export async function terkEdilmisSepetleriHatirlat(
       },
     },
   });
+
+  /** Kuru çalışmada elemelerin her adımda kaç sepet bıraktığı. */
+  let tani: Record<string, number> | undefined;
+  if (kuruCalisma) {
+    const musteriSepeti: Prisma.CartWhereInput = { customerId: { not: null }, items: { some: {} } };
+    const [hepsi, izinli, pencerede] = await Promise.all([
+      prisma.cart.count({ where: musteriSepeti }),
+      prisma.cart.count({
+        where: { ...musteriSepeti, customer: IZINLI_KOSULU },
+      }),
+      prisma.cart.count({
+        where: { ...musteriSepeti, updatedAt: { lte: enGec, gte: enErken } },
+      }),
+    ]);
+    tani = {
+      'dolu musteri sepeti': hepsi,
+      'izinli ve dogrulanmis': izinli,
+      'zaman penceresinde': pencerede,
+    };
+  }
 
   let gonderilen = 0;
 
@@ -153,5 +204,6 @@ export async function terkEdilmisSepetleriHatirlat(
     incelenen: sepetler.length,
     gonderilen,
     atlanan: [...atlananlar.entries()].map(([sebep, adet]) => ({ sebep, adet })),
+    ...(tani ? { tani } : {}),
   };
 }
