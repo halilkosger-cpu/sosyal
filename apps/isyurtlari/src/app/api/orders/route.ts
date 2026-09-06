@@ -595,11 +595,29 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Sipariş bulunamadı' }, { status: 404 });
     }
 
-    // Bu uc kimlik dogrulamasi istemiyor: misafir siparisi veren musteri de
-    // onay sayfasini gorebilmeli. Erisim, tahmin edilmesi zor siparis
-    // kimligine dayaniyor. Bu yuzden yaniti sayfanin ihtiyaci kadar
-    // tutuyoruz - `...order` ile tum kaydi dokmek userId, paymentId gibi
-    // sayfanin kullanmadigi alanlari da disari veriyordu.
+    /**
+     * Bu uc kimlik dogrulamasi istemiyor: misafir siparisi veren musteri de
+     * onay sayfasini gorebilmeli. Erisim, tahmin edilmesi zor siparis
+     * kimligine dayaniyor.
+     *
+     * NOT ALANI DISARI VERILMIYOR.
+     *
+     * Order.notes su bicimde yaziliyor:
+     *   "Musteri: <ad> | Email: <eposta> | Telefon: <telefon>"
+     * Yani musterinin adi, e-postasi ve telefonu. Bu alan yanitta
+     * doniyordu ve uc kimlik dogrulamadigi icin siparis kimligini ele
+     * geciren HERKES bu bilgileri okuyabiliyordu; kimlik adres cubugunda
+     * (/order-confirmation/<id>), tarayici gecmisinde, referrer
+     * basliklarinda ve paylasilan baglantilarda goruunuyor.
+     *
+     * Onay sayfasi bu alani zaten hic cizmiyor - yalnizca tipinde
+     * tanimliydi. Kardes uc /api/siparis-sorgula ayni alani bilerek
+     * ayikliyor, ustelik orada sahiplik kaniti olarak e-posta da
+     * isteniyor.
+     *
+     * Teslimat adresi kaliyor: onay sayfasi onu gosteriyor ve siparis
+     * kimligi burada bir yetki anahtari islevi goruyor.
+     */
     return NextResponse.json({
       id: order.id,
       orderNumber: order.orderNumber,
@@ -613,7 +631,6 @@ export async function GET(req: NextRequest) {
       kuponIndirimi: order.kuponIndirimi,
       paymentMethod: order.paymentMethod,
       shippingAddress: order.shippingAddress,
-      notes: order.notes,
       createdAt: order.createdAt,
       items: order.items || [],
       orderItems: order.items || [],

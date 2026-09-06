@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
 import {
+  SITE_URL,
   absoluteUrl,
   breadcrumbJsonLd,
   defaultOpenGraphImage,
@@ -193,6 +194,37 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
                 itemCondition: 'https://schema.org/NewCondition',
+                // Organization dugumunun kimligiyle BIREBIR ayni olmali; lib/seo.ts
+                // onu `${SITE_URL}/#organization` olarak yaziyor. absoluteUrl('/')
+                // sondaki egik cizgiyi dusurdugu icin burada SITE_URL kullaniliyor,
+                // yoksa referans hicbir dugume baglanmazdi.
+                seller: { '@id': `${SITE_URL}/#organization` },
+
+                /**
+                 * Iade kosullari.
+                 *
+                 * Degerler uydurulmadi; sitenin kendi metninden geliyor
+                 * (/teslimat-iade-sartlari): "teslim tarihinden itibaren 14
+                 * gun icinde hicbir neden belirtmeksizin iade edebilirsiniz".
+                 * lib/iade.ts'teki CAYMA_GUN de ayni sayiyi kullaniyor.
+                 *
+                 * returnFees BILEREK YAZILMIYOR: iade kargo bedelini kimin
+                 * odedigi sayfa metninde net degil. Bilmedigimiz bir sarti
+                 * arama motoruna beyan etmektense alani hic yazmamak dogru -
+                 * yanlis beyan, musteriye verilmis bir soz gibi degerlendirilir.
+                 *
+                 * priceValidUntil de yok: fiyatlarin bir bitis tarihi yok ve
+                 * uydurma bir tarih yazmak "bu fiyat su tarihe kadar gecerli"
+                 * demek olurdu. Google bunu uyari olarak isaretler, hata
+                 * olarak degil.
+                 */
+                hasMerchantReturnPolicy: {
+                  '@type': 'MerchantReturnPolicy',
+                  applicableCountry: 'TR',
+                  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                  merchantReturnDays: 14,
+                  returnMethod: 'https://schema.org/ReturnByMail',
+                },
               },
             }
           : {}),

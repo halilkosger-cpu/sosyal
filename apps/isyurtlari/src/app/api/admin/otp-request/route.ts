@@ -41,7 +41,17 @@ export async function POST(req: NextRequest) {
     const code = generateOTP();
     await storeOTP(email, code);
 
-    console.log(`OTP for ${email}: ${code}`);
+    /**
+     * Kod KAYITLARA YAZILMIYOR.
+     *
+     * Burada kodu duz metin olarak console.log ile yazan bir satir vardi.
+     * lib/otp.ts kodu bilerek yalnizca SHA-256 ozetiyle sakliyor
+     * ("veritabani okunsa bile kod ele gecmesin"); o satir bu tasarimi tek
+     * basina gecersiz kiliyordu. Vercel calisma zamani kayitlarini
+     * gorebilen herkes - ekip uyesi, log entegrasyonu, destek icin
+     * paylasilan bir ekran - 10 dakikalik pencere icinde kodu kullanip
+     * yonetici olabilirdi.
+     */
 
     // Send OTP email
     const result = await resend.emails.send({

@@ -1,0 +1,23 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /_next
+Disallow: /hesabim
+Disallow: /siparislerim
+Disallow: /checkout
+Disallow: /sepet
+Disallow: /favoriler
+Disallow: /order-confirmation
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /ara?
+
+User-Agent: AhrefsBot
+User-Agent: SemrushBot
+User-Agent: DotBot
+User-Agent: MJ12bot
+Disallow: /
+
+Host: https://isyurtlari.com.tr
+Sitemap: https://isyurtlari.com.tr/sitemap.xml

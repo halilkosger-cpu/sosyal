@@ -1,45 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
-
-export async function POST(req: NextRequest) {
-  try {
-    const { password } = await req.json();
-
-    if (!password || !process.env.ADMIN_PASSWORD) {
-      return NextResponse.json({ error: 'Hatalı şifre' }, { status: 401 });
-    }
-
-    // Compare password (plain text for now)
-    if (password !== process.env.ADMIN_PASSWORD) {
-      return NextResponse.json({ error: 'Hatalı şifre' }, { status: 401 });
-    }
-
-    // Create JWT token
-    const token = jwt.sign(
-      { admin: true, iat: Math.floor(Date.now() / 1000) },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    const res = NextResponse.json({ ok: true });
-    console.log('Setting cookie with token:', token.substring(0, 20) + '...');
-    res.cookies.set('admin-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60, // 1 saat
-      path: '/',
-    });
-    console.log('Cookie set, response headers:', res.headers);
-    return res;
-  } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ error: 'Giriş hatası' }, { status: 500 });
-  }
-}
-
+/**
+ * Yonetici oturumunu kapatir.
+ *
+ * ─── PAROLA ILE GIRIS KALDIRILDI ──────────────────────────────────────
+ *
+ * Bu dosyada bir POST ucu vardi: gövdedeki parolayi ADMIN_PASSWORD ortam
+ * degiskeniyle karsilastirip, OTP akisinin urettigiyle BIREBIR AYNI
+ * { admin: true } jetonunu veriyordu. Uc sorunluydu:
+ *
+ *  1. Iki faktorlu dogrulamayi tamamen atliyordu. E-postaya kod gonderme,
+ *     kodun ozetle saklanmasi, 5 deneme siniri, denetim kaydi - hepsi
+ *     (api/admin/otp-request, otp-verify, lib/otp.ts) bu uc dururken
+ *     istege bagli bir susten ibaretti.
+ *  2. Hiz siniri yoktu. Sitedeki tek sinirsiz kimlik dogrulama ucuydu;
+ *     tek bir IP'den sinirsiz parola denemesi yapilabiliyordu. Giris
+ *     denemeleri denetim gunlugune de yazilmiyordu, yani iz birakmiyordu.
+ *  3. Parola duz metin karsilastiriliyor ve ortamda duz metin
+ *     tutuluyordu; ustelik uretilen jetonun bir kismi ve Set-Cookie
+ *     basligini iceren yanit basliklari console.log ile kayitlara
+ *     yaziliyordu.
+ *
+ * Yonetim paneli giris sayfasi (app/admin/login/page.tsx) bu ucu zaten
+ * cagirmiyor; yalnizca OTP akisini kullaniyor. Uc olulmustu ama acik
+ * duruyordu.
+ *
+ * Cikis ucu duruyor: panel cikis dugmesi bunu cagiriyor.
+ */
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
   res.cookies.delete('admin-token');

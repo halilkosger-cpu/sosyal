@@ -89,16 +89,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ─── Kayıt: aynı kişi aynı ürüne tekrar talep verirse adedi güncelle ───
+    /**
+     * ─── AYNI KISI AYNI URUNE TEKRAR TALEP VERIRSE ────────────────────
+     *
+     * Bu uc kimlik dogrulamiyor; "kim" sorusunun tek cevabi govdedeki
+     * e-posta. Eskiden mevcut kayit bulununca ad, telefon, adet ve not
+     * alanlarinin hepsi ustune yaziliyordu. Iki sonucu vardi:
+     *
+     *  1. Veri bozma. Bir baskasinin e-postasini yazan biri, o kisinin
+     *     kayitli ad ve telefonunu degistirebiliyordu; yonetim paneli ve
+     *     stok planlama ozeti bundan sonra saldirganin yazdigi iletisim
+     *     bilgisini gosterirdi.
+     *  2. Varlik sorgulama. Yanittaki `updated: true`, o e-postanin TAM
+     *     OLARAK o urune bekleyen bir talebi oldugunu kanitliyordu. Urun
+     *     kimlikleri herkese acik donuyor; bir adres listesiyle "kim
+     *     neye talep vermis" haritasi cikarilabilirdi.
+     *
+     * Artik mevcut kayitta yalnizca ADET guncelleniyor ve yalnizca
+     * BUYUYORSA. Ad, telefon ve not ilk kaydedildigi gibi kaliyor -
+     * dogru bilgiyi ilk yazan, kaydi gercekten kendi acan kisidir.
+     * Yanit da her iki durumda ayni; disaridan ayirt edilemiyor.
+     */
     const existing = await prisma.preOrder.findFirst({
       where: { productId, email, status: 'WAITING' },
-      select: { id: true },
+      select: { id: true, quantity: true },
     });
 
     const preOrder = existing
       ? await prisma.preOrder.update({
           where: { id: existing.id },
-          data: { quantity, name, phone, note: note || null },
+          data: { quantity: Math.max(existing.quantity, quantity) },
         })
       : await prisma.preOrder.create({
           data: {
@@ -147,7 +167,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: true, id: preOrder.id, updated: Boolean(existing) },
+      // `updated` alani kaldirildi: bir e-postanin o urune talebi olup
+      // olmadigini disariya soyluyordu (yukaridaki aciklama).
+      { success: true, id: preOrder.id },
       { status: 201 }
     );
   } catch (error) {
