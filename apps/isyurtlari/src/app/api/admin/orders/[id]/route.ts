@@ -2,6 +2,7 @@ import { prisma } from '@isyurtlari/database';
 import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
 import { logAudit } from '@/lib/audit-log';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
+import { icerikTazele } from '@/lib/kategoriler';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -56,6 +57,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         shippedAt: true,
         kargoFirmasi: true,
         kargoTakipNo: true,
+        items: { select: { productId: true, quantity: true } },
       },
     });
 
@@ -77,16 +79,53 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
      * "6 Eylül'de kargoya verildi" demek yanlış olurdu.
      */
     const kargoyaYeniVerildi = status === 'SHIPPED' && mevcut.status !== 'SHIPPED';
-    const order = await prisma.order.update({
-      where: { id: params.id },
-      data: {
-        ...(status !== undefined ? { status } : {}),
-        ...(kargoFirmasi !== undefined ? { kargoFirmasi } : {}),
-        ...(kargoTakipNo !== undefined ? { kargoTakipNo } : {}),
-        ...(status === 'DELIVERED' && !mevcut.deliveredAt ? { deliveredAt: new Date() } : {}),
-        ...(kargoyaYeniVerildi ? { shippedAt: new Date() } : {}),
-      },
+    /**
+     * ─── IPTALDE STOK IADESI ──────────────────────────────────────────
+     *
+     * Siparis olusurken stok dusuluyor (bkz. api/orders). Iptal edildiginde
+     * geri yuklenmiyordu: iptal edilen her siparis stogu kalici olarak
+     * eritiyordu. Sonucu, satilabilecek urunun sitede "tukendi" gorunmesi.
+     *
+     * Geri yukleme KOSULLU: yalnizca siparis daha kargoya VERILMEDIYSE.
+     * Kargoya verilmis ya da teslim edilmis bir siparis iptal edildiginde
+     * urun depoda degil, yolda veya musteride. Stogu geri yazmak olmayan
+     * urunu satisa acardi - asiri satisa yol acan hayali stok. O durumda
+     * urun fiilen geri geldiginde stok yonetim panelinden elle
+     * duzeltilmeli.
+     *
+     * Zaten iptal edilmis bir siparis tekrar iptal edilirse stok ikinci kez
+     * yazilmiyor: kosul onceki durumun IPTAL OLMAMASINI ariyor.
+     */
+    const stokGeriYuklensin =
+      status === 'CANCELLED' &&
+      mevcut.status !== 'CANCELLED' &&
+      mevcut.status !== 'SHIPPED' &&
+      mevcut.status !== 'DELIVERED';
+
+    const order = await prisma.$transaction(async (tx) => {
+      if (stokGeriYuklensin) {
+        for (const kalem of mevcut.items) {
+          await tx.product.update({
+            where: { id: kalem.productId },
+            data: { quantity: { increment: kalem.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { id: params.id },
+        data: {
+          ...(status !== undefined ? { status } : {}),
+          ...(kargoFirmasi !== undefined ? { kargoFirmasi } : {}),
+          ...(kargoTakipNo !== undefined ? { kargoTakipNo } : {}),
+          ...(status === 'DELIVERED' && !mevcut.deliveredAt ? { deliveredAt: new Date() } : {}),
+          ...(kargoyaYeniVerildi ? { shippedAt: new Date() } : {}),
+        },
+      });
     });
+
+    // Stok degistiyse kategori ve urun sayfalari tazelensin (ISR).
+    if (stokGeriYuklensin) icerikTazele();
 
     /**
      * Sipariş durumu ve kargo bilgisi müşteriye görünen, paraya dokunan
@@ -95,7 +134,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
      */
     const degisiklikler: string[] = [];
     if (status !== undefined && status !== mevcut.status) {
-      degisiklikler.push(`durum ${mevcut.status} -> ${status}`);
+      degisiklikler.push(
+        `durum ${mevcut.status} -> ${status}` +
+          (stokGeriYuklensin ? ` (stok iade edildi: ${mevcut.items.length} kalem)` : '')
+      );
     }
     if (kargoFirmasi !== undefined && kargoFirmasi !== mevcut.kargoFirmasi) {
       degisiklikler.push(`kargo firması ${mevcut.kargoFirmasi ?? '-'} -> ${kargoFirmasi ?? '-'}`);
