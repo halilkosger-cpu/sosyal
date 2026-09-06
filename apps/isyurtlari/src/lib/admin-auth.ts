@@ -36,3 +36,28 @@ export function yetkisiz() {
 export function adminGuard(req: NextRequest) {
   return isAdminRequest(req) ? null : yetkisiz();
 }
+
+/**
+ * Oturumdaki yöneticinin e-postası.
+ *
+ * Denetim günlüğü "kim" sorusunu cevaplayabilmeli. Kayıtlar önceden
+ * sabit "admin" dizesiyle yazılıyordu; jeton zaten e-postayı taşıyor
+ * (bkz. api/admin/otp-verify), okumamak için bir sebep yok.
+ *
+ * Jeton yoksa ya da geçersizse null döner - çağıran taraf bunu
+ * "bilinmeyen" olarak yazar. Yetki kontrolü bu işlevin görevi değil;
+ * onun için adminGuard var.
+ */
+export function adminEpostasi(req: NextRequest): string | null {
+  const token = req.cookies.get('admin-token')?.value;
+  if (!token) return null;
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (typeof payload !== 'object' || payload === null) return null;
+    const eposta = (payload as { email?: unknown }).email;
+    return typeof eposta === 'string' && eposta ? eposta : null;
+  } catch {
+    return null;
+  }
+}

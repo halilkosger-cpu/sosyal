@@ -66,4 +66,26 @@ export const kategorileriGetir = unstable_cache(
 export function icerikTazele() {
   revalidateTag(KATEGORI_ETIKETI);
   revalidatePath('/sitemap.xml');
+
+  /**
+   * Kategori sayfalari artik ISR ile saklaniyor (bkz. [categorySlug]/page.tsx,
+   * revalidate = 300). Tazelenmezse yonetim panelinden eklenen urun bes
+   * dakikaya kadar kategori sayfasinda gorunmezdi. 'page' turu bu rotanin
+   * TUM ornekleri icin gecerli - her kategori slug'ini tek tek saymak
+   * gerekmiyor.
+   */
+  revalidatePath('/[categorySlug]', 'page');
+
+  /**
+   * Ana sayfa ve urun sayfalari da ISR ile saklaniyor. 'page' turu bir
+   * rotanin TUM ornekleri icin gecerli; her urun slug'ini tek tek saymak
+   * gerekmiyor.
+   *
+   * Dikkat: bu islev ISR'nin dogru calismasinin sarti. Fiyat guncelleme ve
+   * kampanya uclari onceden bunu HIC cagirmiyordu - force-dynamic oldugu
+   * icin fark edilmiyordu, sayfa zaten her istekte yeniden uretiliyordu.
+   * ISR'ye gecerken o uclara da eklendi.
+   */
+  revalidatePath('/');
+  revalidatePath('/urun/[slug]', 'page');
 }

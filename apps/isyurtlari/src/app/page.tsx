@@ -2,7 +2,19 @@ import { prisma } from '@isyurtlari/database';
 import HomeClient from './HomeClient';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+/**
+ * Ana sayfa her istekte yeniden üretilmiyor.
+ *
+ * `force-dynamic` her ziyarette üç veritabanı sorgusu demekti (kategoriler,
+ * son ürünler, kampanyalar) - üstelik sitenin en çok ziyaret edilen
+ * sayfasında. Katalog günde birkaç kez değişiyor, ziyaretçi sayısı üç ayda
+ * %3000 arttı; bu takas artık mantıklı değil.
+ *
+ * Yönetim panelinden ürün, kategori, fiyat ya da kampanya değiştiğinde
+ * icerikTazele() çağrılıyor (bkz. lib/kategoriler.ts) ve sayfa anında
+ * tazeleniyor. Beş dakika bir gecikme değil, yalnızca üst sınır.
+ */
+export const revalidate = 300;
 
 /**
  * Ana sayfanin basligi ve aciklamasi BILEREK kok layout'tan miras aliniyor.

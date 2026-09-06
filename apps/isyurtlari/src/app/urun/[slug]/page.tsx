@@ -10,7 +10,31 @@ import {
   truncate,
 } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+/**
+ * Ürün sayfaları da ISR ile saklanıyor; gerekçe ana sayfadakiyle aynı.
+ *
+ * Stok ve fiyat yapısal veride (Product/Offer) yer aldığı için tazelenmesi
+ * önemli: yönetim panelindeki her değişiklik icerikTazele() ile bu rotayı
+ * da düşürüyor, yani beş dakika yalnızca hiçbir değişiklik olmadığında
+ * geçerli bir üst sınır.
+ */
+export const revalidate = 300;
+
+/**
+ * Ürünler derleme anında biliniyor; sayfaları önceden üretiliyor.
+ * dynamicParams varsayılan olarak açık: sonradan eklenen ürün ilk istekte
+ * üretilir, 404 vermez.
+ */
+export async function generateStaticParams() {
+  if (!hasDatabaseUrl()) return [];
+  try {
+    const urunler = await prisma.product.findMany({ select: { slug: true } });
+    return urunler.map((u) => ({ slug: u.slug }));
+  } catch (error) {
+    console.error('Ürün slug listesi alınamadı:', error);
+    return [];
+  }
+}
 
 type ProductPageProps = {
   params: {

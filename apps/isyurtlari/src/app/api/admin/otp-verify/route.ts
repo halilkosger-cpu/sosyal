@@ -30,12 +30,12 @@ export async function POST(req: NextRequest) {
     // oldugu icin sunucusuz ortamda gercekten isliyor.
     const sinir = await hizSiniriGuard(req, 'otp-verify', 10, 60);
     if (sinir) {
-      logAudit('OTP_VERIFY', email, 'failed', 'Rate limit exceeded', ip);
+      await logAudit('OTP_VERIFY', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
     }
 
     if (email !== ADMIN_EMAIL) {
-      logAudit('OTP_VERIFY', email, 'failed', 'Unauthorized email', ip);
+      await logAudit('OTP_VERIFY', email, 'failed', 'Yetkisiz e-posta', ip);
       return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     if (!isValid) {
       const remaining = await getRemainingAttempts(email);
-      logAudit('OTP_VERIFY', email, 'failed', `Invalid code. Remaining: ${remaining}`, ip);
+      await logAudit('OTP_VERIFY', email, 'failed', `Hatalı kod. Kalan deneme: ${remaining}`, ip);
       if (remaining <= 0) {
         return NextResponse.json(
           { error: 'Maksimum deneme sayısı aşıldı. Lütfen yeni kod isteyin.' },
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       path: '/',
     });
 
-    logAudit('OTP_VERIFY', email, 'success', 'Admin login successful', ip);
+    await logAudit('OTP_VERIFY', email, 'success', 'Yönetici girişi başarılı', ip);
 
     // Suresi gecmis kodlari ara sira temizle
     await kodlariTemizle();
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error) {
     console.error('OTP verification error:', error);
-    logAudit('OTP_VERIFY', email, 'failed', String(error), ip);
+    await logAudit('OTP_VERIFY', email, 'failed', String(error), ip);
     return NextResponse.json(
       { error: 'Doğrulama başarısız' },
       { status: 500 }

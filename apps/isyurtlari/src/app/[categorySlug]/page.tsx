@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
@@ -12,7 +13,42 @@ import {
   truncate,
 } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+/**
+ * Kategori sayfaları artık her istekte yeniden üretilmiyor.
+ *
+ * `dynamic = 'force-dynamic'` her ziyarette dört ayrı veritabanı sorgusu
+ * demekti - kategori, ürünler, kategori listesi ve sayımlar. Site üç ayda
+ * %3000 ziyaretçi büyümesi gördü; katalog ise günde birkaç kez değişiyor.
+ * Her ziyaretçiye taze sorgu atmak, değişmeyen bir sayfa için ödenen boşuna
+ * bir bedel.
+ *
+ * Yerine ISR: sayfa üretilip beş dakika saklanıyor. Yönetim panelinden ürün
+ * ya da kategori değiştiğinde icerikTazele() zaten çağrılıyor (bkz.
+ * lib/kategoriler.ts) ve sayfa anında tazeleniyor - yani beş dakika bir
+ * gecikme değil, yalnızca üst sınır.
+ *
+ * Stok ve süzgeçler yine anlık: ızgara ilk çizimden sonra /api/urunler'e
+ * gidiyor, o uç dinamik.
+ */
+export const revalidate = 300;
+
+/**
+ * Kategoriler derleme anında biliniyor; hepsi önceden üretiliyor.
+ * dynamicParams varsayılan olarak açık, yani sonradan eklenen kategori
+ * ilk istekte üretilip saklanıyor - yeni kategori 404 vermez.
+ */
+export async function generateStaticParams() {
+  if (!hasDatabaseUrl()) return [];
+  try {
+    const kategoriler = await prisma.productCategory.findMany({ select: { slug: true } });
+    return kategoriler.map((k) => ({ categorySlug: k.slug }));
+  } catch (error) {
+    // Derleme sırasında veritabanına ulaşılamazsa sayfalar istek anında
+    // üretilir; derlemeyi düşürmenin anlamı yok.
+    console.error('Kategori slug listesi alınamadı:', error);
+    return [];
+  }
+}
 
 type CategoryPageProps = {
   params: {
@@ -250,7 +286,49 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CategoryPageClient baslangicUrunler={urunler} kategoriler={kategoriler} />
+      <CategoryPageClient
+        baslangicUrunler={urunler}
+        kategoriler={kategoriler}
+        kategoriAdi={category?.name}
+        kategoriAciklamasi={category?.description ?? null}
+      />
+
+      {/**
+        * Diğer kategoriler.
+        *
+        * Kategori sayfasının sonu çıkmaz sokaktı: ürün ızgarası bitiyor,
+        * altında yalnızca site altbilgisi kalıyordu. Aradığını bulamayan
+        * ziyaretçi için sonraki adım yok, arama motoru için de kategoriler
+        * arasında bağ yok.
+        *
+        * Sunucuda çiziliyor: tarayıcıya ek JavaScript gitmiyor, bağlantılar
+        * HTML'de duruyor.
+        */}
+      {kategoriler.length > 1 && (
+        <nav aria-label="Diğer kategoriler" className="bg-white border-t border-gray-200">
+          <div className="max-w-screen-xl mx-auto px-4 py-10">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Diğer kategoriler</h2>
+            <ul className="flex flex-wrap gap-2">
+              {/* Boş kategoriye bağlantı vermiyoruz: ziyaretçiyi boş bir
+                  sayfaya göndermenin ve arama motoruna içeriksiz sayfa
+                  göstermenin faydası yok. */}
+              {kategoriler
+                .filter((k) => k.slug !== params.categorySlug && k.urunSayisi > 0)
+                .map((k) => (
+                  <li key={k.slug}>
+                    <Link
+                      href={`/${k.slug}`}
+                      className="inline-flex items-center gap-2 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 hover:border-[#FF6000] hover:text-[#BA4700] transition"
+                    >
+                      {k.name}
+                      <span className="text-gray-400">{k.urunSayisi}</span>
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </nav>
+      )}
     </>
   );
 }

@@ -1,167 +1,248 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { LuActivity, LuCheck, LuX, LuLoader, LuFilter } from 'react-icons/lu';
+import { useCallback, useEffect, useState } from 'react';
+import { LuActivity, LuInfo, LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
-interface AuditLog {
+/**
+ * Yönetim: denetim günlüğü.
+ *
+ * Kayıtlar veritabanında tutuluyor (bkz. lib/audit-log.ts); bu ekran
+ * onları okunur hâle getiriyor. Önceden günlüğü gösteren bir ekran yoktu,
+ * yalnızca /api/admin/audit-logs ucu vardı - ve o uç da bellekteki diziyi
+ * okuduğu için çoğu zaman boş dönüyordu.
+ *
+ * Süzgeçler sunucuda çalışıyor: tablo zamanla büyüyecek, tamamını çekip
+ * tarayıcıda süzmek aynı hatayı tekrarlamak olurdu.
+ */
+
+interface Kayit {
+  id: string;
   timestamp: string;
   action: string;
   email: string;
-  ip?: string;
-  status: 'success' | 'failed';
+  status: string;
   details?: string;
+  ip?: string;
 }
 
-export default function AuditLogsPage() {
-  const [logs, setLogs] = useState<AuditLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'success' | 'failed'>('all');
+const SAYFA_ADEDI = 50;
+
+/** İşlem kodlarının okunur karşılıkları. Listede olmayan kod olduğu gibi yazılır. */
+const ISLEM_METNI: Record<string, string> = {
+  OTP_REQUEST: 'Giriş kodu istendi',
+  OTP_VERIFY: 'Giriş kodu doğrulandı',
+  IADE_DURUM: 'İade durumu değiştirildi',
+  PREORDER_NOTIFY: 'Ön talep bildirimi gönderildi',
+};
+
+export default function AdminDenetim() {
+  const [kayitlar, setKayitlar] = useState<Kayit[]>([]);
+  const [islemler, setIslemler] = useState<string[]>([]);
+  const [toplam, setToplam] = useState(0);
+  const [sayfa, setSayfa] = useState(1);
+  const [sayfaSayisi, setSayfaSayisi] = useState(0);
+  const [yukleniyor, setYukleniyor] = useState(true);
+  const [hata, setHata] = useState('');
+
+  const [islem, setIslem] = useState('');
+  const [durum, setDurum] = useState('');
+  const [eposta, setEposta] = useState('');
+  /** Yazarken her tuşta istek atılmasın diye aramaya ayrı bir durum. */
+  const [epostaTaslak, setEpostaTaslak] = useState('');
+
+  const yukle = useCallback(async () => {
+    setYukleniyor(true);
+    try {
+      const p = new URLSearchParams({ sayfa: String(sayfa), limit: String(SAYFA_ADEDI) });
+      if (islem) p.set('islem', islem);
+      if (durum) p.set('durum', durum);
+      if (eposta) p.set('email', eposta);
+
+      const yanit = await fetch(`/api/admin/audit-logs?${p.toString()}`, { cache: 'no-store' });
+      if (!yanit.ok) {
+        setHata(yanit.status === 401 ? 'Oturumunuz sona ermiş görünüyor.' : 'Kayıtlar getirilemedi');
+        setKayitlar([]);
+        return;
+      }
+      const veri = await yanit.json();
+      setKayitlar(Array.isArray(veri.logs) ? veri.logs : []);
+      setIslemler(Array.isArray(veri.islemler) ? veri.islemler : []);
+      setToplam(veri.toplam ?? 0);
+      setSayfaSayisi(veri.sayfaSayisi ?? 0);
+      setHata('');
+    } catch {
+      setHata('Bağlantı hatası');
+    } finally {
+      setYukleniyor(false);
+    }
+  }, [sayfa, islem, durum, eposta]);
 
   useEffect(() => {
-    fetchLogs();
-    const interval = setInterval(fetchLogs, 10000); // Refresh every 10 seconds
-    return () => clearInterval(interval);
-  }, []);
+    yukle();
+  }, [yukle]);
 
-  const fetchLogs = async () => {
-    try {
-      const res = await fetch('/api/admin/audit-logs?limit=100');
-      const data = await res.json();
-      if (data.success) {
-        setLogs(data.logs);
-      }
-    } catch (error) {
-      console.error('Failed to fetch logs:', error);
-    } finally {
-      setLoading(false);
-    }
+  /** Süzgeç değişince ilk sayfaya dön; yoksa boş sayfada kalınabiliyor. */
+  const suzgecDegistir = (uygula: () => void) => {
+    setSayfa(1);
+    uygula();
   };
 
-  const filteredLogs = logs.filter((log) => {
-    if (filter === 'all') return true;
-    return log.status === filter;
-  });
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <LuActivity className="text-blue-600" size={24} />
-            </div>
-            Audit Logs
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">Tüm admin giriş denemelerini izleyin</p>
+    <div>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <LuActivity size={20} className="text-blue-600" />
         </div>
-        <button
-          onClick={fetchLogs}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Denetim Günlüğü</h1>
+          <p className="text-sm text-gray-500">
+            {yukleniyor ? '...' : `${toplam} kayıt`}
+          </p>
+        </div>
+      </div>
+
+      {/* Süzgeçler */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <select
+          value={islem}
+          onChange={(e) => suzgecDegistir(() => setIslem(e.target.value))}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
         >
-          Yenile
-        </button>
-      </div>
+          <option value="">Tüm işlemler</option>
+          {islemler.map((i) => (
+            <option key={i} value={i}>
+              {ISLEM_METNI[i] ?? i}
+            </option>
+          ))}
+        </select>
 
-      {/* Filter buttons */}
-      <div className="flex gap-2">
-        {(['all', 'success', 'failed'] as const).map((status) => (
+        <select
+          value={durum}
+          onChange={(e) => suzgecDegistir(() => setDurum(e.target.value))}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+        >
+          <option value="">Başarılı + başarısız</option>
+          <option value="success">Yalnızca başarılı</option>
+          <option value="failed">Yalnızca başarısız</option>
+        </select>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            suzgecDegistir(() => setEposta(epostaTaslak.trim()));
+          }}
+          className="flex gap-2"
+        >
+          <input
+            value={epostaTaslak}
+            onChange={(e) => setEpostaTaslak(e.target.value)}
+            placeholder="E-posta ile süz"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-56"
+          />
           <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === status
-                ? status === 'success'
-                  ? 'bg-green-100 text-green-700'
-                  : status === 'failed'
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-blue-100 text-blue-700'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            type="submit"
+            className="text-sm font-semibold px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-700 transition"
           >
-            {status === 'all'
-              ? `Tümü (${logs.length})`
-              : status === 'success'
-              ? `Başarılı (${logs.filter((l) => l.status === 'success').length})`
-              : `Başarısız (${logs.filter((l) => l.status === 'failed').length})`}
+            Süz
           </button>
-        ))}
+          {eposta && (
+            <button
+              type="button"
+              onClick={() =>
+                suzgecDegistir(() => {
+                  setEposta('');
+                  setEpostaTaslak('');
+                })
+              }
+              className="text-sm px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+            >
+              Temizle
+            </button>
+          )}
+        </form>
       </div>
 
-      {/* Logs table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <LuLoader className="inline animate-spin text-gray-400 mb-2" size={32} />
-            <p className="text-gray-500">Yükleniyor...</p>
-          </div>
-        ) : filteredLogs.length === 0 ? (
-          <div className="p-8 text-center">
-            <LuFilter className="inline text-gray-400 mb-2" size={32} />
-            <p className="text-gray-500">Hiç log bulunamadı</p>
-          </div>
-        ) : (
+      {hata && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
+          <LuInfo size={18} className="mt-0.5 flex-shrink-0" />
+          <div>{hata}</div>
+        </div>
+      )}
+
+      {yukleniyor ? (
+        <div className="flex items-center justify-center py-16">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF6000]" />
+        </div>
+      ) : kayitlar.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-600">
+          Bu süzgeçle eşleşen kayıt yok.
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50">
+              <thead className="bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">Tarih & Saat</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">İşlem</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">Email</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">IP Adresi</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">Durum</th>
-                  <th className="px-6 py-3 text-left font-semibold text-gray-900">Detay</th>
+                  <th className="text-left font-semibold px-4 py-3 whitespace-nowrap">Zaman</th>
+                  <th className="text-left font-semibold px-4 py-3 whitespace-nowrap">İşlem</th>
+                  <th className="text-left font-semibold px-4 py-3 whitespace-nowrap">Kim</th>
+                  <th className="text-left font-semibold px-4 py-3">Ayrıntı</th>
+                  <th className="text-left font-semibold px-4 py-3 whitespace-nowrap">IP</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredLogs.map((log, idx) => (
-                  <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-xs text-gray-500">
-                        {new Date(log.timestamp).toLocaleString('tr-TR')}
-                      </div>
+                {kayitlar.map((k) => (
+                  <tr key={k.id} className="border-t border-gray-100 align-top">
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-500">
+                      {new Date(k.timestamp).toLocaleString('tr-TR')}
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">{log.action}</td>
-                    <td className="px-6 py-4 text-gray-700">{log.email}</td>
-                    <td className="px-6 py-4 text-xs text-gray-500 font-mono">{log.ip || '-'}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        {log.status === 'success' ? (
-                          <>
-                            <LuCheck className="text-green-600 bg-green-100 rounded-full p-1" size={18} />
-                            <span className="text-green-700 font-medium">Başarılı</span>
-                          </>
-                        ) : (
-                          <>
-                            <LuX className="text-red-600 bg-red-100 rounded-full p-1" size={18} />
-                            <span className="text-red-700 font-medium">Başarısız</span>
-                          </>
-                        )}
-                      </div>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span
+                        className={`inline-block w-2 h-2 rounded-full mr-2 align-middle ${
+                          k.status === 'success' ? 'bg-green-500' : 'bg-red-500'
+                        }`}
+                        title={k.status === 'success' ? 'Başarılı' : 'Başarısız'}
+                      />
+                      <span className="font-medium text-gray-900">
+                        {ISLEM_METNI[k.action] ?? k.action}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600 text-xs">{log.details || '-'}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-700">{k.email}</td>
+                    <td className="px-4 py-3 text-gray-600 break-words max-w-md">
+                      {k.details ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-400 font-mono text-xs">
+                      {k.ip ?? '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <p className="text-gray-600 text-sm mb-2">Toplam Deneme</p>
-          <p className="text-3xl font-bold text-gray-900">{logs.length}</p>
+          {sayfaSayisi > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+              <button
+                onClick={() => setSayfa((s) => Math.max(1, s - 1))}
+                disabled={sayfa <= 1}
+                className="flex items-center gap-1 text-sm px-3 py-2 rounded-lg border border-gray-200 text-gray-700 disabled:opacity-40 hover:bg-gray-50 transition"
+              >
+                <LuChevronLeft size={16} /> Önceki
+              </button>
+              <span className="text-sm text-gray-500">
+                Sayfa {sayfa} / {sayfaSayisi}
+              </span>
+              <button
+                onClick={() => setSayfa((s) => Math.min(sayfaSayisi, s + 1))}
+                disabled={sayfa >= sayfaSayisi}
+                className="flex items-center gap-1 text-sm px-3 py-2 rounded-lg border border-gray-200 text-gray-700 disabled:opacity-40 hover:bg-gray-50 transition"
+              >
+                Sonraki <LuChevronRight size={16} />
+              </button>
+            </div>
+          )}
         </div>
-        <div className="bg-white rounded-lg border border-green-200 p-6">
-          <p className="text-gray-600 text-sm mb-2">Başarılı Girişler</p>
-          <p className="text-3xl font-bold text-green-600">{logs.filter((l) => l.status === 'success').length}</p>
-        </div>
-        <div className="bg-white rounded-lg border border-red-200 p-6">
-          <p className="text-gray-600 text-sm mb-2">Başarısız Denemeler</p>
-          <p className="text-3xl font-bold text-red-600">{logs.filter((l) => l.status === 'failed').length}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

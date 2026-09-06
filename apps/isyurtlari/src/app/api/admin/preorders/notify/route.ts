@@ -3,7 +3,7 @@ import { absoluteUrl } from '@/lib/seo';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { emailTemplates } from '@/lib/email-templates';
-import { adminGuard } from '@/lib/admin-auth';
+import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
 import { logAudit } from '@/lib/audit-log';
 
 export const dynamic = 'force-dynamic';
@@ -106,9 +106,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    logAudit(
+    await logAudit(
       'PREORDER_NOTIFY',
-      'admin',
+      adminEpostasi(req) ?? 'bilinmeyen',
       failed.length === 0 ? 'success' : 'failed',
       `${product.name}: ${sentIds.length} gönderildi, ${failed.length} başarısız`,
       ip

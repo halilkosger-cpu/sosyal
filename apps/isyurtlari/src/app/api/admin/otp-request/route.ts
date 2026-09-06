@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     // Validate email (should be admin email)
     const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
     if (email !== ADMIN_EMAIL) {
-      logAudit('OTP_REQUEST', email, 'failed', 'Unauthorized email', ip);
+      await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta', ip);
       return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
     }
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     // ortak.
     const sinir = await hizSiniriGuard(req, 'otp-request', 5, 60);
     if (sinir) {
-      logAudit('OTP_REQUEST', email, 'failed', 'Rate limit exceeded', ip);
+      await logAudit('OTP_REQUEST', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
     }
 
@@ -75,14 +75,14 @@ export async function POST(req: NextRequest) {
 
     if (result.error) {
       console.error('Email sending error:', result.error);
-      logAudit('OTP_REQUEST', email, 'failed', 'Email sending failed', ip);
+      await logAudit('OTP_REQUEST', email, 'failed', 'E-posta gönderilemedi', ip);
       return NextResponse.json(
         { error: 'Email gönderme başarısız' },
         { status: 500 }
       );
     }
 
-    logAudit('OTP_REQUEST', email, 'success', `OTP sent`, ip);
+    await logAudit('OTP_REQUEST', email, 'success', 'Giriş kodu gönderildi', ip);
 
     return NextResponse.json({
       success: true,
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('OTP request error:', error);
-    logAudit('OTP_REQUEST', email, 'failed', String(error), ip);
+    await logAudit('OTP_REQUEST', email, 'failed', String(error), ip);
     return NextResponse.json(
       { error: 'Giriş kodu gönderme başarısız' },
       { status: 500 }

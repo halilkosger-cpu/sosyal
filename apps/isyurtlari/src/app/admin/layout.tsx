@@ -21,7 +21,7 @@ const navItems = [
   { href: '/admin/on-talepler', label: 'Ön Talepler', Icon: LuBell          },
   { href: '/admin/iadeler',    label: 'İadeler',      Icon: LuRotateCcw      },
   { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
-  { href: '/admin/audit-logs', label: 'Audit Logs',  Icon: LuActivity       },
+  { href: '/admin/audit-logs', label: 'Denetim Günlüğü', Icon: LuActivity    },
   { href: '/admin/yedek',      label: 'Yedek',       Icon: LuDatabase       },
 ];
 

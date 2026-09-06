@@ -48,9 +48,20 @@ export default function FavoritesPage() {
      */
     let sonIstek = 0;
     let iptal = false;
+    /**
+     * Sunucudaki favorilerle birlesme (SenkronKopru) sirasinda FAVORI_OLAYI
+     * birkac kez tetikleniyor ve liste degismemis olsa bile ayni istek
+     * tekrar gidiyordu. Son istenen kimlik dizisi hatirlanip ayni liste
+     * icin ikinci istek atlaniyor.
+     */
+    let sonAnahtar: string | null = null;
 
     const yukle = () => {
       const kimlikler = favorileriGetir();
+      const anahtar = kimlikler.join(',');
+      if (anahtar === sonAnahtar) return;
+      sonAnahtar = anahtar;
+
       const sira = ++sonIstek;
 
       if (kimlikler.length === 0) {
@@ -59,7 +70,7 @@ export default function FavoritesPage() {
         return;
       }
 
-      const adres = `/api/urunler?kimlikler=${encodeURIComponent(kimlikler.join(','))}&adet=${kimlikler.length}`;
+      const adres = `/api/urunler?kimlikler=${encodeURIComponent(anahtar)}&adet=${kimlikler.length}`;
 
       fetch(adres, { cache: 'no-store' })
         .then((res) => res.json())
@@ -72,15 +83,29 @@ export default function FavoritesPage() {
         })
         .catch(() => {
           if (iptal || sira !== sonIstek) return;
+          // Basarisiz istekten sonra ayni liste yeniden denenebilsin.
+          sonAnahtar = null;
           setLoading(false);
         });
     };
 
+    /**
+     * Sunucudaki favorilerle birlesme (SenkronKopru) sirasinda FAVORI_OLAYI
+     * arka arkaya birkac kez tetikleniyor ve ayni istek ucuncu kez gidiyordu.
+     * Kisa bir bekleme bunlari tek istege indiriyor.
+     */
+    let zamanlayici: ReturnType<typeof setTimeout> | null = null;
+    const gecikmeliYukle = () => {
+      if (zamanlayici) clearTimeout(zamanlayici);
+      zamanlayici = setTimeout(yukle, 120);
+    };
+
     yukle();
-    window.addEventListener(FAVORI_OLAYI, yukle);
+    window.addEventListener(FAVORI_OLAYI, gecikmeliYukle);
     return () => {
       iptal = true;
-      window.removeEventListener(FAVORI_OLAYI, yukle);
+      if (zamanlayici) clearTimeout(zamanlayici);
+      window.removeEventListener(FAVORI_OLAYI, gecikmeliYukle);
     };
   }, []);
 

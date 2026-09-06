@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
-import { adminGuard } from '@/lib/admin-auth';
+import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
 import { logAudit } from '@/lib/audit-log';
 
 export const dynamic = 'force-dynamic';
@@ -87,18 +87,16 @@ export async function PATCH(req: NextRequest) {
     });
 
     /**
-     * İade kararları paraya dokunuyor; kimin ne zaman ne yaptığı iz bırakmalı.
+     * İade kararları paraya dokunuyor; kimin ne zaman ne yaptığı iz
+     * bırakmalı. Bu günlük artık veritabanında tutuluyor (DenetimKaydi);
+     * önceden bellekteydi ve sunucusuz ortamda kayboluyordu.
      *
-     * UYARI: lib/audit-log.ts kaydı BELLEKTE tutuyor (modül düzeyinde bir
-     * dizi). Uygulama sunucusuz çalışıyor, her istek ayrı bir örnekte
-     * işlenebiliyor ve örnek kapanınca kayıt kayboluyor - yani bu iz
-     * güvenilir değil. Aynı sorun hız sayacında yaşanmış ve sayaç
-     * veritabanına taşınmıştı (bkz. IstekSayaci); denetim günlüğü de
-     * taşınmalı. Para iadesi kararları için ayrıca önemli.
+     * Yazma await ediliyor: yanıt döndükten sonra başlayan iş sunucusuz
+     * ortamda tamamlanmayabilir.
      */
-    logAudit(
+    await logAudit(
       'IADE_DURUM',
-      'admin',
+      adminEpostasi(req) ?? 'bilinmeyen',
       'success',
       `${guncel.returnNumber}: ${mevcut.status} -> ${guncel.status}`
     );

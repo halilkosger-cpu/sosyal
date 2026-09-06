@@ -2,6 +2,7 @@ import { prisma } from '@isyurtlari/database';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminGuard } from '@/lib/admin-auth';
 import { csvAyristir, csvOlustur, fiyatiCoz } from '@/lib/csv';
+import { icerikTazele } from '@/lib/kategoriler';
 
 export const dynamic = 'force-dynamic';
 
@@ -135,6 +136,13 @@ export async function PUT(req: NextRequest) {
       prisma.product.updateMany({ where: { slug: g.slug }, data: { price: g.price } })
     )
   );
+
+  /**
+   * Fiyat degisikligi ana sayfada, kategori ve urun sayfalarinda gorunuyor.
+   * Bu uc icerikTazele()'yi hic cagirmiyordu; sayfalar force-dynamic oldugu
+   * icin fark edilmiyordu. ISR'ye gecince cagrilmasi sart oldu.
+   */
+  icerikTazele();
 
   return NextResponse.json({ success: true, guncellenen: gecerli.length }, { headers: NO_CACHE });
 }

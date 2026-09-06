@@ -994,3 +994,38 @@ model ReturnItem {
   @@unique([returnId, orderItemId])
   @@index([returnId])
 }
+
+/// Yönetim işlemlerinin izi.
+///
+/// Önceden lib/audit-log.ts kayıtları BELLEKTE tutuyordu (modül düzeyinde bir
+/// dizi, son 1000 satır). Uygulama sunucusuz çalışıyor: her istek ayrı bir
+/// örnekte işlenebiliyor ve örnek kapanınca kayıt kayboluyor. Yani hangi
+/// yöneticinin ne zaman giriş yaptığı, hangi iadeyi onayladığı, hangi fiyatı
+/// değiştirdiği hiçbir yerde durmuyordu - para iadesi kararları için kabul
+/// edilemez. Aynı sorun hız sayacında yaşanmış ve sayaç veritabanına
+/// taşınmıştı (bkz. IstekSayaci); bu tablo aynı düzeltmenin denetim
+/// günlüğü karşılığı.
+model DenetimKaydi {
+  id      String @id @default(cuid())
+
+  /// İşlem kodu. Örnek: "OTP_VERIFY", "IADE_DURUM", "PREORDER_NOTIFY".
+  islem   String
+
+  /// İşlemi yapan. Yönetici e-postası, bilinmiyorsa "admin".
+  eposta  String
+
+  /// "success" | "failed"
+  durum   String
+
+  /// Serbest açıklama: neyin değiştiği, hata sebebi vb.
+  ayrinti String?
+
+  /// İstemci adresi (x-forwarded-for ilk değeri).
+  ip      String?
+
+  olusturulma DateTime @default(now())
+
+  @@index([olusturulma])
+  @@index([eposta, olusturulma])
+  @@index([islem, olusturulma])
+}

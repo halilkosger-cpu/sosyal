@@ -74,6 +74,18 @@ interface ListeYaniti {
 interface KategoriSayfasiProps {
   baslangicUrunler?: Product[] | null;
   kategoriler?: Kategori[];
+  /**
+   * Kategorinin adı ve açıklaması sunucudan geliyor.
+   *
+   * Önceden ad ilk ürünün kategorisinden okunuyordu
+   * (`products[0]?.category.name`). Kategoride hiç ürün yoksa ya da bir
+   * süzgeç sonucu boşaltınca sayfanın H1 başlığı "Ürünler" oluyordu -
+   * süzgeç değiştirmek sayfanın başlığını değiştiriyordu. Açıklama ise
+   * yalnızca <meta> etiketinde kullanılıyor, ziyaretçiye hiç
+   * gösterilmiyordu.
+   */
+  kategoriAdi?: string;
+  kategoriAciklamasi?: string | null;
 }
 
 /**
@@ -90,7 +102,12 @@ export default function CategoryPage(props: KategoriSayfasiProps) {
   );
 }
 
-function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: KategoriSayfasiProps) {
+function KategoriIcerigi({
+  baslangicUrunler = null,
+  kategoriler = [],
+  kategoriAdi,
+  kategoriAciklamasi = null,
+}: KategoriSayfasiProps) {
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -198,7 +215,7 @@ function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: Kategori
 
   const meta = categoryMeta[categorySlug];
   const Icon = meta?.Icon ?? IconProductOrigin;
-  const categoryName = products[0]?.category.name ?? 'Ürünler';
+  const categoryName = kategoriAdi ?? products[0]?.category.name ?? 'Ürünler';
   /** Kategorinin süzgeçsiz toplam ürün sayısı (afişteki sayı için). */
   const kategoriToplam = (veri?.fasetler.stok.var ?? 0) + (veri?.fasetler.stok.yok ?? 0);
 
@@ -217,7 +234,7 @@ function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: Kategori
               Ana Sayfa
             </Link>
             <span>/</span>
-            <span className="text-white font-medium">{loading ? '...' : categoryName}</span>
+            <span className="text-white font-medium">{kategoriAdi ?? (loading ? '...' : categoryName)}</span>
           </div>
 
           <div className="flex items-start gap-4 mb-6">
@@ -225,20 +242,53 @@ function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: Kategori
               <Icon className="w-24 h-24 object-contain drop-shadow-md" />
             </div>
             <div className="flex-1">
-              <h1 className="text-4xl font-extrabold">{loading ? '...' : categoryName}</h1>
+              <h1 className="text-4xl font-extrabold">{kategoriAdi ?? (loading ? '...' : categoryName)}</h1>
               <p className="text-white/90 text-sm mt-2 font-medium">
                 {meta?.purpose || 'Meslek Eğitim Programı'} • İsyurtları Cezaevi Ürünleri
               </p>
+              {/**
+                * Buradaki metin şunu yazıyordu:
+                *   "{kategoriToplam} cezaevi hükümlüsü tarafından el yapımı"
+                * Oysa kategoriToplam ÜRÜN sayısı. Gıda kategorisinde 27 ürün
+                * var; sayfa "27 cezaevi hükümlüsü" diyordu. Kaç kişinin
+                * çalıştığı sitede hiçbir yerde tutulmuyor - uydurulamaz.
+                * Elimizdeki gerçek sayı ürün sayısı; yazan da o.
+                */}
               <p className="text-white/70 text-sm mt-1">
-                {loading ? '' : `${kategoriToplam} cezaevi hükümlüsü tarafından el yapımı, doğal ürün`}
+                {loading ? '' : `${kategoriToplam} ürün`}
               </p>
             </div>
           </div>
 
-          {/* Mission Message */}
+          {/**
+            * Kategori tanıtımı.
+            *
+            * Burada iki ayrı blok vardı: afişin içinde bir "Mission Message",
+            * ürün ızgarasının hemen üstünde de bir "Sosyal etki" kutusu. İkisi
+            * de aynı cümleyi kuruyordu (cezaevi hükümlülerinin meslek
+            * eğitimi, rehabilitasyon, topluma yeniden kazanım) ve ikisi de
+            * HER kategoride kelimesi kelimesine aynıydı. Ziyaretçi aynı metni
+            * iki kez okuyor, arama motoru da sekiz kategori sayfasında
+            * birbirinin kopyası içerik görüyordu.
+            *
+            * Tek blok kaldı ve önce kategorinin KENDİ açıklaması yazılıyor -
+            * yönetim panelinden girilen, kategoriye özgü metin. Açıklama
+            * girilmemişse eğitim programına göre değişen kısa bir cümle
+            * yedekte duruyor.
+            */}
           <div className="bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur-sm">
             <p className="text-white text-sm leading-relaxed">
-              <span className="font-semibold">Bu kategorideki her satın alma:</span> Cezaevi ve hapishane hükümlülerinin {meta?.purpose?.toLowerCase() || 'meslek eğitimi'}ne destek olur, rehabilitasyon ve topluma yeniden kazanılmalarında kilit rol oynar. İsyurtları sosyal girişim ürünleri satın alarak insani dönüşüme katkı sağlayın.
+              {kategoriAciklamasi ? (
+                kategoriAciklamasi
+              ) : (
+                <>
+                  <span className="font-semibold">Bu kategorideki her satın alma:</span>{' '}
+                  {meta?.purpose
+                    ? `${meta.purpose} programındaki hükümlülerin`
+                    : 'Meslek eğitimi alan hükümlülerin'}{' '}
+                  emeğine karşılık olur ve topluma yeniden kazanılmalarına katkı sağlar.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -246,14 +296,8 @@ function KategoriIcerigi({ baslangicUrunler = null, kategoriler = [] }: Kategori
 
       <div className="max-w-screen-xl mx-auto px-4 py-6">
 
-        {/* ─── INFO BANNER ─── */}
-        {!loading && products.length > 0 && (
-          <div className="mb-6 bg-white border border-orange-200 rounded-2xl p-4 shadow-sm">
-            <p className="text-sm text-gray-700">
-              <span className="font-semibold text-[#BA4700]">Sosyal etki:</span> İsyurtları'ndan cezaevi ve hapishane hükümlülerinin ürünlerini satın aldığınızda, {meta?.purpose?.toLowerCase() || 'meslek eğitimi'} alan insanların rehabilitasyonuna ve topluma yeniden kazanılmasına direkt katkı sağlıyorsunuz. Türkiye'de sosyal girişim ile fark yaratın.
-            </p>
-          </div>
-        )}
+        {/* Buradaki "Sosyal etki" kutusu afiştekiyle aynı metni tekrarlıyordu;
+            afişteki tek blokta birleştirildi. Bkz. yukarıdaki açıklama. */}
 
         {/* ─── MAIN LAYOUT: FILTERS + PRODUCTS ─── */}
         <div className="flex gap-6">

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminGuard } from '@/lib/admin-auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+/** Paylasilan istemci: bkz. api/admin/campaigns/route.ts */
+import { prisma } from '@isyurtlari/database';
+import { icerikTazele } from '@/lib/kategoriler';
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const red = adminGuard(req);
@@ -35,6 +35,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       include: { products: { include: { product: true } } },
     });
 
+    icerikTazele();
+
     return NextResponse.json(campaign);
   } catch {
     return NextResponse.json({ error: 'Failed to update campaign' }, { status: 500 });
@@ -47,6 +49,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
   try {
     await prisma.campaign.delete({ where: { id: params.id } });
+    icerikTazele();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete campaign' }, { status: 500 });
