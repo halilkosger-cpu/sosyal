@@ -109,18 +109,150 @@ interface KategoriSayfasiProps {
  * duruyor. Sarmalayıcı bu yüzden burada.
  */
 export default function CategoryPage(props: KategoriSayfasiProps) {
+  const params = useParams();
+  const categorySlug = params.categorySlug as string;
+
+  /**
+   * SUNUCU HTML'I BOS GELIYORDU.
+   *
+   * Suspense yedegi bos bir <div> idi. useSearchParams kullanan bilesen
+   * statik uretimde istemciye birakildigi icin kategori sayfalarinin sunucu
+   * HTML'inde ne H1 vardi ne urun listesi - arama motoru icerigi ancak
+   * JavaScript calistirarak gorebiliyordu. Simdi afis (H1 dahil) Suspense'in
+   * DISINDA, yedek de sunucudan gelen urunlerin statik izgarasi.
+   */
   return (
-    <Suspense fallback={<div className="store-shell min-h-screen" />}>
-      <KategoriIcerigi {...props} />
-    </Suspense>
+    <div className="store-shell">
+      <KategoriAfisi
+        categorySlug={categorySlug}
+        kategoriAdi={props.kategoriAdi}
+        kategoriAciklamasi={props.kategoriAciklamasi ?? null}
+        kategoriToplam={props.baslangicUrunler ? props.baslangicUrunler.length : null}
+      />
+      <Suspense fallback={<StatikIzgara urunler={props.baslangicUrunler ?? []} categorySlug={categorySlug} />}>
+        <KategoriIcerigi {...props} />
+      </Suspense>
+    </div>
+  );
+}
+
+function KategoriAfisi({
+  categorySlug,
+  kategoriAdi,
+  kategoriAciklamasi,
+  kategoriToplam,
+}: {
+  categorySlug: string;
+  kategoriAdi?: string;
+  kategoriAciklamasi: string | null;
+  kategoriToplam: number | null;
+}) {
+  const meta = categoryMeta[categorySlug];
+  const afis = kategoriAfisi(categorySlug);
+  const categoryName = kategoriAdi ?? 'Ürünler';
+
+  return (
+    <>
+      {/* ─── KATEGORİ AFİŞİ ───
+          2026 Eylul tasarimi: ana sayfayla ayni acik krem zemin, sagda
+          kategoriye ozel fotograf (public/kategori/). Gida, hediyelik ve
+          peyzaj afisleri o kategorideki gercek urun fotograflarindan
+          uretildi. Ahsap, tekstil, sanat-zanaat ve temizlik kategorilerinde
+          fotografli urun olmadigi icin afislerde URUN YOK - yalnizca
+          malzeme ve alet var (tahta, kumas, firca, lavanta...). Olmayan bir
+          urunu gosterip musteriyi yaniltmamak icin bilerek boyle. */}
+      <section className="relative overflow-hidden bg-[#FBF6EF] border-b border-orange-100/60">
+        {afis && (
+          <div className="hidden md:block absolute inset-0" aria-hidden="true">
+            <Image src={afis} alt="" fill priority sizes="100vw" className="object-cover object-right" />
+            <div className="absolute inset-y-0 left-0 w-[62%] bg-gradient-to-r from-[#FBF6EF] via-[#FBF6EF]/90 to-transparent" />
+          </div>
+        )}
+
+        <div className="relative max-w-screen-xl mx-auto px-4 py-7 md:py-10 md:min-h-[340px]">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-gray-500 text-sm mb-5">
+            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
+              <LuHouse size={14} />
+              Ana Sayfa
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">{categoryName}</span>
+          </div>
+
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3">
+              <KategoriIkon slug={categorySlug} className="w-14 h-14 md:w-20 md:h-20 flex-shrink-0 drop-shadow-sm" />
+              <div>
+                <p className="text-[#BA4700] text-[11px] font-bold uppercase tracking-widest">
+                  {meta?.purpose || 'Meslek Eğitim Programı'}
+                </p>
+                <h1 className="font-serif text-3xl md:text-[2.75rem] leading-tight font-bold text-[#141B2D] tracking-tight mt-1">
+                  {categoryName}
+                </h1>
+              </div>
+            </div>
+            {/* Burada bir zamanlar "{kategoriToplam} cezaevi hükümlüsü"
+                yaziyordu; oysa sayi URUN sayisi. Yazan da o. */}
+            <p className="text-gray-500 text-sm mt-2">
+              {kategoriToplam === null ? '' : `${kategoriToplam} ürün`} · İsyurtları Cezaevi Ürünleri
+            </p>
+
+            {/* Kategori tanitimi: once panelden girilen kategoriye ozel
+                aciklama; yoksa egitim programina gore degisen kisa cumle.
+                (Eskiden iki blokta ayni metin tekrarlaniyordu.) */}
+            <p className="mt-4 text-[15px] leading-relaxed text-gray-700">
+              {kategoriAciklamasi ? (
+                kategoriAciklamasi
+              ) : (
+                <>
+                  Bu kategorideki her satın alma,{' '}
+                  {meta?.purpose
+                    ? `${meta.purpose} programındaki hükümlülerin`
+                    : 'meslek eğitimi alan hükümlülerin'}{' '}
+                  emeğine karşılık olur ve topluma yeniden kazanılmalarına katkı sağlar.
+                </>
+              )}
+            </p>
+          </div>
+
+          {afis && (
+            <div className="md:hidden relative mt-5 aspect-[16/9] rounded-2xl overflow-hidden">
+              <Image src={afis} alt="" fill priority sizes="100vw" className="object-cover object-right" />
+            </div>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}
+
+/** Suspense yedegi: sunucudan gelen urunler, suzgecsiz. Istemci yuklenince yerini tam liste aliyor. */
+function StatikIzgara({ urunler, categorySlug }: { urunler: Product[]; categorySlug: string }) {
+  const meta = categoryMeta[categorySlug];
+  return (
+    <div className="max-w-screen-xl mx-auto px-4 py-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {urunler.map((product) => (
+          <UrunKarti
+            key={product.id}
+            urun={product}
+            gorselArkaPlani={meta?.imgBg ?? 'from-orange-100 to-amber-100'}
+            gorselYuksekligi="h-48"
+            gorselBoyutlari="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            aciklamaGoster
+            etkiRozeti={meta?.impact || 'Eğitim desteği'}
+            favoriButonu={false}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
 function KategoriIcerigi({
   baslangicUrunler = null,
   kategoriler = [],
-  kategoriAdi,
-  kategoriAciklamasi = null,
 }: KategoriSayfasiProps) {
   const params = useParams();
   const router = useRouter();
@@ -229,84 +361,13 @@ function KategoriIcerigi({
 
   const meta = categoryMeta[categorySlug];
   const Icon = meta?.Icon ?? IconProductOrigin;
-  const afis = kategoriAfisi(categorySlug);
-  const categoryName = kategoriAdi ?? products[0]?.category.name ?? 'Ürünler';
   /** Kategorinin süzgeçsiz toplam ürün sayısı (afişteki sayı için). */
   const kategoriToplam = (veri?.fasetler.stok.var ?? 0) + (veri?.fasetler.stok.yok ?? 0);
 
   return (
-    <div className="store-shell">
+    <div>
 
-      {/* ─── KATEGORİ AFİŞİ ───
-          2026 Eylul tasarimi: ana sayfayla ayni acik krem zemin, sagda
-          kategoriye ozel fotograf (public/kategori/). Gida, hediyelik ve
-          peyzaj afisleri o kategorideki gercek urun fotograflarindan
-          uretildi. Ahsap, tekstil, sanat-zanaat ve temizlik kategorilerinde
-          fotografli urun olmadigi icin afislerde URUN YOK - yalnizca
-          malzeme ve alet var (tahta, kumas, firca, lavanta...). Olmayan bir
-          urunu gosterip musteriyi yaniltmamak icin bilerek boyle. */}
-      <section className="relative overflow-hidden bg-[#FBF6EF] border-b border-orange-100/60">
-        {afis && (
-          <div className="hidden md:block absolute inset-0" aria-hidden="true">
-            <Image src={afis} alt="" fill priority sizes="100vw" className="object-cover object-right" />
-            <div className="absolute inset-y-0 left-0 w-[62%] bg-gradient-to-r from-[#FBF6EF] via-[#FBF6EF]/90 to-transparent" />
-          </div>
-        )}
-
-        <div className="relative max-w-screen-xl mx-auto px-4 py-7 md:py-10 md:min-h-[340px]">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-5">
-            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
-              <LuHouse size={14} />
-              Ana Sayfa
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">{kategoriAdi ?? (loading ? '...' : categoryName)}</span>
-          </div>
-
-          <div className="max-w-xl">
-            <div className="flex items-center gap-3">
-              <KategoriIkon slug={categorySlug} className="w-14 h-14 md:w-20 md:h-20 flex-shrink-0 drop-shadow-sm" />
-              <div>
-                <p className="text-[#BA4700] text-[11px] font-bold uppercase tracking-widest">
-                  {meta?.purpose || 'Meslek Eğitim Programı'}
-                </p>
-                <h1 className="font-serif text-3xl md:text-[2.75rem] leading-tight font-bold text-[#141B2D] tracking-tight mt-1">
-                  {kategoriAdi ?? (loading ? '...' : categoryName)}
-                </h1>
-              </div>
-            </div>
-            {/* Burada bir zamanlar "{kategoriToplam} cezaevi hükümlüsü"
-                yaziyordu; oysa sayi URUN sayisi. Yazan da o. */}
-            <p className="text-gray-500 text-sm mt-2">
-              {loading ? '' : `${kategoriToplam} ürün`} · İsyurtları Cezaevi Ürünleri
-            </p>
-
-            {/* Kategori tanitimi: once panelden girilen kategoriye ozel
-                aciklama; yoksa egitim programina gore degisen kisa cumle.
-                (Eskiden iki blokta ayni metin tekrarlaniyordu.) */}
-            <p className="mt-4 text-[15px] leading-relaxed text-gray-700">
-              {kategoriAciklamasi ? (
-                kategoriAciklamasi
-              ) : (
-                <>
-                  Bu kategorideki her satın alma,{' '}
-                  {meta?.purpose
-                    ? `${meta.purpose} programındaki hükümlülerin`
-                    : 'meslek eğitimi alan hükümlülerin'}{' '}
-                  emeğine karşılık olur ve topluma yeniden kazanılmalarına katkı sağlar.
-                </>
-              )}
-            </p>
-          </div>
-
-          {afis && (
-            <div className="md:hidden relative mt-5 aspect-[16/9] rounded-2xl overflow-hidden">
-              <Image src={afis} alt="" fill priority sizes="100vw" className="object-cover object-right" />
-            </div>
-          )}
-        </div>
-      </section>
+      
 
       <div className="max-w-screen-xl mx-auto px-4 py-6">
 
