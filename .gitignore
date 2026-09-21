@@ -37,3 +37,4 @@ yarn-error.log*
 
 # Tasarim uretim adaylari (buyuk PNG)
 tasarim-adaylari/
+apps/isyurtlari/.tasarim-tmp/
