@@ -152,7 +152,7 @@ export default function SearchSuggest() {
       action="/ara"
       method="GET"
       onSubmit={handleSubmit}
-      className="relative flex min-w-0 flex-1"
+      className="relative flex min-w-0 flex-1 max-w-2xl mx-auto"
       role="search"
     >
       <input
@@ -166,12 +166,12 @@ export default function SearchSuggest() {
         onKeyDown={handleKeyDown}
         placeholder="Ürün, kategori veya marka ara..."
         autoComplete="off"
-        className="flex-1 min-w-0 rounded-l-xl border-0 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none placeholder:text-gray-400 focus:ring-4 focus:ring-white/30"
+        className="flex-1 min-w-0 rounded-l-xl border border-r-0 border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 outline-none placeholder:text-gray-400 focus:border-[#CC4E00] focus:ring-4 focus:ring-orange-100"
       />
       <button
         type="submit"
         aria-label="Ürün ara"
-        className="flex items-center justify-center rounded-r-xl bg-[#CC4E00] px-5 py-3 text-white transition-colors hover:bg-[#B34400] focus:outline-none focus:ring-4 focus:ring-white/30"
+        className="flex items-center justify-center rounded-r-xl border border-l-0 border-gray-300 bg-white px-4 py-2.5 text-[#CC4E00] transition-colors hover:bg-orange-50 focus:outline-none focus:ring-4 focus:ring-orange-100"
       >
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

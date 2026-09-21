@@ -16,10 +16,13 @@ import { sepeteEkle, sepeteEklenebilir, type SepeteEklenebilirUrun } from '@/lib
 export default function AddToCartButton({
   product,
   genis = false,
+  etiketli = false,
 }: {
   product: SepeteEklenebilirUrun;
   /** Kartin altinda tam genislikte, yazili buton (ana sayfa vitrini). */
   genis?: boolean;
+  /** Fiyatin yaninda kucuk, yazili buton (kompakt kart). */
+  etiketli?: boolean;
 }) {
   const [eklendi, setEklendi] = useState(false);
   const uygun = sepeteEklenebilir(product);
@@ -37,6 +40,20 @@ export default function AddToCartButton({
       setTimeout(() => setEklendi(false), 1800);
     }
   };
+
+  if (etiketli && uygun) {
+    return (
+      <button
+        onClick={tikla}
+        className={`h-8 shrink-0 rounded-lg px-3 flex items-center gap-1.5 text-xs font-semibold text-white transition-colors ${
+          eklendi ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'
+        }`}
+      >
+        {eklendi ? 'Eklendi' : 'Sepete Ekle'}
+        {eklendi ? <LuCheck size={14} strokeWidth={3} /> : <LuShoppingCart size={14} strokeWidth={2} />}
+      </button>
+    );
+  }
 
   if (genis) {
     if (!uygun) {

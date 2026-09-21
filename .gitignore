@@ -34,3 +34,6 @@ yarn-error.log*
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Tasarim uretim adaylari (buyuk PNG)
+tasarim-adaylari/

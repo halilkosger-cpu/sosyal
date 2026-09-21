@@ -9,7 +9,7 @@ import Olcumler from '@/components/Olcumler';
 import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
-import { IconCart, IconFastShipping, IconEasyReturn, IconSocialContribution, IconSecurePayment } from '@/components/Icons';
+import { IconCart } from '@/components/Icons';
 import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { kisaAd } from '@/lib/kategori-gorunum';
@@ -140,15 +140,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="bg-gray-100 text-gray-900">
 
         {/* ─── TOP BAR ─── */}
-        <header className="sticky top-0 z-50 shadow-md">
+        <header className="sticky top-0 z-50 shadow-sm">
 
-          {/* Main nav row */}
-          <div className="bg-[#CC4E00]">
-            <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center gap-2 md:gap-4">
+          {/* Main nav row - 2026 Eylul tasarimi: beyaz baslik */}
+          <div className="bg-white border-b border-gray-100">
+            <div className="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center gap-3 md:gap-8">
 
               {/* Logo */}
               <Link href="/" className="flex-shrink-0">
-                <div className="bg-white rounded-lg px-3 py-1 flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   {/* logo.jpg 1024x1024 kare ve 54 KB idi; width/height ise
                       160x60 yaziliydi. Tarayici once 160x60 yer ayirip sonra
                       CSS ile 60x60'a cektigi icin duzen kaymasi oluyordu.
@@ -178,13 +178,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* Cart */}
               <Link
                 href="/sepet"
-                className="relative flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
+                className="relative flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors flex-shrink-0"
               >
                 <div className="relative">
-                  <IconCart className="w-6 h-6 mb-0.5 brightness-0 invert" />
+                  <IconCart className="w-6 h-6" />
                   <CartBadge />
                 </div>
-                <span className="text-xs font-semibold">Sepetim</span>
+                <span className="hidden sm:inline text-sm font-medium">Sepetim</span>
               </Link>
 
             </div>
@@ -223,67 +223,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
         </main>
 
-        {/* ─── FOOTER ─── */}
-        <footer className="bg-[#0A1628] text-white mt-8">
+        {/* ─── FOOTER ───
+            2026 Eylul tasarimi: acik zemin, dort sutun.
 
-          {/* Trust bar */}
-          <div className="bg-[#0D1B30]">
-            <div className="max-w-screen-xl mx-auto px-4 py-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {/* Guven cubugundaki her vaat, kosullarini anlatan sayfaya
-                    bagli. Onceden bunlar tiklanamayan metinlerdi: "14 gun iade
-                    hakki" yaziyordu ama musteri iadenin nasil isledigini
-                    aramak zorundaydi. Vaadi sozlesmesinden bir tik uzakta
-                    tutmak hem dogru hem de cagri merkezini rahatlatiyor. */}
-                {[
-                  { Icon: IconFastShipping,       title: 'Hızlı Kargo',   sub: '2-7 iş günü içinde gönderim', href: '/teslimat-iade-sartlari' },
-                  { Icon: IconSecurePayment,      title: 'Güvenli Ödeme', sub: 'SSL ile şifreli işlem',       href: '/guvenli-alisveris' },
-                  { Icon: IconEasyReturn,         title: 'Kolay İade',    sub: '14 gün içinde cayma hakkı',   href: '/teslimat-iade-sartlari' },
-                  { Icon: IconSocialContribution, title: 'Sosyal Katkı',  sub: 'Her alışveriş fark yaratır',  href: '/hakkimizda' },
-                ].map((item) => (
-                  <Link key={item.title} href={item.href} className="flex items-center gap-3 group rounded-lg transition-colors hover:bg-white/5">
-                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <item.Icon className="w-9 h-9 object-contain" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white group-hover:text-orange-200 transition-colors">{item.title}</p>
-                      <p className="text-xs text-gray-400">{item.sub}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Links */}
-          <div className="max-w-screen-xl mx-auto px-4 py-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-              <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white font-bold">Kurumsal</h3>
-                <ul className="space-y-2">
-                  <li><Link href="/hakkimizda" className="text-gray-300 hover:text-white text-sm transition font-medium">Hakkımızda</Link></li>
-                  <li><Link href="/guvenli-alisveris" className="text-gray-300 hover:text-white text-sm transition font-medium">Güvenli Alışveriş</Link></li>
-                  <li><Link href="/kvkk" className="text-gray-300 hover:text-white text-sm transition font-medium">KVKK</Link></li>
-                  <li><Link href="/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Mesafeli Satış Sözleşmesi</Link></li>
-                  <li>
-                    <a href="https://cezaevinden.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-sm transition font-medium">
-                      Platform: cezaevinden.com
-                    </a>
-                  </li>
-                </ul>
+            Kaldirilanlar ve sebepleri:
+             - Visa / Mastercard / iyzico logolari: kartla odeme su an kapali;
+               logolar olmayan bir odeme yolunu vaat ediyordu. Kart odemesi
+               acildiginda geri eklenmeli.
+             - Sosyal medya dugmeleri: hepsi href="#" idi, hicbir hesaba
+               gitmiyordu. Gercek hesap adresleri girildiginde eklenebilir. */}
+        <footer className="bg-white border-t border-gray-200 mt-8">
+          <div className="max-w-screen-xl mx-auto px-4 pt-10 pb-24 md:pb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="col-span-2 md:col-span-1">
+                <Image src="/logo.webp" alt="İsyurtları" width={60} height={60} className="h-[52px] w-auto mb-3" />
+                <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
+                  Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde hükümlülerin el emeğiyle
+                  üretilen ürünlerin online satış mağazası.
+                </p>
+                <a href="mailto:info@isyurtlari.com.tr" className="inline-block mt-3 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+                  info@isyurtlari.com.tr
+                </a>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">Kategoriler</h3>
-                {/* Bu liste elle yaziliydi: /gida, /tekstil, /mobilya, /ahsap.
-                    Ust menu ayni sorundan oturu zaten veritabanina baglanmisti
-                    (admin panelinden eklenen kategori gorunmuyor, silinen
-                    kategori 404 veren olu bag olarak kaliyordu) ama alt bilgi
-                    eski halinde kalmisti - "mobilya" slug'i su an tabloda
-                    yok. Artik ayni kaynaktan besleniyor. */}
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Alışveriş</h3>
+                {/* Kategoriler veritabanindan: panelden eklenen/silinen
+                    kategori burada da hemen guncellenir. */}
                 <ul className="space-y-2">
                   {categories.slice(0, 6).map((cat) => (
                     <li key={cat.slug}>
-                      <Link href={`/${cat.slug}`} className="text-gray-300 hover:text-white text-sm transition font-medium">
+                      <Link href={`/${cat.slug}`} className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">
                         {cat.name}
                       </Link>
                     </li>
@@ -291,31 +260,31 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">Yardım</h3>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Kurumsal</h3>
                 <ul className="space-y-2">
-                  <li><Link href="/bize-ulasin" className="text-gray-300 hover:text-white text-sm transition font-medium">Bize Ulaşın</Link></li>
-                  <li><Link href="/teslimat-iade-sartlari" className="text-gray-300 hover:text-white text-sm transition font-medium">Teslimat & İade</Link></li>
-                  <li><Link href="/gizlilik-sozlesmesi" className="text-gray-300 hover:text-white text-sm transition font-medium">Gizlilik Sözleşmesi</Link></li>
+                  <li><Link href="/hakkimizda" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Hakkımızda</Link></li>
+                  <li><Link href="/guvenli-alisveris" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Güvenli Alışveriş</Link></li>
+                  <li><Link href="/kvkk" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">KVKK</Link></li>
+                  <li><Link href="/mesafeli-satis-sozlesmesi" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Mesafeli Satış Sözleşmesi</Link></li>
+                  <li>
+                    <a href="https://cezaevinden.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">
+                      Platform: cezaevinden.com
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-sm font-bold mb-4 uppercase tracking-wide text-white">İletişim</h3>
-                <p className="text-gray-300 text-sm font-bold mb-1">E-posta:</p>
-                <a href="mailto:info@isyurtlari.com.tr" className="text-gray-300 text-sm mb-3 font-medium hover:text-[#BA4700] transition-colors">info@isyurtlari.com.tr</a>
-                <div className="flex gap-3 mt-4">
-                  {['Twitter', 'Instagram', 'Facebook'].map((s) => (
-                    <a key={s} href="#" aria-label={s} className="w-8 h-8 bg-gray-700 hover:bg-[#CC4E00] rounded-full flex items-center justify-center text-xs font-semibold text-white transition-colors">
-                      {s[0]}
-                    </a>
-                  ))}
-                </div>
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Destek</h3>
+                <ul className="space-y-2">
+                  <li><Link href="/bize-ulasin" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Bize Ulaşın</Link></li>
+                  <li><Link href="/teslimat-iade-sartlari" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Teslimat &amp; İade</Link></li>
+                  <li><Link href="/siparislerim" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Siparişlerim</Link></li>
+                  <li><Link href="/gizlilik-sozlesmesi" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Gizlilik Sözleşmesi</Link></li>
+                </ul>
               </div>
             </div>
-            <div className="border-t border-blue-900/50 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-gray-400 text-sm">
-                © 2026 isyurtlari.com.tr - Tüm hakları saklıdır.
-              </p>
-              <Image src="/logo_band_white@1X.png" alt="Payment Methods - Visa, Mastercard, iyzico" width={280} height={40} className="h-8 w-auto" sizes="(max-width: 640px) 200px, 280px" />
+            <div className="border-t border-gray-100 mt-8 pt-5 text-center">
+              <p className="text-xs text-gray-500">© 2026 isyurtlari.com.tr - Tüm hakları saklıdır.</p>
             </div>
           </div>
         </footer>

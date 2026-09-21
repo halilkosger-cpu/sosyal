@@ -49,10 +49,10 @@ export default function HesapMenusu() {
     return (
       <Link
         href="/giris"
-        className="hidden md:flex flex-col items-center text-white hover:text-orange-100 transition-colors flex-shrink-0"
+        className="hidden md:flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors flex-shrink-0"
       >
-        <LuUser className="w-6 h-6 mb-0.5" strokeWidth={2} />
-        <span className="text-xs font-semibold">Giriş Yap</span>
+        <LuUser className="w-5 h-5" strokeWidth={2} />
+        <span className="text-sm font-medium">Giriş Yap</span>
       </Link>
     );
   }
@@ -63,12 +63,12 @@ export default function HesapMenusu() {
     <div ref={sarmalayici} className="relative hidden md:block flex-shrink-0">
       <button
         onClick={() => setAcik((a) => !a)}
-        className="flex flex-col items-center text-white hover:text-orange-100 transition-colors"
+        className="flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors"
         aria-haspopup="menu"
         aria-expanded={acik}
       >
-        <LuUser className="w-6 h-6 mb-0.5" strokeWidth={2} />
-        <span className="text-xs font-semibold max-w-[80px] truncate">{ilkAd}</span>
+        <LuUser className="w-5 h-5" strokeWidth={2} />
+        <span className="text-sm font-medium max-w-[100px] truncate">{ilkAd}</span>
       </button>
 
       {acik && (

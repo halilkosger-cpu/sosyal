@@ -77,6 +77,12 @@ export interface UrunKartiProps {
    * yerine "Ön Talep Ver" cizilir (kart zaten on talep formuna gidiyor).
    */
   genisSepet?: boolean;
+  /**
+   * Kompakt kart (ana sayfa vitrini): ad, altinda fiyat ve yaninda kucuk
+   * "Sepete Ekle". "Stokta" rozeti cizilmez; tukenmis urunde "Tükendi"
+   * ortusu ve "Ön Talep" dugmesi kalir - durum gizlenmez.
+   */
+  kompakt?: boolean;
   /** Kartin altina eklenecek serbest icerik (or. "favorilerden cikar"). */
   altAlan?: ReactNode;
   /**
@@ -101,6 +107,7 @@ export default function UrunKarti({
   favoriButonu = true,
   sepetButonu = false,
   genisSepet = false,
+  kompakt = false,
   altAlan,
   sarmalaLink = true,
 }: UrunKartiProps) {
@@ -139,7 +146,7 @@ export default function UrunKarti({
         </div>
       )}
 
-      {!tukendi && (
+      {!tukendi && !kompakt && (
         <span className="absolute top-2 left-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded">
           Stokta
         </span>
@@ -276,14 +283,60 @@ export default function UrunKarti({
     </div>
   );
 
-  const kartSiniflari =
-    'group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col';
+  const kompaktGovde = (
+    <div className="p-3 flex flex-col flex-1">
+      <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 group-hover:text-[#BA4700] transition-colors">
+        {urun.name}
+      </h3>
+      <div className="flex flex-wrap items-center justify-between gap-2 mt-auto pt-2">
+        {fiyatVar ? (
+          <span className="flex items-baseline gap-1.5 min-w-0">
+            <span className={`text-base font-bold tracking-tight ${urun.campaign ? 'text-red-600' : 'text-gray-900'}`}>
+              ₺{gecerliFiyat.toFixed(2).replace('.', ',')}
+            </span>
+            {urun.campaign && (
+              <span className="text-[11px] text-gray-400 line-through">₺{urun.price.toFixed(2).replace('.', ',')}</span>
+            )}
+          </span>
+        ) : (
+          <span className="text-xs text-gray-500 italic">Fiyat belirleniyor</span>
+        )}
+        {tukendi ? (
+          <span className="h-8 shrink-0 rounded-lg px-3 flex items-center text-xs font-semibold border border-[#CC4E00] text-[#BA4700] group-hover:bg-orange-50 transition-colors">
+            Ön Talep
+          </span>
+        ) : (
+          fiyatVar && (
+            <AddToCartButton
+              etiketli
+              product={{
+                id: urun.id,
+                name: urun.name,
+                price: gecerliFiyat,
+                slug: urun.slug,
+                imageUrl: urun.imageUrl,
+                quantity: urun.quantity,
+                campaign: urun.campaign ?? null,
+                kdvOrani: urun.category?.kdvOrani ?? null,
+              }}
+            />
+          )
+        )}
+      </div>
+    </div>
+  );
+
+  const icerik = kompakt ? kompaktGovde : govde;
+
+  const kartSiniflari = kompakt
+    ? 'group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col'
+    : 'group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col';
 
   if (!sarmalaLink) {
     return (
       <div className={kartSiniflari}>
         {gorsel}
-        {govde}
+        {icerik}
       </div>
     );
   }
@@ -291,7 +344,7 @@ export default function UrunKarti({
   return (
     <Link href={hedef} className={kartSiniflari}>
       {gorsel}
-      {govde}
+      {icerik}
     </Link>
   );
 }
