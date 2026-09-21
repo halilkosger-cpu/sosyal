@@ -29,6 +29,15 @@ export const truncate = (value: string, maxLength = 155) => {
 
 export const defaultOpenGraphImage = absoluteUrl('/logo.jpg');
 
+/**
+ * Paylasim gorseli (WhatsApp, Facebook, X, LinkedIn onizlemesi).
+ * Onceden kare logo kullaniliyordu; 1.91:1 onizlemelerde kenarlari
+ * kirpiliyor ya da kucuk kare olarak gorunuyordu. 1200x630, ana sayfanin
+ * hero fotografindan. Kurulus (Organization) semasindaki logo ayri ve
+ * logo.jpg olarak kaliyor - Google orada kare logo bekliyor.
+ */
+export const paylasimGorseli = absoluteUrl('/og-image.jpg');
+
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -49,10 +58,10 @@ export const defaultMetadata: Metadata = {
     url: SITE_URL,
     images: [
       {
-        url: defaultOpenGraphImage,
-        width: 1024,
-        height: 1024,
-        alt: SITE_NAME,
+        url: paylasimGorseli,
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} - Beceri. Değer. Yaratan.`,
       },
     ],
   },
@@ -60,7 +69,7 @@ export const defaultMetadata: Metadata = {
     card: 'summary_large_image',
     title: `${SITE_NAME} | Sosyal Girişim`,
     description: SITE_DESCRIPTION,
-    images: [defaultOpenGraphImage],
+    images: [paylasimGorseli],
   },
   robots: {
     index: true,
