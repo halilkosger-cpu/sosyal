@@ -266,7 +266,7 @@ function KategoriIcerigi({
 
           <div className="max-w-xl">
             <div className="flex items-center gap-3">
-              {!afis && <Icon className="w-14 h-14 object-contain" />}
+              <KategoriIkon slug={categorySlug} className="w-14 h-14 md:w-20 md:h-20 flex-shrink-0 drop-shadow-sm" />
               <div>
                 <p className="text-[#BA4700] text-[11px] font-bold uppercase tracking-widest">
                   {meta?.purpose || 'Meslek Eğitim Programı'}
@@ -357,7 +357,7 @@ function KategoriIcerigi({
                           <KategoriIkon
                             slug={k.slug}
                             imageUrl={k.imageUrl}
-                            className="h-6 w-6 flex-shrink-0"
+                            className="h-8 w-8 flex-shrink-0"
                           />
                           <span className="min-w-0 flex-1 truncate">{kisaAd(k.name)}</span>
                           <span

@@ -1,4 +1,4 @@
-import { kategoriIkonu } from '@/lib/kategori-gorunum';
+import { kategoriIkonu, kategoriIkonDosyasi } from '@/lib/kategori-gorunum';
 
 /**
  * Kategori ikonu.
@@ -27,6 +27,25 @@ export default function KategoriIkon({
         src={imageUrl}
         alt=""
         aria-hidden="true"
+        className={`${className} object-contain`}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
+
+  // 2026 Eylul: kategoriye ozel 3B ikonlar (public/kategori-ikon/, 256px
+  // WebP, Higgsfield ile uretildi). Panelden ikon yuklenmisse o oncelikli.
+  const dosya = kategoriIkonDosyasi(slug);
+  if (dosya) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return (
+      <img
+        src={dosya}
+        alt=""
+        aria-hidden="true"
+        width={256}
+        height={256}
         className={`${className} object-contain`}
         loading="lazy"
         decoding="async"

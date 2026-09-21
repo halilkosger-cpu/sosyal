@@ -3,13 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import type { IconType } from 'react-icons';
-import {
-  LuArrowRight, LuSprout, LuShirt, LuAxe, LuGift, LuFlower2, LuPalette,
-  LuSparkles, LuArmchair, LuGrid3X3, LuHammer, LuUsers, LuPackage, LuHeart,
-  LuHandHeart, LuInfo, LuStore,
-} from 'react-icons/lu';
+import { LuArrowRight, LuUsers, LuPackage, LuHeart, LuHandHeart, LuInfo } from 'react-icons/lu';
 import UrunKarti from '@/components/UrunKarti';
+import KategoriIkon from '@/components/KategoriIkon';
 import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture } from '@/components/Icons';
 import { content } from '@/config/content';
 
@@ -39,19 +35,6 @@ interface Product  { id: string; name: string; slug: string; price: number; quan
 interface CampaignProduct { productId: string; discount: number; product: Product; }
 interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
-/** Kategori satirindaki cizgi ikonlar (slug -> ikon). Eski ve yeni slug'lar. */
-const kategoriIkonu: Record<string, IconType> = {
-  'gida': LuSprout, 'gida-urunleri': LuSprout,
-  'tekstil': LuShirt, 'tekstil-urunleri': LuShirt,
-  'ahsap': LuAxe, 'ahsap-urunler': LuAxe,
-  'hediyelik': LuGift,
-  'peyzaj': LuFlower2, 'peyzaj-cicek': LuFlower2,
-  'sanat-zanaat': LuPalette,
-  'temizlik': LuSparkles,
-  'mobilya-urunleri': LuArmchair,
-  'dokuma': LuGrid3X3,
-  'demir-metal-urunleri': LuHammer,
-};
 
 /** Gorseli olmayan urunde kutu emojisi yerine kategorinin ikonu. */
 const urunYedekIkonu: Record<string, React.ElementType> = {
@@ -104,14 +87,14 @@ export default function HomeClient({
       fetch('/api/campaigns/active').then((r) => r.json()).catch(() => []),
     ]).then(([cats, prods, camps]) => {
       setCategories(Array.isArray(cats) ? cats : []);
-      setProducts(Array.isArray(prods) ? prods.slice(0, 8) : []);
+      setProducts(Array.isArray(prods) ? prods.filter((p: Product) => p.imageUrl).slice(0, 8) : []);
       setCampaigns(Array.isArray(camps) ? camps : []);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [baslangicUrunler]);
 
   const kampanyaKartlari = campaigns.flatMap((k) =>
-    k.products.slice(0, 8).map((cp) => ({
+    k.products.filter((cp) => cp.product.imageUrl).slice(0, 8).map((cp) => ({
       ...cp.product,
       campaign: { discount: cp.discount, discountedPrice: indirimliFiyat(cp.product.price, cp.discount) },
     }))
@@ -203,19 +186,19 @@ export default function HomeClient({
           </div>
         ) : (
           <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x -mx-4 px-4 pb-1 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(120px,1fr))] sm:overflow-visible">
-            {categories.map((cat) => {
-              const Icon = kategoriIkonu[cat.slug] ?? LuStore;
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/${cat.slug}`}
-                  className="w-28 shrink-0 snap-start sm:w-auto flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-[#FAFAF9] hover:bg-white hover:border-orange-200 hover:shadow-md px-2 py-4 text-center transition-all"
-                >
-                  <Icon className="w-7 h-7 text-gray-800" strokeWidth={1.5} />
-                  <span className="text-sm font-medium text-gray-800 leading-tight">{cat.name}</span>
-                </Link>
-              );
-            })}
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/${cat.slug}`}
+                className="group w-32 shrink-0 snap-start sm:w-auto flex flex-col items-center justify-center gap-2 rounded-2xl border border-gray-200/80 bg-gradient-to-b from-[#FFFBF6] to-[#F7EFE5] hover:border-orange-200 hover:shadow-lg hover:-translate-y-0.5 px-2 pt-3 pb-4 text-center transition-all duration-200"
+              >
+                <KategoriIkon
+                  slug={cat.slug}
+                  className="w-16 h-16 md:w-20 md:h-20 drop-shadow-sm group-hover:scale-105 transition-transform duration-200"
+                />
+                <span className="text-sm font-semibold text-gray-800 leading-tight">{cat.name}</span>
+              </Link>
+            ))}
           </div>
         )}
       </section>

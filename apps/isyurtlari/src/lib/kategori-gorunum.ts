@@ -38,6 +38,26 @@ export function kategoriIkonu(slug: string): ElementType {
 }
 
 /**
+ * Kategoriye ozel 3B ikon dosyasi (public/kategori-ikon/). Eski slug'lar
+ * yenisine esleniyor. Listede olmayan kategori null doner ve yerlesik
+ * SVG ikona duser - panelden yeni eklenen kategori kirik gorunmez.
+ */
+const IKON_DOSYALARI: Record<string, string> = {
+  gida: 'gida', 'gida-urunleri': 'gida',
+  ahsap: 'ahsap', 'ahsap-urunler': 'ahsap', 'ahsap-urunleri': 'ahsap',
+  hediyelik: 'hediyelik',
+  peyzaj: 'peyzaj', 'peyzaj-cicek': 'peyzaj',
+  'sanat-zanaat': 'sanat-zanaat', dokuma: 'sanat-zanaat',
+  tekstil: 'tekstil', 'tekstil-urunleri': 'tekstil',
+  temizlik: 'temizlik',
+};
+
+export function kategoriIkonDosyasi(slug: string): string | null {
+  const ad = IKON_DOSYALARI[slug];
+  return ad ? `/kategori-ikon/${ad}.webp` : null;
+}
+
+/**
  * Kategori kartlarinin renk gecisi.
  *
  * Renkler HomeClient ve kategori sayfasinda slug'a gore elle yazili

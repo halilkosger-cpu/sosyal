@@ -128,7 +128,10 @@ async function anaSayfaVerisi() {
 
     return {
       kategoriler,
-      urunler: varsayilanSirala(urunler).slice(0, 8).map((u) => ({
+      // Vitrinde yalnizca fotografi olan urunler. Fotografsiz urun ana
+      // sayfada bos kutu gibi duruyordu; kategori sayfalarinda ve aramada
+      // gorunmeye devam ediyor.
+      urunler: varsayilanSirala(urunler.filter((u) => u.imageUrl)).slice(0, 8).map((u) => ({
         id: u.id,
         name: u.name,
         slug: u.slug,

@@ -200,7 +200,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     href={`/${cat.slug}`}
                     className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#BA4700] hover:bg-orange-50 border-b-2 border-transparent hover:border-[#FF6000] transition-all whitespace-nowrap flex-shrink-0"
                   >
-                    <KategoriIkon slug={cat.slug} imageUrl={cat.imageUrl} className="w-7 h-7" />
+                    <KategoriIkon slug={cat.slug} imageUrl={cat.imageUrl} className="w-8 h-8" />
                     {kisaAd(cat.name)}
                   </Link>
                 ))}
