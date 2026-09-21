@@ -36,7 +36,7 @@ export const defaultOpenGraphImage = absoluteUrl('/logo.jpg');
  * hero fotografindan. Kurulus (Organization) semasindaki logo ayri ve
  * logo.jpg olarak kaliyor - Google orada kare logo bekliyor.
  */
-export const paylasimGorseli = absoluteUrl('/og-image.jpg');
+export const paylasimGorseli = absoluteUrl('/og-gorsel.jpg');
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -61,7 +61,7 @@ export const defaultMetadata: Metadata = {
         url: paylasimGorseli,
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} - Beceri. Değer. Yaratan.`,
+        alt: `${SITE_NAME} - Beceri. Değer. Doğal.`,
       },
     ],
   },

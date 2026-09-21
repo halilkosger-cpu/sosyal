@@ -14,7 +14,10 @@ export const content = {
       badge: 'El Emeğine Dayanan Sosyal Girişim',
       title: 'Beceri',
       titleHighlight: 'Değer',
-      titleSuffix: 'Yaratan',
+      // "Yaratan" kaldirildi: yaratmak Allah'a mahsus kabul edildigi icin
+      // yanlis anlasiliyordu. Tek basina "Yaratıcı." da ayni sebeple
+      // ("Yaratıcı" = Allah) secilmedi.
+      titleSuffix: 'Doğal',
       subtitle: 'Hükümlülerin el emeğiyle üretilen ürünler. Her satın alma, bireyin yeniden başlamasına ve topluma kazanılmasına yardım eder.',
       ctaPrimary: 'Değiştir. Satın Al. Destekle.',
       ctaSecondary: 'Misyon & Vizyon',
