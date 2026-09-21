@@ -72,6 +72,11 @@ export interface UrunKartiProps {
   etkiRozeti?: string;
   favoriButonu?: boolean;
   sepetButonu?: boolean;
+  /**
+   * Fiyatin altinda tam genislikte "Sepete Ekle" butonu. Tukenmis urunde
+   * yerine "Ön Talep Ver" cizilir (kart zaten on talep formuna gidiyor).
+   */
+  genisSepet?: boolean;
   /** Kartin altina eklenecek serbest icerik (or. "favorilerden cikar"). */
   altAlan?: ReactNode;
   /**
@@ -95,6 +100,7 @@ export default function UrunKarti({
   etkiRozeti,
   favoriButonu = true,
   sepetButonu = false,
+  genisSepet = false,
   altAlan,
   sarmalaLink = true,
 }: UrunKartiProps) {
@@ -241,6 +247,30 @@ export default function UrunKarti({
           </div>
         )}
       </div>
+
+      {genisSepet && (
+        <div className="mt-3">
+          {tukendi ? (
+            <span className="w-full h-10 rounded-xl border border-[#CC4E00] text-[#BA4700] text-sm font-semibold flex items-center justify-center group-hover:bg-orange-50 transition-colors">
+              Ön Talep Ver
+            </span>
+          ) : (
+            <AddToCartButton
+              genis
+              product={{
+                id: urun.id,
+                name: urun.name,
+                price: gecerliFiyat,
+                slug: urun.slug,
+                imageUrl: urun.imageUrl,
+                quantity: urun.quantity,
+                campaign: urun.campaign ?? null,
+                kdvOrani: urun.category?.kdvOrani ?? null,
+              }}
+            />
+          )}
+        </div>
+      )}
 
       {altAlan}
     </div>

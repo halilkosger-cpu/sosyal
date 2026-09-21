@@ -4,14 +4,34 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import UrunKarti from '@/components/UrunKarti';
-import HeroBackgroundVideo from '@/components/HeroBackgroundVideo';
 import {
   IconFood, IconTextile, IconWood, IconWeaving, IconFurniture,
-  IconSuccess, IconWeekSpecial,
-  IconTransfer, IconFastShipping, IconSocialContribution,
+  IconSuccess, IconWeekSpecial, IconTransfer, IconFastShipping,
+  IconSocialContribution, IconEasyReturn, IconMinistryJustice,
+  IconOrderTracking, IconVocationalTraining, IconProductOrigin,
 } from '@/components/Icons';
 import { content } from '@/config/content';
 import { yedekGecis } from '@/lib/kategori-gorunum';
+
+/**
+ * Ana sayfa - 2026 Eylul yeniden tasarimi.
+ *
+ * Duzen: acik renkli hero (slogan + SEO basligi + gercek urun gorselleri),
+ * istatistik kutulari, guvence seridi, kategori kutulari, kampanyalar,
+ * "El Emegi Urunler" vitrini, sosyal etki bandi, SEO metni.
+ *
+ * Arka plan videosu kaldirildi: sayfanin en buyuk boyamasi (LCP) artik
+ * sunucuda secilen bir urun gorseli; mobilde megabaytlarca video inmiyor.
+ *
+ * H1 METNI DEGISTIRILMEDI. Site "işyurtları", "cezaevi ürünleri" gibi
+ * aramalarda bu baslikla siralaniyor; slogan gorsel olarak one cikiyor ama
+ * baslik etiketi degil.
+ *
+ * Guvence seridindeki her madde sitenin gercek isleyisine dayaniyor
+ * (14 gun cayma hakki, siparis takibi, Turkiye geneline gonderim, kamu
+ * kurumu). Dogrulanamayan bir teslim suresi ya da odeme guvencesi
+ * YAZILMAMALI - taahhut tuketici mevzuatinda baglayici.
+ */
 
 interface Category { id: string; name: string; slug: string; }
 interface Product  { id: string; name: string; slug: string; price: number; quantity: number; imageUrl?: string; category: { name: string; slug: string }; }
@@ -20,33 +40,41 @@ interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
 const categoryConfig: Record<string, { Icon: React.ElementType; gradient: string; purpose: string }> = {
   // Eski slug format (uyumluluk için)
-  'gida-urunleri':        { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil-urunleri':     { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Terzilik Meslek Eğitimi' },
-  'ahsap-urunler':        { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
-  'dokuma':               { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'Dokuma & Sanat Terapisi' },
-  'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',      purpose: 'Mobilya Tasarım Eğitimi' },
-  'demir-metal-urunleri': { Icon: IconFurniture, gradient: 'from-slate-600 to-slate-400',    purpose: 'Metal İşleri Ustası Programı' },
+  'gida-urunleri':        { Icon: IconFood,      gradient: 'from-emerald-500 to-teal-400',  purpose: 'Beslenme & Aşçılık Eğitimi' },
+  'tekstil-urunleri':     { Icon: IconTextile,   gradient: 'from-blue-600 to-indigo-400',   purpose: 'Terzilik Meslek Eğitimi' },
+  'ahsap-urunler':        { Icon: IconWood,      gradient: 'from-amber-500 to-yellow-400',  purpose: 'Marangozluk Beceri Programı' },
+  'dokuma':               { Icon: IconWeaving,   gradient: 'from-violet-600 to-purple-400', purpose: 'Dokuma & Sanat Terapisi' },
+  'mobilya-urunleri':     { Icon: IconFurniture, gradient: 'from-rose-500 to-pink-400',     purpose: 'Mobilya Tasarım Eğitimi' },
+  'demir-metal-urunleri': { Icon: IconFurniture, gradient: 'from-slate-600 to-slate-400',   purpose: 'Metal İşleri Ustası Programı' },
   // Yeni slug format (seed script'ten)
-  'gida':                 { Icon: IconFood,     gradient: 'from-emerald-500 to-teal-400',   purpose: 'Beslenme & Aşçılık Eğitimi' },
-  'tekstil':              { Icon: IconTextile,  gradient: 'from-blue-600 to-indigo-400',    purpose: 'Terzilik Meslek Eğitimi' },
-  'ahsap':                { Icon: IconWood,     gradient: 'from-amber-500 to-yellow-400',   purpose: 'Marangozluk Beceri Programı' },
-  'temizlik':             { Icon: IconWeaving,  gradient: 'from-cyan-500 to-blue-400',      purpose: 'Temizlik & Kozmetik Eğitimi' },
-  'hediyelik':            { Icon: IconWeaving,  gradient: 'from-rose-500 to-pink-400',      purpose: 'El Sanatları & Tasarım' },
-  // Slug 'peyzaj-cicek' yaziliydi ama veritabanindaki slug 'peyzaj'; kart bu
-  // yuzden gri cikiyordu. 'sanat-zanaat' ise tabloda hic yoktu.
-  'peyzaj':               { Icon: IconWood,     gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
-  'peyzaj-cicek':         { Icon: IconWood,     gradient: 'from-green-500 to-emerald-400',  purpose: 'Peyzaj & Çiçek Tasarımı' },
-  'sanat-zanaat':         { Icon: IconWeaving,  gradient: 'from-violet-600 to-purple-400',  purpose: 'El Sanatları & Yaratıcı Üretim' },
-};
-
-const productEmojis: Record<string, string> = {
-  'badem':'🌰','biber-receli':'🫙','biber-salcasi':'🌶️','domates-salcasi':'🍅',
-  'findik':'🥜','incir-receli':'🍓','kuru-baklagil':'🫘','pirinc':'🍚',
-  'tereyag':'🧈','yesil-zeytin':'🫒','zeytinyag':'🫒','peynir':'🧀',
-  'havlu-beyaz':'🛁','havlu-renkli':'🛁','ahsap-sandalye':'🪑','ahsap-masa':'🪑',
+  'gida':                 { Icon: IconFood,      gradient: 'from-emerald-500 to-teal-400',  purpose: 'Beslenme & Aşçılık Eğitimi' },
+  'tekstil':              { Icon: IconTextile,   gradient: 'from-blue-600 to-indigo-400',   purpose: 'Terzilik Meslek Eğitimi' },
+  'ahsap':                { Icon: IconWood,      gradient: 'from-amber-500 to-yellow-400',  purpose: 'Marangozluk Beceri Programı' },
+  'temizlik':             { Icon: IconWeaving,   gradient: 'from-cyan-500 to-blue-400',     purpose: 'Temizlik & Kozmetik Eğitimi' },
+  'hediyelik':            { Icon: IconWeaving,   gradient: 'from-rose-500 to-pink-400',     purpose: 'El Sanatları & Tasarım' },
+  'peyzaj':               { Icon: IconWood,      gradient: 'from-green-500 to-emerald-400', purpose: 'Peyzaj & Çiçek Tasarımı' },
+  'peyzaj-cicek':         { Icon: IconWood,      gradient: 'from-green-500 to-emerald-400', purpose: 'Peyzaj & Çiçek Tasarımı' },
+  'sanat-zanaat':         { Icon: IconWeaving,   gradient: 'from-violet-600 to-purple-400', purpose: 'El Sanatları & Yaratıcı Üretim' },
 };
 
 const announcements = content.home.announcements;
+const statIkonlari = [IconVocationalTraining, IconProductOrigin, IconSocialContribution];
+
+const guvenceler = [
+  { Icon: IconFastShipping,    baslik: 'Türkiye Geneline Gönderim', aciklama: 'Kargo ücreti teslimatta ödenir' },
+  { Icon: IconEasyReturn,      baslik: '14 Gün Cayma Hakkı',        aciklama: 'Teslimden itibaren iade imkânı' },
+  { Icon: IconOrderTracking,   baslik: 'Sipariş Takibi',            aciklama: 'Kargo takip numarasıyla izleyin' },
+  { Icon: IconMinistryJustice, baslik: 'Kamu Kurumu Güvencesi',     aciklama: 'Adalet Bakanlığı İşyurtları Kurumu' },
+];
+
+/** Gorseli olmayan urunde kutu emojisi yerine kategorinin ikonu. */
+const urunYedegi = (slug?: string) => {
+  const Icon = (slug && categoryConfig[slug]?.Icon) || IconFurniture;
+  return <Icon className="w-24 h-24 object-contain opacity-90" />;
+};
+
+const indirimliFiyat = (fiyat: number, indirim: number) =>
+  Math.round(fiyat * (1 - indirim / 100) * 100) / 100;
 
 interface BaslangicVeri {
   baslangicKategoriler?: Category[] | null;
@@ -85,219 +113,175 @@ export default function HomeClient({
     }).catch(() => setLoading(false));
   }, [baslangicUrunler]);
 
-  return (
-    <div className="min-h-screen bg-[#F4F5F7]">
+  // Hero kolaji: vitrindeki gorselli ilk uc urun. Liste zaten "once satin
+  // alinabilir" sirali geldigi icin burada stoktaki urunler one cikiyor.
+  const kolaj = products.filter((p) => p.imageUrl).slice(0, 3);
 
-      {/* ─── ANNOUNCEMENT BAR ─── */}
-      <div className="bg-[#0A1628] text-white border-b border-white/10 overflow-hidden">
-        <div className="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center justify-center md:justify-between gap-4">
-          <div className="hidden md:flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#CC4E00]" />
-            Sosyal etki
-          </div>
-          <p className="min-h-5 text-center text-sm md:text-[15px] font-medium tracking-[0.01em] text-white transition-all duration-500">
+  const kampanyaKartlari = campaigns.flatMap((k) =>
+    k.products.slice(0, 8).map((cp) => ({
+      ...cp.product,
+      campaign: { discount: cp.discount, discountedPrice: indirimliFiyat(cp.product.price, cp.discount) },
+    }))
+  );
+
+  const [sloganA, sloganB, sloganC] = [
+    content.home.hero.title,
+    content.home.hero.titleHighlight,
+    content.home.hero.titleSuffix,
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#F7F5F2]">
+
+      {/* ─── DUYURU ŞERİDİ ─── */}
+      <div className="bg-[#0F2040] text-white">
+        <div className="max-w-screen-xl mx-auto px-4 py-2 flex items-center justify-center gap-3">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#FF7A1A]" aria-hidden="true" />
+          <p className="min-h-5 text-center text-[13px] md:text-sm font-medium tracking-[0.01em] transition-all duration-500">
             {announcements[ticker]}
           </p>
-          <div className="hidden md:flex items-center gap-1.5" aria-hidden="true">
-            {announcements.map((_, index) => (
-              <span
-                key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${index === ticker ? 'w-6 bg-[#CC4E00]' : 'w-1.5 bg-white/30'}`}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
       {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden bg-[#0F2040]">
-        <HeroBackgroundVideo />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOFYwaDQydjQySDE4YzAtOS45NCA4LjA2LTE4IDE4LTE4eiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIvPjwvZz48L3N2Zz4=')] opacity-30" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#CC4E00] opacity-[0.07] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF8F1] via-[#FBF4EC] to-[#F3EBE1]">
+        <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full bg-[#FF7A1A]/10 blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -bottom-40 -left-24 w-[420px] h-[420px] rounded-full bg-[#0F2040]/5 blur-3xl pointer-events-none" aria-hidden="true" />
 
-        <div className="relative max-w-screen-xl mx-auto px-4 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-
-          {/* Left */}
-          <div className="">
-            <div className="inline-flex items-center gap-3 bg-white/10 border border-white/15 text-orange-100 text-xs font-semibold px-4 py-2.5 rounded-full mb-7 tracking-normal shadow-lg shadow-black/10">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
-                <IconSuccess className="w-6 h-6 object-contain" />
+        <div className="relative max-w-screen-xl mx-auto px-4 pt-12 pb-24 md:pt-16 md:pb-28 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2.5 bg-white border border-orange-100 text-[#8B3A00] text-xs font-semibold pl-1.5 pr-4 py-1.5 rounded-full mb-6 shadow-sm">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-50">
+                <IconSuccess className="w-5 h-5 object-contain" />
               </span>
-              <span>{content.home.hero.badge}</span>
+              {content.home.hero.badge}
             </div>
-            <h1 className="text-[2.45rem] md:text-[4rem] font-bold text-white leading-[1.2] md:leading-[1.1] mb-6 tracking-normal">
-              {/* <br /> gorsel bir satir sonu; metin olarak okunmadigi icin
-                  arama motoru basligi "Ürünleriİsyurtları" diye bitisik
-                  goruyordu. Aradaki bosluk bunu duzeltiyor. */}
-              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri{' '}<br />
-              <span className="font-bold text-[#FF7A1A]">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
-            </h1>
-            <p className="text-white/75 text-[17px] md:text-[19px] mb-9 max-w-2xl leading-8 font-normal">
-              {content.home.hero.subtitle} Cezaevi ve hapishane hükümlülerinin eğitim programlarından başarıyla çıktığı ürünleri Türkiye geneline hızlı kargo ile teslim ediyoruz.
+
+            {/* Slogan gorsel vurgu; baslik etiketi degil (SEO icin H1 asagida). */}
+            <p className="font-serif text-[2.9rem] leading-[1.02] md:text-[4.6rem] font-bold text-[#0F2040] tracking-tight mb-5" aria-hidden="true">
+              {sloganA}.{' '}<span className="text-[#CC4E00]">{sloganB}.</span>
+              <br />
+              {sloganC}.
             </p>
-            <div className="flex flex-wrap gap-3 mb-12">
-              <Link href="/gida" className="bg-[#CC4E00] hover:bg-[#A63F00] text-white font-bold px-7 py-3.5 rounded-xl transition-all hover:scale-[1.03] shadow-lg shadow-orange-900/25 flex items-center gap-3 text-sm">
+
+            <h1 className="text-lg md:text-[1.35rem] font-semibold text-[#0F2040]/90 leading-snug mb-4 max-w-xl">
+              {/* <br /> gorsel bir satir sonu; bosluk arama motorunun kelimeleri
+                  bitisik okumasini onluyor. */}
+              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri{' '}<br className="hidden md:block" />
+              <span className="text-[#BA4700]">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
+            </h1>
+
+            <p className="text-gray-600 text-[15px] md:text-base mb-8 max-w-xl leading-7">
+              {content.home.hero.subtitle} Cezaevi ve hapishane hükümlülerinin meslek eğitim programlarında ürettiği ürünleri Türkiye geneline kargo ile teslim ediyoruz.
+            </p>
+
+            <div className="flex flex-wrap gap-3">
+              <Link href="/gida" className="group bg-[#CC4E00] hover:bg-[#A63F00] text-white font-semibold px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-orange-900/15 flex items-center gap-3 text-sm">
                 <span>{content.home.hero.ctaPrimary}</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/95">
-                  <IconTransfer className="w-6 h-6 object-contain" />
-                </span>
+                <IconTransfer className="w-5 h-5 object-contain bg-white rounded-md p-0.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <Link href="/hakkimizda" className="bg-white/8 hover:bg-white/15 text-white font-bold px-7 py-3.5 rounded-xl transition-all border border-white/15 text-sm">
+              <Link href="/hakkimizda" className="bg-white hover:bg-gray-50 text-[#0F2040] font-semibold px-6 py-3.5 rounded-xl transition-colors border border-gray-200 text-sm">
                 {content.home.hero.ctaSecondary}
               </Link>
             </div>
-            <div className="flex gap-10 pt-8 border-t border-white/10">
-              {content.home.stats.map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-2xl font-extrabold text-[#FF7A1A] tracking-normal">{value}</p>
-                  <p className="text-white/75 text-xs mt-0.5 font-semibold">{label}</p>
-                </div>
-              ))}
+          </div>
+
+          {/* Gercek urun gorsellerinden kolaj */}
+          <div className="relative">
+            {kolaj.length >= 3 ? (
+              <div className="grid grid-cols-5 grid-rows-2 gap-3 h-[340px] md:h-[440px]">
+                {kolaj.map((u, i) => (
+                  <Link
+                    key={u.id}
+                    href={`/urun/${u.slug}`}
+                    className={`group relative overflow-hidden rounded-3xl bg-white shadow-xl shadow-black/5 ${i === 0 ? 'col-span-3 row-span-2' : 'col-span-2'}`}
+                  >
+                    <Image
+                      src={u.imageUrl!}
+                      alt={u.name}
+                      fill
+                      priority={i === 0}
+                      sizes={i === 0 ? '(max-width: 1024px) 60vw, 30vw' : '(max-width: 1024px) 40vw, 20vw'}
+                      quality={75}
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <span className="absolute left-3 bottom-3 right-3 bg-white/90 backdrop-blur text-[#0F2040] text-xs font-semibold px-3 py-1.5 rounded-lg truncate">
+                      {u.name}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="relative h-[340px] md:h-[440px] rounded-3xl overflow-hidden shadow-xl shadow-black/5">
+                <Image src="/video/hero-poster.jpg" alt="İşyurtları atölyelerinde üretim" fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+              </div>
+            )}
+
+            <div className="hidden md:flex absolute -left-6 -bottom-6 items-center gap-3 bg-white rounded-2xl shadow-xl shadow-black/10 px-4 py-3 max-w-[260px]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
+                <IconSocialContribution className="w-7 h-7 object-contain" />
+              </span>
+              <p className="text-xs font-semibold text-[#0F2040] leading-snug">{announcements[0]}</p>
             </div>
           </div>
-
-          {/* Right — category preview grid */}
-          <div className="hidden md:grid grid-cols-2 gap-3">
-            {(loading || categories.length === 0 ? [
-              { slug: 'gida',     name: 'Gıda Ürünleri'  },
-              { slug: 'tekstil',  name: 'Tekstil'         },
-              { slug: 'hediyelik',     name: 'Hediyelik'  },
-              { slug: 'ahsap',     name: 'Ahşap Ürünler'  },
-            ] : categories.slice(0, 4)).map((cat) => {
-              // Tabloda karsiligi olmayan kategori gri kalmasin: renk ve ikon
-              // yoksa slug'a gore belirlenmis yedekler kullaniliyor.
-              const cfg = categoryConfig[cat.slug];
-              const Icon = cfg?.Icon ?? IconFurniture;
-              return (
-                <Link
-                  key={cat.slug}
-                  href={`/${cat.slug}`}
-                  className={`group bg-gradient-to-br ${cfg?.gradient ?? yedekGecis(cat.slug)} rounded-2xl p-5 h-44 flex flex-col justify-between hover:scale-[1.03] transition-all duration-200 shadow-lg`}
-                >
-                  <div className="w-20 h-20 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Icon className="w-20 h-20 object-contain drop-shadow-sm" />
-                  </div>
-                  <p className="text-white font-semibold text-sm">{cat.name}</p>
-                </Link>
-              );
-            })}
-          </div>
-
         </div>
       </section>
 
-      {/* ─── ACTIVE CAMPAIGNS (CAROUSEL STYLE) ─── */}
-      {campaigns.length > 0 && (
-        <section className="bg-gradient-to-r from-[#FF6000]/5 to-[#0F2040]/5 border-y border-[#FF6000]/20">
-          <div className="max-w-screen-xl mx-auto px-4 py-8">
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <IconWeekSpecial className="w-5 h-5 object-contain" />
-                <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
+      {/* ─── İSTATİSTİKLER (hero'nun uzerine tasan kutular) ─── */}
+      <section className="relative max-w-screen-xl mx-auto px-4 -mt-14 z-10">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+          {content.home.impactCards.map(({ value, title, description }, i) => {
+            const Ikon = statIkonlari[i] ?? IconSuccess;
+            return (
+              <div key={title} className="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-black/5 px-2.5 py-3 sm:px-5 sm:py-4 flex flex-col sm:flex-row items-center text-center sm:text-left gap-1.5 sm:gap-4">
+                <span className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-50">
+                  <Ikon className="w-8 h-8 object-contain" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-lg sm:text-2xl font-extrabold text-[#0F2040] tracking-tight leading-none">
+                    {value}{' '}
+                    <span className="block mt-1 text-[11px] sm:text-sm font-bold text-[#BA4700] tracking-normal leading-tight">{title}</span>
+                  </p>
+                  <p className="hidden sm:block text-gray-500 text-xs mt-1.5 truncate">{description}</p>
+                </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Kampanyadaki Ürünler</h2>
-            </div>
+            );
+          })}
+        </div>
+      </section>
 
-            {/* Campaigns Carousel */}
-            <div className="w-screen -mx-4 overflow-hidden">
-              <div className="flex gap-0 animate-scroll px-4 pb-4">
-                {/* Original campaigns */}
-                {campaigns.map(campaign => (
-                  <div key={campaign.id} className="flex-shrink-0 w-[70vw] md:w-[350px]">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">{campaign.name}</h3>
-                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                      <div className="flex gap-4 w-max">
-                        {campaign.products.slice(0, 8).map(cp => {
-                        const discountedPrice = cp.product.price * (1 - cp.discount / 100);
-                        return (
-                          <Link
-                            key={cp.productId}
-                            href={`/urun/${cp.product.slug}`}
-                            className="group bg-white rounded-xl border-2 border-[#FF6000] hover:shadow-lg transition-all overflow-hidden flex-shrink-0 w-40"
-                          >
-                            <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
-                              {cp.product.imageUrl ? (
-                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" quality={75} placeholder="empty" />
-                              ) : (
-                                <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
-                              )}
-                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-white text-xs font-bold px-3 py-1 rounded-full">
-                                -%{cp.discount}
-                              </div>
-                            </div>
-                            <div className="p-2.5">
-                              <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
-                              <div className="flex flex-col gap-0.5">
-                                <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#BA4700]">₺{discountedPrice.toFixed(2)}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {campaigns.map(campaign => (
-                  <div key={campaign.id + '-clone'} className="flex-shrink-0 w-[70vw] md:w-[350px]">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">{campaign.name}</h3>
-                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                      <div className="flex gap-4 w-max">
-                        {campaign.products.slice(0, 8).map(cp => {
-                        const discountedPrice = cp.product.price * (1 - cp.discount / 100);
-                        return (
-                          <Link
-                            key={cp.productId + '-clone'}
-                            href={`/urun/${cp.product.slug}`}
-                            className="group bg-white rounded-xl border-2 border-[#FF6000] hover:shadow-lg transition-all overflow-hidden flex-shrink-0 w-40"
-                          >
-                            <div className="relative h-36 bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center overflow-hidden">
-                              {cp.product.imageUrl ? (
-                                <Image src={cp.product.imageUrl} alt={cp.product.name} fill className="object-cover group-hover:scale-105 transition-transform" loading="lazy" quality={75} placeholder="empty" />
-                              ) : (
-                                <span className="text-4xl">{productEmojis[cp.product.slug] || '📦'}</span>
-                              )}
-                              <div className="absolute top-2 right-2 bg-[#CC4E00] text-white text-xs font-bold px-3 py-1 rounded-full">
-                                -%{cp.discount}
-                              </div>
-                            </div>
-                            <div className="p-2.5">
-                              <h4 className="text-xs font-semibold text-gray-900 line-clamp-2 mb-1.5">{cp.product.name}</h4>
-                              <div className="flex flex-col gap-0.5">
-                                <p className="text-xs text-gray-600 line-through font-medium">₺{cp.product.price.toFixed(2)}</p>
-                                <p className="text-base font-bold text-[#BA4700]">₺{discountedPrice.toFixed(2)}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+      {/* ─── GÜVENCE ŞERİDİ ─── */}
+      <section className="max-w-screen-xl mx-auto px-4 pt-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          {guvenceler.map(({ Icon, baslik, aciklama }) => (
+            <div key={baslik} className="flex items-center gap-3 rounded-2xl bg-white/60 border border-gray-200/70 px-4 py-3">
+              <Icon className="w-9 h-9 shrink-0 object-contain" />
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-[#0F2040] leading-tight">{baslik}</p>
+                <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{aciklama}</p>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          ))}
+        </div>
+      </section>
 
-      {/* ─── CATEGORIES ─── */}
-      <section className="max-w-screen-xl mx-auto px-4 py-8">
-        <div className="flex items-end justify-between mb-5">
+      {/* ─── KATEGORİLER ─── */}
+      <section className="max-w-screen-xl mx-auto px-4 pt-14">
+        <div className="flex items-end justify-between gap-4 mb-6">
           <div>
-            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1">Meslek Eğitim Programları</p>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Hangi Alanda Destek Olmak İstiyorsunuz?</h2>
+            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1.5">Meslek Eğitim Programları</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0F2040] tracking-tight">Kategorilere Göz Atın</h2>
           </div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-28 rounded-2xl bg-gray-200 animate-pulse" />)}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-40 rounded-2xl bg-gray-200 animate-pulse" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          // Mobilde yatay kaydirma (7 kategori alt alta ekrani dolduruyordu),
+          // genis ekranda kategori sayisina uyan tek satirlik izgara.
+          <div className="flex gap-3 overflow-x-auto snap-x -mx-4 px-4 pb-2 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(128px,1fr))] sm:overflow-visible">
             {categories.map((cat) => {
               const cfg = categoryConfig[cat.slug];
               const Icon = cfg?.Icon ?? IconFurniture;
@@ -305,14 +289,13 @@ export default function HomeClient({
                 <Link
                   key={cat.id}
                   href={`/${cat.slug}`}
-                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? yedekGecis(cat.slug)} p-4 flex flex-col items-center justify-center text-center min-h-[11rem] hover:scale-[1.04] hover:shadow-xl transition-all duration-200 shadow-md`}
-                  title={cfg?.purpose}
+                  className="w-36 shrink-0 snap-start sm:w-auto group bg-white rounded-2xl border border-gray-200/80 p-4 flex flex-col items-center text-center hover:border-orange-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <div className="w-20 h-20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                    <Icon className="w-20 h-20 object-contain drop-shadow-sm" />
-                  </div>
-                  <p className="text-white text-xs font-semibold leading-tight mb-1">{cat.name}</p>
-                  <p className="text-white/70 text-[10px] leading-tight">{cfg?.purpose}</p>
+                  <span className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${cfg?.gradient ?? yedekGecis(cat.slug)} flex items-center justify-center mb-3 shadow-sm group-hover:scale-105 transition-transform`}>
+                    <Icon className="w-14 h-14 object-contain drop-shadow-sm" />
+                  </span>
+                  <p className="text-sm font-bold text-[#0F2040] leading-tight">{cat.name}</p>
+                  {cfg?.purpose && <p className="text-[11px] text-gray-500 leading-tight mt-1">{cfg.purpose}</p>}
                 </Link>
               );
             })}
@@ -320,101 +303,114 @@ export default function HomeClient({
         )}
       </section>
 
-      {/* ─── CAMPAIGN BANNERS ─── */}
-      <section className="max-w-screen-xl mx-auto px-4 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link href="/gida" className="group col-span-2 relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F2040] to-[#1e4a90] p-8 flex items-center justify-between min-h-44 hover:shadow-xl transition-all">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-[#CC4E00]/10 rounded-full translate-x-1/3 -translate-y-1/3" />
-            <div className="relative z-10">
-              {/* Beyaz metin: koyu turuncu uzerinde koyu gri 3.93 kontrast
-                  veriyordu, beyaz 4.51 veriyor. */}
-              <span className="bg-[#CC4E00] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block mb-3">Öne Çıkan</span>
-              <h3 className="text-white text-3xl font-bold mb-1 tracking-tight">Gıda Ürünleri</h3>
-              <p className="text-gray-400 text-sm mb-5">Doğal, taze, güvenilir</p>
-              <span className="inline-flex items-center gap-2 bg-white text-gray-900 text-xs font-semibold px-4 py-2.5 rounded-lg group-hover:bg-[#CC4E00] group-hover:text-white transition-colors">
-                İncele <IconTransfer className="w-4 h-4" />
-              </span>
+      {/* ─── KAMPANYALAR ─── */}
+      {kampanyaKartlari.length > 0 && (
+        <section className="max-w-screen-xl mx-auto px-4 pt-14">
+          <div className="rounded-3xl bg-gradient-to-r from-[#FFF1E6] to-[#FFE7D4] border border-orange-100 p-5 md:p-7">
+            <div className="flex items-center gap-2 mb-1.5">
+              <IconWeekSpecial className="w-5 h-5 object-contain" />
+              <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest">Bu Hafta Özel</p>
             </div>
-            <IconFood className="w-40 h-40 object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
-          </Link>
-
-          <Link href="/tekstil" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-500 p-7 flex flex-col justify-between min-h-44 hover:shadow-xl transition-all">
-            <div>
-              <h3 className="text-white text-2xl font-bold mb-1 tracking-tight">Tekstil</h3>
-              <p className="text-white/60 text-sm">El yapımı kumaşlar</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0F2040] tracking-tight mb-5">Kampanyadaki Ürünler</h2>
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
+              {kampanyaKartlari.map((u) => (
+                <div key={u.id} className="w-[46vw] sm:w-56 shrink-0 snap-start flex">
+                  <UrunKarti
+                    urun={u}
+                    favoriButonu={false}
+                    genisSepet
+                    gorselYuksekligi="h-44"
+                    gorselBoyutlari="(max-width: 640px) 46vw, 224px"
+                  />
+                </div>
+              ))}
             </div>
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-xs font-semibold px-3 py-2 rounded-lg group-hover:bg-white/25 transition-colors">
-                Görüntüle <IconTransfer className="w-3 h-3" />
-              </span>
-              <IconTextile className="w-24 h-24 object-contain opacity-95" />
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* ─── IMPACT STATISTICS ─── */}
-      <section className="max-w-screen-xl mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {content.home.impactCards.map((card, idx) => {
-            const gradients = [
-              'from-emerald-500 to-teal-600',
-              'from-blue-500 to-indigo-600',
-              'from-orange-500 to-red-600',
-            ];
-            return (
-              <div key={idx} className={`bg-gradient-to-br ${gradients[idx]} rounded-2xl p-8 text-white`}>
-                <p className="text-5xl font-bold mb-2">{card.value}</p>
-                <p className="text-base font-semibold mb-1">{card.title}</p>
-                <p className="text-sm opacity-90">{card.description}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-
-      {/* ─── FEATURED PRODUCTS ─── */}
-      <section className="max-w-screen-xl mx-auto px-4 pb-8">
-        <div className="flex items-end justify-between mb-5">
-          <div>
-            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1">{content.home.productsHeading.subtitle}</p>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">{content.home.productsHeading.title}</h2>
           </div>
-          <Link href="/gida" className="flex items-center gap-1 text-[#BA4700] hover:text-[#8F3700] text-sm font-semibold transition-colors">
-            Tüm Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
+        </section>
+      )}
+
+      {/* ─── EL EMEĞİ ÜRÜNLER ─── */}
+      <section className="max-w-screen-xl mx-auto px-4 pt-14">
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <p className="text-[#8B3A00] text-[11px] font-bold uppercase tracking-widest mb-1.5">{content.home.productsHeading.subtitle}</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#0F2040] tracking-tight">{content.home.productsHeading.title}</h2>
+          </div>
+          <Link href={`/${categories[0]?.slug ?? 'gida'}`} className="hidden sm:flex shrink-0 items-center gap-1.5 text-[#BA4700] hover:text-[#8F3700] text-sm font-semibold transition-colors">
+            Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
           </Link>
         </div>
 
         {loading || products.length === 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl h-72 animate-pulse" />)}
+            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-gray-200 rounded-2xl h-80 animate-pulse" />)}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.filter(p => p.category).map((product, sira) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {products.filter((p) => p.category).map((product, sira) => (
               <UrunKarti
                 key={product.id}
                 urun={product}
                 kategoriGoster
                 favoriButonu={false}
+                genisSepet
+                gorselYedek={urunYedegi(product.category.slug)}
+                gorselYuksekligi="h-44 md:h-56"
                 gorselBoyutlari="(max-width: 768px) 50vw, 25vw"
-                gorselOncelikli={sira < 4}
+                gorselOncelikli={sira < 2}
               />
             ))}
           </div>
         )}
+
+        <div className="sm:hidden mt-5 text-center">
+          <Link href={`/${categories[0]?.slug ?? 'gida'}`} className="inline-flex items-center gap-1.5 text-[#BA4700] text-sm font-semibold">
+            Ürünleri Keşfet <IconTransfer className="w-4 h-4" />
+          </Link>
+        </div>
       </section>
 
-      {/* ─── SEO ACIKLAMA METNI ───
-          Urun listesinin hemen altinda: arama motoru sayfanin ne sattigini ve
-          fiyatlarin nasil isledigini metinden okuyabilsin. Sayfadaki diger
-          metinler kisa etiketlerden ibaret; bu blok sayfaya gercek icerik
-          katiyor. Tasarim sitenin kart dilini kullaniyor (beyaz kart, yumusak
-          kenarlik, ayni tipografi olcegi). */}
-      <section className="max-w-screen-xl mx-auto px-4 pb-10">
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight mb-4">
+      {/* ─── SOSYAL ETKİ BANDI ─── */}
+      <section className="max-w-screen-xl mx-auto px-4 pt-14">
+        <div className="relative overflow-hidden rounded-3xl bg-[#0F2040] px-6 py-10 md:px-12 md:py-12">
+          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#CC4E00]/20 blur-2xl pointer-events-none" aria-hidden="true" />
+          <div className="relative grid grid-cols-1 lg:grid-cols-[1.1fr_1.4fr] gap-8 items-center">
+            <div>
+              <p className="text-orange-300 text-[11px] font-bold uppercase tracking-widest mb-3">Sosyal Etki</p>
+              <p className="font-serif text-white text-2xl md:text-[2rem] font-bold leading-tight">
+                {announcements[0]}
+              </p>
+              <Link href="/hakkimizda" className="inline-flex items-center gap-2 mt-6 bg-white text-[#0F2040] text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-orange-50 transition-colors">
+                Hikâyemiz <IconTransfer className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { Icon: IconSocialContribution, ...content.home.socialImpact[0] },
+                { Icon: IconSuccess,            ...content.home.socialImpact[1] },
+                { Icon: IconFastShipping,       ...content.home.socialImpact[2] },
+              ].map(({ Icon, title, description }) => (
+                <div key={title} className="rounded-2xl bg-white/5 border border-white/10 p-4 flex sm:block items-center gap-3">
+                  <span className="flex shrink-0 w-12 h-12 bg-white rounded-xl items-center justify-center sm:mb-3">
+                    <Icon className="w-8 h-8 object-contain" />
+                  </span>
+                  <div>
+                    <p className="text-white font-semibold text-sm">{title}</p>
+                    <p className="text-white/65 text-xs mt-1 leading-relaxed">{description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SEO AÇIKLAMA METNİ ───
+          Arama motoru sayfanin ne sattigini ve fiyatlarin nasil isledigini
+          metinden okuyabilsin. Metin degistirilmedi. */}
+      <section className="max-w-screen-xl mx-auto px-4 pt-14 pb-14">
+        <div className="rounded-3xl border border-gray-200 bg-white p-6 md:p-10">
+          <h3 className="text-xl md:text-2xl font-bold text-[#0F2040] tracking-tight mb-4">
             Cezaevi Satış Mağazası Fiyatları Hakkında
           </h3>
 
@@ -448,27 +444,6 @@ export default function HomeClient({
               adresinizle Sipariş Sorgula sayfasından takip edebilirsiniz.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* ─── SOCIAL IMPACT ─── */}
-      <section className="max-w-screen-xl mx-auto px-4 pb-10">
-        <div className="bg-[#0F2040] rounded-3xl p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { Icon: IconSocialContribution, title: content.home.socialImpact[0].title, desc: content.home.socialImpact[0].description },
-            { Icon: IconSuccess,            title: content.home.socialImpact[1].title,  desc: content.home.socialImpact[1].description },
-            { Icon: IconFastShipping,       title: content.home.socialImpact[2].title, desc: content.home.socialImpact[2].description },
-          ].map(({ Icon, title, desc }) => (
-            <div key={title} className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Icon className="w-10 h-10 object-contain" />
-              </div>
-              <div>
-                <p className="text-white font-semibold text-sm">{title}</p>
-                <p className="text-white/70 text-xs mt-1 leading-relaxed">{desc}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 

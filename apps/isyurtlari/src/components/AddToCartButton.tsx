@@ -13,7 +13,14 @@ import { sepeteEkle, sepeteEklenebilir, type SepeteEklenebilirUrun } from '@/lib
  * Fiyati girilmemis urunlerde pasif kaliyor: fiyatsiz urun sepete eklenirse
  * sepet ve odeme toplami 0 TL cikar.
  */
-export default function AddToCartButton({ product }: { product: SepeteEklenebilirUrun }) {
+export default function AddToCartButton({
+  product,
+  genis = false,
+}: {
+  product: SepeteEklenebilirUrun;
+  /** Kartin altinda tam genislikte, yazili buton (ana sayfa vitrini). */
+  genis?: boolean;
+}) {
   const [eklendi, setEklendi] = useState(false);
   const uygun = sepeteEklenebilir(product);
 
@@ -30,6 +37,27 @@ export default function AddToCartButton({ product }: { product: SepeteEklenebili
       setTimeout(() => setEklendi(false), 1800);
     }
   };
+
+  if (genis) {
+    if (!uygun) {
+      return (
+        <span className="w-full h-10 rounded-xl bg-gray-100 text-gray-500 text-sm font-semibold flex items-center justify-center cursor-not-allowed">
+          Fiyat belirleniyor
+        </span>
+      );
+    }
+    return (
+      <button
+        onClick={tikla}
+        className={`w-full h-10 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white transition-colors ${
+          eklendi ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'
+        }`}
+      >
+        {eklendi ? <LuCheck size={16} strokeWidth={3} /> : <LuShoppingCart size={16} strokeWidth={2} />}
+        {eklendi ? 'Sepete eklendi' : 'Sepete Ekle'}
+      </button>
+    );
+  }
 
   if (!uygun) {
     return (
