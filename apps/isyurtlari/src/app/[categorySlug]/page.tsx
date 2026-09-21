@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
 import { kategorileriGetir } from '@/lib/kategoriler';
+import { varsayilanSirala } from '@/lib/urun-siralama';
 import {
   SITE_NAME,
   absoluteUrl,
@@ -118,10 +119,12 @@ const getCategoryProducts = async (slug: string) => {
           include: { campaign: true },
         },
       },
-      orderBy: { name: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return urunler.map((u) => {
+    // /api/urunler'in varsayılan sırasıyla aynı: ilk çizim ile istemcinin
+    // sonradan çektiği liste farklı sırada olursa sayfa kendini yeniden dizer.
+    return varsayilanSirala(urunler).map((u) => {
       // Not: indirim orani Campaign'de degil CampaignProduct uzerinde.
       const kp = u.campaigns[0];
       return {

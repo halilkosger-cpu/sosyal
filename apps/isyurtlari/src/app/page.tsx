@@ -1,6 +1,7 @@
 import { prisma } from '@isyurtlari/database';
 import HomeClient from './HomeClient';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
+import { varsayilanSirala } from '@/lib/urun-siralama';
 
 /**
  * Ana sayfa her istekte yeniden üretilmiyor.
@@ -108,7 +109,10 @@ async function anaSayfaVerisi() {
         orderBy: { name: 'asc' },
       }),
       prisma.product.findMany({
-        take: 8,
+        // Hepsi çekilip önce satın alınabilir olanlar seçiliyor (katalog
+        // küçük, sayfa ISR ile saklanıyor). Yalnızca en yeni 8 ürün
+        // alınsaydı vitrin çoğunlukla stokta olmayan ürünlerden oluşurdu -
+        // üstelik ziyaretçilerin neredeyse tamamı bu sayfaya geliyor.
         include: { category: { select: { name: true, slug: true } } },
         orderBy: { createdAt: 'desc' },
       }),
@@ -124,7 +128,7 @@ async function anaSayfaVerisi() {
 
     return {
       kategoriler,
-      urunler: urunler.map((u) => ({
+      urunler: varsayilanSirala(urunler).slice(0, 8).map((u) => ({
         id: u.id,
         name: u.name,
         slug: u.slug,

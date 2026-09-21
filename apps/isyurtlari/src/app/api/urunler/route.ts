@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { urunAra } from '@/lib/arama';
+import { satilabilirlikKademesi } from '@/lib/urun-siralama';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,8 +161,12 @@ export async function GET(req: NextRequest) {
     const fiyatSiralamasi = sirala === 'fiyat-artan' || sirala === 'fiyat-azalan';
     /** Kimlikle çağrıldığında istenen sıra korunuyor (favori ekleme sırası). */
     const kimlikSirasi = kimlikler.length > 0 && sirala === 'varsayilan';
-    const bellekteSirala =
-      (Boolean(aramaPuanlari) && sirala === 'varsayilan') || fiyatSiralamasi || kimlikSirasi;
+    /**
+     * Varsayılan sıralama artık her zaman bellekte: önce satın alınabilir
+     * ürünler (bkz. lib/urun-siralama.ts). Aramada alaka birinci kalıyor,
+     * kademe eşitlik bozucu.
+     */
+    const bellekteSirala = sirala === 'varsayilan' || fiyatSiralamasi;
 
     const siralamaOlcutu =
       sirala === 'isim'
@@ -185,7 +190,7 @@ export async function GET(req: NextRequest) {
       }),
 
       bellekteSirala
-        ? prisma.product.findMany({ where: kosul, select: { id: true, price: true } })
+        ? prisma.product.findMany({ where: kosul, select: { id: true, price: true, quantity: true, createdAt: true } })
         : prisma.product.findMany({
             where: kosul,
             include: { category: true, campaigns: kampanyaIliskisi },
@@ -198,7 +203,7 @@ export async function GET(req: NextRequest) {
     let urunler = urunlerHam as any[];
 
     if (bellekteSirala) {
-      const hepsi = urunlerHam as { id: string; price: number }[];
+      const hepsi = urunlerHam as { id: string; price: number; quantity: number; createdAt: Date }[];
 
       const sirali = [...hepsi].sort((a, b) => {
         if (fiyatSiralamasi) {
@@ -212,7 +217,14 @@ export async function GET(req: NextRequest) {
         if (kimlikSirasi) {
           return kimlikler.indexOf(a.id) - kimlikler.indexOf(b.id);
         }
-        return (aramaPuanlari?.get(b.id) ?? 0) - (aramaPuanlari?.get(a.id) ?? 0);
+        if (aramaPuanlari) {
+          const fark = (aramaPuanlari.get(b.id) ?? 0) - (aramaPuanlari.get(a.id) ?? 0);
+          if (fark !== 0) return fark;
+        }
+        return (
+          satilabilirlikKademesi(a) - satilabilirlikKademesi(b) ||
+          b.createdAt.getTime() - a.createdAt.getTime()
+        );
       });
 
       const sayfaKimlikleri = sirali.slice((sayfa - 1) * adet, sayfa * adet).map((u) => u.id);
