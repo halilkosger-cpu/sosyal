@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { LuInfo, LuMapPin, LuPlus } from 'react-icons/lu';
+import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck } from 'react-icons/lu';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
 import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
-import { IconTransfer, IconSocialContribution } from '@/components/Icons';
 
 interface Campaign {
   id: string;
@@ -333,27 +332,32 @@ export default function CheckoutPage() {
 
   if (pageLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#CC4E00]" />
       </div>
     );
   }
 
+  const kutu = 'rounded-2xl border border-gray-200 bg-white p-5 md:p-6';
+  const baslik = 'flex items-center gap-2.5 text-lg font-bold text-gray-900';
+  const adim = (n: number) => (
+    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#CC4E00] text-white text-sm font-bold">{n}</span>
+  );
+  const secenek = (secili: boolean) =>
+    `flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition ${secili ? 'border-[#CC4E00] bg-orange-50/60' : 'border-gray-200 hover:bg-gray-50'}`;
+
   return (
-    <div className="store-shell">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/sepet" className="text-[#BA4700] hover:text-[#BA4700] font-medium">
-            Sepete geri dön
+    <div className="bg-[#FAFAF9] min-h-[70vh]">
+      <div className="bg-gradient-to-b from-[#FBF6EF] to-[#FAFAF9] border-b border-orange-100/60">
+        <div className="max-w-screen-xl mx-auto px-4 py-6">
+          <Link href="/sepet" className="inline-flex items-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+            <LuArrowLeft size={16} /> Sepete dön
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">Ödeme</h1>
-          <p className="text-gray-600 text-sm mt-1">Her satın alma, hükümlülerin yeniden başlamasına destek olur.</p>
+          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D] mt-2">Ödeme</h1>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-screen-xl mx-auto px-4 py-6 md:py-8">
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl flex items-start gap-3">
             <LuInfo size={18} className="mt-0.5 flex-shrink-0" />
@@ -361,333 +365,175 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Checkout Form */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Kişisel Bilgiler */}
-              <div className="store-card rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Kişisel Bilgiler</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ad Soyad
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="store-input"
-                      placeholder="Adınız Soyadınız"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      E-posta
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="store-input"
-                      placeholder="ornek@email.com"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefon
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="store-input"
-                      placeholder="+90 (5XX) XXX XX XX"
-                      required
-                    />
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+          <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-5">
+            {/* 1. İletişim */}
+            <section className={kutu}>
+              <h2 className={baslik}>{adim(1)} İletişim Bilgileri</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
+                <div className="sm:col-span-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">Ad Soyad</label>
+                  <input id="name" type="text" name="name" autoComplete="name" value={formData.name} onChange={handleInputChange} className="store-input" placeholder="Adınız Soyadınız" required />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">E-posta</label>
+                  <input id="email" type="email" name="email" autoComplete="email" value={formData.email} onChange={handleInputChange} className="store-input" placeholder="ornek@email.com" required />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">Telefon</label>
+                  <input id="phone" type="tel" name="phone" autoComplete="tel" value={formData.phone} onChange={handleInputChange} className="store-input" placeholder="05XX XXX XX XX" required />
                 </div>
               </div>
+            </section>
 
-              {/* Teslimat Adresi */}
-              <div className="store-card rounded-2xl p-6">
-                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-                  <h2 className="text-xl font-bold text-gray-900">Teslimat Adresi</h2>
-                  {musteri && (
-                    <Link href="/adreslerim" className="text-sm font-medium text-[#BA4700] hover:text-[#8F3700] transition">
-                      Adres defterim
-                    </Link>
-                  )}
-                </div>
+            {/* 2. Teslimat adresi */}
+            <section className={kutu}>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <h2 className={baslik}>{adim(2)} Teslimat Adresi</h2>
+                {musteri && (
+                  <Link href="/adreslerim" className="text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">Adres defterim</Link>
+                )}
+              </div>
 
-                {/* Kayitli adresi olan musteri listeden seciyor; olmayan ya da
-                    baska bir adrese gonderecek olan icin serbest metin alani
-                    duruyor. Misafir odemesi de eskisi gibi calisiyor. */}
-                {adresler.length > 0 && (
-                  <div className="space-y-3 mb-5">
-                    {adresler.map((adres) => (
-                      <label
-                        key={adres.id}
-                        className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition ${
-                          seciliAdres === adres.id
-                            ? 'border-[#FF6000] bg-orange-50/60'
-                            : 'border-gray-200 hover:bg-gray-50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="teslimatAdresi"
-                          checked={seciliAdres === adres.id}
-                          onChange={() => setSeciliAdres(adres.id)}
-                          className="mt-1 w-4 h-4 accent-[#FF6000] flex-shrink-0"
-                        />
-                        <span className="min-w-0 flex-1 text-sm">
-                          <span className="flex items-center gap-2 font-semibold text-gray-900">
-                            <LuMapPin size={14} className="text-[#BA4700] flex-shrink-0" />
-                            {adres.title}
-                          </span>
-                          <span className="block text-gray-700 mt-1">{adres.fullName} · {adres.phone}</span>
-                          <span className="block text-gray-600 mt-0.5 leading-relaxed">{adresOzeti(adres)}</span>
+              {/* Kayitli adresi olan musteri listeden seciyor; digerleri serbest metin. Misafir odemesi de calisiyor. */}
+              {adresler.length > 0 && (
+                <div className="space-y-3 mt-5">
+                  {adresler.map((adres) => (
+                    <label key={adres.id} className={secenek(seciliAdres === adres.id)}>
+                      <input type="radio" name="teslimatAdresi" checked={seciliAdres === adres.id} onChange={() => setSeciliAdres(adres.id)} className="mt-1 w-4 h-4 accent-[#CC4E00] flex-shrink-0" />
+                      <span className="min-w-0 flex-1 text-sm">
+                        <span className="flex items-center gap-2 font-semibold text-gray-900">
+                          <LuMapPin size={14} className="text-[#BA4700] flex-shrink-0" /> {adres.title}
                         </span>
-                      </label>
-                    ))}
-
-                    <label
-                      className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition ${
-                        seciliAdres === 'yeni'
-                          ? 'border-[#FF6000] bg-orange-50/60'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="teslimatAdresi"
-                        checked={seciliAdres === 'yeni'}
-                        onChange={() => setSeciliAdres('yeni')}
-                        className="w-4 h-4 accent-[#FF6000] flex-shrink-0"
-                      />
-                      <span className="flex items-center gap-2 text-sm font-medium text-gray-900">
-                        <LuPlus size={14} className="text-[#BA4700]" />
-                        Farklı bir adrese gönder
+                        <span className="block text-gray-700 mt-1">{adres.fullName} · {adres.phone}</span>
+                        <span className="block text-gray-600 mt-0.5 leading-relaxed">{adresOzeti(adres)}</span>
                       </span>
                     </label>
-                  </div>
-                )}
-
-                {seciliAdres === 'yeni' && (
-                  <div>
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                      Adres
-                    </label>
-                    <textarea
-                      id="address"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      rows={4}
-                      className="store-input"
-                      placeholder="Mahalle, sokak, bina no, daire no, ilçe / il"
-                      required
-                    />
-                    {musteri && adresler.length === 0 && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Bu adresi{' '}
-                        <Link href="/adreslerim" className="text-[#BA4700] hover:text-[#8F3700] font-medium underline">
-                          adres defterinize
-                        </Link>{' '}
-                        kaydederseniz sonraki siparişlerinizde baştan yazmanız gerekmez.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Ödeme Yöntemi */}
-              <div className="store-card rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Ödeme Yöntemi</h2>
-                <div className="space-y-4">
-                  <label className="flex items-center p-4 border border-gray-200 rounded-lg cursor-not-allowed bg-gray-50 opacity-50 transition"
-                    title="Yakında aktif edilecek">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="CREDIT_CARD"
-                      checked={false}
-                      disabled
-                      className="w-4 h-4 text-gray-400"
-                    />
-                    <div className="ml-4 flex-1">
-                      <p className="font-semibold text-gray-600">iyzico ile Öde</p>
-                      <p className="text-sm text-gray-500">Visa, Mastercard ve daha fazla (Yakında)</p>
-                    </div>
-                    <Image src="/iyzico.png" alt="iyzico" width={60} height={24} className="h-6 w-auto opacity-50" />
-                  </label>
-
-                  <label className="flex items-center p-4 border rounded-2xl cursor-pointer hover:bg-orange-50/60 transition"
-                    style={{borderColor: paymentMethod === 'TRANSFER' ? '#FF6000' : '#e5e7eb',
-                            backgroundColor: paymentMethod === 'TRANSFER' ? '#fff7ed' : undefined}}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="TRANSFER"
-                      checked={paymentMethod === 'TRANSFER'}
-                      onChange={() => setPaymentMethod('TRANSFER')}
-                      className="w-4 h-4 accent-[#FF6000]"
-                    />
-                    <div className="ml-4 flex-1">
-                      <p className="font-semibold text-gray-900">Havale / EFT</p>
-                      <p className="text-sm text-gray-600">Manuel ödeme onayı gerekir</p>
-                    </div>
-                    <IconTransfer className="w-10 h-10 object-contain" />
+                  ))}
+                  <label className={secenek(seciliAdres === 'yeni')}>
+                    <input type="radio" name="teslimatAdresi" checked={seciliAdres === 'yeni'} onChange={() => setSeciliAdres('yeni')} className="mt-0.5 w-4 h-4 accent-[#CC4E00] flex-shrink-0" />
+                    <span className="flex items-center gap-2 text-sm font-medium text-gray-900"><LuPlus size={14} className="text-[#BA4700]" /> Farklı bir adrese gönder</span>
                   </label>
                 </div>
-              </div>
+              )}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                    İşleniyor...
-                  </>
-                ) : paymentMethod === 'CREDIT_CARD' ? (
-                  'Kredi Kartı ile Destekle'
-                ) : (
-                  'Havale ile Devam Et'
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="store-card rounded-2xl p-6 sticky top-20 space-y-6">
-              {/* Impact Preview */}
-              <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <IconSocialContribution className="w-8 h-8 object-contain" />
-                  <h4 className="text-sm font-bold text-gray-900">Yardımın etkisi</h4>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-700">
-                    <span>Eğitim Saati</span>
-                    <span className="font-bold">{cart.reduce((sum, item) => sum + item.quantity * 5, 0)} saat</span>
-                  </div>
-                  <div className="flex justify-between text-gray-700">
-                    <span>Desteklenen Hükümlü</span>
-                    <span className="font-bold">~{Math.ceil(cart.reduce((sum, item) => sum + item.quantity, 0) * 0.5)} kişi</span>
-                  </div>
-                </div>
-              </div>
-
-              <h3 className="text-lg font-bold text-gray-900">Sipariş Özeti</h3>
-
-              {/* Cart Items */}
-              <div className="space-y-4 mb-6 pb-6 border-b border-gray-200 max-h-96 overflow-y-auto">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <div>
-                      <p className="font-medium text-gray-900">{item.name}</p>
-                      <p className="text-gray-600">×{item.quantity}</p>
-                    </div>
-                    <p className="font-medium text-gray-900">
-                      ₺{(item.price * item.quantity).toFixed(2)}
+              {seciliAdres === 'yeni' && (
+                <div className="mt-5">
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1.5">Adres</label>
+                  <textarea id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleInputChange} rows={3} className="store-input" placeholder="Mahalle, sokak, bina no, daire no, ilçe / il" required />
+                  {musteri && adresler.length === 0 && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Bu adresi <Link href="/adreslerim" className="text-[#BA4700] hover:text-[#8F3700] font-medium underline">adres defterinize</Link> kaydederseniz sonraki siparişlerinizde baştan yazmanız gerekmez.
                     </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Totals */}
-              <div className="space-y-3">
-                <div className="flex justify-between text-gray-600">
-                  <span>Ara Toplam</span>
-                  <span>₺{originalSubtotal.toFixed(2)}</span>
-                </div>
-                {totalDiscount > 0 && (
-                  <div className="flex justify-between text-green-600 font-bold">
-                    <span>İndirim Tasarrufu</span>
-                    <span>-₺{totalDiscount.toFixed(2)}</span>
-                  </div>
-                )}
-                {/* Kargo tutara dahil degil: gonderiler karsi odemeli. Musteri
-                    bunu siparisi onaylamadan once bilmeli. */}
-                <div className="flex justify-between text-gray-600">
-                  <span>Kargo</span>
-                  <span className="font-semibold text-gray-700">
-                    {KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}
-                  </span>
-                </div>
-                {kuponIndirimi > 0 && (
-                  <div className="flex justify-between text-green-700 font-bold">
-                    <span>Kupon ({uygulananKupon})</span>
-                    <span>-₺{kuponIndirimi.toFixed(2)}</span>
-                  </div>
-                )}
-
-                {/* Kupon alanı */}
-                <div className="pt-3 border-t border-gray-200">
-                  {uygulananKupon ? (
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm text-green-700 font-semibold">
-                        {kuponMesaji || 'Kupon uygulandı'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={kuponuKaldir}
-                        className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline"
-                      >
-                        Kaldır
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex gap-2">
-                        <input
-                          value={kuponKodu}
-                          onChange={(e) => setKuponKodu(e.target.value)}
-                          placeholder="Kupon kodu"
-                          className="flex-1 min-w-0 border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono uppercase"
-                        />
-                        <button
-                          type="button"
-                          onClick={kuponuUygula}
-                          disabled={kuponIsleniyor || !kuponKodu.trim()}
-                          className="text-sm font-semibold px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition"
-                        >
-                          {kuponIsleniyor ? '...' : 'Uygula'}
-                        </button>
-                      </div>
-                      {kuponMesaji && (
-                        <p className="text-xs text-red-600 mt-1.5">{kuponMesaji}</p>
-                      )}
-                    </>
                   )}
                 </div>
+              )}
+            </section>
 
-                <div className="flex justify-between text-xl font-bold text-gray-900 pt-3 border-t border-gray-200">
-                  <span>Toplam</span>
-                  <span>₺{kuponluToplam.toFixed(2)}</span>
+            {/* 3. Ödeme yöntemi - kart ödemesi iyzico hesabı açılınca eklenecek */}
+            <section className={kutu}>
+              <h2 className={baslik}>{adim(3)} Ödeme Yöntemi</h2>
+              <div className="space-y-3 mt-5">
+                <label className={secenek(paymentMethod === 'TRANSFER')}>
+                  <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00]" />
+                  <span className="flex-1">
+                    <span className="flex items-center gap-2 font-semibold text-gray-900"><LuLandmark size={16} className="text-[#BA4700]" /> Havale / EFT</span>
+                    <span className="block text-sm text-gray-600 mt-0.5">Banka bilgileri sipariş onayından sonra gösterilir. Ödemeniz onaylanınca siparişiniz hazırlanır.</span>
+                  </span>
+                </label>
+                <div className="flex items-center gap-3 p-4 border border-dashed border-gray-200 rounded-xl text-sm text-gray-500">
+                  <LuCreditCard size={18} className="shrink-0" /> Kartla ödeme yakında eklenecek.
                 </div>
-                {/* Fiyatlar KDV dahil oldugu icin KDV toplamin ustune
-                    eklenmiyor; sepette gorulen tutar ile burada tahsil edilen
-                    tutar ayni. */}
-                <p className="text-xs leading-relaxed text-gray-500">
-                  Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}).
-                  {KARGO_KARSI_ODEMELI
-                    ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.'
-                    : ''}
-                </p>
               </div>
+            </section>
+
+            {/* Mesafeli Sozlesmeler Yonetmeligi: tuketici on bilgilendirmeyi okudugunu siparis oncesi onaylamali. */}
+            <label className="flex items-start gap-3 text-sm text-gray-700 px-1">
+              <input type="checkbox" required className="mt-0.5 w-4 h-4 accent-[#CC4E00] shrink-0" />
+              <span>
+                <Link href="/mesafeli-satis-sozlesmesi" target="_blank" className="font-semibold text-[#BA4700] underline">Ön bilgilendirme formunu ve mesafeli satış sözleşmesini</Link> okudum, onaylıyorum.
+              </span>
+            </label>
+
+            <button type="submit" disabled={submitting} className="w-full h-12 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white rounded-xl font-bold transition flex items-center justify-center gap-2">
+              {submitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> İşleniyor...
+                </>
+              ) : (
+                <>
+                  <LuLock size={16} /> Siparişi Tamamla · ₺{kuponluToplam.toFixed(2).replace('.', ',')}
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Sipariş özeti */}
+          <aside className="rounded-2xl border border-gray-200 bg-white p-5 lg:sticky lg:top-40">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Sipariş Özeti</h2>
+
+            <div className="space-y-3 pb-4 border-b border-gray-100 max-h-80 overflow-y-auto">
+              {cart.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 text-sm">
+                  <span className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-[#F6EFE6]">
+                    {item.imageUrl && <Image src={item.imageUrl} alt="" fill sizes="48px" className="object-cover" />}
+                    <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-gray-800 text-white text-[11px] font-bold flex items-center justify-center">{item.quantity}</span>
+                  </span>
+                  <p className="flex-1 min-w-0 font-medium text-gray-900 line-clamp-2">{item.name}</p>
+                  <p className="font-semibold text-gray-900 shrink-0">₺{((item.campaign?.discountedPrice ?? item.price) * item.quantity).toFixed(2)}</p>
+                </div>
+              ))}
             </div>
-          </div>
+
+            <dl className="space-y-2.5 text-sm pt-4">
+              <div className="flex justify-between text-gray-600"><dt>Ara toplam</dt><dd>₺{originalSubtotal.toFixed(2)}</dd></div>
+              {totalDiscount > 0 && (
+                <div className="flex justify-between text-green-700 font-semibold"><dt>İndirim</dt><dd>-₺{totalDiscount.toFixed(2)}</dd></div>
+              )}
+              {kuponIndirimi > 0 && (
+                <div className="flex justify-between text-green-700 font-semibold"><dt>Kupon ({uygulananKupon})</dt><dd>-₺{kuponIndirimi.toFixed(2)}</dd></div>
+              )}
+              {/* Kargo tutara dahil degil: gonderiler karsi odemeli. */}
+              <div className="flex justify-between text-gray-600">
+                <dt>Kargo</dt>
+                <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}</dd>
+              </div>
+            </dl>
+
+            {/* Kupon */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              {uygulananKupon ? (
+                <div className="flex items-center justify-between gap-2 rounded-lg bg-green-50 border border-green-200 px-3 py-2">
+                  <span className="text-sm text-green-700 font-semibold">{kuponMesaji || 'Kupon uygulandı'}</span>
+                  <button type="button" onClick={kuponuKaldir} className="text-xs font-semibold text-gray-500 hover:text-gray-700 underline">Kaldır</button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex gap-2">
+                    <input value={kuponKodu} onChange={(e) => setKuponKodu(e.target.value)} placeholder="Kupon kodu" aria-label="Kupon kodu" className="flex-1 min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono uppercase focus:outline-none focus:border-[#CC4E00]" />
+                    <button type="button" onClick={kuponuUygula} disabled={kuponIsleniyor || !kuponKodu.trim()} className="text-sm font-semibold px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                      {kuponIsleniyor ? '...' : 'Uygula'}
+                    </button>
+                  </div>
+                  {kuponMesaji && <p className="text-xs text-red-600 mt-1.5">{kuponMesaji}</p>}
+                </>
+              )}
+            </div>
+
+            <div className="flex justify-between items-baseline border-t border-gray-100 mt-4 pt-4">
+              <span className="font-bold text-gray-900">Toplam</span>
+              <span className="text-2xl font-extrabold text-[#141B2D]">₺{kuponluToplam.toFixed(2)}</span>
+            </div>
+            {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor. */}
+            <p className="text-xs leading-relaxed text-gray-500 mt-2">
+              Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}).
+              {KARGO_KARSI_ODEMELI ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+            </p>
+            <ul className="mt-4 space-y-2 text-xs text-gray-600">
+              <li className="flex items-center gap-2"><LuRotateCcw size={14} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>
+              <li className="flex items-center gap-2"><LuTruck size={14} className="text-[#E8620C] shrink-0" /> Kargo takip numarasıyla sipariş takibi</li>
+            </ul>
+          </aside>
         </div>
       </div>
     </div>
