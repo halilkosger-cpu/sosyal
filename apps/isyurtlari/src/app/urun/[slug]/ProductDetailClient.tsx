@@ -88,7 +88,7 @@ const Yildizlar = ({ puan, boyut = 16 }: { puan: number; boyut?: number }) => (
 const GUVENCELER = [
   { Icon: LuTruck, baslik: 'Türkiye geneline gönderim', alt: 'Kargo ücreti teslimatta ödenir' },
   { Icon: LuRotateCcw, baslik: '14 gün cayma hakkı', alt: 'Teslimden itibaren iade' },
-  { Icon: LuShieldCheck, baslik: 'Kamu kurumu güvencesi', alt: 'Adalet Bakanlığı İşyurtları Kurumu' },
+  { Icon: LuShieldCheck, baslik: 'Sipariş takibi', alt: 'Kargo takip numarasıyla' },
   { Icon: LuHandHeart, baslik: 'Sosyal katkı', alt: 'Meslek eğitimine destek' },
 ];
 

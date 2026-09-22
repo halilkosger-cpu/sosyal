@@ -215,7 +215,7 @@ export default function CartPage() {
               </button>
               <ul className="mt-5 space-y-2 text-xs text-gray-600">
                 <li className="flex items-center gap-2"><LuRotateCcw size={15} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>
-                <li className="flex items-center gap-2"><LuShieldCheck size={15} className="text-[#E8620C] shrink-0" /> Adalet Bakanlığı İşyurtları Kurumu güvencesi</li>
+                <li className="flex items-center gap-2"><LuShieldCheck size={15} className="text-[#E8620C] shrink-0" /> Siparişlerim sayfasından kargo takibi</li>
               </ul>
             </aside>
           </div>

@@ -50,8 +50,8 @@ export const content = {
         description: 'Meslek eğitimi ve yeniden başlama',
       },
       {
-        title: 'Sosyal Girişim Onaylı',
-        description: 'Resmi program ve kalite güvencesi',
+        title: 'El Emeği Üretim',
+        description: 'Meslek eğitimi sürecinde üretilen ürünler',
       },
       {
         title: 'Her Satın Alma Yardım Eder',
