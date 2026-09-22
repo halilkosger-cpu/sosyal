@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
+import { varsayilanSirala } from '@/lib/urun-siralama';
 import {
   SITE_URL,
   absoluteUrl,
@@ -259,6 +260,34 @@ export default async function ProductPage({ params }: ProductPageProps) {
       }
     : null;
 
+  /**
+   * Benzer urunler: ayni kategoriden, fotografli, once satin alinabilir
+   * olanlar. Sunucuda cekiliyor ki baglantilar HTML'de olsun (ic linkleme).
+   * Veritabani hatasi sayfayi dusurmesin diye ayri try/catch.
+   */
+  let benzerUrunler: {
+    id: string; name: string; slug: string; price: number; quantity: number;
+    imageUrl?: string; category: { name: string; slug: string };
+  }[] = [];
+  if (product) {
+    try {
+      const adaylar = await prisma.product.findMany({
+        where: { categoryId: product.categoryId, id: { not: product.id }, imageUrl: { not: null } },
+        select: {
+          id: true, name: true, slug: true, price: true, quantity: true, imageUrl: true, createdAt: true,
+          category: { select: { name: true, slug: true } },
+        },
+        take: 24,
+      });
+      benzerUrunler = varsayilanSirala(adaylar).slice(0, 4).map((u) => ({
+        id: u.id, name: u.name, slug: u.slug, price: u.price, quantity: u.quantity,
+        imageUrl: u.imageUrl ?? undefined, category: u.category,
+      }));
+    } catch (error) {
+      console.error('Benzer urunler alinamadi:', error);
+    }
+  }
+
   const jsonLd = [
     breadcrumbJsonLd([
       { name: 'Ana Sayfa', url: absoluteUrl('/') },
@@ -281,7 +310,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductDetailClient baslangicUrun={baslangicUrun} />
+      <ProductDetailClient baslangicUrun={baslangicUrun} benzerUrunler={benzerUrunler} />
     </>
   );
 }

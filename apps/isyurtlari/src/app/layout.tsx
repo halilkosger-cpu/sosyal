@@ -178,6 +178,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* Cart */}
               <Link
                 href="/sepet"
+                aria-label="Sepetim"
                 className="relative flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors flex-shrink-0"
               >
                 <div className="relative">

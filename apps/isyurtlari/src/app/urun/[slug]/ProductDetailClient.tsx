@@ -4,32 +4,35 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LuHouse, LuBadgeCheck, LuHeart } from 'react-icons/lu';
+import {
+  LuHouse, LuCheck, LuShoppingCart, LuTruck, LuRotateCcw, LuShieldCheck,
+  LuHandHeart, LuStar, LuMinus, LuPlus, LuChevronRight,
+} from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
+import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
+import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
 import { urunGoruntulendi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
-import {
-  IconProductOrigin,
-  IconVocationalTraining,
-  IconSocialContribution,
-  IconCampaign,
-  IconSuccess,
-  IconEducationGoal,
-  IconEmploymentSupport,
-  IconReintegration,
-  IconTransferInfo,
-} from '@/components/Icons';
 
-const categoryPurpose: Record<string, { purpose: string; trainingHours: number; skillDescription: string }> = {
-  'gida-urunleri': { purpose: 'Beslenme & Aşçılık Eğitimi', trainingHours: 40, skillDescription: 'Profesyonel aşçılık ve beslenme bilgisi' },
-  'tekstil-urunleri': { purpose: 'Terzilik Meslek Eğitimi', trainingHours: 48, skillDescription: 'Kumaş işleme ve dikiş becerisi' },
-  'ahsap-urunler': { purpose: 'Marangozluk Eğitimi', trainingHours: 60, skillDescription: 'Ahşap işçiliği ve tasarım becerisi' },
-  'dokuma': { purpose: 'Dokuma & Sanat Terapisi', trainingHours: 50, skillDescription: 'Geleneksel dokuma teknikleri' },
-  'mobilya-urunleri': { purpose: 'Mobilya Tasarım Eğitimi', trainingHours: 65, skillDescription: 'Furniture tasarım ve üretim becerisi' },
-  'demir-metal-urunleri': { purpose: 'Metal İşleri Eğitimi', trainingHours: 55, skillDescription: 'Metal işleri ve tornacılık becerisi' },
-};
+/**
+ * Urun sayfasi - 2026 Eylul tasarimi.
+ *
+ * Duzen: galeri | bilgi + fiyat + sepet + guvence rozetleri; altta sekmeler
+ * (Aciklama / Ozellikler / Teslimat & Iade / Yorumlar) ve Benzer Urunler.
+ * Sekme icerikleri hep DOM'da; secili olmayanlar yalnizca gizleniyor, arama
+ * motoru hepsini okuyor.
+ *
+ * KALDIRILAN METINLER (bilerek)
+ * Eski sayfada her urune "Devlet Garantili", "Hicbir kimyasal katki veya
+ * yapay madde icermez", "40/60 saat mesleki egitime yatirim" gibi cumleler
+ * basiliyordu. Hicbiri bir veriden gelmiyordu; kimyasal icermez beyani
+ * temizlik urunlerine bile yaziliyordu. Gidada saglik/icerik beyani ve
+ * dogrulanamayan taahhut tuketici mevzuatinda sorun. Yerine yalnizca
+ * dogrulanabilir bilgi kondu: uretim yeri, KDV, karsi odemeli kargo,
+ * 14 gun cayma hakki.
+ */
 
 interface Campaign {
   id: string;
@@ -56,89 +59,6 @@ interface Product {
   yorumSayisi?: number;
 }
 
-const productValues: Record<string, string[]> = {
-  'zeytinyag': [
-    'Doğal zeytinyağı - hiçbir kimyasal katkı veya rafine işlem yapılmadan',
-    'Geleneksel soğuk presyon yöntemiyle el emeğiyle üretilmiştir',
-    'Sosyal Girişim Beslenme Eğitimi Alan Hükümlüler Tarafından İşlenmiş',
-    'Kar amacı gütmeden sosyal sorumluluk projesi kapsamında',
-    'Her satın alma, hükümlülerin yeniden sosyal hayata kazanılmasına destek olur'
-  ],
-  'peynir': [
-    'Saf ve pastörize sütünden geleneksel yöntemlerle yapılan peynir',
-    'Hiçbir koruyucu madde, sentetik katkı veya boyar madde içermez',
-    'Beslenme & Aşçılık Eğitimi Alan Hükümlüler Tarafından El Emeğiyle Üretildi',
-    'Sosyal Girişim Onaylı Sosyal Girişimim Ürünü',
-    'Devlet garantili, doğal ve sağlıklı üretim sürecine sahip'
-  ],
-  'badem': [
-    'Doğal ve taze badem - kimyasal pestisit veya katkı madde kullanılmadan',
-    'Seçilmiş, temizlenmiş ve doğal yöntemlerle işlenmiştir',
-    'Beslenme Eğitim Programı Katılımcıları Tarafından El Emeğiyle Hazırlanmış',
-    'Kar amacı gütmeyen Sosyal Girişim sosyal projesi',
-    'Her alışveriş, hükümlülerin rehabilitasyon ve reintegrasyon programlarını destekler'
-  ],
-  'pirinc': [
-    'Kaliteli, temiz ve doğal pirinç - hiçbir kimyasal işlem yapılmaksızın',
-    'Sosyal Girişim İşyurtlarında depolanan, kontrol edilen ürün',
-    'Beslenme Eğitimi Alan Hükümlüler Tarafından Paketlenmiştir',
-    'Kar amacı gütmeden sunulan kaliteli beslenme ürünü',
-    'Devlet tarafından onaylanmış ve güvence altına alınan sosyal girişim'
-  ],
-  'tereyag': [
-    'Doğal sütten üretilen, hiçbir yapay maddesi olmayan tereyağ',
-    'Geleneksel yöntemlerle el emeğiyle üretilmiştir',
-    'Beslenme & Aşçılık Eğitim Programının Başarılı Ürünü',
-    'Sosyal Girişim Sosyal Sorumluluk Projesi',
-    'Her satın alma doğal ve sağlıklı üretimi teşvik eder'
-  ],
-  'biber-receli': [
-    'Seçilmiş, taze biber ve doğal şeker ile yapılan reçel',
-    'Pestisite maruz kalmamış kaynaklardan el emeğiyle hazırlanmıştır',
-    'Sosyal Girişim Beslenme Eğitim Program Mezunları Tarafından Yapılmış',
-    'Koruyucu ve katkı madde kullanılmaksızın geleneksel yöntemle konserve edilmiş',
-    'Devlet destekli sosyal girişim - her satın alma bireyin yeniden başlamasını sağlar'
-  ],
-  'findik': [
-    'Kaliteli, taze ve doğal fındık - özel seçim ve temizlik işlemi yapılmış',
-    'İşyurtlarında higienik koşullarda işlenen, kalite kontrol geçmiş ürün',
-    'Beslenme Eğitimi Alan Hükümlüler Tarafından Hazırlanmıştır',
-    'Pestisit ve kimyasal işlem olmaksızın doğal sunumu korunmuştur',
-    'Kar amacı gütmeyen Sosyal Girişim Sosyal Girişimimi'
-  ],
-  'havlu-beyaz': [
-    'Doğal pamuk kumaştan dokumacılık eğitimi alan hükümlüler tarafından yapılan havlu',
-    'Hiçbir sentetik boya veya zararlı kimyasal kullanılmadan renglendirilmiş',
-    'Terzilik ve Tekstil Meslek Eğitim Programının Başarılı Ürünü',
-    'Sosyal Girişim Onaylı - Sağlık ve Çevre Dostu Üretim',
-    'El emeğinin göz kamaştırıcı sonucu, her kullanımda rehabilitasyon programını desteklersiniz'
-  ],
-  'ahsap-sandalye': [
-    'Doğal ve seçilmiş ahşap kullanılarak Marangozluk Eğitim Alan Hükümlüler Tarafından Yapılan Sandalye',
-    'Hiçbir sentetik boya veya toksik kimyasal sürü kullanılmamıştır, tamamen doğal işlenmedir',
-    'Sosyal Girişim El Sanatları Programı - Yüksek Kalite Garantisi',
-    'Çevre dostu, karbon ayakizi düşük, yerel üretim ürünü',
-    'Her satın alma, çatılı ve sosyal yardım alan hükümlüyü destekler'
-  ],
-  'geleneksel-hali': [
-    'Geleneksel dokuma tekniklerini kullanan Dokuma Terapisi Programı Katılımcıları Tarafından El Emeğiyle Yapılan Halı',
-    'Doğal renklendirilmiş, sentetik boya ve kimyasal işlem uygulanmamış',
-    'Sosyal Girişim Sosyal Girişimimi - Sanat ve Terapi Programı Ürünü',
-    'Her iplik, hükümlünün sanat terapisi ve rehabilitasyon sürecinin parçasıdır',
-    'Devlet koruması altında, etik ve sosyal sorumluluk ilkesiyle üretilmiş'
-  ],
-};
-
-const getProductValues = (slug: string): string[] => {
-  return productValues[slug] || [
-    'Sosyal Girişim Tarafından Onaylanmış El Yapımı Ürün',
-    'Hiçbir Kimyasal Katkı Veya Yapay Madde İçermez',
-    'Kar Amacı Gütmeden, Sosyal Sorumluluk İlkesiyle Üretilmiştir',
-    'Hükümlülerin Meslek Eğitimi ve Rehabilitasyonunu Destekler',
-    'Devlet Garantili - Her Satın Alma Yeniden Başlamaya Yardım Eder'
-  ];
-};
-
 interface Review {
   id: string;
   rating: number;
@@ -149,7 +69,36 @@ interface Review {
   helpfulCount: number;
 }
 
-export default function ProductDetailPage({ baslangicUrun = null }: { baslangicUrun?: Product | null }) {
+type Sekme = 'aciklama' | 'ozellikler' | 'teslimat' | 'yorumlar';
+
+const fiyat = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
+
+const Yildizlar = ({ puan, boyut = 16 }: { puan: number; boyut?: number }) => (
+  <span className="flex" aria-label={`5 üzerinden ${puan.toFixed(1)}`}>
+    {[1, 2, 3, 4, 5].map((i) => (
+      <LuStar
+        key={i}
+        size={boyut}
+        className={i <= Math.round(puan) ? 'text-[#E8620C] fill-[#E8620C]' : 'text-gray-300'}
+      />
+    ))}
+  </span>
+);
+
+const GUVENCELER = [
+  { Icon: LuTruck, baslik: 'Türkiye geneline gönderim', alt: 'Kargo ücreti teslimatta ödenir' },
+  { Icon: LuRotateCcw, baslik: '14 gün cayma hakkı', alt: 'Teslimden itibaren iade' },
+  { Icon: LuShieldCheck, baslik: 'Kamu kurumu güvencesi', alt: 'Adalet Bakanlığı İşyurtları Kurumu' },
+  { Icon: LuHandHeart, baslik: 'Sosyal katkı', alt: 'Meslek eğitimine destek' },
+];
+
+export default function ProductDetailPage({
+  baslangicUrun = null,
+  benzerUrunler = [],
+}: {
+  baslangicUrun?: Product | null;
+  benzerUrunler?: KartUrunu[];
+}) {
   const params = useParams();
   const slug = params.slug as string;
   const [product, setProduct] = useState<Product | null>(baslangicUrun);
@@ -163,6 +112,7 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
   const [submittingReview, setSubmittingReview] = useState(false);
   /** Galeride seçili görselin sırası. */
   const [seciliGorsel, setSeciliGorsel] = useState(0);
+  const [sekme, setSekme] = useState<Sekme>('aciklama');
   /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
   const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
   const { musteri } = useMusteri();
@@ -196,20 +146,11 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
   }, [slug]);
 
   /**
-   * Sepete ekleme artik lib/cart.ts'teki sepeteEkle() uzerinden yapiliyor.
-   *
-   * Buradaki kopya mantik iki soruna yol aciyordu:
-   *  - Kampanya fiyati yok sayiliyordu. Urun kartlarindaki buton indirimli
-   *    fiyati (campaign.discountedPrice) sepete yazarken bu sayfa tam fiyati
-   *    yaziyordu; ayni indirimli urun, nereden eklendigine gore farkli fiyata
-   *    sepete giriyordu.
-   *  - Stok ve fiyat kontrolu yoktu; sepeteEkle() bu kontrolu yapiyor.
-   *
-   * GA'nin add_to_cart olayi da sepeteEkle() icinde gonderiliyor.
+   * Sepete ekleme lib/cart.ts'teki sepeteEkle() uzerinden: kampanya fiyati,
+   * stok ve fiyat kontrolu ve GA add_to_cart orada.
    */
   const handleAddToCart = () => {
     if (!product) return;
-
     const eklendi = sepeteEkle(
       {
         id: product.id,
@@ -223,23 +164,54 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
       },
       quantity
     );
-
     if (!eklendi) return;
-
     setAdded(true);
     setQuantity(1);
     setTimeout(() => setAdded(false), 3000);
   };
 
+  const yorumGonder = async () => {
+    setReviewMesaji(null);
+    if (reviewForm.text.trim().length < 10) {
+      setReviewMesaji({ tur: 'hata', metin: 'Yorum en az 10 karakter olmalı.' });
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      // Kimlik gonderilmiyor: yazar sunucuda oturumdan belirleniyor (baskasi
+      // adina yorum birakilamasin).
+      const res = await fetch(`/api/products/${slug}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rating: reviewForm.rating,
+          title: reviewForm.title || null,
+          text: reviewForm.text,
+        }),
+      });
+      const veri = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setReviewMesaji({ tur: 'ok', metin: veri.mesaj || 'Yorumunuz alındı. İncelendikten sonra yayınlanacak.' });
+        setReviewFormOpen(false);
+        setReviewForm({ rating: 5, title: '', text: '' });
+      } else {
+        setReviewMesaji({ tur: 'hata', metin: veri.error || 'Yorum gönderilemedi' });
+      }
+    } catch {
+      setReviewMesaji({ tur: 'hata', metin: 'Bağlantı hatası. Lütfen tekrar deneyin.' });
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   if (loading) return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF6000]" />
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#CC4E00]" />
     </div>
   );
 
   if (!product) return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center gap-4">
-      <span className="text-6xl">😕</span>
+    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
       <p className="text-gray-600 font-medium">Ürün bulunamadı</p>
       <Link href="/" className="bg-[#CC4E00] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#A63F00] transition-colors">
         Ana Sayfaya Dön
@@ -249,621 +221,320 @@ export default function ProductDetailPage({ baslangicUrun = null }: { baslangicU
 
   const inStock = product.quantity > 0;
   const hasPrice = product.price > 0;
+  const gecerliFiyat = product.campaign?.discountedPrice ?? product.price;
+  const ortalama = reviews.length > 0 ? reviews.reduce((t, r) => t + r.rating, 0) / reviews.length : null;
 
-  /** Uç galeri döndürmezse (eski önbellek, sunucudan gelen ilk veri) ana
-      görsele düşülüyor; sayfa hiçbir durumda görselsiz kalmıyor. */
+  /** Uç galeri döndürmezse ana görsele düşülüyor. */
   const gorseller =
     product.galeri && product.galeri.length > 0
       ? product.galeri
       : product.imageUrl
         ? [{ url: product.imageUrl, alt: product.name }]
         : [];
+  const secili = gorseller[Math.min(seciliGorsel, gorseller.length - 1)];
+
+  const sekmeler: { id: Sekme; ad: string }[] = [
+    { id: 'aciklama', ad: 'Açıklama' },
+    ...(product.ozellikler && product.ozellikler.length > 0 ? [{ id: 'ozellikler' as Sekme, ad: 'Özellikler' }] : []),
+    { id: 'teslimat', ad: 'Teslimat & İade' },
+    { id: 'yorumlar', ad: `Yorumlar (${reviews.length})` },
+  ];
 
   return (
-    <div className="store-shell">
+    <div className="bg-white">
 
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-screen-xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
-              <LuHouse size={14} strokeWidth={2} /> Ana Sayfa
-            </Link>
-            <span>/</span>
-            <Link href={`/${product.category.slug}`} className="hover:text-[#BA4700] transition-colors">
+      <nav className="max-w-screen-xl mx-auto px-4 pt-4 pb-2 flex items-center gap-1.5 text-sm text-gray-500 overflow-hidden" aria-label="Sayfa yolu">
+        <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 shrink-0"><LuHouse size={14} /> Ana Sayfa</Link>
+        <LuChevronRight size={14} className="shrink-0" />
+        <Link href={`/${product.category.slug}`} className="hover:text-[#BA4700] shrink-0">{product.category.name}</Link>
+        <LuChevronRight size={14} className="shrink-0" />
+        <span className="text-gray-900 font-medium truncate">{product.name}</span>
+      </nav>
+
+      <div className="max-w-screen-xl mx-auto px-4 pb-8 pt-2 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+
+        {/* ─── GALERİ ─── */}
+        <div>
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
+            {secili ? (
+              <Image src={secili.url} alt={secili.alt} fill priority quality={80} sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            ) : (
+              <KategoriIkon slug={product.category.slug} className="w-40 h-40" />
+            )}
+            {!inStock && (
+              <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-4 py-1.5 rounded-full">Tükendi</span>
+            )}
+            {product.campaign && (
+              <span className="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full">%{product.campaign.discount} İndirim</span>
+            )}
+          </div>
+          {gorseller.length > 1 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+              {gorseller.map((g, i) => (
+                <button
+                  key={g.url}
+                  onClick={() => setSeciliGorsel(i)}
+                  aria-label={`${i + 1}. görseli göster`}
+                  aria-current={i === seciliGorsel}
+                  className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition ${i === seciliGorsel ? 'border-[#CC4E00]' : 'border-transparent hover:border-gray-300'}`}
+                >
+                  <Image src={g.url} alt="" fill className="object-cover" sizes="80px" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ─── BİLGİ ─── */}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3 mb-2">
+            <Link href={`/${product.category.slug}`} className="inline-flex items-center gap-1.5 text-xs font-bold text-[#BA4700] bg-orange-50 hover:bg-orange-100 px-2.5 py-1 rounded-full">
+              <KategoriIkon slug={product.category.slug} className="w-5 h-5" />
               {product.category.name}
             </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium line-clamp-1">{product.name}</span>
+            <span className={`flex items-center gap-1.5 text-xs font-semibold ${inStock ? 'text-green-700' : 'text-red-600'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-green-600' : 'bg-red-600'}`} />
+              {inStock ? 'Stokta' : 'Tükendi'}
+            </span>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-screen-xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-serif text-2xl md:text-[2rem] font-bold text-[#141B2D] leading-tight">{product.name}</h1>
+            <FavoriteButton productId={product.id} size="lg" />
+          </div>
 
-          {/* ─── GÖRSEL GALERİSİ ───
-              Önceden tek görsel vardı. Galeri boşsa davranış aynı: ana
-              görsel gösteriliyor, küçük resim şeridi hiç çizilmiyor. */}
-          <div>
-            <div className="store-card rounded-3xl overflow-hidden aspect-square flex items-center justify-center relative bg-gradient-to-br from-orange-50 to-slate-100">
-              {gorseller.length > 0 ? (
-                <Image
-                  src={gorseller[Math.min(seciliGorsel, gorseller.length - 1)].url}
-                  alt={gorseller[Math.min(seciliGorsel, gorseller.length - 1)].alt}
-                  fill
-                  className="object-cover"
-                  priority
-                  quality={80}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  placeholder="empty"
-                />
-              ) : (
-                <IconProductOrigin className="w-40 h-40 object-contain opacity-95" />
-              )}
-              {!inStock && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <span className="bg-red-500 text-white text-lg font-bold px-6 py-2 rounded-full">Tükendi</span>
+          {ortalama !== null && (
+            <button onClick={() => setSekme('yorumlar')} className="flex items-center gap-2 mt-2 text-sm text-gray-600 hover:text-[#BA4700] w-fit">
+              <Yildizlar puan={ortalama} /> {ortalama.toFixed(1)} · {reviews.length} yorum
+            </button>
+          )}
+
+          {/* Fiyat */}
+          <div className="mt-5">
+            {hasPrice ? (
+              <>
+                <div className="flex items-baseline gap-3">
+                  <span className={`text-4xl font-extrabold tracking-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</span>
+                  {product.campaign && <span className="text-lg text-gray-400 line-through">{fiyat(product.price)}</span>}
                 </div>
-              )}
-            </div>
-
-            {gorseller.length > 1 && (
-              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-                {gorseller.map((gorsel, sira) => (
-                  <button
-                    key={gorsel.url}
-                    onClick={() => setSeciliGorsel(sira)}
-                    aria-label={`${sira + 1}. görseli göster`}
-                    aria-current={sira === seciliGorsel}
-                    className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition ${
-                      sira === seciliGorsel ? 'border-[#FF6000]' : 'border-transparent hover:border-gray-300'
-                    }`}
-                  >
-                    <Image src={gorsel.url} alt="" fill className="object-cover" sizes="64px" placeholder="empty" />
-                  </button>
-                ))}
-              </div>
+                <p className="text-xs text-gray-500 mt-1">KDV dahil · Kargo karşı ödemeli</p>
+              </>
+            ) : (
+              <p className="text-lg font-bold text-gray-700">Fiyat belirleniyor</p>
             )}
           </div>
 
-          {/* ─── INFO ─── */}
-          <div className="flex flex-col">
+          <p className="mt-5 text-[15px] leading-relaxed text-gray-600 line-clamp-4">{product.description}</p>
+          {product.description && product.description.length > 220 && (
+            <button onClick={() => { setSekme('aciklama'); document.getElementById('urun-sekmeler')?.scrollIntoView({ behavior: 'smooth' }); }} className="mt-1 text-sm font-semibold text-[#BA4700] w-fit">
+              Devamını oku
+            </button>
+          )}
 
-            {/* Category + stock */}
-            <div className="flex items-center gap-3 mb-3">
-              <Link
-                href={`/${product.category.slug}`}
-                className="bg-orange-100 text-[#BA4700] text-xs font-bold px-3 py-1 rounded-full hover:bg-orange-200 transition-colors"
-              >
-                {product.category.name}
-              </Link>
-              {inStock ? (
-                <span className="flex items-center gap-1 text-green-600 text-xs font-semibold">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full" /> Stokta
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-red-500 text-xs font-semibold">
-                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Tükendi
-                </span>
-              )}
-            </div>
-
-            {/* Title + Favorite */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
-                {product.name}
-              </h1>
-              <FavoriteButton productId={product.id} size="lg" />
-            </div>
-
-            {/* Description */}
-            <p className="text-gray-500 leading-relaxed mb-6 text-sm">
-              {product.description}
-              <span className="text-gray-600 font-medium block mt-3">
-                💡 Bu ürün cezaevi hükümlülerinin {categoryPurpose[product.category.slug]?.purpose.toLowerCase() || 'meslek eğitimi'} görerek el emeğiyle üretmişlerdir. Her satın alma, topluma yeniden kazanılmalarına destek olur.
-              </span>
-            </p>
-
-            {/* ─── ÜRÜN ÖZELLİKLERİ ───
-                Ağırlık, malzeme, menşe gibi bilgiler. Girilmemişse blok hiç
-                çizilmiyor: boş bir "Özellikler" başlığı, bilgi olmadığını
-                söylemenin en kötü yolu. */}
-            {product.ozellikler && product.ozellikler.length > 0 && (
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6 shadow-sm">
-                <h3 className="font-bold text-gray-900 mb-4">Ürün Özellikleri</h3>
-                <dl className="divide-y divide-gray-100">
-                  {product.ozellikler.map((ozellik) => (
-                    <div key={ozellik.ad} className="flex gap-4 py-2.5 text-sm">
-                      <dt className="w-40 flex-shrink-0 text-gray-500">{ozellik.ad}</dt>
-                      <dd className="flex-1 text-gray-900 font-medium">{ozellik.deger}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-
-            {/* Production Values */}
-            <div className="bg-white border border-orange-200 rounded-2xl p-6 mb-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <IconSuccess className="w-8 h-8 object-contain" />
-                <h3 className="font-bold text-gray-900">Üretim Değerleri & Güvence</h3>
-              </div>
-              <ul className="space-y-3">
-                {getProductValues(slug).map((value, idx) => (
-                  <li key={idx} className="flex gap-3">
-                    <span className="text-[#BA4700] font-bold text-lg leading-none mt-0.5">✓</span>
-                    <span className="text-sm text-gray-700 leading-relaxed">{value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Campaign Banner */}
-            {product.campaign && (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <IconCampaign className="w-9 h-9 object-contain" />
-                  <h4 className="font-bold text-red-700">Kampanya: {product.campaign.name}</h4>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-red-600">%{product.campaign.discount}</span>
-                  <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="line-through">₺{product.price.toFixed(2)}</span>
-                    </p>
-                    <p className="text-lg font-bold text-red-600">
-                      ₺{product.campaign.discountedPrice.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Price box */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-5 shadow-sm">
-              {hasPrice ? (
-                <>
-                  <p className="text-sm text-gray-400 mb-1">{product.campaign ? 'İndirimli Fiyat' : 'Fiyat'}</p>
-                  <p className="text-4xl font-extrabold text-[#BA4700]">
-                    ₺{product.campaign ? product.campaign.discountedPrice.toFixed(2) : product.price.toFixed(2)}
-                  </p>
-                  {/* Burada "Ucretsiz kargo" yaziyordu; gonderiler karsi
-                      odemeli, yani kargo ucretsiz degil. Ayni sayfada ana
-                      sayfadaki aciklama ve sikca sorulan sorular dogru bilgiyi
-                      veriyordu - musteri iki farkli soz goruyordu. */}
-                  <p className="text-xs text-gray-400 mt-2">KDV dahil · Kargo karşı ödemeli</p>
-                </>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-gray-200 shadow-sm">
-                    <IconTransferInfo className="w-9 h-9 object-contain" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-700">Fiyat Belirleniyor</p>
-                    <p className="text-xs text-gray-400">Bu ürünün fiyatı yakında açıklanacak</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Add to cart */}
+          {/* Satın alma */}
+          <div className="mt-6">
             {hasPrice && inStock ? (
-              <div className="space-y-3">
-                {/* Quantity */}
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 font-medium">Adet:</span>
-                  <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-white">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold"
-                    >−</button>
-                    <span className="w-10 text-center font-bold text-gray-900">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
-                      className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-lg font-bold"
-                    >+</button>
-                  </div>
-                  <span className="text-xs text-gray-400">({product.quantity} adet mevcut)</span>
+              <div className="flex gap-3">
+                <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shrink-0">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100" aria-label="Azalt"><LuMinus size={16} /></button>
+                  <span className="w-10 text-center font-bold text-gray-900">{quantity}</span>
+                  <button onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))} className="w-11 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100" aria-label="Arttır"><LuPlus size={16} /></button>
                 </div>
-
-                {/* Button */}
-                {added ? (
-                  <div className="w-full bg-green-500 text-white py-3.5 rounded-xl font-bold text-center flex items-center justify-center gap-2">
-                    <LuBadgeCheck size={20} strokeWidth={2} /> Sepete Eklendi! Teşekkürler 🙏
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleAddToCart}
-                    className="w-full bg-[#CC4E00] hover:bg-[#A63F00] text-white py-3.5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-base"
-                  >
-                    <LuHeart size={18} strokeWidth={2} /> Destekle ve Sepete Ekle
-                  </button>
-                )}
-
-                <Link
-                  href="/sepet"
-                  className="w-full border-2 border-[#FF6000] text-[#BA4700] hover:bg-orange-50 py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm"
+                <button
+                  onClick={handleAddToCart}
+                  className={`flex-1 h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}
                 >
-                  Sepete Git →
-                </Link>
+                  {added ? <><LuCheck size={18} /> Sepete eklendi</> : <><LuShoppingCart size={18} /> Sepete Ekle</>}
+                </button>
               </div>
             ) : !inStock ? (
               <PreOrderForm productId={product.id} productName={product.name} />
             ) : (
-              <button disabled className="w-full bg-gray-200 text-gray-400 py-3.5 rounded-xl font-bold cursor-not-allowed">
-                Fiyat Bekleniyor
-              </button>
+              <button disabled className="w-full h-12 bg-gray-100 text-gray-500 rounded-xl font-bold cursor-not-allowed">Fiyat belirlenince satışa açılacak</button>
             )}
-
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-3 mt-6">
-              {[
-                { Icon: IconVocationalTraining, text: 'Meslek Eğitimi' },
-                { Icon: IconSuccess,            text: 'Sosyal Girişim' },
-                { Icon: IconSocialContribution, text: 'Sosyal Proje' },
-              ].map(({ Icon, text }) => (
-                <div key={text} className="bg-white rounded-xl border border-gray-200 p-3 flex flex-col items-center gap-1.5 text-center shadow-sm">
-                  <Icon className="w-9 h-9 object-contain" />
-                  <span className="text-xs font-medium text-blue-900">{text}</span>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-
-        {/* ─── MISSION & IMPACT SECTIONS ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-
-          {/* Purpose section */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
-                <IconVocationalTraining className="w-11 h-11 object-contain" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900">Bu Ürün Kimden Geliyor?</h3>
-            </div>
-            <div className="space-y-3 text-sm text-gray-700">
-              <p>
-                Bu ürün, <span className="font-semibold text-blue-900">{categoryPurpose[product.category.slug]?.purpose || 'Meslek Eğitimi'}</span> alan hükümlüler tarafından el emeğiyle üretilmiştir.
-              </p>
-              <div className="flex items-start gap-3 rounded-2xl bg-orange-50 border border-orange-200 p-3">
-                <IconEducationGoal className="w-9 h-9 object-contain flex-shrink-0" />
-                <p>
-                  <span className="font-semibold">Eğitim Hedefi:</span> {categoryPurpose[product.category.slug]?.skillDescription || 'Profesyonel beceri geliştirme'}
-                </p>
-              </div>
-              <p className="text-xs text-gray-600 italic border-l-4 border-blue-400 pl-3 mt-2">
-                Her satın alma, bu bireyin yeniden başlama yolculuğuna ve topluma kazanılmasına direkt katkı sağlar.
-              </p>
-            </div>
-          </div>
-
-          {/* Impact section */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0">
-                <IconSocialContribution className="w-11 h-11 object-contain" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900">Yardımın Nasıl Kullanılacak?</h3>
-            </div>
-            <div className="space-y-3 text-sm text-gray-700">
-              {[
-                {
-                  Icon: IconEducationGoal,
-                  title: 'Eğitim Programı',
-                  text: `${categoryPurpose[product.category.slug]?.trainingHours || 50} saat mesleki eğitime yatırım`,
-                },
-                {
-                  Icon: IconEmploymentSupport,
-                  title: 'İstihdam Desteği',
-                  text: 'Yeniden başlayan bireyin iş arayışına destek',
-                },
-                {
-                  Icon: IconReintegration,
-                  title: 'Reentegrasyon',
-                  text: 'Topluma başarılı dönüş için gerekli tüm destek',
-                },
-              ].map(({ Icon, title, text }) => (
-                <div key={title} className="flex items-start gap-3 rounded-2xl bg-gray-50 border border-gray-200 p-3">
-                  <Icon className="w-9 h-9 object-contain flex-shrink-0" />
-                  <span><span className="font-semibold">{title}:</span> {text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-
-        {/* ─── REVIEWS SECTION ─── */}
-        <div className="mt-12 border-t border-gray-200 pt-8">
-          {reviewsLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FF6000]" />
-            </div>
-          ) : reviews.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-2xl">
-              <p className="text-gray-600 mb-4">Bu ürün hakkında henüz yorum yapılmamış</p>
-              <p className="text-sm text-gray-500">Bu ürünü satın aldıysanız ilk yorum yapan siz olabilirsiniz!</p>
-            </div>
-          ) : (
-            <>
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-4xl font-bold text-gray-900">
-                        {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
-                      </span>
-                      <div className="flex gap-0.5">
-                        {Array(Math.round(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length)).fill(0).map((_, i) => (
-                          <span key={i} className="text-2xl">⭐</span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500">{reviews.length} müşteri yorumu</p>
-                  </div>
-                </div>
-
-                {/* Rating breakdown */}
-                <div className="space-y-2 max-w-xs">
-                  {[5, 4, 3, 2, 1].map((stars) => {
-                    const count = reviews.filter(r => r.rating === stars).length;
-                    const percent = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-                    return (
-                      <div key={stars} className="flex items-center gap-3">
-                        <span className="text-xs text-gray-600 min-w-fit">{stars}★ ({count})</span>
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#CC4E00]" style={{ width: `${percent}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Reviews list */}
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <div key={review.id} className="bg-white rounded-2xl border border-gray-200 p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#FF6000] to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                          {review.user.name.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 text-sm">{review.user.name}</p>
-                          <p className="text-xs text-gray-400">
-                            {new Date(review.createdAt).toLocaleDateString('tr-TR')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-0.5">
-                        {Array(review.rating).fill(0).map((_, i) => (
-                          <span key={i} className="text-lg">⭐</span>
-                        ))}
-                      </div>
-                    </div>
-                    {review.title && (
-                      <p className="font-semibold text-gray-900 text-sm mb-2">{review.title}</p>
-                    )}
-                    <p className="text-sm text-gray-700 leading-relaxed mb-3">{review.text}</p>
-                    <div className="flex items-center gap-4 text-xs">
-                      <button className="text-gray-500 hover:text-[#BA4700] font-medium transition-colors">
-                        👍 Faydalı ({review.helpfulCount})
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Review Form Modal */}
-          {reviewFormOpen && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-96 overflow-y-auto">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Ürün Yorumu Yaz</h3>
-
-                <div className="space-y-4">
-                  {/* Rating */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">Puan (1-5 ⭐)</label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          onClick={() => setReviewForm({ ...reviewForm, rating: star })}
-                          className={`text-3xl transition ${star <= reviewForm.rating ? '⭐' : '☆'}`}
-                        >
-                          {star <= reviewForm.rating ? '⭐' : '☆'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Başlık (İsteğe bağlı)</label>
-                    <input
-                      type="text"
-                      value={reviewForm.title}
-                      onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
-                      placeholder="Ürün hakkındaki düşünceniz"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6000]"
-                    />
-                  </div>
-
-                  {/* Comment */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Yorumunuz *</label>
-                    <textarea
-                      value={reviewForm.text}
-                      onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
-                      placeholder="Ürünü kullanarak yaşadığınız deneyimi paylaşın..."
-                      rows={4}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6000]"
-                    />
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      onClick={() => {
-                        setReviewFormOpen(false);
-                        setReviewForm({ rating: 5, title: '', text: '' });
-                      }}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg transition"
-                    >
-                      İptal
-                    </button>
-                    <button
-                      onClick={async () => {
-                        setReviewMesaji(null);
-
-                        if (reviewForm.text.trim().length < 10) {
-                          setReviewMesaji({ tur: 'hata', metin: 'Yorum en az 10 karakter olmalı.' });
-                          return;
-                        }
-
-                        setSubmittingReview(true);
-                        try {
-                          /**
-                           * Kimlik gönderilmiyor.
-                           *
-                           * Burada daha önce localStorage'dan okunan ya da
-                           * uydurulan bir "userId" ('guest-' + zaman damgası)
-                           * gövdeye konuyordu; uç da yazarı o alandan
-                           * okuyordu. Yani isteği düzenleyen biri başkasının
-                           * adına yorum bırakabiliyordu. Yazar artık sunucuda
-                           * oturumdan belirleniyor.
-                           */
-                          const res = await fetch(`/api/products/${slug}/reviews`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              rating: reviewForm.rating,
-                              title: reviewForm.title || null,
-                              text: reviewForm.text,
-                            }),
-                          });
-
-                          const veri = await res.json().catch(() => ({}));
-
-                          if (res.ok) {
-                            setReviewMesaji({
-                              tur: 'ok',
-                              metin: veri.mesaj || 'Yorumunuz alındı. İncelendikten sonra yayınlanacak.',
-                            });
-                            setReviewFormOpen(false);
-                            setReviewForm({ rating: 5, title: '', text: '' });
-                          } else {
-                            setReviewMesaji({ tur: 'hata', metin: veri.error || 'Yorum gönderilemedi' });
-                          }
-                        } catch {
-                          setReviewMesaji({ tur: 'hata', metin: 'Bağlantı hatası. Lütfen tekrar deneyin.' });
-                        } finally {
-                          setSubmittingReview(false);
-                        }
-                      }}
-                      disabled={submittingReview}
-                      className="flex-1 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white font-medium py-2 rounded-lg transition"
-                    >
-                      {submittingReview ? 'Gönderiliyor...' : 'Yorumu Gönder'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Yorum formunun sonucu. Onceden alert() ile gosteriliyordu; tarayici
-              kaplamasi hem sayfayi kilitliyor hem mesaji kaybediyordu. */}
-          {reviewMesaji && (
-            <div
-              className={`mt-8 rounded-2xl border px-5 py-4 text-sm ${
-                reviewMesaji.tur === 'ok'
-                  ? 'bg-green-50 border-green-200 text-green-800'
-                  : 'bg-red-50 border-red-200 text-red-700'
-              }`}
-            >
-              {reviewMesaji.metin}
-            </div>
-          )}
-
-          {/* Yorum yazma cagrisi.
-              Yorum yazmak icin giris sart: yazarin kimligi oturumdan
-              belirleniyor ve yalnizca urunu satin almis musteri yazabiliyor. */}
-          <div className="mt-8 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-6 text-center">
-            <h3 className="font-bold text-gray-900 mb-2">Siz de Yorum Yapın</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              {musteri
-                ? 'Bu ürünü satın aldıysanız deneyiminizi diğer müşterilerle paylaşın'
-                : 'Yorum yazmak için giriş yapın. Yalnızca satın aldığınız ürünlere yorum yazabilirsiniz.'}
-            </p>
-            {musteri ? (
-              <button
-                onClick={() => {
-                  setReviewMesaji(null);
-                  setReviewFormOpen(true);
-                }}
-                className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
-              >
-                Yorum Yaz
-              </button>
-            ) : (
-              <Link
-                href={`/giris?devam=/urun/${slug}`}
-                className="bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-2.5 rounded-xl font-medium transition inline-block"
-              >
-                Giriş Yap
+            {added && (
+              <Link href="/sepet" className="mt-3 flex items-center justify-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+                Sepete git <LuChevronRight size={16} />
               </Link>
             )}
+            {hasPrice && inStock && product.quantity <= 5 && (
+              <p className="mt-2 text-xs font-semibold text-[#BA4700]">Son {product.quantity} adet</p>
+            )}
+          </div>
+
+          {/* Güvence rozetleri - her biri doğrulanabilir bilgi */}
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            {GUVENCELER.map(({ Icon, baslik, alt }) => (
+              <div key={baslik} className="flex items-start gap-3 rounded-xl border border-gray-200 bg-[#FAFAF9] p-3">
+                <Icon size={22} className="text-[#E8620C] shrink-0 mt-0.5" strokeWidth={1.75} />
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-gray-900 leading-tight">{baslik}</p>
+                  <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{alt}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ─── MOBİLDE SABİT SATIN ALMA BARI ───
-          Ürün sayfası uzun: açıklama, üretim değerleri, özellikler, yorumlar.
-          Mobilde aşağı inen müşteri fiyatı ve sepete ekleme düğmesini
-          kaybediyordu; geri dönmek için yukarı kaydırmak gerekiyordu.
-          Çubuk alt gezinmenin üstünde duruyor (bottom-16). */}
-      {hasPrice && inStock && (
-        <div
-          className="md:hidden fixed bottom-16 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3"
-          style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
-        >
-          <div className="min-w-0 flex-1">
-            {product.campaign ? (
-              <>
-                <p className="text-[11px] text-gray-400 line-through leading-none">
-                  ₺{product.price.toFixed(2)}
-                </p>
-                <p className="text-lg font-bold text-red-600 leading-tight">
-                  ₺{product.campaign.discountedPrice.toFixed(2)}
-                </p>
-              </>
-            ) : (
-              <p className="text-lg font-bold text-[#BA4700] leading-tight">
-                ₺{product.price.toFixed(2)}
-              </p>
-            )}
-            <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli</p>
+      {/* ─── SEKMELER ─── */}
+      <section id="urun-sekmeler" className="max-w-screen-xl mx-auto px-4 pb-10 scroll-mt-40">
+        <div role="tablist" className="flex gap-1 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+          {sekmeler.map((s) => (
+            <button
+              key={s.id}
+              role="tab"
+              aria-selected={sekme === s.id}
+              onClick={() => setSekme(s.id)}
+              className={`px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${sekme === s.id ? 'border-[#CC4E00] text-[#BA4700]' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+            >
+              {s.ad}
+            </button>
+          ))}
+        </div>
+
+        <div className="pt-6 max-w-4xl">
+          <div role="tabpanel" hidden={sekme !== 'aciklama'} className="space-y-4 text-[15px] leading-7 text-gray-700">
+            <p className="whitespace-pre-line">{product.description}</p>
+            <p className="rounded-xl bg-[#FDF1E7] border border-orange-100 px-4 py-3 text-sm text-gray-700">
+              Bu ürün, Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde hükümlülerin el emeğiyle üretilmiştir.
+            </p>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold text-white transition-colors ${
-              added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'
-            }`}
-          >
+          {product.ozellikler && product.ozellikler.length > 0 && (
+            <div role="tabpanel" hidden={sekme !== 'ozellikler'}>
+              <dl className="divide-y divide-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+                {product.ozellikler.map((o) => (
+                  <div key={o.ad} className="flex gap-4 px-4 py-3 text-sm odd:bg-[#FAFAF9]">
+                    <dt className="w-40 shrink-0 text-gray-500">{o.ad}</dt>
+                    <dd className="flex-1 font-medium text-gray-900">{o.deger}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          <div role="tabpanel" hidden={sekme !== 'teslimat'} className="space-y-3 text-[15px] leading-7 text-gray-700">
+            <p><strong className="text-gray-900">Kargo:</strong> Gönderiler karşı ödemeli yapılır. Kargo ücreti sipariş toplamına dahil değildir, teslimat sırasında kargo firmasına ödenir.</p>
+            <p><strong className="text-gray-900">Sipariş takibi:</strong> Siparişiniz kargoya verildiğinde takip numarası Siparişlerim sayfasında görünür.</p>
+            <p><strong className="text-gray-900">Cayma hakkı:</strong> Ürünü teslim aldığınız tarihten itibaren 14 gün içinde hiçbir gerekçe göstermeden iade edebilirsiniz.</p>
+            <Link href="/teslimat-iade-sartlari" className="inline-flex items-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+              Teslimat ve iade şartlarının tamamı <LuChevronRight size={16} />
+            </Link>
+          </div>
+
+          <div role="tabpanel" hidden={sekme !== 'yorumlar'}>
+            {reviewsLoading ? (
+              <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#CC4E00]" /></div>
+            ) : ortalama === null ? (
+              <p className="text-gray-600 py-4">Bu ürün için henüz yorum yok.</p>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-4xl font-bold text-gray-900">{ortalama.toFixed(1)}</span>
+                  <div>
+                    <Yildizlar puan={ortalama} boyut={18} />
+                    <p className="text-sm text-gray-500 mt-1">{reviews.length} müşteri yorumu</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="rounded-xl border border-gray-200 p-5">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <div className="flex items-center gap-3">
+                          <span className="w-9 h-9 rounded-full bg-orange-100 text-[#BA4700] font-bold text-sm flex items-center justify-center">{r.user.name.charAt(0)}</span>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">{r.user.name}</p>
+                            <p className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</p>
+                          </div>
+                        </div>
+                        <Yildizlar puan={r.rating} />
+                      </div>
+                      {r.title && <p className="font-semibold text-gray-900 text-sm mb-1">{r.title}</p>}
+                      <p className="text-sm text-gray-700 leading-relaxed">{r.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {reviewMesaji && (
+              <div className={`mt-6 rounded-xl border px-4 py-3 text-sm ${reviewMesaji.tur === 'ok' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                {reviewMesaji.metin}
+              </div>
+            )}
+
+            <div className="mt-6 rounded-xl bg-[#FDF1E7] border border-orange-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-sm text-gray-700">
+                {musteri ? 'Bu ürünü satın aldıysanız deneyiminizi paylaşın.' : 'Yorum yazmak için giriş yapın. Yalnızca satın aldığınız ürünlere yorum yazabilirsiniz.'}
+              </p>
+              {musteri ? (
+                <button onClick={() => { setReviewMesaji(null); setReviewFormOpen(true); }} className="shrink-0 bg-[#CC4E00] hover:bg-[#A63F00] text-white px-5 py-2.5 rounded-lg text-sm font-semibold">Yorum Yaz</button>
+              ) : (
+                <Link href={`/giris?devam=/urun/${slug}`} className="shrink-0 bg-[#CC4E00] hover:bg-[#A63F00] text-white px-5 py-2.5 rounded-lg text-sm font-semibold text-center">Giriş Yap</Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {benzerUrunler.length > 0 && (
+        <section className="max-w-screen-xl mx-auto px-4 pb-12">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Benzer Ürünler</h2>
+            <Link href={`/${product.category.slug}`} className="inline-flex items-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+              Tümünü Gör <LuChevronRight size={16} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            {benzerUrunler.map((u) => (
+              <UrunKarti key={u.id} urun={u} kompakt favoriButonu={false} gorselArkaPlani="from-[#F6EFE6] to-[#EFE4D6]" gorselYuksekligi="h-36 md:h-44" gorselBoyutlari="(max-width: 768px) 50vw, 25vw" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {reviewFormOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Ürün Yorumu Yaz</h3>
+            <div className="space-y-4">
+              <div className="flex gap-1" role="radiogroup" aria-label="Puan">
+                {[1, 2, 3, 4, 5].map((y) => (
+                  <button key={y} onClick={() => setReviewForm({ ...reviewForm, rating: y })} aria-label={`${y} yıldız`}>
+                    <LuStar size={30} className={y <= reviewForm.rating ? 'text-[#E8620C] fill-[#E8620C]' : 'text-gray-300'} />
+                  </button>
+                ))}
+              </div>
+              <input type="text" value={reviewForm.title} onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })} placeholder="Başlık (isteğe bağlı)" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#CC4E00]" />
+              <textarea value={reviewForm.text} onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })} placeholder="Ürünle ilgili deneyiminiz (en az 10 karakter)" rows={4} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-[#CC4E00]" />
+              {reviewMesaji?.tur === 'hata' && <p className="text-sm text-red-600">{reviewMesaji.metin}</p>}
+              <div className="flex gap-3">
+                <button onClick={() => { setReviewFormOpen(false); setReviewForm({ rating: 5, title: '', text: '' }); }} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 rounded-lg">İptal</button>
+                <button onClick={yorumGonder} disabled={submittingReview} className="flex-1 bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white font-medium py-2.5 rounded-lg">
+                  {submittingReview ? 'Gönderiliyor...' : 'Yorumu Gönder'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobilde sabit satın alma çubuğu (alt gezinmenin üstünde) */}
+      {hasPrice && inStock && (
+        <div className="md:hidden fixed bottom-16 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+          <div className="min-w-0 flex-1">
+            {product.campaign && <p className="text-[11px] text-gray-400 line-through leading-none">{fiyat(product.price)}</p>}
+            <p className={`text-lg font-bold leading-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</p>
+            <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli</p>
+          </div>
+          <button onClick={handleAddToCart} className={`shrink-0 px-6 py-3 rounded-xl font-semibold text-white transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}>
             {added ? 'Sepete eklendi' : 'Sepete Ekle'}
           </button>
         </div>
       )}
-
-      <div className="h-8" />
+      <div className="h-20 md:h-0" />
     </div>
   );
 }
