@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuArrowLeft, LuMapPin, LuPlus, LuInfo, LuPencil, LuTrash2, LuCheck } from 'react-icons/lu';
+import HesapSekmeleri from '@/components/HesapSekmeleri';
+import { LuMapPin, LuPlus, LuInfo, LuPencil, LuTrash2, LuCheck } from 'react-icons/lu';
 import { useMusteri } from '@/lib/musteri-istemci';
 
 interface Adres {
@@ -149,7 +150,7 @@ export default function AdreslerimSayfasi() {
 
   if (yukleniyor) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAFAF9] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF6000]" />
       </div>
     );
@@ -157,7 +158,7 @@ export default function AdreslerimSayfasi() {
 
   if (!musteri) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12 px-4">
+      <div className="min-h-screen bg-[#FAFAF9] py-12 px-4">
         <div className="max-w-md mx-auto bg-white rounded-2xl border border-gray-200 p-8 text-center shadow-sm">
           <div className="w-12 h-12 rounded-full bg-orange-100 text-[#BA4700] flex items-center justify-center mx-auto mb-5">
             <LuMapPin size={24} />
@@ -174,19 +175,17 @@ export default function AdreslerimSayfasi() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-[#FAFAF9]">
+      <div className="bg-gradient-to-b from-[#FBF6EF] to-[#FAFAF9] border-b border-orange-100/60">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/hesabim" className="flex items-center gap-2 text-[#BA4700] hover:text-[#8F3700] font-medium mb-4 transition">
-            <LuArrowLeft size={18} /> Hesabım
-          </Link>
+          <HesapSekmeleri />
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <div className="w-11 h-11 bg-white shadow-sm border border-orange-100 rounded-xl flex items-center justify-center">
                 <LuMapPin size={20} className="text-[#BA4700]" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Adreslerim</h1>
+                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D]">Adreslerim</h1>
                 <p className="text-sm text-gray-600">
                   {listeYukleniyor ? '...' : `${adresler.length} kayıtlı adres`}
                 </p>

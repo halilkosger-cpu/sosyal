@@ -95,11 +95,11 @@ export default function SecureShoppingPage() {
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex gap-2">
                     <span>✓</span>
-                    <span>Gerçek zamanlı sipariş takibi</span>
+                    <span>Kargo takip numarasıyla sipariş takibi</span>
                   </li>
                   <li className="flex gap-2">
                     <span>✓</span>
-                    <span>Sorun halinde para iadesi garantisi</span>
+                    <span>Kusurlu, hasarlı veya yanlış gönderilen üründe yasal haklarınız saklıdır (değişim, onarım veya ücret iadesi)</span>
                   </li>
                   <li className="flex gap-2">
                     <span>✓</span>

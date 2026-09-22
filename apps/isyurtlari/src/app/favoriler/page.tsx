@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuHeart, LuArrowLeft } from 'react-icons/lu';
+import HesapSekmeleri from '@/components/HesapSekmeleri';
+import { LuHeart } from 'react-icons/lu';
 import { favorileriGetir, favoriyiCikar, FAVORI_OLAYI } from '@/lib/favoriler';
 import UrunKarti from '@/components/UrunKarti';
 
@@ -115,18 +116,16 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAFAF9]">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gradient-to-b from-[#FBF6EF] to-[#FAFAF9] border-b border-orange-100/60">
         <div className="max-w-screen-xl mx-auto px-4 py-6">
-          <Link href="/" className="flex items-center gap-2 text-[#BA4700] hover:text-[#8F3700] font-medium mb-4 transition">
-            <LuArrowLeft size={18} /> Geri
-          </Link>
+          <HesapSekmeleri />
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-              <LuHeart size={22} className="text-red-600" />
+            <div className="w-11 h-11 bg-white shadow-sm border border-orange-100 rounded-xl flex items-center justify-center">
+              <LuHeart size={22} className="text-[#E8620C]" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Favorilerim</h1>
+            <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D]">Favorilerim</h1>
           </div>
           <p className="text-gray-600 text-sm mt-2">
             {loading ? '...' : `${favorites.length} ürün`}

@@ -53,10 +53,10 @@ function GirisFormu() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#FBF6EF] to-white py-12 px-4">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Giriş Yap</h1>
+          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D] mb-1">Giriş Yap</h1>
           <p className="text-sm text-gray-600 mb-6">
             Siparişlerinizi takip etmek ve sepetinizi cihazlar arasında taşımak için.
           </p>
@@ -134,7 +134,7 @@ export default function GirisSayfasi() {
   // useSearchParams bir Suspense sinirinin altinda olmali; aksi halde tum
   // sayfa istemci tarafinda uretilmeye zorlanir.
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-100" />}>
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-[#FBF6EF] to-white" />}>
       <GirisFormu />
     </Suspense>
   );

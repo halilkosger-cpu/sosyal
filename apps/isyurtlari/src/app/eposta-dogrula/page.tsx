@@ -53,7 +53,7 @@ function Dogrulama() {
   }, [jeton]);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#FBF6EF] to-white py-12 px-4">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm text-center">
           {durum === 'bekliyor' && (
@@ -98,7 +98,7 @@ function Dogrulama() {
 
 export default function EpostaDogrulamaSayfasi() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-100" />}>
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-[#FBF6EF] to-white" />}>
       <Dogrulama />
     </Suspense>
   );

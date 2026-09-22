@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuArrowLeft, LuPackage, LuTruck, LuCheck, LuClock, LuSearch, LuInfo } from 'react-icons/lu';
+import HesapSekmeleri from '@/components/HesapSekmeleri';
+import { LuPackage, LuTruck, LuCheck, LuClock, LuSearch, LuInfo } from 'react-icons/lu';
 import { useMusteri } from '@/lib/musteri-istemci';
 
 /**
@@ -301,18 +302,15 @@ export default function SiparislerimSayfasi() {
   const { musteri, yukleniyor } = useMusteri();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-[#FAFAF9]">
+      <div className="bg-gradient-to-b from-[#FBF6EF] to-[#FAFAF9] border-b border-orange-100/60">
         <div className="mx-auto max-w-screen-md px-4 py-6">
-          <Link href={musteri ? '/hesabim' : '/'}
-            className="mb-4 flex items-center gap-2 font-medium text-[#BA4700] transition hover:text-[#8F3700]">
-            <LuArrowLeft size={18} /> {musteri ? 'Hesabım' : 'Geri'}
-          </Link>
+          <HesapSekmeleri />
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm border border-orange-100">
               <LuPackage size={22} className="text-[#BA4700]" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D]">
               {musteri ? 'Siparişlerim' : 'Sipariş Sorgula'}
             </h1>
           </div>
