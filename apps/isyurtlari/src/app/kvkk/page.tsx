@@ -114,10 +114,6 @@ export default function KVKKPage() {
                 <span>•</span>
                 <span>Yasal gereklilikler veya mahkeme kararları gereği</span>
               </li>
-              <li className="flex gap-3">
-                <span>•</span>
-                <span>Adalet Bakanlığı ve ilgili kamu kurumları</span>
-              </li>
             </ul>
           </section>
 

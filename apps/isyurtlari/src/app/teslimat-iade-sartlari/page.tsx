@@ -93,7 +93,7 @@ export default function ShippingReturnsPage() {
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Ürün Garantisi</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                İşyurtlarında üretilen tüm ürünler kalite kontrol sürecinden geçmiştir. Ürünlerin garantisi ve kullanım koşulları ürün bilgisinde belirtilmiştir.
+                Üretici İşyurtları Genel Müdürlüğü'nün belirttiği üzere ürünler, hijyen ve doğallık esas alınarak, gereksiz katkı maddesi kullanılmadan üretilir ve kalite kontrolünden geçer. Ürünlerin garantisi ve kullanım koşulları ürün bilgisinde belirtilmiştir.
               </p>
             </section>
 
