@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { IconCart, IconProductOrigin, IconContinueShopping } from '@/components/Icons';
+import { LuArrowLeft, LuArrowRight, LuMinus, LuPlus, LuRotateCcw, LuShieldCheck, LuShoppingBag, LuTrash2 } from 'react-icons/lu';
+
+const tl = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 import { sepettenCikarildi } from '@/lib/analiz';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
 
@@ -99,174 +101,123 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#CC4E00]" />
       </div>
     );
   }
 
-  return (
-    <div className="store-shell">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-screen-2xl mx-auto px-4 py-4">
-          <Link href="/" className="text-[#BA4700] hover:text-[#BA4700] font-medium inline-flex items-center gap-2">
-            <IconContinueShopping className="w-5 h-5 object-contain" /> Alışverişe devam et
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">Sepetim</h1>
-        </div>
-      </div>
+  const adet = cart.reduce((t, i) => t + i.quantity, 0);
 
-      {/* Content */}
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  return (
+    <div className="bg-white min-h-[70vh]">
+      <div className="max-w-screen-xl mx-auto px-4 pt-6 pb-12">
+        <div className="flex items-end justify-between gap-4 mb-6">
+          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#141B2D]">
+            Sepetim {cart.length > 0 && <span className="text-base font-sans font-medium text-gray-500">({adet} ürün)</span>}
+          </h1>
+          <Link href="/" className="inline-flex items-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
+            <LuArrowLeft size={16} /> Alışverişe devam et
+          </Link>
+        </div>
+
         {cart.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center shadow-sm">
-            <IconCart className="w-24 h-24 object-contain mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Sepetiniz boş</h2>
-            <p className="text-gray-600 mb-6">Sosyal faydaya dönüşecek ürünleri keşfetmek için vitrine dönebilirsiniz.</p>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center bg-[#CC4E00] text-white px-6 py-3 rounded-xl hover:bg-[#A63F00] transition font-semibold"
-            >
-              Ürünleri keşfet
+          <div className="rounded-2xl border border-gray-200 bg-gradient-to-b from-[#FFFBF6] to-[#F7EFE5] p-10 md:p-14 text-center">
+            <LuShoppingBag size={56} strokeWidth={1.25} className="mx-auto text-[#E8620C] mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Sepetiniz boş</h2>
+            <p className="text-gray-600 mb-6">El emeği ürünleri keşfetmek için vitrine göz atın.</p>
+            <Link href="/" className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white px-6 py-3 rounded-xl font-semibold">
+              Ürünleri keşfet <LuArrowRight size={16} />
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+            {/* Ürünler */}
+            <div className="lg:col-span-2 rounded-2xl border border-gray-200 divide-y divide-gray-100">
               {cart.map((item) => (
-                <div key={item.id} className="store-card rounded-2xl p-4 flex gap-4">
-                  {/* Image */}
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200">
+                <div key={item.id} className="p-4 flex gap-4">
+                  <Link href={`/urun/${item.slug}`} className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl overflow-hidden bg-[#F6EFE6] flex items-center justify-center">
                     {item.imageUrl ? (
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover rounded" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
-                      <IconProductOrigin className="w-14 h-14 object-contain" />
+                      <LuShoppingBag size={32} className="text-[#E8620C]" />
                     )}
-                  </div>
+                  </Link>
 
-                  {/* Details */}
-                  <div className="flex-1">
-                    <Link
-                      href={`/urun/${item.slug}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-[#BA4700] transition"
-                    >
-                      {item.name}
-                    </Link>
-                    <div className="mt-1 flex items-center gap-2">
-                      {item.campaign ? (
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <Link href={`/urun/${item.slug}`} className="font-semibold text-gray-900 hover:text-[#BA4700] leading-snug line-clamp-2">
+                        {item.name}
+                      </Link>
+                      <button onClick={() => removeItem(item.id)} aria-label={`${item.name} ürününü sepetten çıkar`} className="shrink-0 p-1.5 -m-1.5 text-gray-400 hover:text-red-600">
+                        <LuTrash2 size={18} />
+                      </button>
+                    </div>
+
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
+                      <span className={`font-semibold ${item.campaign ? 'text-red-600' : 'text-gray-700'}`}>{tl(getItemPrice(item))}</span>
+                      {item.campaign && (
                         <>
-                          <span className="text-red-600 font-bold text-lg">
-                            ₺{item.campaign.discountedPrice.toFixed(2)}
-                          </span>
-                          <span className="text-gray-400 line-through text-sm">
-                            ₺{item.price.toFixed(2)}
-                          </span>
-                          <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
-                            %{item.campaign.discount} İndirim
-                          </span>
+                          <span className="text-gray-400 line-through text-xs">{tl(item.price)}</span>
+                          <span className="bg-red-50 text-red-700 text-[11px] font-bold px-1.5 py-0.5 rounded">%{item.campaign.discount}</span>
                         </>
-                      ) : (
-                        <span className="text-[#BA4700] font-bold text-lg">
-                          ₺{item.price.toFixed(2)}
-                        </span>
                       )}
                     </div>
 
-                    {/* Quantity Controls */}
-                    <div className="flex items-center gap-2 mt-3 w-fit">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
-                      >
-                        −
-                      </button>
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                        className="w-10 text-center bg-gray-100 rounded outline-none"
-                      />
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
-                      >
-                        +
-                      </button>
+                    <div className="mt-auto pt-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1} aria-label="Azalt" className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-40"><LuMinus size={14} /></button>
+                        <input
+                          type="number"
+                          min={1}
+                          value={item.quantity}
+                          onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
+                          aria-label="Adet"
+                          className="w-10 h-9 text-center font-semibold text-gray-900 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} aria-label="Arttır" className="w-9 h-9 flex items-center justify-center text-gray-600 hover:bg-gray-100"><LuPlus size={14} /></button>
+                      </div>
+                      <p className="font-bold text-gray-900">{tl(getItemPrice(item) * item.quantity)}</p>
                     </div>
-                  </div>
-
-                  {/* Remove Button */}
-                  <div className="flex flex-col justify-between items-end">
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700 transition font-medium text-sm"
-                    >
-                      Sil
-                    </button>
-                    <p className="text-gray-900 font-bold text-lg">
-                      ₺{(getItemPrice(item) * item.quantity).toFixed(2)}
-                    </p>
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Summary */}
-            <div className="lg:col-span-1">
-              <div className="store-card rounded-2xl p-6 sticky top-20">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Sipariş özeti</h3>
-
-                <div className="space-y-3 mb-4 pb-4 border-b border-gray-200">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Ara Toplam</span>
-                    <span>₺{originalSubtotal.toFixed(2)}</span>
-                  </div>
-                  {totalDiscount > 0 && (
-                    <div className="flex justify-between text-green-600 font-bold">
-                      <span>İndirim Tasarrufu</span>
-                      <span>-₺{totalDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-gray-600">
-                    <span>Kargo</span>
-                    <span className="font-semibold text-gray-700">
-                      {KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-xl font-bold text-gray-900 mb-2">
-                  <span>Toplam</span>
-                  <span>₺{total.toFixed(2)}</span>
-                </div>
-
-                {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden
-                    cikiyor. Musteri odeme sayfasinda farkli bir tutarla
-                    karsilasmasin diye burada aciklaniyor. */}
-                <p className="text-xs leading-relaxed text-gray-500 mb-6">
-                  Fiyatlara KDV dahildir (₺{tax.toFixed(2)}).
-                  {KARGO_KARSI_ODEMELI
-                    ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.'
-                    : ''}
-                </p>
-
-                <button
-                  onClick={() => router.push('/checkout')}
-                  className="w-full bg-[#CC4E00] text-white py-3 rounded-xl font-semibold hover:bg-[#A63F00] transition mb-3"
-                >
-                  Ödemeye Geç
-                </button>
-
-                <button
-                  onClick={clearCart}
-                  className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-xl hover:bg-gray-50 transition font-medium text-sm"
-                >
-                  Sepeti Boşalt
-                </button>
+              <div className="p-4 flex justify-end">
+                <button onClick={clearCart} className="text-sm text-gray-500 hover:text-red-600">Sepeti boşalt</button>
               </div>
             </div>
+
+            {/* Özet */}
+            <aside className="rounded-2xl border border-gray-200 bg-[#FAFAF9] p-5 lg:sticky lg:top-40">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Sipariş özeti</h2>
+              <dl className="space-y-2.5 text-sm">
+                <div className="flex justify-between text-gray-600"><dt>Ara toplam</dt><dd>{tl(originalSubtotal)}</dd></div>
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between text-green-700 font-semibold"><dt>İndirim</dt><dd>-{tl(totalDiscount)}</dd></div>
+                )}
+                <div className="flex justify-between text-gray-600">
+                  <dt>Kargo</dt>
+                  <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? tl(shipping) : 'Ücretsiz'}</dd>
+                </div>
+              </dl>
+              <div className="flex justify-between items-baseline border-t border-gray-200 mt-4 pt-4">
+                <span className="font-bold text-gray-900">Toplam</span>
+                <span className="text-2xl font-extrabold text-[#141B2D]">{tl(total)}</span>
+              </div>
+              {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden cikiyor. */}
+              <p className="text-xs leading-relaxed text-gray-500 mt-2">
+                Fiyatlara KDV dahildir ({tl(tax)}).
+                {KARGO_KARSI_ODEMELI ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+              </p>
+              <button onClick={() => router.push('/checkout')} className="w-full mt-5 h-12 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-xl font-bold flex items-center justify-center gap-2">
+                Ödemeye Geç <LuArrowRight size={18} />
+              </button>
+              <ul className="mt-5 space-y-2 text-xs text-gray-600">
+                <li className="flex items-center gap-2"><LuRotateCcw size={15} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>
+                <li className="flex items-center gap-2"><LuShieldCheck size={15} className="text-[#E8620C] shrink-0" /> Adalet Bakanlığı İşyurtları Kurumu güvencesi</li>
+              </ul>
+            </aside>
           </div>
         )}
       </div>
