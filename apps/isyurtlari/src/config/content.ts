@@ -69,7 +69,7 @@ export const content = {
       badge: 'Sosyal etki odaklı pazar yeri',
       title: 'İşyurtları ürünleriyle',
       titleHighlight: 'gerçek değer',
-      titleSuffix: 'yaratın',
+      titleSuffix: 'katın',
       description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren sosyal girişim platformu.',
     },
     stats: [
