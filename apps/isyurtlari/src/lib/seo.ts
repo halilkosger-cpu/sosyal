@@ -7,9 +7,9 @@ import type { Metadata } from 'next';
 // tersine cevrilmeli: www -> apex, 308 (kalici).
 export const SITE_URL = 'https://isyurtlari.com.tr';
 export const SITE_NAME = 'isyurtlari.com.tr';
-export const SITE_TITLE = 'Sosyal Girişim İşyurtları Online Mağaza';
+export const SITE_TITLE = 'Cezaevi & Hapishane Ürünleri Online Mağaza';
 export const SITE_DESCRIPTION =
-  'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ürünler ve sosyal girişim alışveriş deneyimi.';
+  'İşyurtları online satış mağazası. Hükümlülerin el emeğiyle üretilen doğal ürünler.';
 
 export const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;
@@ -67,7 +67,7 @@ export const defaultMetadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} | Sosyal Girişim`,
+    title: `${SITE_NAME} | Cezaevi Ürünleri`,
     description: SITE_DESCRIPTION,
     images: [paylasimGorseli],
   },
@@ -93,7 +93,7 @@ export const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
-  name: 'Sosyal Girişim İşyurtları',
+  name: 'İsyurtları',
   alternateName: SITE_NAME,
   url: SITE_URL,
   logo: defaultOpenGraphImage,

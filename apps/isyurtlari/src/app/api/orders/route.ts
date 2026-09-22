@@ -551,7 +551,7 @@ export async function POST(req: NextRequest) {
         trainingHoursFunded,
         prisonersSupportedCount,
         totalItemsCount,
-        missionMessage: `🎉 Tebrikler! Sosyal Girişim'e katkı sağladın: ${trainingHoursFunded} saat meslek eğitimi ve ${prisonersSupportedCount} hükümlünün yeniden başlamasını destekledin.`,
+        missionMessage: 'Siparişiniz alındı. Hükümlü el emeği ürünlerini tercih ettiğiniz için teşekkür ederiz.',
       },
       paymentRequired: body.paymentMethod === 'CREDIT_CARD',
       bankDetails:

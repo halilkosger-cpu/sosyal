@@ -108,7 +108,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const canonical = absoluteUrl(`/urun/${product.slug}`);
   const image = getProductImage(product.imageUrl);
   const description = truncate(product.description);
-  const enrichedDescription = `${description} - Cezaevi hükümlüsü tarafından el yapımı, doğal ürün. İsyurtları sosyal girişim.`;
+  const enrichedDescription = `${description} - Cezaevi hükümlüsü tarafından el yapımı, doğal ürün.`;
   const enrichedTitle = `${product.name} | İsyurtları - Cezaevi Ürünü`;
 
   return {
@@ -121,7 +121,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       'hapishane ürünü',
       'el yapımı',
       'doğal ürün',
-      'sosyal girişim',
       'rehabilitasyon destekli',
       product.category.name.toLowerCase(),
     ],
@@ -134,7 +133,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       url: canonical,
       type: 'website',
       locale: 'tr_TR',
-      images: [{ url: image, width: 1200, height: 630, alt: `${product.name} - Cezaevi Sosyal Girişim Ürünü` }],
+      images: [{ url: image, width: 1200, height: 630, alt: `${product.name} - Cezaevi Ürünü` }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -173,7 +172,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         category: product.category.name,
         brand: {
           '@type': 'Brand',
-          name: 'İsyurtları - Cezaevi Sosyal Girişim',
+          name: 'İsyurtları',
           description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler',
         },
         // Fiyati girilmemis urunlerde `offers` hic yazilmiyor.

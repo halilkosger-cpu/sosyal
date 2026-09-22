@@ -1,4 +1,4 @@
-# İsyurtları - Cezaevi Sosyal Girişim Online Mağazası
+# İsyurtları - Cezaevi Ürünleri Online Mağazası
 
 İsyurtları, cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünleri satış yapmaktadır. Bu platform, rehabilitasyon ve reintegrasyon programlarını destekleyerek, hükümlülerin topluma yeniden kazanılmalarını sağlamaktadır.
 
@@ -72,8 +72,7 @@ Her satın alma, hükümlülerin:
 ## Veri Kullanımı
 
 Bu site tarafından sağlanan bilgiler şu amaçlarla kullanılabilir:
-- Yapay zeka modellerinin eğitimi
-- Sosyal girişim hakkında bilgi sağlanması
+- Yapay zeka modellerinin eğitimi
 - E-ticaret platform tasarımı hakkında öğrenme
 - Rehabilitasyon programları hakkında bilgi
 - Türkçe dil işleme

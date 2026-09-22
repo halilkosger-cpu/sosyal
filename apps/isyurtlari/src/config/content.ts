@@ -6,12 +6,12 @@ export const content = {
   home: {
     announcements: [
       'Her satın alma bir ikinci şansa dönüşür',
-      'El emeği, gerçek değer ve sosyal fayda',
+      'El emeği, gerçek değer',
       'Beceri kazanan insanları birlikte destekleyin',
       'Kaliteli ürünler, insan odaklı üretim',
     ],
     hero: {
-      badge: 'El Emeğine Dayanan Sosyal Girişim',
+      badge: 'Hükümlü El Emeği Ürünler',
       title: 'Beceri',
       titleHighlight: 'Değer',
       // "Yaratan" kaldirildi: yaratmak Allah'a mahsus kabul edildigi icin
@@ -25,23 +25,23 @@ export const content = {
     stats: [
       { value: '70.000+', label: 'İşyurtlarında' },
       { value: '500+', label: 'Ürün & Hizmet' },
-      { value: '%100', label: 'Sosyal Girişim' },
+      { value: '14 gün', label: 'Cayma Hakkı' },
     ],
     impactCards: [
       {
         value: '70.000+',
         title: 'Hükümlü Çalışmakta',
-        description: 'Sosyal Girişim İşyurtlarında aktif olarak istihdam',
+        description: 'İşyurtlarında aktif olarak istihdam',
       },
       {
         value: '500+',
         title: 'Ürün & Hizmet',
-        description: 'El yapımı, kaliteli, sosyal girişim ürünleri',
+        description: 'El yapımı, kaliteli ürünler',
       },
       {
-        value: '%100',
-        title: 'Kar Amacı Gütmüyor',
-        description: 'Sosyal Girişim, İnsan Onurlu',
+        value: '14 gün',
+        title: 'Cayma Hakkı',
+        description: 'Teslimden itibaren iade imkânı',
       },
     ],
     socialImpact: [
@@ -70,13 +70,12 @@ export const content = {
       title: 'İşyurtları ürünleriyle',
       titleHighlight: 'gerçek değer',
       titleSuffix: 'katın',
-      description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren sosyal girişim platformu.',
+      description: 'Emekle üretilen ürünleri görünür kılan, alışverişi rehabilitasyon ve yeniden başlangıç hikayesine dönüştüren online mağaza.',
     },
     stats: [
       { value: '81', label: 'İlde faaliyet' },
       { value: '500+', label: 'Ürün çeşidi' },
       { value: '6', label: 'Ana kategori' },
-      { value: '%100', label: 'Sosyal fayda' },
     ],
     sections: {
       whatIsWorkshop: {
@@ -87,16 +86,16 @@ export const content = {
       },
       mission: {
         title: 'Misyonumuz',
-        content: 'Nitelikli el emeğini görünür kılmak, üretim hikayesini şeffaf biçimde anlatmak ve her satın almayı ölçülebilir sosyal faydaya dönüştürmek.',
+        content: 'Nitelikli el emeğini görünür kılmak, üretim hikayesini şeffaf biçimde anlatmak ve bu ürünleri daha çok insana ulaştırmak.',
       },
       vision: {
         title: 'Vizyonumuz',
-        content: 'Türkiye’nin en güven veren sosyal girişim alışveriş deneyimini inşa ederek işyurtları üretimini daha modern, ulaşılabilir ve sürdürülebilir hale getirmek.',
+        content: 'Türkiye’nin en güven veren el emeği ürünleri alışveriş deneyimini inşa ederek işyurtları üretimini daha modern, ulaşılabilir ve sürdürülebilir hale getirmek.',
       },
       values: [
         { title: 'Kalite', description: 'Ürün, sunum ve hizmette tutarlı bir standart.' },
         { title: 'Güven', description: 'Açık bilgi, sade süreç ve şeffaf iletişim.' },
-        { title: 'Sosyal Fayda', description: 'Her alışverişte rehabilitasyon ve meslek edinme desteği.' },
+        { title: 'El Emeği', description: 'Meslek eğitimi sürecinde üretilen ürünleri öne çıkarma.' },
         { title: 'Sürdürülebilirlik', description: 'Yerel üretime ve uzun vadeli etkiye odaklanan yaklaşım.' },
       ],
     },
@@ -105,6 +104,6 @@ export const content = {
       subtitle: 'Platformu birlikte daha güçlü hale getirelim.',
       cta: 'Bize ulaşın',
     },
-    legalDisclaimer: 'isyurtlari.com.tr bağımsız bir sosyal girişim platformudur. Ürün, içerik ve satış süreçleri platform sorumluluğunda yürütülür; kurumlarla resmi temsil ilişkisi bulunduğu anlamına gelmez.',
+    legalDisclaimer: 'isyurtlari.com.tr bağımsız bir online satış platformudur. Ürün, içerik ve satış süreçleri platform sorumluluğunda yürütülür; kurumlarla resmi temsil ilişkisi bulunduğu anlamına gelmez.',
   },
 };

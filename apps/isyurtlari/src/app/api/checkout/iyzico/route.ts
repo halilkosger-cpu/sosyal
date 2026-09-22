@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         {
           id: orderId,
           name: `Sipariş #${orderNumber}`,
-          category1: 'Sosyal Girişim',
+          category1: 'El Emeği Ürünleri',
           itemType: 'PHYSICAL',
           price: totalAmount.toFixed(2),
         },

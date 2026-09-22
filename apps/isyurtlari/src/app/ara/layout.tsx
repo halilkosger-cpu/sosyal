@@ -4,8 +4,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Ürün Arama | İşyurtları Online Mağaza',
-  description: 'İşyurtları online mağazasında ürün ara. Sosyal Girişim tarafından üretilen sosyal girişim ürünlerinde arama yapın.',
-  keywords: 'işyurtları arama, ürün ara, işyurtları ürünleri, sosyal girişim ürün',
+  description: 'İşyurtları online mağazasında ürün ara. Hükümlülerin el emeğiyle üretilen ürünlerde arama yapın.',
+  keywords: 'işyurtları arama, ürün ara, işyurtları ürünleri',
   robots: 'noindex',
 };
 

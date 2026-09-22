@@ -83,7 +83,7 @@ export default function OrderConfirmationPage() {
   }, [orderId]);
 
   const handleShare = () => {
-    const text = `🎉 Sosyal Giriş'i destekledim! Hükümlülerin rehabilitasyonuna katkı sağladım. Sen de katıl: isyurtlari.com.tr`;
+    const text = `🎉 İsyurtları'ndan hükümlü el emeği ürünleri aldım. Sen de incele: isyurtlari.com.tr`;
     if (navigator.share) {
       navigator.share({ title: 'İsyurtları', text, url: window.location.href });
     } else {
@@ -132,7 +132,7 @@ export default function OrderConfirmationPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">🎉 BAŞARILI!</h1>
           <p className="text-xl text-green-700 font-semibold mb-2">Değiştirdin. Destekledin. Fark Yarattın.</p>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {order.impact?.missionMessage || "Sosyal Giriş'e katkı sağladığınız için teşekkürler."}
+            {order.impact?.missionMessage || "Siparişiniz için teşekkürler."}
           </p>
         </div>
       </div>
@@ -312,7 +312,7 @@ export default function OrderConfirmationPage() {
                 <LuShare2 size={18} /> Sosyal Medyada Paylaş
               </button>
               <p className="text-xs text-gray-500 text-center mt-3">
-                Arkadaşlarına Sosyal Giriş'i anlatmana yardımcı ol
+                Arkadaşlarına İsyurtları'nı anlatmana yardımcı ol
               </p>
             </div>
 

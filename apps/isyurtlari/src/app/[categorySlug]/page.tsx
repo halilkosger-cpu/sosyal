@@ -179,7 +179,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const title = getCategoryTitle(categoryName);
   const description = truncate(
     category?.description ||
-      `${categoryName} kategorisindeki el emeği ürünleri keşfedin. Her alışveriş sosyal fayda ve meslek eğitimine destek olur.`
+      `${categoryName} kategorisindeki el emeği ürünleri keşfedin. Her alışveriş meslek eğitimine destek olur.`
   );
   const canonical = absoluteUrl(`/${params.categorySlug}`);
   const image = category?.imageUrl ? absoluteUrl(category.imageUrl) : defaultOpenGraphImage;
@@ -248,7 +248,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       inLanguage: 'tr-TR',
       description:
         category?.description ||
-        `${categoryName} kategorisindeki el emeği sosyal girişim ürünleri.`,
+        `${categoryName} kategorisindeki el emeği ürünleri.`,
       numberOfItems: category?.products.length,
     },
     /**

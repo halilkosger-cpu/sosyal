@@ -39,7 +39,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   ...defaultMetadata,
-  title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri | Sosyal Girişim',
+  title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
   // 155 karakteri asmiyor: Google arama sonucunda yaklasik bu uzunlukta
   // kesiyor, oncesi 224 karakterdi ve sonu hic gorunmuyordu.
   description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal gıda, tekstil ve ahşap ürünleri. Her satın alma meslek eğitimine destek olur.',
@@ -48,8 +48,6 @@ export const metadata: Metadata = {
     'cezaevi ürünleri',
     'hapishane ürünleri',
     'hükümlü ürünleri',
-    'cezaevi sosyal girişim',
-    'işyurtları sosyal girişim',
     'el yapımı ürünler türkiye',
     'doğal gıda ürünleri',
     'rehabilitasyon ürünleri',
@@ -58,7 +56,6 @@ export const metadata: Metadata = {
     'cezaevinden ürün satın al',
     'sosyal sorumluluk',
     'hükümlü destekle',
-    'türkiye sosyal girişim',
     'çıkış sonrası istihdam',
   ],
   openGraph: {
@@ -66,13 +63,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
-    description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları. Rehabilitasyon destekli sosyal girişim.',
+    description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları.',
     images: [
       {
         url: `${SITE_URL}/logo.jpg`,
         width: 1024,
         height: 1024,
-        alt: 'İsyurtları - Cezaevi Sosyal Girişim Online Mağaza',
+        alt: 'İsyurtları - Cezaevi Ürünleri Online Mağaza',
       },
     ],
   },
@@ -80,7 +77,7 @@ export const metadata: Metadata = {
     ...defaultMetadata.twitter,
     card: 'summary_large_image',
     title: 'İsyurtları | Cezaevi Ürünleri Online Mağaza',
-    description: 'Hapishane ve cezaevi hükümlülerinin el emeğiyle ürettiği doğal ürünler. Sosyal girişim destekli satın alma.',
+    description: 'Hapishane ve cezaevi hükümlülerinin el emeğiyle ürettiği doğal ürünler.',
   },
 };
 

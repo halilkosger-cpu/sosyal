@@ -121,7 +121,7 @@ export const emailTemplates = {
         </div>
 
         <div class="footer">
-          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim. Tüm hakları saklıdır.</p>
+          <p>© 2024 isyurtlari.com.tr. Tüm hakları saklıdır.</p>
           <p style="margin-top: 10px; color: #bbb;">Bu email otomatik olarak gönderilmiştir. Lütfen yanıtlamayınız.</p>
         </div>
       </div>
@@ -178,7 +178,7 @@ export const emailTemplates = {
         </div>
 
         <div class="footer">
-          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim.</p>
+          <p>© 2024 isyurtlari.com.tr.</p>
         </div>
       </div>
     </body>
@@ -279,7 +279,7 @@ export const emailTemplates = {
         </div>
 
         <div class="footer">
-          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim.</p>
+          <p>© 2024 isyurtlari.com.tr.</p>
         </div>
       </div>
     </body>
@@ -344,7 +344,7 @@ export const emailTemplates = {
         </div>
 
         <div class="footer">
-          <p>© 2024 isyurtlari.com.tr - Sosyal Girişim.</p>
+          <p>© 2024 isyurtlari.com.tr.</p>
         </div>
       </div>
     </body>

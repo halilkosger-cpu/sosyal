@@ -1,11 +1,11 @@
 'use client';
 
-// Tüm SVG ikonlar - Sosyal Girişim İşyurtları
+// Tüm SVG ikonlar - İşyurtları
 // Updated: 2026-05-04
 // Accessibility: WCAG 2.1 AA compliant
 // SEO: Schema.org microdata included
 
-export function IconFood({ className = 'w-6 h-6', ariaLabel = 'Gıda Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
+export function IconFood({ className = 'w-6 h-6', ariaLabel = 'Gıda Ürünleri' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-food">
       <title>Gıda Ürünleri - Beslenme & Aşçılık Eğitimi</title>
@@ -20,7 +20,7 @@ export function IconFood({ className = 'w-6 h-6', ariaLabel = 'Gıda Ürünleri 
   );
 }
 
-export function IconTextile({ className = 'w-6 h-6', ariaLabel = 'Tekstil Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
+export function IconTextile({ className = 'w-6 h-6', ariaLabel = 'Tekstil Ürünleri' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-textile">
       <title>Tekstil Ürünleri - Terzilik Meslek Eğitimi</title>
@@ -37,7 +37,7 @@ export function IconTextile({ className = 'w-6 h-6', ariaLabel = 'Tekstil Ürün
   );
 }
 
-export function IconWood({ className = 'w-6 h-6', ariaLabel = 'Ahşap Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
+export function IconWood({ className = 'w-6 h-6', ariaLabel = 'Ahşap Ürünleri' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-wood">
       <title>Ahşap Ürünleri - Marangozluk Beceri Programı</title>
@@ -55,7 +55,7 @@ export function IconWood({ className = 'w-6 h-6', ariaLabel = 'Ahşap Ürünleri
   );
 }
 
-export function IconWeaving({ className = 'w-6 h-6', ariaLabel = 'Dokuma Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
+export function IconWeaving({ className = 'w-6 h-6', ariaLabel = 'Dokuma Ürünleri' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-weaving">
       <title>Dokuma Ürünleri - Dokuma & Sanat Terapisi</title>
@@ -73,7 +73,7 @@ export function IconWeaving({ className = 'w-6 h-6', ariaLabel = 'Dokuma Ürünl
   );
 }
 
-export function IconFurniture({ className = 'w-6 h-6', ariaLabel = 'Mobilya Ürünleri - Sosyal Girişim' }: { className?: string; ariaLabel?: string }) {
+export function IconFurniture({ className = 'w-6 h-6', ariaLabel = 'Mobilya Ürünleri' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-furniture">
       <title>Mobilya Ürünleri - Furniture Tasarım Eğitimi</title>
@@ -94,8 +94,8 @@ export function IconFurniture({ className = 'w-6 h-6', ariaLabel = 'Mobilya Ür�
 export function IconAboutUs({ className = 'w-6 h-6', ariaLabel = 'Hakkımızda' }: { className?: string; ariaLabel?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-about">
-      <title>Hakkımızda - Sosyal Girişim İşyurtları</title>
-      <desc>Sosyal Girişim İşyurtları hakkında bilgi ikonu - rehabilitasyon ve yeniden entegrasyon projesi</desc>
+      <title>Hakkımızda - İşyurtları</title>
+      <desc>İşyurtları hakkında bilgi ikonu - rehabilitasyon ve yeniden entegrasyon projesi</desc>
       <g fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="44">
         <circle cx="512" cy="236" r="74" stroke="currentColor"/>
         <path d="M348 464C370 372 432 328 512 328C592 328 654 372 676 464" stroke="currentColor"/>
@@ -229,7 +229,7 @@ export function IconSocialContribution({ className = 'w-6 h-6', ariaLabel = 'Sos
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-social-contribution">
       <title>Sosyal Katkı - Rehabilitasyon Projesi</title>
-      <desc>Sosyal girişim ve rehabilitasyon desteği ikonu</desc>
+      <desc>Rehabilitasyon desteği ikonu</desc>
       <g fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="44">
         <path d="M154 684C236 600 320 576 410 628H594C634 628 666 660 666 700C666 740 634 772 594 772H456" stroke="currentColor"/>
         <path d="M666 692L794 570C826 540 876 542 906 574C936 606 934 656 902 686L734 846C690 888 630 912 570 912H328C266 912 222 890 154 842" stroke="currentColor"/>
@@ -267,7 +267,7 @@ export function IconSocialProject({ className = 'w-6 h-6', ariaLabel = 'Sosyal P
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" className={className} role="img" aria-label={ariaLabel} data-testid="icon-social-project">
       <title>Sosyal Proje - İşyurtları Projesi</title>
-      <desc>Sosyal Girişim İşyurtları projesi ve dayanışma ikonu</desc>
+      <desc>İşyurtları projesi ve dayanışma ikonu</desc>
       <g fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="44">
         <circle cx="512" cy="224" r="70" stroke="currentColor"/>
         <circle cx="260" cy="512" r="70" stroke="currentColor"/>

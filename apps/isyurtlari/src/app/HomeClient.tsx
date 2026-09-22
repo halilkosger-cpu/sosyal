@@ -56,7 +56,7 @@ const urunYedegi = (slug?: string) => {
 const istatistikler = [
   { Icon: LuUsers,   deger: content.home.stats[0]?.value ?? '70.000+', etiket: 'Hükümlü' },
   { Icon: LuPackage, deger: content.home.stats[1]?.value ?? '500+',    etiket: 'Ürün & Hizmet' },
-  { Icon: LuHeart,   deger: content.home.stats[2]?.value ?? '%100',    etiket: 'Sosyal Girişim' },
+  { Icon: LuHeart,   deger: content.home.stats[2]?.value ?? '14 gün',    etiket: 'Cayma Hakkı' },
 ];
 
 const indirimliFiyat = (fiyat: number, indirim: number) =>
@@ -142,7 +142,7 @@ export default function HomeClient({
             </p>
 
             <h1 className="mt-4 text-[15px] md:text-base font-normal leading-relaxed text-gray-700">
-              Hükümlülerin El Emeğiyle Sosyal Girişim Ürünleri{' '}
+              Hükümlülerin El Emeğiyle Üretilen Ürünler{' '}
               <span className="font-semibold text-gray-900">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
             </h1>
 
@@ -282,7 +282,7 @@ export default function HomeClient({
         <div className="space-y-3 text-sm leading-7 text-gray-600 max-w-4xl">
           <p>
             İsyurtları, Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde üretilen
-            ürünleri doğrudan alıcıyla buluşturan bir sosyal girişim platformudur. Sitedeki
+            ürünleri doğrudan alıcıyla buluşturan bir online satış platformudur. Sitedeki
             <strong className="font-semibold text-gray-800"> işyurtları online satış</strong>{' '}
             kataloğunda gıda, tekstil, ahşap, hediyelik, temizlik ve el sanatları kategorileri
             yer alır. Her ürün, bir hükümlünün meslek eğitimi sürecinde ortaya çıkar; satın
