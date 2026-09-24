@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 /**
  * Ürün araması.
@@ -93,7 +94,8 @@ export async function urunAra(sorgu: string): Promise<AramaSonucu> {
           similarity(public.tr_normalize(p."name"), public.tr_normalize($1))
         )::float8 AS skor
       FROM "Product" p
-      WHERE ${kelimeKosullari}
+      WHERE p."imageUrl" IS NOT NULL AND p."imageUrl" <> ''
+        AND ${kelimeKosullari}
       ORDER BY skor DESC, p."name" ASC
       LIMIT ${AZAMI_SONUC};
       `,
@@ -109,6 +111,7 @@ export async function urunAra(sorgu: string): Promise<AramaSonucu> {
 
     const urunler = await prisma.product.findMany({
       where: {
+        ...GORSELLI_URUN,
         OR: [
           { name: { contains: temiz, mode: 'insensitive' } },
           { description: { contains: temiz, mode: 'insensitive' } },

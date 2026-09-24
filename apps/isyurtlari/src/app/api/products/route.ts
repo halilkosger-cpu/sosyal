@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
     const categorySlug = req.nextUrl.searchParams.get('category');
     const search = req.nextUrl.searchParams.get('search');
 
-    const where: any = {};
+    const where: any = { ...GORSELLI_URUN };
 
     if (categorySlug) {
       where.category = {

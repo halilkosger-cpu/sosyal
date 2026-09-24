@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { urunAra } from '@/lib/arama';
 import { satilabilirlikKademesi } from '@/lib/urun-siralama';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,6 +115,10 @@ export async function GET(req: NextRequest) {
 
     /** Faset sayımlarının temeli: süzgeçler UYGULANMADAN önceki küme. */
     const temelKosul = {
+      // Fotografsiz urunler hicbir listede gorunmuyor; bkz.
+      // lib/urun-gorunurluk.ts. Fasetler de bu kumeden sayiliyor, yoksa
+      // "Gida (18)" yazip 11 urun gosteren kategoriler cikiyordu.
+      ...GORSELLI_URUN,
       ...(kategoriSlug ? { category: { slug: kategoriSlug } } : {}),
       ...(aramaKimlikleri ? { id: { in: aramaKimlikleri } } : {}),
       ...(kimlikler.length > 0 ? { id: { in: kimlikler } } : {}),

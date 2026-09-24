@@ -1,6 +1,7 @@
 import { unstable_cache, revalidateTag, revalidatePath } from 'next/cache';
 import { prisma } from '@isyurtlari/database';
 import { hasDatabaseUrl } from './seo';
+import { GORSELLI_URUN } from './urun-gorunurluk';
 import type { Kategori } from './kategori-gorunum';
 
 /**
@@ -32,18 +33,33 @@ export const kategorileriGetir = unstable_cache(
           name: true,
           slug: true,
           imageUrl: true,
-          _count: { select: { products: true } },
+          // Sayim yalnizca vitrinde gorunen urunleri kapsiyor; bkz.
+          // lib/urun-gorunurluk.ts.
+          _count: { select: { products: { where: GORSELLI_URUN } } },
         },
         orderBy: { name: 'asc' },
       });
 
-      return satirlar.map((s) => ({
-        id: s.id,
-        name: s.name,
-        slug: s.slug,
-        imageUrl: s.imageUrl,
-        urunSayisi: s._count.products,
-      }));
+      return (
+        satirlar
+          /**
+           * Gosterilecek tek bir urunu kalmayan kategori menuden de
+           * kategori satirindan da dusuyor. Aksi halde musteri "Temizlik
+           * ve Kozmetik"e tiklayip bos sayfayla karsilasirdi; Google
+           * tarafinda da bos liste sayfasi "soft 404" sayiliyor.
+           *
+           * Kategori silinmiyor: ilk fotograf yuklendigi anda
+           * kategorileriTazele() ile menuye geri geliyor.
+           */
+          .filter((s) => s._count.products > 0)
+          .map((s) => ({
+            id: s.id,
+            name: s.name,
+            slug: s.slug,
+            imageUrl: s.imageUrl,
+            urunSayisi: s._count.products,
+          }))
+      );
     } catch (error) {
       // Veritabani erisilemezse baslik cubugu bos kalsin; sayfa yine acilsin.
       console.error('Kategori listesi alinamadi:', error);

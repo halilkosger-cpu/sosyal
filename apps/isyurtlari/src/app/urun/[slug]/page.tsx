@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
 import {
   SITE_URL,
   absoluteUrl,
@@ -30,7 +31,11 @@ export const revalidate = 300;
 export async function generateStaticParams() {
   if (!hasDatabaseUrl()) return [];
   try {
-    const urunler = await prisma.product.findMany({ select: { slug: true } });
+    // Fotografsiz urunler onceden uretilmiyor; bkz. lib/urun-gorunurluk.ts.
+    const urunler = await prisma.product.findMany({
+      where: GORSELLI_URUN,
+      select: { slug: true },
+    });
     return urunler.map((u) => ({ slug: u.slug }));
   } catch (error) {
     console.error('Ürün slug listesi alınamadı:', error);
@@ -127,6 +132,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     alternates: {
       canonical,
     },
+    // Fotografsiz urun sayfasi hicbir listede gorunmuyor ve sitemap'te de
+    // yok; eski baglantilar calismaya devam etsin diye 404 vermiyoruz ama
+    // Google'a indekslememesini soyluyoruz. Fotograf yuklendigi anda bu
+    // etiket kendiliginden kalkiyor. Bkz. lib/urun-gorunurluk.ts.
+    ...(gorselliMi(product) ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: enrichedTitle,
       description: enrichedDescription,

@@ -1,6 +1,7 @@
 ﻿import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@isyurtlari/database';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 /**
  * Sitemap her istekte veritabanindan uretilir.
@@ -87,7 +88,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Kategori sayfaları
+    // Gosterilecek urunu kalmayan kategori sitemap'e girmiyor: bos liste
+    // sayfasi Google tarafinda "soft 404" sayiliyor.
     const categories = await prisma.productCategory.findMany({
+      where: { products: { some: GORSELLI_URUN } },
       select: { slug: true, createdAt: true },
     });
 
@@ -100,6 +104,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Ürün detay sayfaları
     const products = await prisma.product.findMany({
+      // Fotografsiz urunler sitemap'e girmiyor; bkz. lib/urun-gorunurluk.ts.
+      where: GORSELLI_URUN,
       select: { slug: true, updatedAt: true, quantity: true },
       orderBy: { updatedAt: 'desc' },
     });

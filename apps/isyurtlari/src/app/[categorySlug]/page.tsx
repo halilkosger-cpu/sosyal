@@ -5,6 +5,7 @@ import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import {
   SITE_NAME,
   absoluteUrl,
@@ -111,7 +112,7 @@ const getCategoryProducts = async (slug: string) => {
   try {
     const now = new Date();
     const urunler = await prisma.product.findMany({
-      where: { category: { slug } },
+      where: { category: { slug }, ...GORSELLI_URUN },
       include: {
         category: { select: { name: true, slug: true } },
         campaigns: {
