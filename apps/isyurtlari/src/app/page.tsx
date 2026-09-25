@@ -2,6 +2,7 @@ import { prisma } from '@isyurtlari/database';
 import HomeClient from './HomeClient';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 /**
  * Ana sayfa her istekte yeniden üretilmiyor.
@@ -104,7 +105,10 @@ async function anaSayfaVerisi() {
     const now = new Date();
 
     const [kategoriler, urunler, kampanyalar] = await Promise.all([
+      // Gosterilecek urunu kalmayan kategori vitrine cikmiyor; bkz.
+      // lib/urun-gorunurluk.ts.
       prisma.productCategory.findMany({
+        where: { products: { some: GORSELLI_URUN } },
         select: { id: true, name: true, slug: true },
         orderBy: { name: 'asc' },
       }),
