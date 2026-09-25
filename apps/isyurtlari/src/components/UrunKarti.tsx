@@ -6,6 +6,7 @@ import Image from 'next/image';
 import PreOrderBadge from '@/components/PreOrderBadge';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToCartButton from '@/components/AddToCartButton';
+import { urunGorseli, urunSrcSet } from '@/lib/urun-gorsel';
 
 /**
  * Urun karti.
@@ -119,9 +120,38 @@ export default function UrunKarti({
   // sayfaya varinca "stoga girince haber ver" adimi hazir olsun.
   const hedef = `/urun/${urun.slug}${tukendi ? '?on-talep=1' : ''}`;
 
+  /** Yerel boyutlandirilmis surumu varsa srcset, yoksa undefined. */
+  const yerelSrcSet = urunSrcSet(urun.slug);
+
   const gorsel = (
     <div className={`relative ${gorselYuksekligi} bg-gradient-to-br ${gorselArkaPlani} flex items-center justify-center overflow-hidden`}>
-      {urun.imageUrl ? (
+      {yerelSrcSet ? (
+        /**
+         * Yerel surumu olan urunde duz <img> kullaniliyor, next/image
+         * degil. Sebep: next.config.js'te images.unoptimized acik, bu
+         * durumda next/image srcset URETMIYOR - tek boyutlu bir <img>
+         * ciziyor ve telefondan giren de 1024 piksellik dosyayi
+         * indiriyor. Duz <img> ile 400/800/1024 srcset'i biz veriyoruz;
+         * tarayici ekrana gore secim yapiyor. Olculen fark: mobil
+         * izgarada gorsel basina ~68 KB yerine ~15 KB.
+         *
+         * Yerel surumu olmayan urun asagidaki next/image daliyla
+         * eskisi gibi calisiyor - davranis degismiyor.
+         */
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={urunGorseli(urun.slug, urun.imageUrl)}
+          srcSet={yerelSrcSet}
+          sizes={gorselBoyutlari}
+          alt={urun.name}
+          width={1024}
+          height={1024}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          decoding="async"
+          fetchPriority={gorselOncelikli ? 'high' : undefined}
+          loading={gorselOncelikli ? 'eager' : 'lazy'}
+        />
+      ) : urun.imageUrl ? (
         <Image
           src={urun.imageUrl}
           alt={urun.name}

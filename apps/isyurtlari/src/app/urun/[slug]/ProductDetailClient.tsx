@@ -14,6 +14,8 @@ import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
 import { urunGoruntulendi } from '@/lib/analiz';
+import { urunGorseli, urunSrcSet } from '@/lib/urun-gorsel';
+import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
 
 /**
@@ -233,6 +235,14 @@ export default function ProductDetailPage({
         : [];
   const secili = gorseller[Math.min(seciliGorsel, gorseller.length - 1)];
 
+  /**
+   * srcset yalnizca galerinin ILK gorselinde veriliyor. Yerel
+   * boyutlandirilmis surum urunun ana gorselinden uretildi; admin
+   * panelinden sonradan eklenen ek galeri gorsellerinin yerel karsiligi
+   * yok, onlar eskisi gibi next/image ile ciziliyor.
+   */
+  const anaSrcSet = seciliGorsel === 0 ? urunSrcSet(product.slug) : undefined;
+
   const sekmeler: { id: Sekme; ad: string }[] = [
     { id: 'aciklama', ad: 'Açıklama' },
     ...(product.ozellikler && product.ozellikler.length > 0 ? [{ id: 'ozellikler' as Sekme, ad: 'Özellikler' }] : []),
@@ -257,7 +267,26 @@ export default function ProductDetailPage({
         {/* ─── GALERİ ─── */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
-            {secili ? (
+            {secili && anaSrcSet ? (
+              /**
+               * Yerel boyutlandirilmis surumu olan urunde duz <img>:
+               * images.unoptimized acikken next/image srcset uretmiyor,
+               * telefondan giren de 1024 piksellik dosyayi indiriyor.
+               * Bkz. lib/urun-gorsel.ts ve components/UrunKarti.tsx.
+               */
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={urunGorseli(product.slug, secili.url)}
+                srcSet={anaSrcSet}
+                sizes="(max-width: 1024px) 100vw, 600px"
+                alt={secili.alt}
+                width={1024}
+                height={1024}
+                className="absolute inset-0 w-full h-full object-cover"
+                decoding="async"
+                fetchPriority="high"
+              />
+            ) : secili ? (
               <Image src={secili.url} alt={secili.alt} fill priority quality={80} sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             ) : (
               <KategoriIkon slug={product.category.slug} className="w-40 h-40" />
@@ -284,6 +313,12 @@ export default function ProductDetailPage({
               ))}
             </div>
           )}
+
+          {/* Üretim bilgisi - tek kaynak, bkz. config/content.ts */}
+          <section className="mt-4 rounded-xl border border-gray-200 bg-[#FAFAF9] p-4">
+            <h2 className="text-[13px] font-semibold text-gray-900 mb-1">Üretim</h2>
+            <p className="text-[13px] text-gray-600 leading-relaxed">{URETIM_BILGISI}</p>
+          </section>
         </div>
 
         {/* ─── BİLGİ ─── */}

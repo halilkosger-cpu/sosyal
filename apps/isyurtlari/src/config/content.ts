@@ -1,6 +1,20 @@
 // Website Content Configuration
 // Tüm metin içerikler bu dosyada merkezi olarak yönetilir
 
+/**
+ * Üretim bilgisi. Her ürün sayfasında galerinin altında gösteriliyor.
+ *
+ * Bilerek TEK BİR YERDE duruyor ve ürünlerin `description` alanına
+ * yazılmıyor: 49 ürün sayfasının her birinde aynı cümle bulunursa Google
+ * bunu yinelenen içerik sayar ve ürün sayfalarının tamamını aşağı çeker.
+ * Paylaşılan bir bileşen olarak ise sitenin standart bilgisi olarak
+ * okunuyor.
+ */
+export const URETIM_BILGISI =
+  'Adalet Bakanlığı işyurtları tesislerinde, hükümlülerin topluma entegre ' +
+  'edilmesi, meslek edinmeleri ve kazanç sağlamaları amacıyla üretimi ' +
+  'yapılmaktadır.';
+
 export const content = {
   // Home Page
   home: {
