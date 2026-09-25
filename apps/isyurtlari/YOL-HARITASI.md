@@ -1,6 +1,20 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 25 Eylül 2026 · Sıradaki iş: **Aşama 2**
+Son güncelleme: 25 Eylül 2026 (akşam) · Sıradaki iş: **Aşama 6 / fotoğrafsız 14 ürün**
+
+## Durum özeti
+
+| Aşama | Durum |
+|---|---|
+| 1 — İyzico ucunu güvene alma | ✅ bitti |
+| 2 — Görsel boru hattı (srcset) | ✅ bitti, canlıda ölçüldü |
+| 3 — Fotoğrafların tek görsel dile oturtulması | ✅ 49 ürün bitti |
+| 4 — Ana sayfa (A+C) | ✅ bitti |
+| 5 — İçerik derinliği | ✅ 49 açıklama + 3 kategori metni yazıldı |
+| 6 — İyzico tam entegrasyon | ⛔ hesap bekliyor |
+
+Kalan iki iş: fotoğrafı hiç olmayan 14 ürün (resmî galeriden indirilecek)
+ve ürün başına net miktar / içindekiler bilgisi.
 
 Bu dosya, konuşma bağlamı kaybolduğunda doğru zemini bulmak için var.
 Buradaki her sayı ve iddia canlı sitede ya da kaynak kodda **ölçülerek**
