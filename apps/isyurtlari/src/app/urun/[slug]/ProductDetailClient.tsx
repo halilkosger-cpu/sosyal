@@ -14,7 +14,7 @@ import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
 import { urunGoruntulendi } from '@/lib/analiz';
-import { urunGorseli, urunSrcSet } from '@/lib/urun-gorsel';
+import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
 
@@ -226,13 +226,22 @@ export default function ProductDetailPage({
   const gecerliFiyat = product.campaign?.discountedPrice ?? product.price;
   const ortalama = reviews.length > 0 ? reviews.reduce((t, r) => t + r.rating, 0) / reviews.length : null;
 
-  /** Uç galeri döndürmezse ana görsele düşülüyor. */
+  /**
+   * Uç galeri döndürmezse ana görsele düşülüyor.
+   *
+   * Üçüncü basamak, resmî galeriden gelen 12 ürün için: onların
+   * veritabanındaki `imageUrl`i boş, fotoğrafları yalnızca public/urun/
+   * altında duruyor. O basamak olmadan galeri boş kalıyor ve ürün
+   * sayfasında fotoğraf yerine kategori ikonu çıkıyordu (canlıda ölçüldü).
+   */
   const gorseller =
     product.galeri && product.galeri.length > 0
       ? product.galeri
       : product.imageUrl
         ? [{ url: product.imageUrl, alt: product.name }]
-        : [];
+        : yerelGorselVar(product.slug)
+          ? [{ url: urunGorseli(product.slug) as string, alt: product.name }]
+          : [];
   const secili = gorseller[Math.min(seciliGorsel, gorseller.length - 1)];
 
   /**

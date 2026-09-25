@@ -4,6 +4,7 @@ import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
 import { varsayilanSirala } from '@/lib/urun-siralama';
 import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
+import { yerelGorselVar } from '@/lib/urun-gorsel';
 import {
   SITE_URL,
   absoluteUrl,
@@ -86,8 +87,19 @@ const getProduct = async (slug: string): Promise<UrunSonucu> => {
   }
 };
 
-const getProductImage = (imageUrl?: string | null) =>
-  imageUrl ? absoluteUrl(imageUrl) : defaultOpenGraphImage;
+/**
+ * Paylasim ve schema.org gorseli.
+ *
+ * Bir urunun fotografi iki yerde olabiliyor: veritabanindaki imageUrl ya
+ * da public/urun/ altindaki yerel surumler (bkz. lib/urun-gorsel.ts).
+ * Burada yerel surum once geliyor; hem daha kucuk hem de resmi galeriden
+ * gelen 12 urunun imageUrl'i bos. Yerelde 1024 piksellik surum seciliyor:
+ * WhatsApp ve Twitter onizlemesi 800'den kucuk gorseli kirpiyordu.
+ */
+const getProductImage = (slug: string, imageUrl?: string | null) => {
+  if (yerelGorselVar(slug)) return absoluteUrl(`/urun/${slug}-1024.webp`);
+  return imageUrl ? absoluteUrl(imageUrl) : defaultOpenGraphImage;
+};
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const sonuc = await getProduct(params.slug);
@@ -111,7 +123,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = sonuc.urun;
 
   const canonical = absoluteUrl(`/urun/${product.slug}`);
-  const image = getProductImage(product.imageUrl);
+  const image = getProductImage(product.slug, product.imageUrl);
   const description = truncate(product.description);
   const enrichedDescription = `${description} - Cezaevi hükümlüsü tarafından el yapımı, doğal ürün.`;
   const enrichedTitle = `${product.name} | İsyurtları - Cezaevi Ürünü`;
@@ -177,7 +189,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         '@id': `${absoluteUrl(`/urun/${product.slug}`)}#product`,
         name: product.name,
         description: truncate(product.description, 500),
-        image: [getProductImage(product.imageUrl)],
+        image: [getProductImage(product.slug, product.imageUrl)],
         sku: product.slug,
         category: product.category.name,
         brand: {
