@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
 import { icerikTazele } from '@/lib/kategoriler';
+import hazirAciklamalar from '@/config/urun-aciklamalari.json';
 
 /**
  * Toplu urun aciklamasi guncelleme.
@@ -31,7 +32,16 @@ type Girdi = { slug: string; aciklama: string };
 
 function govdeyiCozumle(ham: unknown): { girdiler: Girdi[] } | { hata: string } {
   if (!ham || typeof ham !== 'object') return { hata: 'Gövde okunamadı' };
-  const kayitlar = (ham as { kayitlar?: unknown }).kayitlar;
+
+  /**
+   * `hazir: true` gelirse repodaki hazirlanmis metinler kullaniliyor
+   * (config/urun-aciklamalari.json). Boylece yonetici 20 KB'lik bir
+   * JSON'u elle yapistirmak zorunda kalmiyor; panelden tek dugme
+   * yetiyor. Gonderilen kayitlar varsa onlar oncelikli.
+   */
+  const kayitlar =
+    (ham as { kayitlar?: unknown }).kayitlar ??
+    ((ham as { hazir?: unknown }).hazir === true ? hazirAciklamalar : undefined);
 
   if (!kayitlar || typeof kayitlar !== 'object' || Array.isArray(kayitlar)) {
     return { hata: 'kayitlar alanı { slug: açıklama } biçiminde olmalı' };
