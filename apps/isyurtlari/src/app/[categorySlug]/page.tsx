@@ -6,6 +6,7 @@ import CategoryPageClient from './CategoryPageClient';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { varsayilanSirala } from '@/lib/urun-siralama';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
+import { KATEGORI_METINLERI } from '@/config/kategori-metinleri';
 import {
   SITE_NAME,
   absoluteUrl,
@@ -261,6 +262,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryName = category?.name ?? 'Ürünler';
   const title = getCategoryTitle(categoryName);
   const canonical = absoluteUrl(`/${params.categorySlug}`);
+  /** Metni olmayan kategori bolumu hic cizilmiyor. */
+  const kategoriMetni = KATEGORI_METINLERI[params.categorySlug];
   const jsonLd = [
     breadcrumbJsonLd([
       { name: 'Ana Sayfa', url: absoluteUrl('/') },
@@ -322,6 +325,28 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         kategoriAdi={category?.name}
         kategoriAciklamasi={category?.description ?? null}
       />
+
+      {/**
+        * Kategori metni.
+        *
+        * Ürün ızgarasının ALTINDA: müşteri önce ürünü görüyor, metin
+        * okumak zorunda kalmıyor. Sunucuda çiziliyor, tarayıcıya ek
+        * JavaScript gitmiyor. Bkz. config/kategori-metinleri.ts.
+        */}
+      {kategoriMetni && (
+        <section className="bg-[#FAFAF9] border-t border-gray-200">
+          <div className="max-w-3xl mx-auto px-4 py-12">
+            {kategoriMetni.map((bolum) => (
+              <div key={bolum.baslik} className="mb-8 last:mb-0">
+                <h2 className="font-serif text-xl font-semibold text-gray-900 mb-3">{bolum.baslik}</h2>
+                {bolum.paragraflar.map((p, i) => (
+                  <p key={i} className="text-[15px] text-gray-600 leading-relaxed mb-3 last:mb-0">{p}</p>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/**
         * Diğer kategoriler.
