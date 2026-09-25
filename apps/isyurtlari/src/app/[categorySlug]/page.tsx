@@ -155,6 +155,19 @@ const getCategoryProducts = async (slug: string) => {
   }
 };
 
+/** Kategoride vitrine cikabilecek urun sayisi. */
+const urunSayisi = async (slug: string) => {
+  if (!hasDatabaseUrl()) return 1;
+  try {
+    return await prisma.product.count({ where: { category: { slug }, ...GORSELLI_URUN } });
+  } catch (error) {
+    // Erisilemiyorsa noindex koymuyoruz: gecici bir ariza kategoriyi
+    // indeksten dusurmemeli.
+    console.error('Kategori urun sayisi alinamadi:', error);
+    return 1;
+  }
+};
+
 const getCategoryTitle = (categoryName: string) => {
   const taban = categoryName.toLocaleLowerCase('tr-TR').endsWith(' ürünleri')
     ? categoryName
@@ -185,12 +198,25 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const canonical = absoluteUrl(`/${params.categorySlug}`);
   const image = category?.imageUrl ? absoluteUrl(category.imageUrl) : defaultOpenGraphImage;
 
+  /**
+   * Gosterilecek urunu kalmayan kategori (bkz. lib/urun-gorunurluk.ts)
+   * menuden ve sitemap'ten dusuyor ama adresi calismaya devam ediyor:
+   * Google'in indeksinde ve disaridan verilmis baglantilarda duruyor, 404
+   * donmek onlari bosa dusururdu. Bos liste sayfasi ise soft 404 sayiliyor,
+   * o yuzden indekslenmemesini soyluyoruz. follow aciik kaliyor: sayfadaki
+   * menu ve diger kategori baglantilari izlenmeye devam etsin.
+   *
+   * Ilk fotograf yuklendigi anda etiket kendiliginden kalkiyor.
+   */
+  const gorunurUrunSayisi = await urunSayisi(params.categorySlug);
+
   return {
     title,
     description,
     alternates: {
       canonical,
     },
+    ...(gorunurUrunSayisi === 0 ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       title: `${title} | ${SITE_NAME}`,
       description,

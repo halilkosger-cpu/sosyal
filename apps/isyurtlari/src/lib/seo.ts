@@ -27,8 +27,6 @@ export const truncate = (value: string, maxLength = 155) => {
   return `${clean.slice(0, maxLength - 1).trim()}…`;
 };
 
-export const defaultOpenGraphImage = absoluteUrl('/logo.jpg');
-
 /**
  * Paylasim gorseli (WhatsApp, Facebook, X, LinkedIn onizlemesi).
  * Onceden kare logo kullaniliyordu; 1.91:1 onizlemelerde kenarlari
@@ -37,6 +35,15 @@ export const defaultOpenGraphImage = absoluteUrl('/logo.jpg');
  * logo.jpg olarak kaliyor - Google orada kare logo bekliyor.
  */
 export const paylasimGorseli = absoluteUrl('/og-gorsel.jpg');
+
+/**
+ * Kendi gorseli olmayan sayfalarin paylasim gorseli. Uzun sure logo.jpg
+ * idi; sonucta ana sayfa, kategori ve fotografsiz urun paylasimlarinin
+ * hepsi kucuk kare logo olarak gorunuyordu. Artik paylasim gorseline
+ * isaret ediyor - iki isim de ayni dosya, eski cagrilar kirilmasin diye
+ * ikisi de duruyor.
+ */
+export const defaultOpenGraphImage = paylasimGorseli;
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),

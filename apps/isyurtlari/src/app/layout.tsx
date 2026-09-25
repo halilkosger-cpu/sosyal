@@ -10,7 +10,7 @@ import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
 import { IconCart } from '@/components/Icons';
-import { defaultMetadata, organizationJsonLd, websiteJsonLd } from '@/lib/seo';
+import { defaultMetadata, organizationJsonLd, paylasimGorseli, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { kisaAd } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
@@ -66,9 +66,11 @@ export const metadata: Metadata = {
     description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları.',
     images: [
       {
-        url: `${SITE_URL}/logo.jpg`,
-        width: 1024,
-        height: 1024,
+        // 1200x630: WhatsApp/X/LinkedIn onizlemesi bu oranı bekliyor.
+        // Kare logo buyuk onizlemede kucuk bir ikona duserek geliyordu.
+        url: paylasimGorseli,
+        width: 1200,
+        height: 630,
         alt: 'İsyurtları - Cezaevi Ürünleri Online Mağaza',
       },
     ],
