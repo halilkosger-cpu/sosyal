@@ -290,17 +290,16 @@ export default function CheckoutPage() {
       }
 
       if (paymentMethod === 'CREDIT_CARD') {
-        // Iyzico payment
+        /**
+         * Yalnizca orderId gonderiliyor. Onceden tutar, e-posta ve isim de
+         * buradan gidiyordu; uc de onlara guveniyordu, yani sepet tutari
+         * tarayicidan degistirilebiliyordu. Artik hepsi siparis kaydindan
+         * okunuyor (bkz. api/checkout/iyzico/route.ts).
+         */
         const paymentRes = await fetch('/api/checkout/iyzico', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId: data.orderId,
-            orderNumber: data.orderNumber,
-            totalAmount: kuponluToplam,
-            customerEmail: formData.email,
-            customerName: formData.name,
-          }),
+          body: JSON.stringify({ orderId: data.orderId }),
         });
 
         if (!paymentRes.ok) {

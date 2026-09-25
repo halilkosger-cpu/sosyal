@@ -1,6 +1,6 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 25 Eylül 2026 · Son commit: `55441b9`
+Son güncelleme: 25 Eylül 2026 · Sıradaki iş: **Aşama 2**
 
 Bu dosya, konuşma bağlamı kaybolduğunda doğru zemini bulmak için var.
 Buradaki her sayı ve iddia canlı sitede ya da kaynak kodda **ölçülerek**
@@ -52,9 +52,22 @@ ziyaretçi de masaüstü boyutundaki görseli indiriyor.
 
 ---
 
-## Aşama 1 — İyzico ödeme ucunu güvene alma
+## Aşama 1 — İyzico ödeme ucunu güvene alma ✅ BİTTİ (25 Eylül 2026)
 
-**Zorluk:** kolay · **Süre:** ~45 dk · **Engel yok** (iyzico hesabı gerekmiyor)
+**Zorluk:** kolay · **Engel yok** (iyzico hesabı gerekmiyor)
+
+Yapıldı. Route artık yalnızca `orderId` alıyor; tutar, müşteri ve adres
+`Order` kaydından okunuyor. Eklenenler: hız sınırı (5 dk'da 10 istek),
+`PENDING` + `CREDIT_CARD` durum kontrolü, gerçek sepet kalemleri
+(`price` = sepet toplamı, `paidPrice` = tahsil edilecek tutar), gerçek
+teslimat adresi, yanıt gövdesinin loglanmaması, istemciye yığın izi
+sızdırmayan hata mesajları. İstemci de yalnızca `orderId` gönderiyor.
+
+TCKN toplanmıyor; iyzico alanı zorunlu tuttuğu için yer tutucu gidiyor.
+Adres ayrıştırması (şehir/posta kodu) ve TCKN yer tutucusu **sandbox'ta
+doğrulanmalı** — hesap gelince Aşama 6'da.
+
+<details><summary>Kapatılan açığın ayrıntısı</summary>
 
 ### Sorun (kod okunarak doğrulandı)
 
@@ -81,10 +94,7 @@ gönderdiği tutarla kendi hesabı uyuşmazsa siparişi reddediyor. Yani
 5. `console.log('Iyzico Response Body', ...)` kaldırılsın — yanıt, ödeme
    oturumu bilgisi taşıyor.
 
-### Kabul ölçütü
-
-Değiştirilmiş `totalAmount` ile yapılan istek 400/403 dönmeli; doğru
-`orderId` ile yapılan istek siparişin veritabanındaki tutarını kullanmalı.
+</details>
 
 ---
 
