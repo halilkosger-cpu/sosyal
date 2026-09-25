@@ -104,4 +104,72 @@ export const KATEGORI_METINLERI: Record<string, KategoriBolumu[]> = {
       ],
     },
   ],
+
+  temizlik: [
+    {
+      baslik: 'Cezaevi işyurtlarında üretilen temizlik ve kozmetik ürünleri',
+      paragraflar: [
+        'Bu sayfadaki ürünler Adalet Bakanlığı İşyurtları Genel Müdürlüğü’ne bağlı atölyelerde üretiliyor. İki ayrı hat var: bir yanda kolonya, parfüm ve sabun gibi kişisel bakım ürünleri, diğer yanda sıvı sabun ve yüzey temizleyici gibi temizlik ürünleri. Ürünün üzerindeki marka hangi işyurdunda üretildiğini gösteriyor.',
+      ],
+    },
+    {
+      baslik: 'Bu ürünleri kimler üretiyor',
+      paragraflar: [
+        'Atölyelerde çalışanlar ceza infaz kurumlarındaki hükümlüler. Çalışma ücret karşılığı; kişi hem bir gelir elde ediyor hem de tahliye sonrasında işine yarayacak bir meslek öğreniyor. Kozmetik üretimi bu açıdan öğretici bir alan: dolum, etiketleme, hijyen kuralları ve parti takibi hem burada hem dışarıdaki bir tesiste aynı şekilde yapılıyor.',
+      ],
+    },
+    {
+      baslik: 'Kolonya ve parfüm',
+      paragraflar: [
+        'Kolonya ve parfüm alkol bazlı ürünler; ısıdan ve ışıktan etkileniyorlar. Şişenin kapağı sıkıca kapatılıp serin ve karanlık bir yerde — parfümlerde kendi kutusunun içinde — saklandığında kokusunu daha uzun koruyor. Banyo gibi sıcaklığı ve nemi sürekli değişen yerler bu ürünler için iyi bir raf değil. Alkol bazlı oldukları için aleve ve ısı kaynaklarına yakın bırakılmamalı.',
+        'Parfümlerde seri kodu (32-01, 32-02, 32-03) farklı kokuları ayırt etmek için kullanılıyor; kadın ve erkek serileri ayrı.',
+      ],
+    },
+    {
+      baslik: 'Sabun ve temizlik ürünleri',
+      paragraflar: [
+        'El yapımı sabunlar kalıptan çıkarılıp kesiliyor; bu yüzden her parçanın kenarı ve rengi birbirinden birazcık farklı oluyor. Kullanım arasında suyu süzülen bir sabunlukta bekletilen sabun daha uzun gidiyor.',
+        'Sıvı sabun ve yüzey temizleyici büyük boy bidonlarda geliyor; okul, yurt ve ofis gibi yerlerde sabunlukları ve temizlik kaplarını doldurmak için kullanılıyor. Kullanım oranı ve uyarılar etiketin üzerinde yazıyor; kullanmadan önce oraya bakmak gerekiyor. Temizlik ürünleri çocukların ulaşamayacağı bir yerde, kapağı kapalı saklanmalı ve başka temizlik ürünleriyle karıştırılmamalı.',
+      ],
+    },
+    {
+      baslik: 'Sipariş ve teslimat',
+      paragraflar: [
+        'Cam şişeli ürünler kırılmaya karşı ek ambalajla gönderiliyor. Teslim tarihinden itibaren 14 gün içinde cayma hakkınız var; kozmetik ürünlerde ambalajın açılmamış olması gerekiyor.',
+      ],
+    },
+  ],
+
+  ahsap: [
+    {
+      baslik: 'İşyurdu marangozhanelerinde üretilen ahşap ürünler',
+      paragraflar: [
+        'Bu sayfadaki ürünler Adalet Bakanlığı İşyurtları’na bağlı marangoz atölyelerinde üretiliyor. Ahşap işçiliği işyurtlarının en eski üretim alanlarından biri: aynı atölyelerde kamu kurumlarının mobilyası da yapılıyor, buradaki küçük ölçekli ürünler o tezgâhın yanında çıkan işler.',
+      ],
+    },
+    {
+      baslik: 'Zanaat öğrenmek',
+      paragraflar: [
+        'Marangozhanede çalışan hükümlüler ücret karşılığı çalışıyor ve tahliye sonrasında iş bulunabilen bir zanaat öğreniyor. Ölçü alma, kesim, zımpara, birleştirme ve yüzey işlemi — bu adımların hepsi dışarıdaki bir atölyede de aynı şekilde yapılıyor. Oyma ve kakma işçiliği bunun üzerine gelen ayrı bir ustalık.',
+      ],
+    },
+    {
+      baslik: 'Elde üretimin sonuçları',
+      paragraflar: [
+        'Ahşap doğal bir malzeme: aynı ürünün iki adedi birebir aynı olmuyor. Damar yönü, renk tonu ve desendeki küçük farklar kusur değil, malzemenin ve elde işçiliğin doğal sonucu. Kakma işlenmiş yüzeylerde desen tek tek yerleştirildiği için parçalar arasında minik ölçü farkları da bulunabiliyor.',
+      ],
+    },
+    {
+      baslik: 'Bakım',
+      paragraflar: [
+        'Ahşap nemden ve ani sıcaklık değişiminden etkileniyor; radyatör üstü, banyo ve doğrudan güneş gören pencere önü uzun vadede yüzeyi çatlatıyor. Tozu kuru ve yumuşak bir bezle alınmalı, ıslak bez ve aşındırıcı temizleyici kullanılmamalı. Cilalı yüzeylerde yılda bir kez uygun bir ahşap bakım yağı yüzeyi tazeliyor.',
+      ],
+    },
+    {
+      baslik: 'Sipariş ve teslimat',
+      paragraflar: [
+        'Ahşap ürünler köşelerine ek koruma konularak gönderiliyor. Teslim tarihinden itibaren 14 gün içinde cayma hakkınız var.',
+      ],
+    },
+  ],
 };
