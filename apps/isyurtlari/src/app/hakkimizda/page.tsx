@@ -16,6 +16,7 @@ import { prisma } from '@isyurtlari/database';
 import { LuHouse, LuChevronRight, LuTarget, LuLeaf, LuBadgeCheck, LuShieldCheck, LuHeart, LuArrowRight, LuMail } from 'react-icons/lu';
 import { content } from '@/config/content';
 import { hasDatabaseUrl } from '@/lib/seo';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 /**
  * Hakkimizda - 2026 Eylul tasarimi.
@@ -29,7 +30,13 @@ export const revalidate = 3600;
 async function sayilar() {
   if (!hasDatabaseUrl()) return null;
   try {
-    const [kategori, urun] = await Promise.all([prisma.productCategory.count(), prisma.product.count()]);
+    // Sayimlar vitrinde gercekten gorunen kumeyi anlatiyor. Ham sayim
+    // kullanilirken sayfa "7 kategori, 63 urun" yaziyor, katalogda 3
+    // kategori ve 49 urun gorunuyordu. Bkz. lib/urun-gorunurluk.ts.
+    const [kategori, urun] = await Promise.all([
+      prisma.productCategory.count({ where: { products: { some: GORSELLI_URUN } } }),
+      prisma.product.count({ where: GORSELLI_URUN }),
+    ]);
     return { kategori, urun };
   } catch {
     return null;
