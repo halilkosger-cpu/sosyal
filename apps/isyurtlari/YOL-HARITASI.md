@@ -1,6 +1,6 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 25 Eylül 2026 (akşam) · Sıradaki iş: **Aşama 6 / fotoğrafsız 14 ürün**
+Son güncelleme: 25 Eylül 2026 (gece) · Sıradaki iş: **Aşama 6 (iyzico) ve fiyatsız 31 ürün**
 
 ## Durum özeti
 
@@ -8,12 +8,15 @@ Son güncelleme: 25 Eylül 2026 (akşam) · Sıradaki iş: **Aşama 6 / fotoğra
 |---|---|
 | 1 — İyzico ucunu güvene alma | ✅ bitti |
 | 2 — Görsel boru hattı (srcset) | ✅ bitti, canlıda ölçüldü |
-| 3 — Fotoğrafların tek görsel dile oturtulması | ✅ 49 ürün bitti |
+| 3 — Fotoğrafların tek görsel dile oturtulması | ✅ 49 ürün Higgs ile, 12 ürün resmî galeriden |
 | 4 — Ana sayfa (A+C) | ✅ bitti |
-| 5 — İçerik derinliği | ✅ 49 açıklama + 3 kategori metni yazıldı |
+| 5 — İçerik derinliği | ✅ 61 açıklama + 3 kategori metni yazıldı |
 | 6 — İyzico tam entegrasyon | ⛔ hesap bekliyor |
 
-Kalan iki iş: fotoğrafı hiç olmayan 14 ürün (resmî galeriden indirilecek)
+Fotoğrafsız 14 ürünün 12'si resmî galeriden çözüldü; kalan ikisi
+(Bez Çanta Setleri, Takı Çantası) galeride yok, gizli duruyorlar.
+
+Kalan işler: iyzico hesabı (Aşama 6), **31 ürünün fiyatı girilmemiş**
 ve ürün başına net miktar / içindekiler bilgisi.
 
 Bu dosya, konuşma bağlamı kaybolduğunda doğru zemini bulmak için var.
@@ -29,10 +32,11 @@ yazıldı; tahmin yok. Yeni bir iddia eklenecekse önce doğrulanmalı.
 | | Değer |
 |---|---|
 | Veritabanındaki ürün | 63 |
-| Vitrinde görünen ürün | 49 |
-| Fotoğrafsız ürün | 14 |
-| Görünen kategori | 3 — Gıda (27), Hediyelik (21), Peyzaj (1) |
-| Gizlenen kategori | 3 — Temizlik ve Kozmetik (11), Tekstil (2), Ahşap (1) |
+| Vitrinde görünen ürün | 61 |
+| Fotoğrafsız ürün | 2 - Bez Çanta Setleri, Takı Çantası |
+| Fiyatı girilmemiş ürün | 31 (kartta "Fiyat belirleniyor", sepete eklenemiyor) |
+| Görünen kategori | 5 - Gıda (27), Hediyelik (21), Temizlik (11), Peyzaj (1), Ahşap (1) |
+| Gizlenen kategori | 1 - Tekstil (2 ürün, ikisi de fotoğrafsız) |
 
 Fotoğrafsız ürünler silinmedi; `src/lib/urun-gorunurluk.ts` tek kural olarak
 listeleme, arama, sitemap ve `generateStaticParams` sorgularından süzüyor.
