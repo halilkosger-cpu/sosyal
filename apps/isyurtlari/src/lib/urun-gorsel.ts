@@ -23,8 +23,27 @@
  * olmayan urun eskisi gibi imageUrl ile calismaya devam eder.
  */
 
-/** Yerel surumu uretilmis urunler. */
+/**
+ * Yerel surumu uretilmis urunler.
+ *
+ * Listenin ilk 49'u Higgs'te yeniden sahnelenen urun fotograflari.
+ * Sonraki 12'si Adalet Bakanligi Isyurtlari'nin resmi urun galerisinden
+ * alinip ayni krem zemine tasinan gercek urun fotograflari; etiketler
+ * degistirilmedi, yalnizca arka plan temizlendi.
+ */
 const YEREL = new Set([
+  'ahsap-kutular',
+  'el-yapimi-dogal-sabun',
+  'erkek-parfumu-32-01',
+  'erkek-parfumu-32-02',
+  'erkek-parfumu-32-03',
+  'gul-kolonyasi',
+  'kadin-parfumu-32-01',
+  'kadin-parfumu-32-02',
+  'kadin-parfumu-32-03',
+  'lavanta-kolonyasi',
+  'sivi-sabun',
+  'yuzey-temizleyici',
   'badem',
   'bal-ari-urunleri',
   'biber-receli',
@@ -75,6 +94,12 @@ const YEREL = new Set([
   'zeytinyagi',
   'zeytinyagi-500ml',
 ]);
+
+/**
+ * Ayni kume, Prisma `where` icinde kullanilabilsin diye dizi olarak.
+ * Vitrin gorunurluk kurali bunu okuyor; bkz. lib/urun-gorunurluk.ts.
+ */
+export const YEREL_GORSELLI_SLUGLAR: string[] = Array.from(YEREL);
 
 /** Uretilen genislikler. Kaynak 1024 piksel; buyutme yapilmiyor. */
 export const GORSEL_BOYUTLARI = [400, 800, 1024] as const;

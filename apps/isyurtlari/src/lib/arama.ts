@@ -1,5 +1,18 @@
 import { prisma } from '@isyurtlari/database';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
+import { YEREL_GORSELLI_SLUGLAR } from '@/lib/urun-gorsel';
+
+/**
+ * Yerel gorseli olan urunlerin slug listesi, ham SQL icin.
+ *
+ * Buradaki deger kullanici girdisi degil, kodda duran sabit bir liste;
+ * yine de disaridan bir slug sizarsa diye yalnizca guvenli karakterler
+ * gecirilip tek tirnak iki katlaniyor.
+ */
+const YEREL_SLUG_SQL =
+  YEREL_GORSELLI_SLUGLAR.filter((s) => /^[a-z0-9-]+$/.test(s))
+    .map((s) => `'${s.replace(/'/g, "''")}'`)
+    .join(', ') || `''`;
 
 /**
  * Ürün araması.
@@ -94,7 +107,10 @@ export async function urunAra(sorgu: string): Promise<AramaSonucu> {
           similarity(public.tr_normalize(p."name"), public.tr_normalize($1))
         )::float8 AS skor
       FROM "Product" p
-      WHERE p."imageUrl" IS NOT NULL AND p."imageUrl" <> ''
+      WHERE (
+          (p."imageUrl" IS NOT NULL AND p."imageUrl" <> '')
+          OR p."slug" IN (${YEREL_SLUG_SQL})
+        )
         AND ${kelimeKosullari}
       ORDER BY skor DESC, p."name" ASC
       LIMIT ${AZAMI_SONUC};
