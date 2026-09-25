@@ -16,8 +16,19 @@ Son güncelleme: 25 Eylül 2026 (gece) · Sıradaki iş: **Aşama 6 (iyzico) ve 
 Fotoğrafsız 14 ürünün 12'si resmî galeriden çözüldü; kalan ikisi
 (Bez Çanta Setleri, Takı Çantası) galeride yok, gizli duruyorlar.
 
-Kalan işler: iyzico hesabı (Aşama 6), **31 ürünün fiyatı girilmemiş**
-ve ürün başına net miktar / içindekiler bilgisi.
+Kalan işler, önem sırasıyla:
+
+1. **31 ürünün fiyatı girilmemiş.** Katalogun yarısı. Bu ürünler kartta
+   "Fiyat belirleniyor" gösteriyor, sepete eklenemiyor ve schema.org'da
+   `offers` almıyorlar — yani Google'da fiyatsız görünüyorlar. Ürün
+   sayfası ve fotoğrafı hazır, tek eksik sayı. Admin → Fiyatlar.
+2. **Stok.** Şu an 63 ürünün tamamı "Tükendi". Temizlik kategorisinin
+   11 ürününün hepsi ön talep formuna düşüyor.
+3. **iyzico hesabı** (Aşama 6) — kart ödemesi bunsuz açılamıyor.
+4. Ürün başına net miktar / içindekiler bilgisi (açıklamaları
+   güçlendirmek için).
+5. Bez Çanta Setleri ve Takı Çantası — resmî galeride karşılığı yok,
+   fotoğraf gelene kadar gizli kalıyorlar.
 
 Bu dosya, konuşma bağlamı kaybolduğunda doğru zemini bulmak için var.
 Buradaki her sayı ve iddia canlı sitede ya da kaynak kodda **ölçülerek**
@@ -249,3 +260,49 @@ Yani form açılsa bile ödeme sonucu hiçbir zaman doğrulanmaz ve sipariş
 - Kanıtlanamayan iddia (sağlık, içerik, garanti) yazılmıyor.
 - Her değişiklik `npx tsc --noEmit` ile doğrulanıp canlıda ölçülerek
   kapatılır.
+
+---
+
+## 25 Eylül gecesi — iddia denetimi
+
+Temizlik kategorisi vitrine dönünce açılış metni de görünür oldu ve
+içinde "geleneksel yöntemlerle **katkısız** olarak hazırlanıyor" yazıyordu.
+Bunun üzerine bütün site metinleri aynı gözle tarandı. İki kalıp çıktı:
+
+**1. Bağış iması.** Alışverişin bir eğitim programına destek olduğunu
+söyleyen cümleler:
+
+| Yer | Eski metin |
+|---|---|
+| Ana sayfa meta açıklaması | "Her satın alma meslek eğitimine destek olur." |
+| /gida kategori açıklaması | "Her satın alma aşçılık eğitimine destek olur." |
+| /ahsap kategori açıklaması | "her alışveriş meslek edindirmeye katkıdır" |
+| /hediyelik kategori açıklaması | "hediyeniz bir yeniden başlangıç olsun" |
+| Kategori yedek metni (2 yer) | "topluma yeniden kazanılmalarına katkı sağlar" |
+| Ana sayfa anahtar kelimeleri | "sosyal sorumluluk", "hükümlü destekle", "reintegrasyon projesi" |
+
+Site bağımsız bir ticari mağaza; kâr amacı gütmeyen bir yapının parçası
+değil ve satış gelirinin nereye gittiği konusunda söz veremez.
+Hükümlülerin ücret karşılığı çalıştığı ve meslek öğrendiği ayrı ve doğru
+bir olgu — o duruyor, "alışveriş bağıştır" iması kalktı.
+
+**2. Her ürüne yapıştırılan nitelemeler.** Ürün sayfalarının meta
+açıklamasına "— Cezaevi hükümlüsü tarafından el yapımı, doğal ürün."
+ekleniyordu. Katalog büyüyünce ikisi de her ürün için doğru olmaktan
+çıktı: parfüm ve kolonya seri dolum şişede geliyor, yüzey temizleyicinin
+etiketinde kimyasal bileşim yazıyor.
+
+Bir de olgu hatası vardı: /peyzaj "her türlü çiçek, ağaç bulunmaktadır"
+diyordu; katalogda tek bir fidan var.
+
+**Bilerek değiştirilmeyenler:** gıda, hediyelik, ahşap ve peyzaj
+kategorilerinin başlık ekindeki "Doğal ve El Yapımı". Uzun süredir
+indekstedirler ve "doğal" arama hacmi olan bir kelime. Yalnızca temizlik
+kendi ekini aldı. hk isterse bunlar da gözden geçirilebilir.
+
+**Henüz elden geçirilmedi:** `src/config/content.ts` içindeki
+`home.socialImpact` ("Her Satın Alma Yardım Eder") ve `about.hero`
+("Sosyal etki odaklı pazar yeri") blokları. Birincisi ana sayfa
+yenilendiğinde kullanımdan kalktı, ikincisi /hakkimizda sayfasında.
+Ayrıca oradaki "500+ ürün" ve "81 ilde faaliyet" sayıları katalogla
+tutmuyor (63 ürün var).
