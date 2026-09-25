@@ -125,7 +125,14 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const canonical = absoluteUrl(`/urun/${product.slug}`);
   const image = getProductImage(product.slug, product.imageUrl);
   const description = truncate(product.description);
-  const enrichedDescription = `${description} - Cezaevi hükümlüsü tarafından el yapımı, doğal ürün.`;
+  /**
+   * Eskiden her urunun aciklamasina "- Cezaevi hukumlusu tarafindan el
+   * yapimi, dogal urun." ekleniyordu. Katalog buyuyunce ikisi de her urun
+   * icin dogru olmaktan cikti: parfum ve kolonya seri dolum sisede
+   * geliyor, yuzey temizleyicinin etiketinde kimyasal bilesim yaziyor.
+   * Ek artik yalnizca dogrulanabilir olani soyluyor.
+   */
+  const enrichedDescription = `${description} Adalet Bakanlığı İşyurtları atölyelerinde üretiliyor.`;
   const enrichedTitle = `${product.name} | İsyurtları - Cezaevi Ürünü`;
 
   return {
@@ -136,9 +143,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       'işyurtları',
       'cezaevi ürünü',
       'hapishane ürünü',
-      'el yapımı',
-      'doğal ürün',
-      'rehabilitasyon destekli',
+      'işyurtları ürünü',
       product.category.name.toLowerCase(),
     ],
     alternates: {

@@ -42,21 +42,23 @@ export const metadata: Metadata = {
   title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
   // 155 karakteri asmiyor: Google arama sonucunda yaklasik bu uzunlukta
   // kesiyor, oncesi 224 karakterdi ve sonu hic gorunmuyordu.
-  description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal gıda, tekstil ve ahşap ürünleri. Her satın alma meslek eğitimine destek olur.',
+  // Eskiden "Her satin alma meslek egitimine destek olur" ile bitiyordu.
+  // Bu, alisverisin bir egitim programina bagis oldugunu ima ediyor;
+  // site bagimsiz bir ticari magaza ve satis gelirinin nereye gittigi
+  // konusunda boyle bir soz veremez. Hukumlulerin ucret karsiligi
+  // calistigi ve meslek ogrendigi ayri bir olgu, sayfalarda soyleniyor.
+  description: 'Adalet Bakanlığı İşyurtları atölyelerinde üretilen gıda, hediyelik, ahşap ve temizlik ürünleri. Hükümlülerin el emeği, bağımsız online mağaza.',
   keywords: [
     'işyurtları online mağaza',
     'cezaevi ürünleri',
     'hapishane ürünleri',
     'hükümlü ürünleri',
     'el yapımı ürünler türkiye',
-    'doğal gıda ürünleri',
-    'rehabilitasyon ürünleri',
-    'reintegrasyon projesi',
-    'hapishane eğitim programı',
+    'işyurtları zeytinyağı',
     'cezaevinden ürün satın al',
-    'sosyal sorumluluk',
-    'hükümlü destekle',
-    'çıkış sonrası istihdam',
+    'işyurtları hediyelik',
+    'çini hediyelik ürünler',
+    'oltu taşı tesbih',
   ],
   openGraph: {
     ...defaultMetadata.openGraph,

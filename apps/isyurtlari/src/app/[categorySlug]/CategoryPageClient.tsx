@@ -206,11 +206,15 @@ function KategoriAfisi({
                 kategoriAciklamasi
               ) : (
                 <>
-                  Bu kategorideki her satın alma,{' '}
+                  {/* Eskiden "her satın alma ... topluma yeniden
+                      kazanılmalarına katkı sağlar" yazıyordu. Site bağımsız
+                      bir ticari mağaza; satıştan elde edilen gelirin bir
+                      programa gittiğini söyleyemiyoruz. */}
+                  Bu kategorideki ürünler{' '}
                   {meta?.purpose
-                    ? `${meta.purpose} programındaki hükümlülerin`
-                    : 'meslek eğitimi alan hükümlülerin'}{' '}
-                  emeğine karşılık olur ve topluma yeniden kazanılmalarına katkı sağlar.
+                    ? `${meta.purpose} atölyelerinde`
+                    : 'Adalet Bakanlığı İşyurtları atölyelerinde'}{' '}
+                  üretiliyor.
                 </>
               )}
             </p>

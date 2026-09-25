@@ -169,11 +169,30 @@ const urunSayisi = async (slug: string) => {
   }
 };
 
-const getCategoryTitle = (categoryName: string) => {
+/**
+ * Kategori basligindaki ek.
+ *
+ * Varsayilan ek "Cezaevi El Emegi, Dogal ve El Yapimi". Temizlik ve
+ * kozmetikte ikisi de tutmuyor: parfum ve kolonya seri dolum sisede
+ * geliyor (el yapimi degil), yuzey temizleyicinin etiketinde kimyasal
+ * bilesim yaziyor (dogal degil). Baslikta yazan sey sayfada satilanla
+ * ortusmedigi icin bu kategoriye kendi eki veriliyor.
+ *
+ * Diger kategorilerin eki bilerek degistirilmedi: uzun suredir
+ * indekstelerler ve "dogal" arama hacmi olan bir kelime.
+ */
+const BASLIK_EKI: Record<string, string> = {
+  temizlik: 'Cezaevi İşyurtları Üretimi',
+};
+
+const getCategoryTitle = (categoryName: string, categorySlug?: string) => {
   const taban = categoryName.toLocaleLowerCase('tr-TR').endsWith(' ürünleri')
     ? categoryName
     : `${categoryName} Ürünleri`;
-  return `${taban} — Cezaevi El Emeği, Doğal ve El Yapımı`;
+  const ek =
+    (categorySlug ? BASLIK_EKI[categorySlug] : undefined) ??
+    'Cezaevi El Emeği, Doğal ve El Yapımı';
+  return `${taban} — ${ek}`;
 };
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -191,10 +210,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   const category = sonuc.kategori;
   const categoryName = category.name;
-  const title = getCategoryTitle(categoryName);
+  const title = getCategoryTitle(categoryName, params.categorySlug);
   const description = truncate(
     category?.description ||
-      `${categoryName} kategorisindeki el emeği ürünleri keşfedin. Her alışveriş meslek eğitimine destek olur.`
+      // Kategorinin kendi aciklamasi bossa devreye giren yedek metin.
+      // Eskiden "Her alisveris meslek egitimine destek olur" diyordu;
+      // site bagimsiz bir ticari magaza, satis gelirinin bir egitim
+      // programina gittigini soyleyemez.
+      `${categoryName} kategorisindeki ürünler Adalet Bakanlığı İşyurtları atölyelerinde üretiliyor.`
   );
   const canonical = absoluteUrl(`/${params.categorySlug}`);
   const image = category?.imageUrl ? absoluteUrl(category.imageUrl) : defaultOpenGraphImage;
@@ -260,7 +283,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const category = sonuc.durum === 'bulundu' ? sonuc.kategori : null;
   const categoryName = category?.name ?? 'Ürünler';
-  const title = getCategoryTitle(categoryName);
+  const title = getCategoryTitle(categoryName, params.categorySlug);
   const canonical = absoluteUrl(`/${params.categorySlug}`);
   /** Metni olmayan kategori bolumu hic cizilmiyor. */
   const kategoriMetni = KATEGORI_METINLERI[params.categorySlug];
