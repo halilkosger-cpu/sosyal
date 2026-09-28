@@ -13,23 +13,23 @@ import { content } from '@/config/content';
  *
  * ─── DUZEN ────────────────────────────────────────────────────────────
  *
- * Turuncu duyuru seridi / krem hero (solda buyuk baslik, sagda uc urunun
- * ust uste binen kumesi) / lacivert guven bandi / kategori satiri /
- * kampanyalar / sakin urun izgarasi / SEO metni.
+ * Turuncu duyuru seridi / hero (genis fotograf, solundaki bos alanda
+ * baslik) / lacivert guven bandi / kategori satiri / kampanyalar /
+ * sakin urun izgarasi / SEO metni.
  *
  * ─── NEDEN DEGISTI ────────────────────────────────────────────────────
  *
  * Onceki hero tam genislikte tek bir fotografti ve uzerine uc beyaz
- * istatistik kutusu biniyordu. Iki sorunu vardi:
+ * istatistik kutusu biniyordu. Rakamlar ("70.000+ hukumlu", "500+ urun")
+ * bu sitenin dogrulayabilecegi sayilar degildi; yerlerine yalnizca
+ * dogrulanabilir uc madde tasiyan lacivert bant geldi: uretim yeri,
+ * ucret ve meslek, 14 gun cayma hakki.
  *
- *  1) Fotograf Higgsfield ile uretilmis bir sahneydi; sattigimiz urunler
- *     degildi. Artik hero'daki uc gorsel katalogdaki GERCEK urunlerin
- *     fotograflari (bakir sahan, cini tabak, uzum pekmezi) ve her biri
- *     public/urun/ altindaki boyutlandirilmis WebP.
- *  2) Istatistik kutularindaki rakamlar ("70.000+ hukumlu", "500+ urun")
- *     bu sitenin dogrulayabilecegi sayilar degildi. Yerlerine yalnizca
- *     dogrulanabilir uc madde tasiyan lacivert bant geldi: uretim yeri,
- *     ucret ve meslek, 14 gun cayma hakki.
+ * Bir ara fotografin yerinde uc urunun ust uste binen kumesi vardi.
+ * Fotograf geri alindi: uretilmis bir sahne olsa da katalogdaki gercek
+ * urunleri gosteriyor (aci biber receli, polen, zeytinyagi, cini tabak,
+ * kuru baklagiller) ve sol ucte biri baslik icin bos birakilarak
+ * tasarlanmis - hero'nun istedigi tam olarak o.
  *
  * ─── KORUNAN SEYLER ───────────────────────────────────────────────────
  *
@@ -57,15 +57,22 @@ const urunYedegi = (slug?: string) => {
 };
 
 /**
- * Hero'daki urun kumesi. Katalogdaki gercek urunlerin boyutlandirilmis
- * surumleri (bkz. lib/urun-gorsel.ts). Dosyalar public/urun/ altinda
- * durdugu icin urun veritabanindan kalksa bile hero bozulmuyor.
+ * Hero fotografi, iki kirpim.
+ *
+ * Genis surum solda bilerek bos birakilarak uretildi; baslik oraya
+ * oturuyor. Mobil surum ayni sahnenin kare kirpimi; icinde bos alan
+ * olmadigi icin metin uzerine bindirilmiyor, once metin sonra fotograf
+ * olarak diziliyor.
+ *
+ * Olculer CLS icin: tarayici fotograf inmeden once yerini ayiriyor.
  */
-const HERO_KUMESI = [
-  { dosya: 'el-yapimi-bakir-islemeler', alt: 'El yapımı bakır sahan', sinif: 'w-[62%] left-0 top-[4%]' },
-  { dosya: 'el-yapimi-cini-tabak',      alt: 'El yapımı çini tabak',  sinif: 'w-[48%] right-[2%] top-0' },
-  { dosya: 'uzum-pekmezi',              alt: 'Yaş üzüm pekmezi',      sinif: 'w-[40%] right-[12%] bottom-0' },
-];
+const HERO_GORSEL = {
+  genis: { src: '/hero/anasayfa-hero.webp', w: 2000, h: 857 },
+  dar: { src: '/hero/anasayfa-hero-mobil.webp', w: 900, h: 675 },
+  alt:
+    'Ahşap tezgâhta işyurtları ürünleri: çini tabak, acı biber reçeli ' +
+    'kavanozları, polen kavanozları, kuru baklagiller ve zeytinyağı.',
+};
 
 /**
  * Guven bandi. Her madde dogrulanabilir: ilk ikisi uretimin kendisi,
@@ -134,57 +141,92 @@ export default function HomeClient({
         </p>
       </div>
 
-      {/* ─── HERO ─── */}
-      <section className="bg-gradient-to-br from-[#F6EADB] via-[#EFE0CD] to-[#E7D4BD] border-b border-[#E3D5C2]">
-        <div className="max-w-screen-xl mx-auto px-4 py-10 md:py-16 grid gap-10 md:gap-12 md:grid-cols-[1.05fr_.95fr] md:items-center">
+      {/* ─── HERO ───
+          Tek metin blogu, iki yerlesim:
 
-          <div>
-            <p className="flex items-center gap-3 text-[11px] md:text-xs font-semibold uppercase tracking-[0.18em] text-[#A63F00] mb-4">
-              El emeği · Tek elden
-              <span className="h-px flex-1 max-w-[90px] bg-current opacity-35" aria-hidden="true" />
-            </p>
+          - lg altinda: metin krem zeminde, fotograf (kare kirpim) altinda.
+          - lg ustunde: genis fotograf dogal oraniyla akista; metin mutlak
+            konumla uzerine, fotografin solundaki bos alana biniyor.
 
-            {/* Slogan gorsel; basligin kendisi asagidaki H1. */}
-            <p className="font-serif text-[2.5rem] md:text-[3.8rem] leading-[1.02] font-bold text-[#141B2D] tracking-tight" aria-hidden="true">
-              {content.home.hero.title}.
-              <br />
-              {content.home.hero.titleHighlight}.{' '}
-              <span className="text-[#CC4E00]">{content.home.hero.titleSuffix}.</span>
-            </p>
+          Metin lg'de mutlak konumlu oldugu icin DOM'da tek kez duruyor -
+          iki ayri kirilim icin kopyalansa sayfada iki H1 olurdu.
 
-            <h1 className="mt-5 text-[15px] md:text-base font-normal leading-relaxed text-gray-700 max-w-lg">
-              Hükümlülerin El Emeğiyle Üretilen Ürünler{' '}
-              <span className="font-semibold text-gray-900">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
-            </h1>
+          Fotograf LCP adayi: eager + fetchPriority=high, lazy degil. */}
+      <section className="border-b border-[#E3D5C2] bg-gradient-to-br from-[#F6EADB] via-[#EFE0CD] to-[#E7D4BD] lg:bg-none lg:bg-[#F4E8D6]">
+        <div className="lg:relative">
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href={tumUrunler} className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors">
-                Ürünleri keşfet <LuArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href="/hakkimizda" className="inline-flex items-center gap-2 border border-[#141B2D]/25 text-[#141B2D] hover:bg-white/60 text-sm font-semibold px-5 py-3 rounded-lg transition-colors">
-                Nasıl üretiliyor <LuInfo className="w-4 h-4" />
-              </Link>
+          {/* Metin. lg'de fotografin ustunde, soldaki bos alanda. */}
+          <div className="lg:absolute lg:inset-0 lg:z-10 lg:flex lg:items-center">
+            <div className="max-w-screen-xl mx-auto px-4 w-full py-10 lg:py-0">
+              {/**
+               * Sutun genisligi olculerek secildi: fotografta en soldaki
+               * recel kavanozu %39,7'de basliyor. %42'de H1'in son satiri
+               * 1440 pikselde kavanoza 7 piksel kala bitiyordu - teknik
+               * olarak binmiyor ama sikisik duruyordu. %36 ile aralik
+               * yaklasik 40 piksele cikiyor.
+               */}
+              <div className="lg:max-w-[36%] xl:max-w-[37%]">
+                <p className="flex items-center gap-3 text-[11px] md:text-xs font-semibold uppercase tracking-[0.18em] text-[#A63F00] mb-4">
+                  El emeği · Tek elden
+                  <span className="h-px flex-1 max-w-[90px] bg-current opacity-35" aria-hidden="true" />
+                </p>
+
+                {/* Slogan gorsel; basligin kendisi asagidaki H1. */}
+                <p className="font-serif text-[2.5rem] sm:text-[3rem] lg:text-[3.1rem] xl:text-[3.6rem] leading-[1.02] font-bold text-[#141B2D] tracking-tight" aria-hidden="true">
+                  {content.home.hero.title}.
+                  <br />
+                  {content.home.hero.titleHighlight}.{' '}
+                  <span className="text-[#CC4E00]">{content.home.hero.titleSuffix}.</span>
+                </p>
+
+                {/* lg'de daha erken sariyor: olculdu, max-w-lg ile son
+                    satir 1440 pikselde ilk recel kavanozuna 9 piksel kala
+                    bitiyordu. max-w-sm ile aralik ~90 piksele cikiyor. */}
+                <h1 className="mt-5 text-[15px] md:text-base font-normal leading-relaxed text-gray-700 max-w-lg lg:max-w-sm">
+                  Hükümlülerin El Emeğiyle Üretilen Ürünler{' '}
+                  <span className="font-semibold text-gray-900">İsyurtları</span> Cezaevi &amp; Hapishane Online Mağazası
+                </h1>
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <Link href={tumUrunler} className="inline-flex items-center gap-2 bg-[#CC4E00] hover:bg-[#A63F00] text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors">
+                    Ürünleri keşfet <LuArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link href="/hakkimizda" className="inline-flex items-center gap-2 border border-[#141B2D]/25 text-[#141B2D] hover:bg-white/60 text-sm font-semibold px-5 py-3 rounded-lg transition-colors">
+                    Nasıl üretiliyor <LuInfo className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Urun kumesi: uc gercek urun, ust uste binen yerlesim. */}
-          <div className="relative aspect-[1/0.92] max-w-[460px] w-full mx-auto md:mx-0 md:max-w-none">
-            {HERO_KUMESI.map(({ dosya, alt, sinif }, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={dosya}
-                src={`/urun/${dosya}-800.webp`}
-                srcSet={`/urun/${dosya}-400.webp 400w, /urun/${dosya}-800.webp 800w`}
-                sizes="(max-width: 768px) 50vw, 25vw"
-                alt={alt}
-                width={800}
-                height={800}
-                className={`absolute rounded-sm shadow-[0_18px_44px_-18px_rgba(20,27,45,0.42)] ${sinif}`}
-                decoding="async"
-                fetchPriority={i === 0 ? 'high' : undefined}
-              />
-            ))}
-          </div>
+          {/**
+           * Fotograf. <picture> ile sanat yonetimi: mobil cihaz genis
+           * dosyayi hic indirmiyor, sadece kendi kirpimini aliyor.
+           *
+           * max-h-[78vh]: 1920 piksel genisliginde fotograf dogal olarak
+           * 823 piksel yuksekliginde geliyor, o hala ekrana sigiyor.
+           * Daha genis ekranlarda ustten ve alttan biraz kirpiliyor -
+           * sol taraf duz krem oldugu icin kirpim gorunmuyor.
+           */}
+          <picture>
+            <source
+              media="(min-width: 1024px)"
+              srcSet={HERO_GORSEL.genis.src}
+              width={HERO_GORSEL.genis.w}
+              height={HERO_GORSEL.genis.h}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HERO_GORSEL.dar.src}
+              alt={HERO_GORSEL.alt}
+              width={HERO_GORSEL.dar.w}
+              height={HERO_GORSEL.dar.h}
+              className="w-full h-auto lg:max-h-[78vh] lg:object-cover lg:object-center"
+              decoding="async"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </picture>
         </div>
       </section>
 
