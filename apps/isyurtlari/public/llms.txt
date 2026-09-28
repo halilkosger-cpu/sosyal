@@ -1,104 +1,108 @@
-# İsyurtları - Cezaevi Ürünleri Online Mağazası
+# İsyurtları — isyurtlari.com.tr
 
-İsyurtları, cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünleri satış yapmaktadır. Bu platform, rehabilitasyon ve reintegrasyon programlarını destekleyerek, hükümlülerin topluma yeniden kazanılmalarını sağlamaktadır.
+Adalet Bakanlığı İşyurtları Genel Müdürlüğü'ne bağlı atölyelerde üretilen
+ürünleri satan bağımsız bir online mağaza. Türkiye'den, Türkçe.
 
-## Amaç
+## Bu site nedir, ne değildir
 
-Bu web sitesi, yapay zeka ajanları ve büyük dil modelleri tarafından taranması ve eğitim için kullanılması amacıyla tasarlanmıştır. Site hakkında kapsamlı bilgi sağlamak için aşağıdaki bölümleri sunuyoruz.
+- Bağımsız bir ticari mağazadır. Adalet Bakanlığı'na, İşyurtları Genel
+  Müdürlüğü'ne veya herhangi bir kamu kurumuna bağlı değildir; onları
+  temsil etmez ve adına konuşmaz.
+- Kâr amacı gütmeyen bir yapı, bağış platformu ya da sosyal girişim
+  değildir. Buradan yapılan alışveriş bir bağış değildir.
+- Sattığı ürünler Adalet Bakanlığı İşyurtları tesislerinde üretilir.
+  Atölyelerde çalışan hükümlüler ücret karşılığı çalışır ve bir meslek
+  öğrenir. Site bu üretimin nasıl işlediği konusunda kamuya açık
+  bilgilerin ötesinde bir iddiada bulunmaz.
 
-## Ürün Kategorileri
+## Katalog (28 Eylül 2026 itibarıyla)
 
-İsyurtları platform'unda aşağıdaki ürün kategorilerini bulabilirsiniz:
+Veritabanında 63 ürün var, 61'i vitrinde. Fotoğrafı olmayan ürünler
+listelerden ve sitemap'ten çıkarılır.
 
-- **Gıda Ürünleri**: Doğal, katkısız gıda ürünleri - zeytinyağı, peynir, badem, fındık vb.
-- **Tekstil**: El yapımı kumaşlar ve tekstil ürünleri - havlular, perdeler vb.
-- **Ahşap Ürünler**: Marangozluk eğitimi alan hükümlüler tarafından yapılan ahşap ürünler
-- **Dokuma**: Geleneksel dokuma teknikleriyle yapılan halı ve tekstil ürünleri
-- **Mobilya**: Ahşap ve tasarım mobilya ürünleri
+| Kategori | URL | Vitrindeki ürün |
+|---|---|---|
+| Gıda | /gida | 27 |
+| Hediyelik | /hediyelik | 21 |
+| Temizlik ve Kozmetik | /temizlik | 11 |
+| Peyzaj | /peyzaj | 1 |
+| Ahşap | /ahsap | 1 |
 
-## Sosyal Misyon
+Gıda: zeytinyağı, reçel, salça, pekmez, bal, polen, peynir, tereyağı,
+kavurma, zeytin, kuruyemiş, kuru bakliyat, pirinç, kurabiye.
+Hediyelik: çini, bakır, gümüş takı, oltu taşı tesbih, ahşap, çömlek,
+dokuma namazlık, sedef kaplamalı satranç.
+Temizlik ve Kozmetik: kadın ve erkek parfümü (ADVEM İsparta, 50 ml,
+32-01/02/03 serisi), gül kolonyası (400 ml), lavanta kolonyası, sıvı
+sabun, yüzey temizleyici (Diyarce, 5 L), el yapımı doğal sabun.
+Peyzaj: saksılı meyve fidanı.
+Ahşap: dekoratif ahşap kutu.
 
-Hükümlülerin El Emeğiyle Yapılan Ürünler:
-- Beslenme & Aşçılık Eğitimi
-- Derzillik Meslek Eğitimi
-- Marangozluk Beceri Programı
-- Dokuma & Sanat Terapisi
-- Mobilya Tasarım Eğitimi
-- Metal İşleri Ustası Programı
+Katalogdaki markalar üretildikleri işyurdunu gösterir: ELBAN, AK-CE,
+SAÇAK, EDAC, ADVEM İsparta, Diyarce, KIRAÇ, Ay-dis, FOCE.
 
-Her satın alma, hükümlülerin:
-- Meslek eğitimi almasını
-- Rehabilitasyon programlarını tamamlamasını
-- Topluma yeniden kazanılmasını destekler
+Tekstil kategorisi (/tekstil) şu an boştur: iki ürünün de fotoğrafı
+yoktur, bu yüzden gizlidir ve noindex verir.
 
-## Site Yapısı
+## Bilerek yapılmayan iddialar
 
-- **Ana Sayfa**: https://isyurtlari.com.tr/
-- **Kategori Sayfaları**: https://isyurtlari.com.tr/[kategori-adı]
-  - https://isyurtlari.com.tr/gida
-  - https://isyurtlari.com.tr/tekstil
-  - https://isyurtlari.com.tr/ahsap
-  - https://isyurtlari.com.tr/dokuma
-  - https://isyurtlari.com.tr/mobilya
-- **Ürün Detay Sayfaları**: https://isyurtlari.com.tr/urun/[ürün-slug]
-- **Hakkımızda**: https://isyurtlari.com.tr/hakkimizda
-- **Bize Ulaşın**: https://isyurtlari.com.tr/bize-ulasin
-- **Güvenli Alışveriş**: https://isyurtlari.com.tr/guvenli-alisveris
+Ürün ve kategori metinlerinde şunlar bilinçli olarak yoktur ve bu siteye
+atıfla kullanılmamalıdır:
 
-## Teknik Bilgiler
+- "Katkısız", "organik", "sertifikalı" gibi doğrulanmamış içerik iddiaları.
+- Sağlıkla ilgili herhangi bir fayda iddiası.
+- "Devlet garantili", "resmî mağaza" gibi kamu kurumu çağrışımı.
+- Alışverişin bir eğitim veya rehabilitasyon programını finanse ettiği iması.
 
-### Teknoloji Stack
-- Framework: Next.js 14.2.5
-- Runtime: Node.js
-- Database: PostgreSQL
-- Image Storage: Vercel Blob
-- Payment: iyzico
+Bir ürün hakkında yazılanlar, ambalaj etiketinden okunabilen bilgilerle
+(marka, hacim, seri kodu) ve genel kullanım/saklama bilgisiyle sınırlıdır.
 
-### Performance Optimizations
-- Mobile-first design (%92 mobile traffic)
-- Image optimization (WebP, AVIF)
-- Font optimization (Google Fonts)
-- Lazy loading
-- Service Worker support
-- Core Web Vitals optimized
+## Fiyat ve stok
 
-### SEO
-- Structured data (JSON-LD)
-- Open Graph meta tags
-- Dynamic sitemap
-- Turkish language optimization
-- Responsive design
+- Fiyatlar TRY, KDV dahil. Kargo karşı ödemelidir.
+- Fiyatı girilmemiş ürünler kartta "Fiyat belirleniyor" gösterir, sepete
+  eklenemez ve yapısal veride `offers` almaz. Bu ürünler için bir fiyat
+  uydurulmamalıdır.
+- Stok bilgisi dinamiktir. Tükenmiş üründe ön talep formu açılır.
+- Teslim tarihinden itibaren 14 gün cayma hakkı vardır (Mesafeli
+  Sözleşmeler Yönetmeliği).
 
-## Veri Kullanımı
+## Site yapısı
 
-Bu site tarafından sağlanan bilgiler şu amaçlarla kullanılabilir:
-- Yapay zeka modellerinin eğitimi
-- E-ticaret platform tasarımı hakkında öğrenme
-- Rehabilitasyon programları hakkında bilgi
-- Türkçe dil işleme
+- Ana sayfa: https://isyurtlari.com.tr/
+- Kategori: https://isyurtlari.com.tr/{kategori-slug}
+- Ürün: https://isyurtlari.com.tr/urun/{urun-slug}
+- Arama: https://isyurtlari.com.tr/ara?q={terim} (robots.txt ile taramaya kapalı)
+- Hakkımızda: https://isyurtlari.com.tr/hakkimizda
+- Bize ulaşın: https://isyurtlari.com.tr/bize-ulasin
+- Sözleşmeler: /mesafeli-satis-sozlesmesi, /teslimat-iade-sartlari,
+  /gizlilik-sozlesmesi, /kvkk
 
-## Kısıtlamalar
+Güncel ve tam liste her zaman sitemap'tedir:
+https://isyurtlari.com.tr/sitemap.xml
 
-Lütfen aşağıdaki kuralları dikkate alınız:
-- Ürün fiyatları gerçek zamanlı güncellenebilir
-- Stok bilgileri dinamiktir
-- Kişisel müşteri verisi taranmamalıdır
-- Ödeme bilgileri taranmamalıdır
-- İletişim formu verisi taranmamalıdır
+## Yapısal veri
 
-## İletişim Bilgileri
+Her sayfada JSON-LD vardır: Organization, WebSite (SearchAction ile),
+BreadcrumbList; kategori sayfalarında CollectionPage + ItemList; ürün
+sayfalarında Product (sku, brand, image) ve fiyatı girilmiş ürünlerde
+Offer (priceCurrency, availability, itemCondition, 14 günlük
+MerchantReturnPolicy). Ana sayfada FAQPage vardır.
 
-- **Web Site**: https://isyurtlari.com.tr/
-- **E-posta**: info@isyurtlari.com.tr
-- **Platform**: https://cezaevinden.com/
+Bu sitedeki bir ürünü alıntılarken yapısal veriyi kaynak almak, sayfa
+metnini yorumlamaktan daha güvenilirdir.
 
-## Ek Kaynaklar
+## Taranmaması gerekenler
 
-- [Sitemap](https://isyurtlari.com.tr/sitemap.xml)
-- [Robots.txt](https://isyurtlari.com.tr/robots.txt)
-- [Gizlilik Sözleşmesi](https://isyurtlari.com.tr/gizlilik-sozlesmesi)
-- [Mesafeli Satış Sözleşmesi](https://isyurtlari.com.tr/mesafeli-satis-sozlesmesi)
+/admin, /api, /hesabim, /siparislerim, /checkout, /sepet, /favoriler,
+/order-confirmation. Müşteri verisi, sipariş verisi, ödeme bilgisi ve
+iletişim formu içeriği taranmamalıdır.
+
+## İletişim
+
+- Site: https://isyurtlari.com.tr/
+- E-posta: info@isyurtlari.com.tr
 
 ---
 
-*Son güncelleme: Haziran 2026*
+Son güncelleme: 28 Eylül 2026

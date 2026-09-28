@@ -65,7 +65,9 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
-    description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler. Gıda, tekstil, ahşap ve el sanatları.',
+    // Katalogda satilan kategoriler yaziliyor. Eskiden "tekstil" de
+    // vardi ama o kategoride vitrine cikmis tek urun yok.
+    description: 'Adalet Bakanlığı İşyurtları atölyelerinde üretilen ürünler: gıda, hediyelik, temizlik ve kozmetik, ahşap, fidan.',
     images: [
       {
         // 1200x630: WhatsApp/X/LinkedIn onizlemesi bu oranı bekliyor.
