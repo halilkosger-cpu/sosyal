@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { verifyOTP, getRemainingAttempts, kodlariTemizle } from '@/lib/otp';
+import { verifyOTP, getRemainingAttempts, kodlariTemizle, normalizeEmail, normalizeCode } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { jwtAnahtari } from '@/lib/admin-auth';
@@ -13,17 +13,25 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    email = (body.email || '').trim().toLowerCase();
-    const code = (body.code || '').trim();
+    email = normalizeEmail(body.email);
+    const code = normalizeCode(body.code);
 
     if (!email || !code) {
       return NextResponse.json(
-        { error: 'Email ve kod gereklidir' },
+        { error: 'E-posta ve 6 haneli doğrulama kodu gereklidir' },
         { status: 400 }
       );
     }
 
-    const sinir = await hizSiniriGuard(req, 'otp-verify', 10, 60);
+    if (code.length !== 6) {
+      return NextResponse.json(
+        { error: 'Doğrulama kodu 6 haneli bir sayı olmalıdır' },
+        { status: 400 }
+      );
+    }
+
+    // Hız sınırı: dakikada en fazla 6 deneme
+    const sinir = await hizSiniriGuard(req, 'otp-verify', 6, 60);
     if (sinir) {
       await logAudit('OTP_VERIFY', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
@@ -36,48 +44,55 @@ export async function POST(req: NextRequest) {
     ].filter(Boolean);
 
     if (!ADMIN_EMAILS.includes(email)) {
-      await logAudit('OTP_VERIFY', email, 'failed', 'Yetkisiz e-posta', ip);
-      return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
+      await logAudit('OTP_VERIFY', email, 'failed', 'Yetkisiz e-posta ile kod onayı', ip);
+      return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
     }
 
-    // Verify OTP
+    // OTP Doğrula
     const isValid = await verifyOTP(email, code);
 
     if (!isValid) {
       const remaining = await getRemainingAttempts(email);
       await logAudit('OTP_VERIFY', email, 'failed', `Hatalı kod. Kalan deneme: ${remaining}`, ip);
+
       if (remaining <= 0) {
         return NextResponse.json(
-          { error: 'Maksimum deneme sayısı aşıldı. Lütfen yeni kod isteyin.' },
+          { error: 'Maksimum deneme sayısı (5) aşıldı. Güvenlik gereği kod iptal edildi. Lütfen yeni bir kod talep ediniz.' },
           { status: 429 }
         );
       }
+
       return NextResponse.json(
-        { error: `Hatalı kod. Kalan deneme: ${remaining}` },
+        { error: `Hatalı veya süresi dolmuş kod. Kalan hakkınız: ${remaining}` },
         { status: 401 }
       );
     }
 
-    // Create JWT token using common secure key
+    // Doğrulama başarılı - Yönetici JWT jetonunu imzala
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
       jwtAnahtari(),
       { expiresIn: '24h' }
     );
 
-    // Set secure cookie with 'lax' sameSite to prevent cookie dropping on client navigation
-    const res = NextResponse.json({ success: true });
+    // Güvenli HTTP-only çerez tanımla
+    const res = NextResponse.json({
+      success: true,
+      redirect: '/admin',
+      message: 'Kimlik doğrulama başarılı',
+    });
+
     res.cookies.set('admin-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 24 saat
       path: '/',
+      maxAge: 86400, // 24 saat
     });
 
-    await logAudit('OTP_VERIFY', email, 'success', 'Yönetici girişi başarılı', ip);
+    await logAudit('OTP_VERIFY', email, 'success', 'Yönetici 2FA OTP ile başarıyla oturum açtı', ip);
 
-    // Süresi geçmiş kodları ara sıra temizle
+    // Arka planda süresi geçmiş kodları temizle
     await kodlariTemizle();
 
     return res;
@@ -85,7 +100,7 @@ export async function POST(req: NextRequest) {
     console.error('OTP verification error:', error);
     await logAudit('OTP_VERIFY', email, 'failed', String(error), ip);
     return NextResponse.json(
-      { error: 'Doğrulama başarısız' },
+      { error: 'Doğrulama işlemi sırasında sunucu hatası oluştu.' },
       { status: 500 }
     );
   }

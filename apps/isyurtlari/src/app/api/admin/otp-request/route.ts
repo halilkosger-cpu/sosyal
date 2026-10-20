@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { generateOTP, storeOTP } from '@/lib/otp';
+import { generateOTP, storeOTP, normalizeEmail } from '@/lib/otp';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { logAudit } from '@/lib/audit-log';
 
@@ -13,89 +13,77 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    email = body.email;
+    email = normalizeEmail(body.email);
 
     if (!email) {
-      return NextResponse.json({ error: 'Email gereklidir' }, { status: 400 });
+      return NextResponse.json({ error: 'E-posta adresi gereklidir' }, { status: 400 });
     }
 
-    // Validate email (admin email listesi normalize edildi)
-    const normalizedEmail = email.toLowerCase().trim();
+    // Yetkili yönetici e-posta kontrolü
     const ALLOWED_EMAILS = [
       (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
       'halil.kosger@gmail.com',
-      'info@isyurtlari.com.tr'
+      'info@isyurtlari.com.tr',
     ].filter(Boolean);
 
-    if (!ALLOWED_EMAILS.includes(normalizedEmail)) {
-      await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta', ip);
-      return NextResponse.json({ error: 'Yetkisiz email adresi. Lütfen kayıtlı yönetici e-postasını kullanın.' }, { status: 403 });
+    if (!ALLOWED_EMAILS.includes(email)) {
+      await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta ile kod talebi', ip);
+      return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
     }
-    email = normalizedEmail;
 
-    // Hiz siniri: dakikada 5 kod istegi.
-    //
-    // Onceden bellekteki sayac kullaniliyordu; sunucusuz ortamda her istek
-    // ayri bir ornekte islenebildigi icin sayac surekli sifirlaniyor ve sinir
-    // pratikte islemiyordu. Sayac artik veritabaninda, tum ornekler icin
-    // ortak.
-    const sinir = await hizSiniriGuard(req, 'otp-request', 5, 60);
+    // Hız sınırı: dakikada en fazla 4 kod isteği
+    const sinir = await hizSiniriGuard(req, 'otp-request', 4, 60);
     if (sinir) {
       await logAudit('OTP_REQUEST', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
     }
 
-    // Generate OTP
+    // Kriptografik güvenli kod üret ve SHA-256 ile veritabanına kaydet
     const code = generateOTP();
     await storeOTP(email, code);
 
-    /**
-     * Kod KAYITLARA YAZILMIYOR.
-     *
-     * Burada kodu duz metin olarak console.log ile yazan bir satir vardi.
-     * lib/otp.ts kodu bilerek yalnizca SHA-256 ozetiyle sakliyor
-     * ("veritabani okunsa bile kod ele gecmesin"); o satir bu tasarimi tek
-     * basina gecersiz kiliyordu. Vercel calisma zamani kayitlarini
-     * gorebilen herkes - ekip uyesi, log entegrasyonu, destek icin
-     * paylasilan bir ekran - 10 dakikalik pencere icinde kodu kullanip
-     * yonetici olabilirdi.
-     */
-
-    // Send OTP email
+    // E-posta gönderimi
     const result = await resend.emails.send({
       from: 'info@isyurtlari.com.tr',
       to: email,
-      subject: 'Admin Paneli Giriş Kodu - isyurtlari.com.tr',
+      subject: 'Admin Paneli Giriş Doğrulama Kodu - isyurtlari.com.tr',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #FF6000;">Admin Paneli Giriş Kodu</h2>
-          <p>Merhaba,</p>
-          <p>Admin paneline giriş yapmak için aşağıdaki kodu kullanınız:</p>
-
-          <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-            <p style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #FF6000; margin: 0;">
-              ${code}
-            </p>
-            <p style="color: #666; margin-top: 10px;">Bu kod 10 dakika geçerlidir.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 540px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+          <div style="background: #0F2040; padding: 24px; text-align: center;">
+            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">İşyurtları Yönetim Paneli</h2>
+            <p style="color: #93c5fd; margin: 6px 0 0 0; font-size: 13px;">Tek Kullanımlık Güvenli Giriş Kodu</p>
           </div>
-
-          <p style="color: #666; font-size: 14px;">
-            Eğer bu işlemi yapmadıysanız, lütfen bu emaili dikkate almayınız.
-          </p>
-
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="color: #999; font-size: 12px;">
-            isyurtlari.com.tr © 2024. Tüm hakları saklıdır.
-          </p>
+          <div style="padding: 28px;">
+            <p style="color: #374151; font-size: 15px; margin: 0 0 16px 0;">Merhaba,</p>
+            <p style="color: #4b5563; font-size: 14px; line-height: 1.5; margin: 0 0 20px 0;">
+              Yönetim paneline giriş yapabilmeniz için tek kullanımlık güvenlik kodunuz aşağıdadır:
+            </p>
+            <div style="background: #FFF7ED; border: 2px dashed #EA580C; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;">
+              <span style="font-size: 34px; font-weight: 800; letter-spacing: 6px; color: #EA580C; font-family: monospace;">
+                ${code}
+              </span>
+              <p style="color: #9a3412; font-size: 12px; margin: 10px 0 0 0; font-weight: 600;">
+                Bu kod 15 dakika boyunca geçerlidir.
+              </p>
+            </div>
+            <p style="color: #6b7280; font-size: 13px; line-height: 1.4; margin: 20px 0 0 0;">
+              Bu giriş talebini siz gerçekleştirmediyseniz bu iletiyi görmezden gelebilirsiniz. Kodunuzu kimseyle paylaşmayınız.
+            </p>
+          </div>
+          <div style="background: #f9fafb; padding: 14px 28px; border-top: 1px solid #e5e7eb; text-align: center;">
+            <p style="color: #9ca3af; font-size: 11px; margin: 0;">
+              isyurtlari.com.tr © 2026. Tüm hakları saklıdır.
+            </p>
+          </div>
         </div>
       `,
     });
 
     if (result.error) {
       console.error('Email sending error:', result.error);
-      await logAudit('OTP_REQUEST', email, 'failed', 'E-posta gönderilemedi', ip);
+      await logAudit('OTP_REQUEST', email, 'failed', `E-posta gönderilemedi: ${result.error.message}`, ip);
       return NextResponse.json(
-        { error: 'Email gönderme başarısız' },
+        { error: 'Doğrulama kodu e-postası gönderilemedi. Lütfen daha sonra tekrar deneyiniz.' },
         { status: 500 }
       );
     }
@@ -104,13 +92,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Giriş kodu email adresinize gönderilmiştir',
+      message: '6 haneli giriş kodu e-posta adresinize gönderildi.',
     });
   } catch (error) {
     console.error('OTP request error:', error);
     await logAudit('OTP_REQUEST', email, 'failed', String(error), ip);
     return NextResponse.json(
-      { error: 'Giriş kodu gönderme başarısız' },
+      { error: 'Giriş kodu talebi işlenirken bir hata oluştu.' },
       { status: 500 }
     );
   }
