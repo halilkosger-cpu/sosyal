@@ -94,17 +94,30 @@ export const defaultMetadata: Metadata = {
     shortcut: '/logo.jpg',
     apple: '/logo.jpg',
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION || undefined,
+    other: {
+      ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+        ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+        : {}),
+    },
+  },
 };
 
 export const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
+  '@type': ['Organization', 'OnlineStore'],
   '@id': `${SITE_URL}/#organization`,
   name: 'İsyurtları',
   alternateName: SITE_NAME,
   url: SITE_URL,
   logo: defaultOpenGraphImage,
   description: SITE_DESCRIPTION,
+  currenciesAccepted: 'TRY',
+  paymentAccepted: 'Credit Card, Bank Transfer',
+  priceRange: '₺₺',
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer support',

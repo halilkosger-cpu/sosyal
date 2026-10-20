@@ -30,6 +30,7 @@ export function middleware(req: NextRequest) {
     if (!token) {
       const loginUrl = new URL('/admin/login', req.url);
       const res = NextResponse.redirect(loginUrl);
+      res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
       res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       return res;
     }
@@ -37,8 +38,9 @@ export function middleware(req: NextRequest) {
 
   const res = NextResponse.next();
 
-  // Admin sayfaları ve API'lerde disk önbelleğini kesin olarak devre dışı bırak
+  // Admin sayfaları, alt klasörleri ve API'lerde arama motoru/AI indeksini ve önbelleğini kesin olarak devre dışı bırak
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
     res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     res.headers.set('Pragma', 'no-cache');
     res.headers.set('Expires', '0');
