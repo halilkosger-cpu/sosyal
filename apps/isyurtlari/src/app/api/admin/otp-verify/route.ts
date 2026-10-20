@@ -11,6 +11,8 @@ export async function POST(req: NextRequest) {
   let email = 'unknown';
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   const isHttps = req.headers.get('x-forwarded-proto') === 'https' || req.url.startsWith('https://');
+  const host = req.headers.get('host') || '';
+  const cookieDomain = host.includes('isyurtlari.com.tr') ? '.isyurtlari.com.tr' : undefined;
 
   try {
     const body = await req.json();
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (4 saatlik güvenlik oturumu)
+    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (4 saat)
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
       jwtAnahtari(),
@@ -83,10 +85,11 @@ export async function POST(req: NextRequest) {
       message: 'Kimlik doğrulama başarılı',
     });
 
-    // Çerezi tarayıcıya güvenli ve kalıcı olarak set et (4 saat)
+    // Çerezi hem www hem apex domain'de (.isyurtlari.com.tr) geçerli olacak şekilde set et
     res.cookies.set('admin-token', token, {
       path: '/',
-      maxAge: 4 * 60 * 60, // 4 saat oturum süresi
+      domain: cookieDomain,
+      maxAge: 4 * 60 * 60, // 4 saat
       sameSite: 'lax',
       secure: isHttps,
     });

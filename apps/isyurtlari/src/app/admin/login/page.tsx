@@ -72,8 +72,13 @@ export default function AdminLoginPage() {
         if (data.token) {
           try {
             const isHttps = window.location.protocol === 'https:';
-            // Çerezi hem HTTP hem JS katmanında mühürle
+            const isCustomDomain = window.location.hostname.includes('isyurtlari.com.tr');
+            const domainPart = isCustomDomain ? '; domain=.isyurtlari.com.tr' : '';
+
+            // Hem host-only hem domain genelinde çerezi mühürle
+            document.cookie = `admin-token=${encodeURIComponent(data.token)}; path=/${domainPart}; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
             document.cookie = `admin-token=${encodeURIComponent(data.token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
+
             localStorage.setItem('admin_token', data.token);
             sessionStorage.setItem('admin_token', data.token);
           } catch {}

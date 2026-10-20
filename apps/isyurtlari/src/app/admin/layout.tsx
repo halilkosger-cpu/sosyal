@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
@@ -31,7 +30,6 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router   = useRouter();
   const [open, setOpen] = useState(false);
 
   // Oturum Güvenlik Bekçisi: Sayfa geçişlerinde çerezi taze tutar
@@ -41,6 +39,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const token = localStorage.getItem('admin_token');
       if (token && !document.cookie.includes('admin-token=')) {
         const isHttps = window.location.protocol === 'https:';
+        const isCustomDomain = window.location.hostname.includes('isyurtlari.com.tr');
+        const domainPart = isCustomDomain ? '; domain=.isyurtlari.com.tr' : '';
+        document.cookie = `admin-token=${encodeURIComponent(token)}; path=/${domainPart}; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
         document.cookie = `admin-token=${encodeURIComponent(token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
       }
     } catch {}
@@ -52,6 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     try {
       localStorage.removeItem('admin_token');
       sessionStorage.clear();
+      document.cookie = 'admin-token=; path=/; domain=.isyurtlari.com.tr; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
       document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
     } catch {}
     window.location.href = '/admin/logout';
@@ -61,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className={`flex flex-col h-full ${mobile ? '' : 'w-64 flex-shrink-0'}`}>
       {/* Logo */}
       <div className="p-5 border-b border-blue-900/50">
-        <Link href="/admin" className="flex items-center gap-3">
+        <a href="/admin" className="flex items-center gap-3">
           <div className="bg-white rounded-xl p-1.5">
             <Image src="/logo.jpg" alt="Logo" width={80} height={30} className="object-contain h-7 w-auto" />
           </div>
@@ -69,15 +71,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="text-white text-xs font-bold">Admin Paneli</p>
             <p className="text-blue-400 text-[10px]">isyurtlari.com.tr</p>
           </div>
-        </Link>
+        </a>
       </div>
 
-      {/* Nav */}
+      {/* Nav: Standart temiz ve tam sayfa geçişleri ile çerezin düşmesini önler */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map(({ href, label, Icon }) => {
           const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
           return (
-            <Link
+            <a
               key={href}
               href={href}
               onClick={() => setOpen(false)}
@@ -89,21 +91,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Icon size={18} strokeWidth={active ? 2.5 : 2} />
               {label}
-            </Link>
+            </a>
           );
         })}
       </nav>
 
       {/* Alt Bölüm & Güvenli Çıkış */}
       <div className="p-4 border-t border-blue-900/50 space-y-2">
-        <Link
+        <a
           href="/"
           target="_blank"
           className="flex items-center gap-3 px-4 py-2 text-blue-400 hover:text-white text-xs transition-colors rounded-lg hover:bg-white/5"
         >
           <LuPackage size={15} />
           Siteyi Görüntüle
-        </Link>
+        </a>
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-300 hover:text-white font-bold rounded-xl text-xs transition-all shadow-sm"
