@@ -9,6 +9,7 @@ import Olcumler from '@/components/Olcumler';
 import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
+const KargoTakipModal = dynamic(() => import('@/components/KargoTakipModal'), { ssr: false });
 import { IconCart } from '@/components/Icons';
 import { defaultMetadata, organizationJsonLd, paylasimGorseli, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
@@ -173,9 +174,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* Search bar */}
               <SearchSuggest />
 
-              {/* Hesap. Buradaki kullanici simgesi daha once cezaevinden.com'a
-                  gidiyordu ve sitede musteri hesabi yoktu; artik gercek giris
-                  ve hesap menusu. Sosyal platform baglantisi alt bilgide. */}
+              {/* Kargom Nerede Hızlı Sorgulama */}
+              <KargoTakipModal />
+
+              {/* Hesap */}
               <HesapMenusu />
 
               {/* Cart */}

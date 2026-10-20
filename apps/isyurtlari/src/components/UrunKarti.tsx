@@ -176,14 +176,67 @@ export default function UrunKarti({
         </div>
       )}
 
-      {!tukendi && !kompakt && (
-        <span className="absolute top-2 left-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded">
-          Stokta
-        </span>
-      )}
+      {/* Akıllı Mahsul & Zanaat Rozeti */}
+      {(() => {
+        if (tukendi) return null;
+        if (urun.quantity > 0 && urun.quantity <= 5) {
+          return (
+            <span className="absolute top-2 left-2 bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+              ⚡ Son {urun.quantity} Adet
+            </span>
+          );
+        }
+        const catSlug = urun.category?.slug || '';
+        const nameLower = urun.name.toLowerCase();
+        if (
+          catSlug === 'gida' ||
+          nameLower.includes('zeytinya') ||
+          nameLower.includes('bal') ||
+          nameLower.includes('reçel') ||
+          nameLower.includes('sirke') ||
+          nameLower.includes('salça') ||
+          nameLower.includes('pekmez') ||
+          nameLower.includes('ceviz')
+        ) {
+          return (
+            <span className="absolute top-2 left-2 bg-emerald-700/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+              🌿 Yeni Mahsul
+            </span>
+          );
+        }
+        if (
+          catSlug === 'tekstil' ||
+          catSlug === 'el-sanatlari' ||
+          catSlug === 'hediyelik' ||
+          nameLower.includes('deri') ||
+          nameLower.includes('çanta') ||
+          nameLower.includes('çini')
+        ) {
+          return (
+            <span className="absolute top-2 left-2 bg-[#141B2D]/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+              ✂️ El Emeği
+            </span>
+          );
+        }
+        if (catSlug === 'ahsap' || nameLower.includes('ahşap')) {
+          return (
+            <span className="absolute top-2 left-2 bg-[#533827]/95 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+              🪵 Masif Ahşap
+            </span>
+          );
+        }
+        if (!kompakt) {
+          return (
+            <span className="absolute top-2 left-2 bg-[#CC4E00] text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+              Stokta
+            </span>
+          );
+        }
+        return null;
+      })()}
 
       {urun.campaign && (
-        <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+        <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
           %{urun.campaign.discount} İndirim
         </span>
       )}

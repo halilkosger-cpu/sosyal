@@ -17,6 +17,7 @@ import { urunGoruntulendi } from '@/lib/analiz';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
+import BirlikteAl from '@/components/BirlikteAl';
 
 /**
  * Urun sayfasi - 2026 Eylul tasarimi.
@@ -450,6 +451,16 @@ export default function ProductDetailPage({
           </div>
         </div>
       </div>
+
+      {/* ─── BİRLİKTE SIK TERCİH EDİLENLER (CROSS-SELL) ─── */}
+      {(() => {
+        const tamamlayicilar = benzerUrunler.filter((u) => u.id !== product.id && u.price > 0 && u.quantity > 0).slice(0, 2);
+        return tamamlayicilar.length > 0 && hasPrice && inStock ? (
+          <div className="max-w-screen-xl mx-auto px-4">
+            <BirlikteAl anaUrun={product} tamamlayicilar={tamamlayicilar} />
+          </div>
+        ) : null;
+      })()}
 
       {/* ─── SEKMELER ─── */}
       <section id="urun-sekmeler" className="max-w-screen-xl mx-auto px-4 pb-10 scroll-mt-40">
