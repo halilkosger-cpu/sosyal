@@ -93,6 +93,9 @@ const YEREL = new Set([
   'yesil-zeytin',
   'zeytinyagi',
   'zeytinyagi-500ml',
+  'bez-canta-setleri',
+  'taki-cantasi',
+  'takı-cantasi',
 ]);
 
 /**

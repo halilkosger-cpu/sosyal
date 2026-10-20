@@ -143,14 +143,24 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
-### ⚪ Aşama 11: Gelecek Geliştirmeler & Kalan Eksikler
+### 🟢 Aşama 11: Eksik 2 Ürünün Fotoğrafları & Vitrinde Yayına Alınması
+- [x] **'Bez Çanta Setleri' ve 'Takı Çantası' Fotoğrafları Üretildi ve Yayına Alındı:**
+  - Katalogun krem zemin ve el emeği dokusuyla birebir uyumlu profesyonel stüdyo ürün fotoğrafları oluşturuldu.
+  - FFmpeg ile mobil ve masaüstü için optimize edilmiş WebP boyutları üretildi:
+    - `bez-canta-setleri-400.webp` (5 KB), `bez-canta-setleri-800.webp` (17 KB), `bez-canta-setleri-1024.webp` (42 KB).
+    - `taki-cantasi-400.webp` (12 KB), `taki-cantasi-800.webp` (44 KB), `taki-cantasi-1024.webp` (77 KB).
+  - `src/lib/urun-gorsel.ts` içindeki `YEREL` kümesine eklenerek ürünler gizlilikten çıkarıldı; vitrinde, Tekstil kategorisinde ve sitemap'te yayına girdi.
+  - `urun-aciklamalari.json` dosyasına zengin Türkçe ürün açıklamaları ve kullanım tavsiyeleri eklendi.
+
+---
+
+### ⚪ Aşama 12: Gelecek Geliştirmeler & Kalan Eksikler
 - [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı veya girdi maliyeti eksik ürünlerin `/admin/fiyatlar` ekranından veya CSV indirilerek doldurulması.
-- [ ] **Görselleri Eksik 2 Ürün:** *Bez Çanta Setleri* ve *Takı Çantası* fotoğraflarının eklenerek vitrinde yayına alınması.
 
 ---
 
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli ve Logo İşNet GİB e-Arşiv Entegrasyonu sıfır hatayla tamamlandı ve canlıya alındı.
+* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu ve Tüm Katalog Görselleri (63/63 ürün eksiksiz) sıfır hatayla tamamlandı ve canlıya alındı.
 * **Canlı Erişim:**
   * Muhasebe & e-Arşiv Kokpiti: `https://isyurtlari.com.tr/admin/muhasebe`
   * Fiyat & Maliyet Paneli: `https://isyurtlari.com.tr/admin/fiyatlar`
