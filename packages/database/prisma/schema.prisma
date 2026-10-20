@@ -1269,6 +1269,16 @@ model Fatura {
   genelToplam  Float       @default(0) // KDV Dahil Genel Toplam
   aciklama     String?
   durum        String      @default("ONAYLANDI") // TASLAK, ONAYLANDI, IPTAL
+
+  // Logo İşNet / e-Devlet & GİB Entegrasyon Alanları
+  ettn          String?     @unique // RFC 4122 v4 UUID (Evrensel Tekil Tanımlama Numarası)
+  gibFaturaNo   String?     @unique // GİB 16 Haneli Seri No (Örn: ISY2026000000001)
+  eFaturaTuru   String      @default("EARSIV") // EARSIV | EFATURA
+  eFaturaDurum  String      @default("TASLAK") // TASLAK | KUYRUKTA | IMZALANDI | GIB_GONDERILDI | BASARILI | HATALI
+  pdfUrl        String?
+  hataMesaji    String?
+  gonderimTarihi DateTime?
+
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -1277,6 +1287,7 @@ model Fatura {
 
   @@index([cariId])
   @@index([tarih])
+  @@index([eFaturaDurum])
 }
 
 model FaturaSatir {

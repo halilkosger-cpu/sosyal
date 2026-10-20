@@ -1,0 +1,14 @@
+-- LOGO ISNET & E-FATURA / E-ARSIV ALANLARI
+-- Her deploy'da calisir, idempotent yapidadir.
+
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "ettn" TEXT;
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "gibFaturaNo" TEXT;
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "eFaturaTuru" TEXT NOT NULL DEFAULT 'EARSIV';
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "eFaturaDurum" TEXT NOT NULL DEFAULT 'TASLAK';
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "pdfUrl" TEXT;
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "hataMesaji" TEXT;
+ALTER TABLE "Fatura" ADD COLUMN IF NOT EXISTS "gonderimTarihi" TIMESTAMP(3);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "Fatura_ettn_key" ON "Fatura"("ettn");
+CREATE UNIQUE INDEX IF NOT EXISTS "Fatura_gibFaturaNo_key" ON "Fatura"("gibFaturaNo");
+CREATE INDEX IF NOT EXISTS "Fatura_eFaturaDurum_idx" ON "Fatura"("eFaturaDurum");

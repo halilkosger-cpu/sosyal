@@ -6,7 +6,7 @@ import {
   LuTrendingUp, LuTrendingDown, LuDollarSign, LuPackage,
   LuShoppingBag, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
   LuReceipt, LuPackagePlus, LuDownload, LuHistory, LuTrash2, LuCheck,
-  LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye,
+  LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye, LuSend,
 } from 'react-icons/lu';
 
 type Tab = 'ozet' | 'cariler' | 'faturalar' | 'banka' | 'giderler' | 'stok-girisi' | 'kritik-stok';
@@ -49,6 +49,7 @@ export default function LogoGo3MuhasebeMerkezi() {
   // 3. Faturalar State
   const [faturalar, setFaturalar] = useState<any[]>([]);
   const [faturaLoading, setFaturaLoading] = useState(false);
+  const [gonderiliyorId, setGonderiliyorId] = useState<string | null>(null);
 
   // 4. Banka & Kasa State
   const [bankaHesaplari, setBankaHesaplari] = useState<any[]>([]);
@@ -96,6 +97,25 @@ export default function LogoGo3MuhasebeMerkezi() {
   const faturalariYukle = () => {
     setFaturaLoading(true);
     fetch('/api/admin/muhasebe/faturalar').then((r) => r.json()).then((d) => { setFaturalar(Array.isArray(d) ? d : []); setFaturaLoading(false); });
+  };
+
+  const gibeGonder = async (id: string) => {
+    if (!confirm('Bu fatura Logo İşNet üzerinden GİB e-Arşiv sistemine resmi olarak iletilecektir. Onaylıyor musunuz?')) return;
+    setGonderiliyorId(id);
+    try {
+      const res = await fetch(`/api/admin/muhasebe/faturalar/${id}/gib-gonder`, { method: 'POST' });
+      const d = await res.json();
+      if (res.ok) {
+        alert(`✅ Fatura GİB sistemine başarıyla iletildi!\n\nGİB Fatura No: ${d.gibFaturaNo}\nETTN: ${d.ettn}`);
+        faturalariYukle();
+      } else {
+        alert(`⚠️ Hata: ${d.error}`);
+      }
+    } catch {
+      alert('⚠️ Bağlantı hatası, fatura iletilemedi.');
+    } finally {
+      setGonderiliyorId(null);
+    }
   };
 
   const bankaYukle = () => {
@@ -536,6 +556,8 @@ export default function LogoGo3MuhasebeMerkezi() {
                     <th className="py-3 px-3 text-right">KDV Matrahı</th>
                     <th className="py-3 px-3 text-right">KDV Tutarı</th>
                     <th className="py-3 px-3 text-right">Genel Toplam (₺)</th>
+                    <th className="py-3 px-3 text-center">e-Arşiv (GİB)</th>
+                    <th className="py-3 px-3 text-center">İşlem</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -552,6 +574,47 @@ export default function LogoGo3MuhasebeMerkezi() {
                       <td className="py-3 px-3 text-right text-xs font-medium text-gray-600">{paraFormat(f.matrah)}</td>
                       <td className="py-3 px-3 text-right text-xs font-medium text-purple-600">{paraFormat(f.kdvTutari)}</td>
                       <td className="py-3 px-3 text-right font-bold text-gray-900">{paraFormat(f.genelToplam)}</td>
+                      <td className="py-3 px-3 text-center text-xs">
+                        {f.gibFaturaNo ? (
+                          <div>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                              <LuCheck size={11} /> {f.gibFaturaNo}
+                            </span>
+                            <p className="text-[10px] text-gray-400 font-mono mt-0.5 truncate max-w-[120px] mx-auto" title={f.ettn}>
+                              {f.ettn}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                            Taslak
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          {f.gibFaturaNo ? (
+                            <a
+                              href={`/api/admin/muhasebe/faturalar/${f.id}/pdf`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors"
+                              title="Resmi e-Arşiv Faturasını Görüntüle ve Yazdır"
+                            >
+                              <LuEye size={13} /> Resmi Gör
+                            </a>
+                          ) : (
+                            <button
+                              onClick={() => gibeGonder(f.id)}
+                              disabled={gonderiliyorId === f.id}
+                              className="inline-flex items-center gap-1 text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 px-2.5 py-1 rounded-lg transition-colors shadow-sm"
+                              title="Logo İşNet üzerinden GİB e-Arşiv faturası olarak ilet"
+                            >
+                              <LuSend size={12} />
+                              {gonderiliyorId === f.id ? 'İletiliyor…' : "GİB'e Gönder"}
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
