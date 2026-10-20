@@ -96,7 +96,7 @@ export const defaultMetadata: Metadata = {
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
-    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || 'b2e70824a524a6c1',
     yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION || undefined,
     other: {
       ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
