@@ -202,8 +202,17 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
+### 🟢 Aşama 17: Birlikte Sık Tercih Edilenler, Akıllı Rozetler & Kargom Nerede Modalı
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - **Birlikte Sık Tercih Edilenler (Cross-Sell / BirlikteAl):** Ürün detay sayfasında tamamlayıcı ürünlerle birlikte tek tıkla toplu sepete ekleme motoru kuruldu.
+  - **Akıllı Ürün Rozetleri:** Ürün kartlarında kategori ve ada duyarlı `🌿 Yeni Mahsul`, `✂️ El Emeği`, `🪵 Masif Ahşap` ve `⚡ Son X Adet` aciliyet ve zanaat etiketleri canlıya alındı.
+  - **Kargom Nerede? Hızlı Takip Modalı:** Header alanına yerleştirilen buton ile müşterilerin üye girişi yapmaksızın Sipariş No ve E-posta ile kargo firması, takip kodu ve durumunu tek tıkla sorgulayabilmesi sağlandı.
+
+---
+
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu, Tüm Katalog Görselleri (63/63), 320 Cezaevi Tedarikçileri, Ön Talep Rezervasyonu, Koli Sevk Etiketi, 2FA OTP Güvenlik Mimarisi, Kırılmazlık Ambalaj Güvencesi, Sepet Hedef İlerleme Çubuğu ve VIP Açılış Bülteni sıfır hatayla tamamlandı ve canlıya alındı.
+* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu, Tüm Katalog Görselleri (63/63), 320 Cezaevi Tedarikçileri, Ön Talep Rezervasyonu, Koli Sevk Etiketi, 2FA OTP Güvenlik Mimarisi, Kırılmazlık Güvencesi, Sepet Hedef İlerleme Çubuğu, VIP Bülten, Birlikte Al Kombin Motoru, Akıllı Ürün Rozetleri ve Kargom Nerede Sorgulama Modalı sıfır hatayla tamamlandı ve canlıya alındı.
 * **Canlı Erişim:**
   * Mağaza Ana Sayfa: `https://isyurtlari.com.tr`
   * Muhasebe & e-Arşiv Kokpiti: `https://isyurtlari.com.tr/admin/muhasebe`
