@@ -69,10 +69,13 @@ export default function AdminLoginPage() {
       if (res.ok) {
         setMessage('Doğrulama başarılı! Yönetici paneline aktarılıyorsunuz...');
 
-        // Çerezin tarayıcıda kalıcı olmasını hem JS hem HTTP ile garantiye al
         if (data.token) {
           try {
-            document.cookie = `admin-token=${encodeURIComponent(data.token)}; path=/; max-age=604800; SameSite=Lax;`;
+            const isHttps = window.location.protocol === 'https:';
+            // Çerezi hem HTTP hem JS katmanında mühürle
+            document.cookie = `admin-token=${encodeURIComponent(data.token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
+            localStorage.setItem('admin_token', data.token);
+            sessionStorage.setItem('admin_token', data.token);
           } catch {}
         }
 

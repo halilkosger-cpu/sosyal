@@ -8,7 +8,9 @@ import {
   LuLogOut, LuMenu, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
   LuRotateCcw, LuTicket, LuFileText, LuShieldCheck,
 } from 'react-icons/lu';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+export const dynamic = 'force-dynamic';
 
 const navItems = [
   { href: '/admin',            label: 'Dashboard',   Icon: LuLayoutDashboard },
@@ -31,11 +33,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router   = useRouter();
   const [open, setOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
+
+  // Oturum Güvenlik Bekçisi: Sayfa geçişlerinde çerezi taze tutar
+  useEffect(() => {
+    if (pathname === '/admin/login' || pathname === '/admin/logout') return;
+    try {
+      const token = localStorage.getItem('admin_token');
+      if (token && !document.cookie.includes('admin-token=')) {
+        const isHttps = window.location.protocol === 'https:';
+        document.cookie = `admin-token=${encodeURIComponent(token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
+      }
+    } catch {}
+  }, [pathname]);
 
   if (pathname === '/admin/login' || pathname === '/admin/logout') return <>{children}</>;
 
   const handleLogout = () => {
+    try {
+      localStorage.removeItem('admin_token');
+      sessionStorage.clear();
+      document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
+    } catch {}
     window.location.href = '/admin/logout';
   };
 
@@ -88,11 +106,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Link>
         <button
           onClick={handleLogout}
-          disabled={loggingOut}
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-300 hover:text-white font-bold rounded-xl text-xs transition-all shadow-sm"
         >
           <LuLogOut size={16} />
-          {loggingOut ? 'Çıkış Yapılıyor...' : 'Güvenli Çıkış Yap'}
+          Güvenli Çıkış Yap
         </button>
       </div>
     </div>
@@ -130,7 +147,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-2">
               <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                2FA Korumalı Oturum Aktif
+                2FA Güvenli Oturum Aktif
               </span>
             </div>
           </div>
@@ -142,12 +159,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </span>
             <button
               onClick={handleLogout}
-              disabled={loggingOut}
               className="flex items-center gap-2 px-3.5 py-2 bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 text-red-700 hover:text-white font-bold rounded-xl text-xs transition-all shadow-xs"
               title="Oturumu güvenle kapat ve çerezleri temizle"
             >
               <LuLogOut size={15} />
-              {loggingOut ? 'Çıkılıyor...' : 'Güvenli Çıkış'}
+              Güvenli Çıkış
             </button>
           </div>
         </header>

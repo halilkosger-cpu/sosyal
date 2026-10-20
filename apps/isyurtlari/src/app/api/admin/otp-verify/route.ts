@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   let email = 'unknown';
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  const isHttps = req.headers.get('x-forwarded-proto') === 'https' || req.url.startsWith('https://');
 
   try {
     const body = await req.json();
@@ -68,11 +69,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (7 gün)
+    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (4 saatlik güvenlik oturumu)
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
       jwtAnahtari(),
-      { expiresIn: '7d' }
+      { expiresIn: '4h' }
     );
 
     const res = NextResponse.json({
@@ -82,13 +83,17 @@ export async function POST(req: NextRequest) {
       message: 'Kimlik doğrulama başarılı',
     });
 
-    // Çerezi hem istemci hem sunucu navigasyonunda kesintisiz çalışacak şekilde set et
+    // Çerezi tarayıcıya güvenli ve kalıcı olarak set et (4 saat)
     res.cookies.set('admin-token', token, {
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 gün boyunca geçerli
+      maxAge: 4 * 60 * 60, // 4 saat oturum süresi
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      secure: isHttps,
     });
+
+    // Önbellek engelleme başlıkları
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.headers.set('Pragma', 'no-cache');
 
     await logAudit('OTP_VERIFY', email, 'success', 'Yönetici 2FA OTP ile başarıyla oturum açtı', ip);
 

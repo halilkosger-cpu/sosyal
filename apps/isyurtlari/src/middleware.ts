@@ -16,10 +16,8 @@ export function middleware(req: NextRequest) {
 
   // Admin Koruması (/admin/login ve /admin/logout hariç)
   if (pathname.startsWith('/admin') && pathname !== '/admin/login' && pathname !== '/admin/logout') {
-    // 1. req.cookies üzerinden oku
     const cookieToken = req.cookies.get('admin-token')?.value;
 
-    // 2. Cookie başlığından oku (fallback)
     const headerCookies = req.headers.get('cookie') || '';
     const rawCookieToken = headerCookies
       .split(';')
@@ -30,11 +28,22 @@ export function middleware(req: NextRequest) {
     const token = cookieToken || rawCookieToken;
 
     if (!token) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+      const loginUrl = new URL('/admin/login', req.url);
+      const res = NextResponse.redirect(loginUrl);
+      res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+      return res;
     }
   }
 
   const res = NextResponse.next();
+
+  // Admin sayfaları ve API'lerde disk önbelleğini kesin olarak devre dışı bırak
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.headers.set('Pragma', 'no-cache');
+    res.headers.set('Expires', '0');
+    res.headers.set('Surrogate-Control', 'no-store');
+  }
 
   if (kanonikOlmayanHost(req.headers.get('host'))) {
     res.headers.set('X-Robots-Tag', 'noindex, nofollow');
