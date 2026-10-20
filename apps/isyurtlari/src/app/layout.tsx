@@ -18,6 +18,7 @@ import KategoriIkon from '@/components/KategoriIkon';
 import HesapMenusu from '@/components/HesapMenusu';
 const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
+const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -298,6 +299,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </footer>
 
         <CookieConsent />
+        <KampanyaModal />
         <Olcumler />
         {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
         <SenkronKopru />

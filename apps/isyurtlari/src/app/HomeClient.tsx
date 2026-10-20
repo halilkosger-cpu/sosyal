@@ -9,6 +9,7 @@ import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture } from '@/c
 import { content } from '@/config/content';
 import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
+import KampanyaHeroBanner from '@/components/KampanyaHeroBanner';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -274,6 +275,9 @@ export default function HomeClient({
         )}
       </section>
 
+      {/* ─── BÜYÜK AÇILIŞ & EFSANE KASIM VİTRİN BANNERI ─── */}
+      <KampanyaHeroBanner />
+
       {/* ─── GÜNÜN FIRSATI & CANLI GERİ SAYIM SAYACI ─── */}
       {products.length > 0 && <GununFirsati products={products} />}
 
@@ -301,7 +305,7 @@ export default function HomeClient({
       {/* ─── EL EMEĞİ ÜRÜNLER ───
           Kare kadraj ve genis satir araligi: kartlar birbirine
           yapismiyor, fotograflar ayni oranda duruyor. */}
-      <section className="max-w-screen-xl mx-auto px-4 pt-12">
+      <section id="urunler" className="max-w-screen-xl mx-auto px-4 pt-12 scroll-mt-24">
         <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
           <h2 className="font-serif text-2xl md:text-[1.9rem] font-semibold text-gray-900 tracking-tight">El emeği ürünler</h2>
           <Link href={tumUrunler} className="inline-flex items-center gap-1.5 text-[#BA4700] hover:text-[#8F3700] text-sm font-semibold">
