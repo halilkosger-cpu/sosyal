@@ -33,18 +33,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  if (pathname === '/admin/login') return <>{children}</>;
+  if (pathname === '/admin/login' || pathname === '/admin/logout') return <>{children}</>;
 
-  const handleLogout = async () => {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    try {
-      await fetch('/api/admin/login', { method: 'DELETE' });
-    } catch {}
-
-    // İstemci tarafında da çerezi temizle
-    document.cookie = 'admin-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    window.location.replace('/admin/login');
+  const handleLogout = () => {
+    window.location.href = '/admin/logout';
   };
 
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (

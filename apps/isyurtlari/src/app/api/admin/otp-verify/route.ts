@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { verifyOTP, getRemainingAttempts, kodlariTemizle, normalizeEmail, normalizeCode } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
@@ -11,7 +10,6 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   let email = 'unknown';
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
-  const isHttps = req.headers.get('x-forwarded-proto') === 'https' || req.url.startsWith('https://');
 
   try {
     const body = await req.json();
@@ -59,7 +57,7 @@ export async function POST(req: NextRequest) {
 
       if (remaining <= 0) {
         return NextResponse.json(
-          { error: 'Maksimum deneme sayısı (5) aşıldı. Güvenlik gereği kod iptal edildi. Lütfen yeni bir kod talep ediniz.' },
+          { error: 'Maksimum deneme sayısı (5) aşıldı. Lütfen yeni bir kod talep ediniz.' },
           { status: 429 }
         );
       }
@@ -70,29 +68,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (24 saat)
+    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (7 gün)
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
       jwtAnahtari(),
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     );
 
-    const cookieOpts = {
-      httpOnly: true,
-      secure: isHttps,
-      sameSite: 'lax' as const,
-      path: '/',
-      maxAge: 86400, // 24 saat
-    };
-
-    // 1) Next.js cookies() API ile set et
-    try {
-      cookies().set('admin-token', token, cookieOpts);
-    } catch {
-      // route handler fallback
-    }
-
-    // 2) NextResponse cookies ile de set et (çift garantili)
     const res = NextResponse.json({
       success: true,
       token,
@@ -100,7 +82,13 @@ export async function POST(req: NextRequest) {
       message: 'Kimlik doğrulama başarılı',
     });
 
-    res.cookies.set('admin-token', token, cookieOpts);
+    // Çerezi hem istemci hem sunucu navigasyonunda kesintisiz çalışacak şekilde set et
+    res.cookies.set('admin-token', token, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 gün boyunca geçerli
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
 
     await logAudit('OTP_VERIFY', email, 'success', 'Yönetici 2FA OTP ile başarıyla oturum açtı', ip);
 

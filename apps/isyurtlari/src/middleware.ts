@@ -12,12 +12,11 @@ function kanonikOlmayanHost(host: string | null): boolean {
 }
 
 export function middleware(req: NextRequest) {
-  const { pathname, searchParams } = req.nextUrl;
-  const isHttps = req.headers.get('x-forwarded-proto') === 'https' || req.url.startsWith('https://');
+  const { pathname } = req.nextUrl;
 
-  // Admin Koruması
-  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    // 1. Çerezden oku
+  // Admin Koruması (/admin/login ve /admin/logout hariç)
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login' && pathname !== '/admin/logout') {
+    // 1. req.cookies üzerinden oku
     const cookieToken = req.cookies.get('admin-token')?.value;
 
     // 2. Cookie başlığından oku (fallback)
@@ -28,27 +27,10 @@ export function middleware(req: NextRequest) {
       .find((c) => c.startsWith('admin-token='))
       ?.split('=')[1];
 
-    // 3. URL Session Parametresi (SSO / 2FA redirection fallback)
-    const urlSessionToken = searchParams.get('session');
-
-    const token = cookieToken || rawCookieToken || urlSessionToken;
+    const token = cookieToken || rawCookieToken;
 
     if (!token) {
       return NextResponse.redirect(new URL('/admin/login', req.url));
-    }
-
-    // Eğer URL'den session token ile gelindiyse, çerezi set edip URL'i temizle
-    if (urlSessionToken) {
-      const cleanUrl = new URL(pathname, req.url);
-      const res = NextResponse.redirect(cleanUrl);
-      res.cookies.set('admin-token', urlSessionToken, {
-        httpOnly: true,
-        secure: isHttps,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 86400,
-      });
-      return res;
     }
   }
 

@@ -68,10 +68,16 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         setMessage('Doğrulama başarılı! Yönetici paneline aktarılıyorsunuz...');
-        // Tarayıcı çerez politikalarına takılmayan kusursuz SSO oturum aktarımı
-        const targetUrl = data.token ? `/admin?session=${encodeURIComponent(data.token)}` : '/admin';
+
+        // Çerezin tarayıcıda kalıcı olmasını hem JS hem HTTP ile garantiye al
+        if (data.token) {
+          try {
+            document.cookie = `admin-token=${encodeURIComponent(data.token)}; path=/; max-age=604800; SameSite=Lax;`;
+          } catch {}
+        }
+
         setTimeout(() => {
-          window.location.replace(targetUrl);
+          window.location.href = '/admin';
         }, 150);
       } else {
         setError(data.error || 'Geçersiz veya süresi dolmuş kod.');
