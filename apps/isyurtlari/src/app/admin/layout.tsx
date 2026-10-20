@@ -18,8 +18,6 @@ const navItems = [
   { href: '/admin/aciklamalar', label: 'Açıklamalar', Icon: LuFileText       },
   { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
   { href: '/admin/muhasebe',   label: 'Ön Muhasebe & Kâr', Icon: LuLayoutDashboard },
-  { href: '/admin/muhasebe/giderler', label: 'Giderler', Icon: LuRotateCcw },
-  { href: '/admin/muhasebe/stok-girisi', label: 'Stok Girişi (Mal Alış)', Icon: LuPackage },
   { href: '/admin/siparisler', label: 'Siparişler',  Icon: LuShoppingBag    },
   { href: '/admin/on-talepler', label: 'Ön Talepler', Icon: LuBell          },
   { href: '/admin/iadeler',    label: 'İadeler',      Icon: LuRotateCcw      },
