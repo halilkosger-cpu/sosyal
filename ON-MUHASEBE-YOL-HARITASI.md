@@ -116,14 +116,28 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
-### ⚪ Aşama 9: Gelecek Geliştirmeler & Kalan Eksikler
-- [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı 0 olan 31 ürünün satış fiyatı ve girdi maliyetlerinin `/admin/fiyatlar` ekranından tamamlanması.
+### 🟢 Aşama 9: Fiyat, Girdi Maliyeti ve KDV Yönetimi Ekranı (`/admin/fiyatlar`)
+- [x] **Çoklu Sütunlu Finansal Fiyat Paneli:**
+  - Satış Fiyatı (TL), Alış Maliyeti (Girdi Fiyatı TL), Tahmini Brüt Kâr Marjı (%) ve KDV Oranı (%1 / %20) tek ekrana entegre edildi.
+  - Anlık Brüt Kâr Marjı rozetleri (renk kodlu: Yeşil, Mavi, Sarı, Kırmızı) ile kârlılık görselleştirildi.
+  - "Sadece Fiyatsızlar" ve "Sadece Maliyetsizler" filtre butonları eklendi.
+  - Değişiklikler yapıldıkça ekranın sağ altında yapışkan (sticky) **"Değişiklikleri Kaydet"** çubuğu ile tek tıkla toplu güncelleme bağlandı.
+- [x] **Excel / CSV Toplu İçe & Dışa Aktarım:**
+  - `slug`, `urun_adi`, `kategori`, `stok`, `satis_fiyati`, `alis_maliyeti`, `kdv_orani` sütunları içeren CSV indirme ve yükleme desteği.
+  - CSV yüklendiğinde eski vs yeni değerleri gösteren önizleme tablosu ve hata yakalama motoru.
+
+---
+
+### ⚪ Aşama 10: Gelecek Geliştirmeler & Kalan Eksikler
+- [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı veya girdi maliyeti eksik ürünlerin `/admin/fiyatlar` ekranından veya CSV indirilerek doldurulması.
 - [ ] **Görselleri Eksik 2 Ürün:** *Bez Çanta Setleri* ve *Takı Çantası* fotoğraflarının eklenerek vitrinde yayına alınması.
 - [ ] **E-Fatura / E-Arşiv Entegrasyonu (İsteğe Bağlı):** Gelir İdaresi Başkanlığı (GİB) e-arşiv portalı veya özel entegratör (Logo, Paraşüt vb.) API bağlantısı.
 
 ---
 
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 ERP standardında Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi başarıyla tamamlandı ve derlendi.
-* **Canlı Erişim:** `https://isyurtlari.com.tr/admin/muhasebe`
+* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi ve Fiyat/Maliyet/KDV Yönetim Paneli başarıyla tamamlandı ve derlendi.
+* **Canlı Erişim:**
+  * Muhasebe Kokpiti: `https://isyurtlari.com.tr/admin/muhasebe`
+  * Fiyat & Maliyet Paneli: `https://isyurtlari.com.tr/admin/fiyatlar`
 * **Son Güncelleme:** 20 Ekim 2026

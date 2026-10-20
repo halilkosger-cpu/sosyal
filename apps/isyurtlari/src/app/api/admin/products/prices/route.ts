@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const NO_CACHE = { 'Cache-Control': 'no-store, max-age=0' };
 const MAKUL_UST_SINIR = 1_000_000; // 1 milyon TL uzeri neredeyse kesin yazim hatasi
 
-/** Toplu fiyat girisi icin urun listesini CSV olarak indirir. */
+/** Toplu fiyat, maliyet ve KDV girisi icin urun listesini CSV olarak indirir. */
 export async function GET(req: NextRequest) {
   const red = adminGuard(req);
   if (red) return red;
@@ -20,13 +20,15 @@ export async function GET(req: NextRequest) {
   });
 
   const satirlar: (string | number)[][] = [
-    ['slug', 'urun_adi', 'kategori', 'stok', 'fiyat'],
+    ['slug', 'urun_adi', 'kategori', 'stok', 'satis_fiyati', 'alis_maliyeti', 'kdv_orani'],
     ...urunler.map((u) => [
       u.slug,
       u.name,
       u.category?.name ?? '',
       u.quantity,
       u.price > 0 ? String(u.price).replace('.', ',') : '',
+      (u.purchasePrice ?? 0) > 0 ? String(u.purchasePrice).replace('.', ',') : '',
+      u.vatRate ?? 20,
     ]),
   ];
 
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
     headers: {
       ...NO_CACHE,
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="isyurtlari-fiyatlar.csv"',
+      'Content-Disposition': 'attachment; filename="isyurtlari-fiyat-ve-maliyetler.csv"',
     },
   });
 }
@@ -59,46 +61,107 @@ export async function POST(req: NextRequest) {
 
   const baslik = satirlar[0].map((h) => h.trim().toLowerCase());
   const slugSutun = baslik.findIndex((h) => h === 'slug');
-  const fiyatSutun = baslik.findIndex((h) => h === 'fiyat' || h === 'price');
+  const fiyatSutun = baslik.findIndex(
+    (h) => h === 'fiyat' || h === 'price' || h === 'satis_fiyati' || h === 'satis'
+  );
+  const maliyetSutun = baslik.findIndex(
+    (h) => h === 'alis_maliyeti' || h === 'maliyet' || h === 'purchase_price' || h === 'girdi_fiyati'
+  );
+  const kdvSutun = baslik.findIndex(
+    (h) => h === 'kdv_orani' || h === 'kdv' || h === 'vat_rate' || h === 'vat'
+  );
 
-  if (slugSutun === -1 || fiyatSutun === -1) {
+  if (slugSutun === -1 || (fiyatSutun === -1 && maliyetSutun === -1)) {
     return NextResponse.json(
-      { error: "Başlık satırında 'slug' ve 'fiyat' sütunları bulunamadı" },
+      { error: "Başlık satırında en az 'slug' ve 'satis_fiyati' (veya 'alis_maliyeti') bulunmalıdır." },
       { status: 400 }
     );
   }
 
-  const mevcut = await prisma.product.findMany({ select: { slug: true, name: true, price: true } });
+  const mevcut = await prisma.product.findMany({
+    select: { slug: true, name: true, price: true, purchasePrice: true, vatRate: true },
+  });
   const slugMap = new Map(mevcut.map((u) => [u.slug, u]));
 
-  const degisecek: { slug: string; ad: string; eskiFiyat: number; yeniFiyat: number }[] = [];
+  const degisecek: {
+    slug: string;
+    ad: string;
+    eskiFiyat: number;
+    yeniFiyat?: number;
+    eskiMaliyet: number;
+    yeniMaliyet?: number;
+    eskiKdv: number;
+    yeniKdv?: number;
+  }[] = [];
   const sorunlar: { satir: number; slug: string; sebep: string }[] = [];
   const atlanan: string[] = [];
 
   for (let i = 1; i < satirlar.length; i++) {
     const r = satirlar[i];
     const slug = (r[slugSutun] ?? '').trim();
-    const hamFiyat = (r[fiyatSutun] ?? '').trim();
+    const hamFiyat = fiyatSutun !== -1 ? (r[fiyatSutun] ?? '').trim() : '';
+    const hamMaliyet = maliyetSutun !== -1 ? (r[maliyetSutun] ?? '').trim() : '';
+    const hamKdv = kdvSutun !== -1 ? (r[kdvSutun] ?? '').trim() : '';
 
-    if (!slug) { sorunlar.push({ satir: i + 1, slug: '', sebep: 'slug boş' }); continue; }
+    if (!slug) {
+      sorunlar.push({ satir: i + 1, slug: '', sebep: 'slug boş' });
+      continue;
+    }
 
     const urun = slugMap.get(slug);
-    if (!urun) { sorunlar.push({ satir: i + 1, slug, sebep: 'bu slug ile ürün bulunamadı' }); continue; }
-
-    if (hamFiyat === '') { atlanan.push(slug); continue; }
-
-    const fiyat = fiyatiCoz(hamFiyat);
-    if (fiyat === null) {
-      sorunlar.push({ satir: i + 1, slug, sebep: `"${hamFiyat}" sayıya çevrilemedi` });
+    if (!urun) {
+      sorunlar.push({ satir: i + 1, slug, sebep: 'bu slug ile ürün bulunamadı' });
       continue;
     }
-    if (fiyat > MAKUL_UST_SINIR) {
-      sorunlar.push({ satir: i + 1, slug, sebep: `${fiyat} TL fazla yüksek, yazım hatası olabilir` });
-      continue;
-    }
-    if (fiyat === urun.price) { atlanan.push(slug); continue; }
 
-    degisecek.push({ slug, ad: urun.name, eskiFiyat: urun.price, yeniFiyat: fiyat });
+    let yeniFiyat: number | undefined = undefined;
+    if (hamFiyat !== '') {
+      const p = fiyatiCoz(hamFiyat);
+      if (p === null) {
+        sorunlar.push({ satir: i + 1, slug, sebep: `Fiyat "${hamFiyat}" sayıya çevrilemedi` });
+      } else if (p > MAKUL_UST_SINIR) {
+        sorunlar.push({ satir: i + 1, slug, sebep: `${p} TL fazla yüksek, yazım hatası olabilir` });
+      } else if (p !== urun.price) {
+        yeniFiyat = p;
+      }
+    }
+
+    let yeniMaliyet: number | undefined = undefined;
+    if (hamMaliyet !== '') {
+      const c = fiyatiCoz(hamMaliyet);
+      if (c === null) {
+        sorunlar.push({ satir: i + 1, slug, sebep: `Maliyet "${hamMaliyet}" sayıya çevrilemedi` });
+      } else if (c > MAKUL_UST_SINIR) {
+        sorunlar.push({ satir: i + 1, slug, sebep: `${c} TL maliyet fazla yüksek` });
+      } else if (c !== (urun.purchasePrice ?? 0)) {
+        yeniMaliyet = c;
+      }
+    }
+
+    let yeniKdv: number | undefined = undefined;
+    if (hamKdv !== '') {
+      const k = parseInt(hamKdv, 10);
+      if (k === 1 || k === 20 || k === 10 || k === 8) {
+        if (k !== (urun.vatRate ?? 20)) {
+          yeniKdv = k;
+        }
+      }
+    }
+
+    if (yeniFiyat !== undefined || yeniMaliyet !== undefined || yeniKdv !== undefined) {
+      degisecek.push({
+        slug,
+        ad: urun.name,
+        eskiFiyat: urun.price,
+        yeniFiyat,
+        eskiMaliyet: urun.purchasePrice ?? 0,
+        yeniMaliyet,
+        eskiKdv: urun.vatRate ?? 20,
+        yeniKdv,
+      });
+    } else {
+      atlanan.push(slug);
+    }
   }
 
   return NextResponse.json(
@@ -107,41 +170,74 @@ export async function POST(req: NextRequest) {
   );
 }
 
-/** Onaylanan fiyatlari uygular. */
+/** Onaylanan fiyat ve maliyetleri uygular. */
 export async function PUT(req: NextRequest) {
   const red = adminGuard(req);
   if (red) return red;
 
   const { updates } = await req.json();
   if (!Array.isArray(updates) || updates.length === 0) {
-    return NextResponse.json({ error: 'Güncellenecek fiyat yok' }, { status: 400 });
+    return NextResponse.json({ error: 'Güncellenecek veri yok' }, { status: 400 });
   }
 
-  const gecerli: { slug: string; price: number }[] = [];
+  const gecerli: {
+    slug: string;
+    price?: number;
+    purchasePrice?: number;
+    vatRate?: number;
+  }[] = [];
+
   for (const u of updates) {
     const slug = String(u?.slug ?? '').trim();
-    const price = Number(u?.price);
     if (!slug) continue;
-    if (!Number.isFinite(price) || price < 0 || price > MAKUL_UST_SINIR) continue;
-    gecerli.push({ slug, price: Math.round(price * 100) / 100 });
+
+    const data: { price?: number; purchasePrice?: number; vatRate?: number } = {};
+
+    if (u?.price !== undefined) {
+      const price = Number(u.price);
+      if (Number.isFinite(price) && price >= 0 && price <= MAKUL_UST_SINIR) {
+        data.price = Math.round(price * 100) / 100;
+      }
+    }
+
+    if (u?.purchasePrice !== undefined) {
+      const purchasePrice = Number(u.purchasePrice);
+      if (Number.isFinite(purchasePrice) && purchasePrice >= 0 && purchasePrice <= MAKUL_UST_SINIR) {
+        data.purchasePrice = Math.round(purchasePrice * 100) / 100;
+      }
+    }
+
+    if (u?.vatRate !== undefined) {
+      const vatRate = Number(u.vatRate);
+      if (vatRate === 1 || vatRate === 20 || vatRate === 10 || vatRate === 8) {
+        data.vatRate = vatRate;
+      }
+    }
+
+    if (Object.keys(data).length > 0) {
+      gecerli.push({ slug, ...data });
+    }
   }
 
   if (gecerli.length === 0) {
-    return NextResponse.json({ error: 'Geçerli fiyat bulunamadı' }, { status: 400 });
+    return NextResponse.json({ error: 'Geçerli veri bulunamadı' }, { status: 400 });
   }
 
   // Tek islemde uygula: yarim kalmis guncelleme olmasin
   await prisma.$transaction(
-    gecerli.map((g) =>
-      prisma.product.updateMany({ where: { slug: g.slug }, data: { price: g.price } })
-    )
+    gecerli.map((g) => {
+      const updateData: any = {};
+      if (g.price !== undefined) updateData.price = g.price;
+      if (g.purchasePrice !== undefined) updateData.purchasePrice = g.purchasePrice;
+      if (g.vatRate !== undefined) updateData.vatRate = g.vatRate;
+
+      return prisma.product.updateMany({
+        where: { slug: g.slug },
+        data: updateData,
+      });
+    })
   );
 
-  /**
-   * Fiyat degisikligi ana sayfada, kategori ve urun sayfalarinda gorunuyor.
-   * Bu uc icerikTazele()'yi hic cagirmiyordu; sayfalar force-dynamic oldugu
-   * icin fark edilmiyordu. ISR'ye gecince cagrilmasi sart oldu.
-   */
   icerikTazele();
 
   return NextResponse.json({ success: true, guncellenen: gecerli.length }, { headers: NO_CACHE });
