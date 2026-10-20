@@ -8,6 +8,7 @@ import KategoriIkon from '@/components/KategoriIkon';
 import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture } from '@/components/Icons';
 import { content } from '@/config/content';
 import VipBulten from '@/components/VipBulten';
+import GununFirsati from '@/components/GununFirsati';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -272,6 +273,9 @@ export default function HomeClient({
           </div>
         )}
       </section>
+
+      {/* ─── GÜNÜN FIRSATI & CANLI GERİ SAYIM SAYACI ─── */}
+      {products.length > 0 && <GununFirsati products={products} />}
 
       {/* ─── KAMPANYALAR (yalnizca aktif kampanya varsa) ─── */}
       {kampanyaKartlari.length > 0 && (

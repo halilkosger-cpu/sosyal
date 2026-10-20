@@ -30,6 +30,12 @@ Kalan işler, önem sırasıyla:
 5. Bez Çanta Setleri ve Takı Çantası — resmî galeride karşılığı yok,
    fotoğraf gelene kadar gizli kalıyorlar.
 
+### Sırada Bekleyen E-Ticaret & İletişim Geliştirmeleri (Kullanıcı Onaylı Notlar)
+
+- [ ] **WhatsApp Hızlı Danışma & Sipariş Butonu:** Sağ alt köşeye şık WhatsApp butonu; ürün detay sayfasındayken tıklandığında ürün adı ve linkiyle birlikte mesaj açar ("Merhaba, [Ürün] hakkında bilgi almak istiyorum").
+- [ ] **SMS Bildirim Entegrasyonu (Netgsm / İletiMerkezi):** Sipariş verildiğinde ve kargoya teslim edildiğinde müşteriye otomatik takip linkli SMS gönderimi.
+- [ ] **Şirket Kurulumu & Ön Muhasebe Resmiyet Adımları:** Resmi şirket unvanı, VKN ve MERSİS'in footer/sözleşmelere eklenmesi, Logo İşNet canlı API anahtarlarıyla GİB e-Arşiv/e-Fatura gönderiminin başlatılması.
+
 Bu dosya, konuşma bağlamı kaybolduğunda doğru zemini bulmak için var.
 Buradaki her sayı ve iddia canlı sitede ya da kaynak kodda **ölçülerek**
 yazıldı; tahmin yok. Yeni bir iddia eklenecekse önce doğrulanmalı.
