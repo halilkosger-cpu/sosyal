@@ -192,9 +192,20 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
+### 🟢 Aşama 16: E-Ticaret Dönüşüm (CRO), Kırılmazlık Güvencesi & VIP Açılış Bülteni
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - **Madde 4 (Kırılmazlık & Güvenilirlik):** Ürün detayında sepete ekle altına cam/zeytinyağı/reçel için *"🛡️ %100 Hasarsız & Kırılmaz Teslimat Güvencesi"* (havalı airbag ambalaj & koşulsuz aynı gün telafi) kutusu eklendi.
+  - **Madde 1 & 5 (Sosyal Kanıt & Temin Şeffaflığı):** Ürün sayfalarına *"Bugün 18 kişi inceledi"*, *"⭐ %98 Memnuniyet"* ve *"🏛️ Yetkili Cezaevi Mağazasından Orijinal Faturalı Temin"* güvence kutuları entegre edildi.
+  - **Madde 2 (Sepet Değeri Artırma / AOV):** Sepet ekranına ₺750 hedefli dinamik ilerleme çubuğu (*"₺... daha ekleyin, sürpriz el emeği hediyesi kazanın"*) eklendi.
+  - **Madde 6 (VIP Erken Müşteri & İndirim Kuponu):** Ana sayfaya modern `VipBulten` bileşeni yerleştirildi. E-postasını giren ziyaretçiye anında tek tıkla kopyalanabilen `%10 Hoş Geldin Kuponu` (**`HOSGELDIN10`**) üretilmekte ve sistemde otomatik tanınmaktadır.
+
+---
+
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu, Tüm Katalog Görselleri (63/63), 320 Cezaevi Tedarikçileri, Ön Talep Rezervasyonu, Koli Sevk Etiketi ve 2FA OTP Güvenlik Mimarisi sıfır hatayla tamamlandı ve canlıya alındı.
+* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu, Tüm Katalog Görselleri (63/63), 320 Cezaevi Tedarikçileri, Ön Talep Rezervasyonu, Koli Sevk Etiketi, 2FA OTP Güvenlik Mimarisi, Kırılmazlık Ambalaj Güvencesi, Sepet Hedef İlerleme Çubuğu ve VIP Açılış Bülteni sıfır hatayla tamamlandı ve canlıya alındı.
 * **Canlı Erişim:**
+  * Mağaza Ana Sayfa: `https://isyurtlari.com.tr`
   * Muhasebe & e-Arşiv Kokpiti: `https://isyurtlari.com.tr/admin/muhasebe`
   * Sipariş & Koli Sevk Etiketleri: `https://isyurtlari.com.tr/admin/siparisler`
   * Fiyat & Maliyet Paneli: `https://isyurtlari.com.tr/admin/fiyatlar`
