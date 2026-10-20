@@ -203,12 +203,89 @@ export default function AdminOrdersPage() {
                       <p className="text-sm text-gray-700">{order.shippingAddress}</p>
                     </div>
 
-                    {/* Kargo */}
+                    {/* Kargo & Sevk İrsaliyesi */}
                     {order.status !== 'CANCELLED' && (
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                          Kargo Takibi
-                        </p>
+                      <div className="bg-gray-50/70 p-4 rounded-xl border border-gray-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                            Kargo ve Sevk İşlemleri
+                          </p>
+                          <button
+                            onClick={() => {
+                              const printWindow = window.open('', '_blank');
+                              if (!printWindow) return;
+                              const firmaAd = KARGO_FIRMALARI.find(f => f.kod === kargoAlanlari(order).firma)?.ad || 'Standart Kargo';
+                              printWindow.document.write(`
+                                <html>
+                                  <head>
+                                    <title>Koli Sevk Fişi - #${order.orderNumber}</title>
+                                    <style>
+                                      body { font-family: Arial, sans-serif; padding: 24px; color: #111; }
+                                      .box { border: 2px solid #000; padding: 20px; max-width: 500px; margin: 0 auto; border-radius: 8px; }
+                                      .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+                                      .title { font-size: 18px; font-weight: bold; }
+                                      .meta { font-size: 12px; }
+                                      .section { margin-bottom: 14px; }
+                                      .label { font-size: 11px; text-transform: uppercase; font-weight: bold; color: #555; }
+                                      .val { font-size: 14px; font-weight: bold; margin-top: 2px; }
+                                      .items { font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 8px; }
+                                      .items td, .items th { border: 1px solid #ddd; padding: 6px; }
+                                      .barcode { font-family: monospace; font-size: 24px; letter-spacing: 4px; text-align: center; margin: 16px 0; border: 1px dashed #999; padding: 10px; }
+                                    </style>
+                                  </head>
+                                  <body>
+                                    <div class="box">
+                                      <div class="header">
+                                        <div>
+                                          <div class="title">İŞYURTLARI KURUMU</div>
+                                          <div class="meta">Online Satış Mağazası - isyurtlari.com.tr</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                          <div style="font-weight: bold; font-size: 16px;">#${order.orderNumber}</div>
+                                          <div class="meta">${new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
+                                        </div>
+                                      </div>
+                                      
+                                      <div class="section">
+                                        <div class="label">ALICI (MÜŞTERİ) BİLGİLERİ</div>
+                                        <div class="val">${order.user?.name || 'Müşteri'}</div>
+                                        <div style="font-size: 13px; margin-top: 4px; line-height: 1.4;">${order.shippingAddress}</div>
+                                        <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">Tel: ${order.user?.email || ''}</div>
+                                      </div>
+
+                                      <div class="barcode">
+                                        *${order.orderNumber}*
+                                      </div>
+
+                                      <div class="section">
+                                        <div class="label">KARGO BİLGİSİ</div>
+                                        <div class="val">${firmaAd} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kargoAlanlari(order).takipNo}` : '· (Karşı Ödemeli / Anlaşmalı)'}</div>
+                                      </div>
+
+                                      <div class="section">
+                                        <div class="label">PAKET İÇERİĞİ (${order.items.length} Kalem)</div>
+                                        <table class="items">
+                                          <tr><th>Ürün</th><th>Adet</th></tr>
+                                          ${order.items.map(it => `<tr><td>${it.product?.name || 'Ürün'}</td><td align="center">${it.quantity}</td></tr>`).join('')}
+                                        </table>
+                                      </div>
+                                      
+                                      <div style="font-size: 10px; text-align: center; color: #777; margin-top: 14px;">
+                                        Bu belge koli üzeri teslimat ve sevk etiketi olarak düzenlenmiştir.
+                                      </div>
+                                    </div>
+                                    <script>window.print();</script>
+                                  </body>
+                                </html>
+                              `);
+                              printWindow.document.close();
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-xs transition-colors border border-blue-200"
+                            title="Koli üzeri teslimat ve sevk etiketini yazdır"
+                          >
+                            📦 Koli Etiketi Yazdır
+                          </button>
+                        </div>
                         <div className="flex flex-wrap items-center gap-2">
                           <select
                             value={kargoAlanlari(order).firma}
@@ -218,7 +295,7 @@ export default function AdminOrdersPage() {
                                 [order.id]: { ...kargoAlanlari(order), firma: e.target.value },
                               }))
                             }
-                            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"
+                            className="border border-gray-200 rounded-lg px-3 py-2 text-xs bg-white font-medium"
                           >
                             <option value="">Kargo firması seçin</option>
                             {KARGO_FIRMALARI.map((f) => (
@@ -233,20 +310,19 @@ export default function AdminOrdersPage() {
                                 [order.id]: { ...kargoAlanlari(order), takipNo: e.target.value },
                               }))
                             }
-                            placeholder="Takip numarası"
-                            className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono w-52"
+                            placeholder="Kargo Takip No (Örn: 123456789)"
+                            className="border border-gray-200 rounded-lg px-3 py-2 text-xs font-mono w-56 font-bold"
                           />
                           <button
                             onClick={() => kargoKaydet(order)}
                             disabled={updating === order.id}
                             className="bg-gray-900 hover:bg-gray-700 disabled:bg-gray-400 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
                           >
-                            Kaydet
+                            Takip Kodunu Kaydet
                           </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1.5">
-                          Takip numarası girilirse sipariş "Gönderildi" durumuna geçer ve müşteri
-                          bu bilgiyi siparişlerim sayfasında görür.
+                        <p className="text-[11px] text-gray-500 mt-2">
+                          Takip numarası girildiğinde sipariş otomatik "Gönderildi" durumuna geçer ve müşterinin sipariş takip ekranına düşer.
                         </p>
                       </div>
                     )}

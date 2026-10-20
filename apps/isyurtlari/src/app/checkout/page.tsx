@@ -429,19 +429,29 @@ export default function CheckoutPage() {
               )}
             </section>
 
-            {/* 3. Ödeme yöntemi - kart ödemesi iyzico hesabı açılınca eklenecek */}
+            {/* 3. Ödeme yöntemi */}
             <section className={kutu}>
-              <h2 className={baslik}>{adim(3)} Ödeme Yöntemi</h2>
+              <h2 className={baslik}>{adim(3)} Ödeme & Sipariş Yöntemi</h2>
               <div className="space-y-3 mt-5">
                 <label className={secenek(paymentMethod === 'TRANSFER')}>
                   <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00]" />
                   <span className="flex-1">
-                    <span className="flex items-center gap-2 font-semibold text-gray-900"><LuLandmark size={16} className="text-[#BA4700]" /> Havale / EFT</span>
-                    <span className="block text-sm text-gray-600 mt-0.5">Banka bilgileri sipariş onayından sonra gösterilir. Ödemeniz onaylanınca siparişiniz hazırlanır.</span>
+                    <span className="flex items-center gap-2 font-bold text-gray-900">
+                      <LuLandmark size={17} className="text-[#BA4700]" /> Ön Talep / Sipariş Rezervasyonu (Banka Onayı Bekleniyor)
+                    </span>
+                    <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
+                      Banka hesaplarımız onay sürecindedir. <strong>Şu an ödeme alınmaz</strong>; siparişiniz adınıza rezerve edilir ve müşteri temsilcimiz sizinle iletişime geçer.
+                    </span>
                   </span>
                 </label>
-                <div className="flex items-center gap-3 p-4 border border-dashed border-gray-200 rounded-xl text-sm text-gray-500">
-                  <LuCreditCard size={18} className="shrink-0" /> Kartla ödeme yakında eklenecek.
+                <div className="flex items-center justify-between p-4 border border-dashed border-gray-200 rounded-xl text-xs text-gray-500 bg-gray-50/50">
+                  <div className="flex items-center gap-2.5">
+                    <LuCreditCard size={18} className="shrink-0 text-gray-400" />
+                    <span>Kredi / Banka Kartı (iyzico Sanal POS)</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    Entegrasyon Hazırlığında
+                  </span>
                 </div>
               </div>
             </section>

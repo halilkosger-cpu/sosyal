@@ -467,6 +467,25 @@ export default function LogoGo3MuhasebeMerkezi() {
                 <option value="SATICI">320 Satıcılar (Tedarikçiler)</option>
               </select>
               <button
+                onClick={async () => {
+                  if (!confirm('5 büyük Cezaevi İşyurdu Müdürlüğü (320 Tedarikçi) ve başlangıç ürün maliyetleri otomatik tanımlanacaktır. Onaylıyor musunuz?')) return;
+                  setCariLoading(true);
+                  const res = await fetch('/api/admin/muhasebe/seed-suppliers', { method: 'POST' });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert(`✅ ${data.message}\nGüncellenen Ürün Sayısı: ${data.guncellenenUrunSayisi}`);
+                    carileriYukle();
+                  } else {
+                    alert(`⚠️ ${data.error}`);
+                  }
+                  setCariLoading(false);
+                }}
+                className="flex items-center gap-1.5 bg-blue-900 hover:bg-blue-950 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors"
+                title="Niğde, Foça, Edirne, Bozkurt ve Menemen Cezaevi İşyurtlarını 320 cari olarak kaydeder"
+              >
+                🏛️ Cezaevi Tedarikçilerini Tanımla
+              </button>
+              <button
                 onClick={() => setYeniCariModal(true)}
                 className="flex items-center gap-1.5 bg-[#CC4E00] hover:bg-[#b04300] text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors"
               >
