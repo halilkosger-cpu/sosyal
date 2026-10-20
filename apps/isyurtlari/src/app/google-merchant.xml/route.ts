@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
+import { urunGorseli } from '@/lib/urun-gorsel';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // 1 saat önbellek
@@ -40,7 +41,13 @@ export async function GET() {
         const categoryName = xmlEscape(p.category?.name || 'Genel');
         const price = `${Number(p.price).toFixed(2)} TRY`;
         const availability = p.quantity > 0 ? 'in_stock' : 'out_of_stock';
-        const imageUrl = xmlEscape(p.imageUrl || `${SITE_URL}/logo.jpg`);
+        
+        const yerelGorsel = urunGorseli(p.slug, p.imageUrl);
+        let tamGorselUrl = `${SITE_URL}/logo.jpg`;
+        if (yerelGorsel) {
+          tamGorselUrl = yerelGorsel.startsWith('http') ? yerelGorsel : `${SITE_URL}${yerelGorsel}`;
+        }
+        const imageUrl = xmlEscape(tamGorselUrl);
 
         return `    <item>
       <g:id>${p.id}</g:id>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LuFlame, LuTimer, LuShoppingBag, LuCheck, LuSparkles } from 'react-icons/lu';
 import { sepeteEkle } from '@/lib/cart';
+import { urunGorseli } from '@/lib/urun-gorsel';
 
 interface Product {
   id: string;
@@ -59,6 +60,7 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
 
   if (!firsatUrunu) return null;
 
+  const gorselAdresi = urunGorseli(firsatUrunu.slug, firsatUrunu.imageUrl);
   // Fırsat için referans eski fiyat (temsili liste fiyatı / %15 piyasa indirimi etkisi)
   const eskiFiyat = Math.round(firsatUrunu.price * 1.2);
 
@@ -146,9 +148,9 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
               href={`/urun/${firsatUrunu.slug}`}
               className="relative w-36 h-36 shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 group"
             >
-              {firsatUrunu.imageUrl ? (
+              {gorselAdresi ? (
                 <Image
-                  src={firsatUrunu.imageUrl}
+                  src={gorselAdresi}
                   alt={firsatUrunu.name}
                   fill
                   sizes="150px"
