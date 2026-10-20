@@ -7,7 +7,8 @@ import { hizSiniriGuard, sayaclariTemizle } from '@/lib/hiz-siniri';
 
 export const dynamic = 'force-dynamic';
 
-const resend = new Resend(process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY);
+const resendApiKey = process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY || 're_mock_key';
+const resend = new Resend(resendApiKey);
 
 const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;

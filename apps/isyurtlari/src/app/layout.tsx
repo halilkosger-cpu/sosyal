@@ -270,11 +270,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <li><Link href="/guvenli-alisveris" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Güvenli Alışveriş</Link></li>
                   <li><Link href="/kvkk" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">KVKK</Link></li>
                   <li><Link href="/mesafeli-satis-sozlesmesi" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Mesafeli Satış Sözleşmesi</Link></li>
-                  <li>
-                    <a href="https://cezaevinden.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">
-                      Platform: cezaevinden.com
-                    </a>
-                  </li>
                 </ul>
               </div>
               <div>

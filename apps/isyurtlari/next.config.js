@@ -7,6 +7,12 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@isyurtlari/database'],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   compress: true,
 

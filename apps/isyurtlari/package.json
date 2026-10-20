@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@isyurtlari/database": "workspace:*",
-    "@prisma/client": "^5.16.1",
+    "@prisma/client": "^5.22.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^0.21.0",
     "@vercel/speed-insights": "^2.0.0",

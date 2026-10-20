@@ -44,7 +44,7 @@ export async function generateStaticParams() {
   if (!hasDatabaseUrl()) return [];
   try {
     const kategoriler = await prisma.productCategory.findMany({ select: { slug: true } });
-    return kategoriler.map((k) => ({ categorySlug: k.slug }));
+    return kategoriler.map((k: { slug: string }) => ({ categorySlug: k.slug }));
   } catch (error) {
     // Derleme sırasında veritabanına ulaşılamazsa sayfalar istek anında
     // üretilir; derlemeyi düşürmenin anlamı yok.

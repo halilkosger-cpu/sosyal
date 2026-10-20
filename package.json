@@ -1,6 +1,7 @@
 {
   "name": "isyurtlari-platform",
   "version": "1.0.0",
+  "packageManager": "pnpm@9.5.0",
   "private": true,
   "workspaces": [
     "apps/*",
