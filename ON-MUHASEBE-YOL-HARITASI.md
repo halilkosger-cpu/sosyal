@@ -55,21 +55,53 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
-### 🟢 Aşama 4: Kritik Stok Alarm & E-posta Bildirim Motoru
+### 🟢 Aşama 4: Logo GO3 ERP Ön Muhasebe Modülleri Entegrasyonu
+- [x] **Logo GO3 Cari Hesap Modülü (120 Alıcılar / 320 Satıcılar):**
+  - Kodlama standardı: `CH-120-XXXX` (Müşteriler / Alıcılar) ve `CH-320-XXXX` (Tedarikçi Cezaevleri & Toptancılar).
+  - Muhasebe hesap planı kodları (`120.01.xxx`, `320.01.xxx`), Vergi Dairesi/TCKN, şehir ve anlık bakiye takibi.
+  - Cari Hesap Ekstresi: Tarih sıralı Borç, Alacak ve Yürüyen Bakiye dökümü (`/api/admin/muhasebe/cariler/ekstre`).
+  - Hızlı Cari Kart Oluşturma: Modal pencereden tek tıkla yeni müşteri veya tedarikçi kartı açma.
+- [x] **Logo GO3 Fatura & İrsaliye Modülü:**
+  - Satış Faturaları: `FTR-2026-XXXXX` seri numarası, KDV dahil genel toplam, net matrah ve KDV tutarı ayrıştırması.
+  - Satınalma / Alış Faturaları: `ALIS-2026-XXXXX` seri numarası ile tedarikçi mal kabulleri.
+  - Otomatik Cari Entegrasyonu: Fatura kaydedildiğinde Alıcı cari hesabına anında BORÇ, Satıcı cari hesabına ALACAK olarak işlenir; bakiye otomatik güncellenir.
+- [x] **Logo GO3 Banka & Kasa Modülü:**
+  - Banka Hesap Tanımları: Ziraat, İş Bankası, Vakıfbank vb. IBAN ve hesap adı tanımlama.
+  - Havale / EFT Tahsilat & Ödeme: Cari seçimi ile bankaya giriş (tahsilat) veya bankadan çıkış (tedarikçi ödemesi).
+  - Cari Bakiye Kapatma: Tahsilat yapıldığında müşterinin borcu düşer (ALACAK işlenir), banka bakiyesi artar; ödeme yapıldığında tedarikçinin alacağı kapatılır (BORÇ işlenir).
+
+---
+
+### 🟢 Aşama 5: Tek Ekran 7 Sekmeli (Tab Bar) Logo GO3 Yönetici Kokpiti
+- [x] **Tek Ekran Sekmeli Mimari (`/admin/muhasebe`)**: Sayfa yenilenmeksizin sekmeler arasında anlık geçiş:
+  - **Sekme 1: 📈 Gelir Tablosu & Kârlılık (P&L):** Net Hasılat, SMM, Brüt Kâr, Net Kâr; Gelir Tablosu; KDV Dengesi (Hesaplanan vs İndirilecek); Kategori bazlı gider pasta/bar dağılımı.
+  - **Sekme 2: 👥 Cari Hesaplar (120 / 320):** Alıcı ve Satıcı listesi, anlık bakiyeler, borç/alacak durumu, tek tıkla **"Cari Ekstre İncele"** modalı ve **"Yeni Cari Aç"** penceresi.
+  - **Sekme 3: 📑 Fatura & İrsaliye:** Satış ve Satınalma faturaları, matrah/KDV detayları, cari unvanı, durum rozetleri ve **"Yeni Fatura Kes"** modalı.
+  - **Sekme 4: 🏦 Banka & Kasa:** Tanımlı banka hesapları, güncel bakiyeler, hesap hareketleri (Havale/EFT) ve **"Havale/EFT İşlemi Yap"** modalı.
+  - **Sekme 5: 🧾 İşletme Giderleri:** Kargo, Reklam, Komisyon, Genel gider giriş formu ve filtrelenebilir döküm.
+  - **Sekme 6: 📦 Mal Kabul & WAV:** Tedarikçiden gelen parti mal girişi, Ağırlıklı Ortalama Maliyet (WAV) hesaplayıcısı.
+  - **Sekme 7: ⚠️ Kritik Stok Alarmı:** Stoğu kritik seviyenin (`minStockLevel`) altına inen ürünler ve anlık uyarılar.
+- [x] **Muhasebe Excel İndir Menüsü:** Sağ üst köşeden tarih aralığına göre:
+  - *📊 Satış & KDV Raporu (.csv)*
+  - *🧾 Gider Faturaları Raporu (.csv)* indirme düğmeleri.
+
+---
+
+### 🟢 Aşama 6: Kritik Stok Alarm & E-posta Bildirim Motoru
 - [x] Müşteri siparişi tamamlandığında stok anlık düşürülürken `quantity <= minStockLevel` kontrolünün otomatik çalışması.
 - [x] Eşiğin altına düşen ürün olduğunda `/admin/muhasebe` ekranında dikkat çekici uyarı rozeti ve banner gösterimi.
 - [x] Resend üzerinden yönetici e-posta adresine (`info@isyurtlari.com.tr` / `halil.kosger@gmail.com`) şık HTML formatında ürün adı, kalan stok ve eşik bilgisini içeren **"Kritik Stok Uyarısı"** e-postası iletimi.
 
 ---
 
-### 🟢 Aşama 5: Test, Güvenlik ve Canlıya Dağıtım (Deployment)
-- [x] Next.js derleme (`next build`) doğrulaması yapıldı: 51 sayfa (SSR, SSG, Static) sıfır hatayla derlendi.
-- [x] Veritabanı canlı migrasyon SQL dosyası hazırlandı.
-- [x] Git geçmişi commit edildi (`20b9e92`) ve GitHub `main` branch'ine başarıyla gönderildi (Vercel otomatik canlıya aldı).
+### 🟢 Aşama 7: Test, Güvenlik ve Derleme Doğrulaması
+- [x] Next.js derleme (`next build`) doğrulaması yapıldı: 51 sayfa ve 10 muhasebe API rotası sıfır hatayla derlendi.
+- [x] Veritabanı canlı migrasyon SQL dosyası (`packages/database/prisma/sql/logo-go3-modulleri.sql`) hazırlandı.
+- [x] Vercel deploy anında otomatik, hatasız ve veri kayıpsız çalışan SQL senkronizasyonu bağlandı.
 
 ---
 
-### ⚪ Aşama 6: Gelecek Geliştirmeler & Kalan Eksikler
+### ⚪ Aşama 8: Gelecek Geliştirmeler & Kalan Eksikler
 - [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı 0 olan 31 ürünün satış fiyatı ve girdi maliyetlerinin `/admin/fiyatlar` ekranından tamamlanması.
 - [ ] **Sipariş Başı Tahmini Kargo Gideri:** Sabit kargo anlaşması tutarının sipariş oluşturulurken otomatik gider olarak işletilmesi opsiyonu.
 - [ ] **iyzico Canlı Entegrasyonu:** Kartlı ödeme için callback rotasının yazılması ve canlı API anahtarlarının bağlanması.
@@ -78,6 +110,6 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 ---
 
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Ön Muhasebe, Gider Yönetimi, Mal Kabulü (WAV), Tek Ekran Sekmeli Arayüz ve Excel Export başarıyla tamamlandı ve canlıya alındı.
+* **Mevcut Durum:** ✅ Logo GO3 ERP standardında Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti ve Excel Export başarıyla tamamlandı ve derleme doğrulaması yapıldı.
 * **Canlı Erişim:** `https://isyurtlari.com.tr/admin/muhasebe`
 * **Son Güncelleme:** 20 Ekim 2026

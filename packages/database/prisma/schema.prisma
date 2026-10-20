@@ -1198,3 +1198,140 @@ model StockMovement {
   @@index([createdAt])
 }
 
+// ─── LOGO GO3 MODÜLLERİ: CARİ, FATURA & BANKA ────────────────
+
+enum CariTur {
+  ALICI     // 120 Müşteriler
+  SATICI    // 320 Tedarikçiler / İşyurtları
+}
+
+model CariKart {
+  id           String         @id @default(cuid())
+  kod          String         @unique // CH-120-0001 veya CH-320-0001
+  unvan        String         // Ad Soyad veya Şirket Unvanı
+  tur          CariTur        @default(ALICI)
+  muhasebeKodu String?        // 120.01.001 veya 320.01.001
+  vergiDairesi String?
+  vergiTcNo    String?        // TC Kimlik veya Vergi Kimlik No
+  eposta       String?
+  telefon      String?
+  adres        String?
+  sehir        String?
+  bakiye       Float          @default(0) // Pozitif: Alacaklıyız / Negatif: Borçluyuz
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  hareketler   CariHareket[]
+  faturalar    Fatura[]
+  bankaHareketleri BankaHareketi[]
+
+  @@index([tur])
+  @@index([kod])
+}
+
+enum HareketTur {
+  BORC    // Cari borçlandı (Örn: Mal sattık veya para ödedik)
+  ALACAK  // Cari alacaklandı (Örn: Mal aldık veya para tahsil ettik)
+}
+
+model CariHareket {
+  id         String     @id @default(cuid())
+  cariId     String
+  tarih      DateTime   @default(now())
+  islemTuru  String     // SATIS_FATURASI, ALIS_FATURASI, BANKA_HAVALE, NAKIT_TAHSILAT vb.
+  belgeNo    String?
+  aciklama   String
+  borc       Float      @default(0)
+  alacak     Float      @default(0)
+  bakiye     Float      @default(0) // Hareket anındaki kümülatif bakiye
+  createdAt  DateTime   @default(now())
+
+  cari CariKart @relation(fields: [cariId], references: [id], onDelete: Cascade)
+
+  @@index([cariId])
+  @@index([tarih])
+}
+
+enum FaturaTur {
+  SATIS     // 600 Yurtiçi Satış Faturası
+  SATINALMA // 153 Mal Alış Faturası
+}
+
+model Fatura {
+  id           String      @id @default(cuid())
+  faturaNo     String      @unique // FTR-2026-0001
+  tur          FaturaTur   @default(SATIS)
+  tarih        DateTime    @default(now())
+  cariId       String
+  orderId      String?     @unique // Bağlı sipariş (varsa)
+  matrah       Float       @default(0) // KDV Hariç Toplam
+  kdvTutari    Float       @default(0) // Toplam KDV
+  genelToplam  Float       @default(0) // KDV Dahil Genel Toplam
+  aciklama     String?
+  durum        String      @default("ONAYLANDI") // TASLAK, ONAYLANDI, IPTAL
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  cari    CariKart      @relation(fields: [cariId], references: [id], onDelete: Cascade)
+  satirlar FaturaSatir[]
+
+  @@index([cariId])
+  @@index([tarih])
+}
+
+model FaturaSatir {
+  id         String   @id @default(cuid())
+  faturaId   String
+  productId  String?
+  aciklama   String   // Ürün veya Hizmet Adı
+  miktar     Int      @default(1)
+  birimFiyat Float    // KDV Hariç veya Dahil
+  kdvOrani   Float    @default(20) // 1, 10, 20
+  kdvTutari  Float    @default(0)
+  satirToplam Float   // KDV Dahil Satır Tutarı
+
+  fatura Fatura @relation(fields: [faturaId], references: [id], onDelete: Cascade)
+
+  @@index([faturaId])
+}
+
+model BankaHesabi {
+  id           String          @id @default(cuid())
+  hesapAdi     String          // Örn: Ziraat Bankası Ticari TL, Vakıfbank Şirket, İyzico POS Havuzu
+  bankaAdi     String          // Ziraat, Garanti, İyzico vb.
+  iban         String?
+  hesapNo      String?
+  subeKodu     String?
+  bakiye       Float           @default(0)
+  aktif        Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  hareketler   BankaHareketi[]
+}
+
+enum BankaHareketTur {
+  GIRIS // Tahsilat / Havale Gelen (+)
+  CIKIS // Ödeme / Havale Giden (-)
+}
+
+model BankaHareketi {
+  id             String          @id @default(cuid())
+  bankaHesapId   String
+  tarih          DateTime        @default(now())
+  tur            BankaHareketTur
+  tutar          Float
+  cariId         String?
+  belgeNo        String?         // Dekont No / Sipariş No
+  aciklama       String
+  durum          String          @default("ONAYLANDI") // BEKLIYOR, ONAYLANDI, REDDEDILDI
+  createdAt      DateTime        @default(now())
+
+  bankaHesabi    BankaHesabi     @relation(fields: [bankaHesapId], references: [id], onDelete: Cascade)
+  cari           CariKart?       @relation(fields: [cariId], references: [id])
+
+  @@index([bankaHesapId])
+  @@index([tarih])
+}
+
+
