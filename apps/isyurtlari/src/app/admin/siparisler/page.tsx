@@ -237,8 +237,8 @@ export default function AdminOrdersPage() {
                                     <div class="box">
                                       <div class="header">
                                         <div>
-                                          <div class="title">İŞYURTLARI KURUMU</div>
-                                          <div class="meta">Online Satış Mağazası - isyurtlari.com.tr</div>
+                                          <div class="title">İŞ-YRT GIDA LTD. ŞTİ.</div>
+                                          <div class="meta">isyurtlari.com.tr · Sipariş Sevk ve Teslimat Fişi</div>
                                         </div>
                                         <div style="text-align: right;">
                                           <div style="font-weight: bold; font-size: 16px;">#${order.orderNumber}</div>
@@ -246,6 +246,12 @@ export default function AdminOrdersPage() {
                                         </div>
                                       </div>
                                       
+                                      <div class="section" style="border-bottom: 1px dashed #ccc; padding-bottom: 8px; margin-bottom: 10px;">
+                                        <div class="label">GÖNDERİCİ BİLGİLERİ</div>
+                                        <div class="val" style="font-size: 13px;">İŞ-YRT Gıda Ltd. Şti.</div>
+                                        <div style="font-size: 11px; color: #555;">Online Dağıtım & Sevkiyat Merkezi · isyurtlari.com.tr</div>
+                                      </div>
+
                                       <div class="section">
                                         <div class="label">ALICI (MÜŞTERİ) BİLGİLERİ</div>
                                         <div class="val">${order.user?.name || 'Müşteri'}</div>

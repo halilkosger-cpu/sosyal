@@ -14,15 +14,15 @@ export interface SirketBilgileri {
 }
 
 export const VARSAYILAN_SIRKET: SirketBilgileri = {
-  vkn: process.env.SIRKET_VKN || '1234567890',
-  unvan: process.env.SIRKET_UNVAN || 'İŞYURTLARI SOSYAL MAĞAZACILIK VE TİC. LTD. ŞTİ.',
-  vergiDairesi: process.env.SIRKET_VERGI_DAIRESI || 'Ankara Kurumlar Vergi Dairesi',
-  adres: process.env.SIRKET_ADRES || 'Adalet Bakanlığı İşyurtları Kurumu, Kızılay',
+  vkn: process.env.SIRKET_VKN || '1111111111',
+  unvan: process.env.SIRKET_UNVAN || 'İŞ-YRT GIDA TİC. LTD. ŞTİ.',
+  vergiDairesi: process.env.SIRKET_VERGI_DAIRESI || 'Kurulum Aşamasında',
+  adres: process.env.SIRKET_ADRES || 'Ankara',
   sehir: 'Ankara',
   eposta: 'info@isyurtlari.com.tr',
   telefon: '0312 000 00 00',
-  ticaretSicilNo: '123456',
-  mersisNo: '0123456789000001',
+  ticaretSicilNo: 'Kurulum Aşamasında',
+  mersisNo: 'Kurulum Aşamasında',
 };
 
 /**
