@@ -68,9 +68,11 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         setMessage('Doğrulama başarılı! Yönetici paneline aktarılıyorsunuz...');
+        // Tarayıcı çerez politikalarına takılmayan kusursuz SSO oturum aktarımı
+        const targetUrl = data.token ? `/admin?session=${encodeURIComponent(data.token)}` : '/admin';
         setTimeout(() => {
-          window.location.replace('/admin');
-        }, 300);
+          window.location.replace(targetUrl);
+        }, 150);
       } else {
         setError(data.error || 'Geçersiz veya süresi dolmuş kod.');
       }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { verifyOTP, getRemainingAttempts, kodlariTemizle, normalizeEmail, normalizeCode } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
@@ -10,6 +11,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   let email = 'unknown';
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+  const isHttps = req.headers.get('x-forwarded-proto') === 'https' || req.url.startsWith('https://');
 
   try {
     const body = await req.json();
@@ -68,27 +70,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Doğrulama başarılı - Yönetici JWT jetonunu imzala
+    // Doğrulama başarılı - Yönetici JWT jetonunu imzala (24 saat)
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
       jwtAnahtari(),
       { expiresIn: '24h' }
     );
 
-    // Güvenli HTTP-only çerez tanımla
+    const cookieOpts = {
+      httpOnly: true,
+      secure: isHttps,
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: 86400, // 24 saat
+    };
+
+    // 1) Next.js cookies() API ile set et
+    try {
+      cookies().set('admin-token', token, cookieOpts);
+    } catch {
+      // route handler fallback
+    }
+
+    // 2) NextResponse cookies ile de set et (çift garantili)
     const res = NextResponse.json({
       success: true,
+      token,
       redirect: '/admin',
       message: 'Kimlik doğrulama başarılı',
     });
 
-    res.cookies.set('admin-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 86400, // 24 saat
-    });
+    res.cookies.set('admin-token', token, cookieOpts);
 
     await logAudit('OTP_VERIFY', email, 'success', 'Yönetici 2FA OTP ile başarıyla oturum açtı', ip);
 
