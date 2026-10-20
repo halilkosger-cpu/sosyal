@@ -101,15 +101,29 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
-### ⚪ Aşama 8: Gelecek Geliştirmeler & Kalan Eksikler
+### 🟢 Aşama 8: Otomatik Kargo Gideri & iyzico POS / Tahsilat Entegrasyonu
+- [x] **Sipariş Başı Otomatik Kargo Maliyeti (`/lib/muhasebe-entegrasyonu.ts`):**
+  - Her sipariş geldiğinde varsayılan 75 TL anlaşmalı kargo maliyeti `KRG-<siparisNo>` fişiyle anında `Expense` (`SHIPPING`) tablosuna işletilir.
+  - P&L ve Gelir Tablosunda anlık kargo kâr/zarar dengesi otomatik görünür.
+- [x] **iyzico Callback & Tahsilat & Komisyon Entegrasyonu (`/api/checkout/iyzico/callback`):**
+  - iyzico ödeme formu tamamlandığında gelen `token` iyzico servisiyle doğrulanır.
+  - Ödeme başarılı olduğunda sipariş `CONFIRMED`, `Payment` kaydı `COMPLETED` yapılır.
+  - Müşteri 120 Cari Kartına satış faturası karşılığı ALACAK işlenerek cari bakiye kapatılır.
+  - Banka/POS hesabına net tahsilat tutarı GIRIS olarak işlenir.
+  - %2.99 Sanal POS komisyon kesintisi `KOM-<siparisNo>` fişiyle otomatik olarak `Expense` (`COMMISSION`) tablosuna kaydedilir.
+- [x] **Havale/EFT Yönetici Onayı Tahsilat Entegrasyonu (`/api/admin/orders/[id]`):**
+  - Yönetici panelden siparişi onayladığında (`PENDING` -> `CONFIRMED`), cari hesap tahsilatı ve banka hesabı bakiyesi otomatik güncellenir.
+
+---
+
+### ⚪ Aşama 9: Gelecek Geliştirmeler & Kalan Eksikler
 - [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı 0 olan 31 ürünün satış fiyatı ve girdi maliyetlerinin `/admin/fiyatlar` ekranından tamamlanması.
-- [ ] **Sipariş Başı Tahmini Kargo Gideri:** Sabit kargo anlaşması tutarının sipariş oluşturulurken otomatik gider olarak işletilmesi opsiyonu.
-- [ ] **iyzico Canlı Entegrasyonu:** Kartlı ödeme için callback rotasının yazılması ve canlı API anahtarlarının bağlanması.
 - [ ] **Görselleri Eksik 2 Ürün:** *Bez Çanta Setleri* ve *Takı Çantası* fotoğraflarının eklenerek vitrinde yayına alınması.
+- [ ] **E-Fatura / E-Arşiv Entegrasyonu (İsteğe Bağlı):** Gelir İdaresi Başkanlığı (GİB) e-arşiv portalı veya özel entegratör (Logo, Paraşüt vb.) API bağlantısı.
 
 ---
 
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 ERP standardında Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti ve Excel Export başarıyla tamamlandı ve derleme doğrulaması yapıldı.
+* **Mevcut Durum:** ✅ Logo GO3 ERP standardında Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi başarıyla tamamlandı ve derlendi.
 * **Canlı Erişim:** `https://isyurtlari.com.tr/admin/muhasebe`
 * **Son Güncelleme:** 20 Ekim 2026

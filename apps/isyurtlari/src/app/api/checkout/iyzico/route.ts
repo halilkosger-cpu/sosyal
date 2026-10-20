@@ -199,6 +199,7 @@ export async function POST(req: NextRequest) {
       paymentChannel: 'WEB',
       pageType: 'PRODUCT',
       clientIp: istemciIp,
+      callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://isyurtlari.com.tr'}/api/checkout/iyzico/callback`,
 
       buyer: {
         id: siparis.customerId ?? siparis.orderNumber,

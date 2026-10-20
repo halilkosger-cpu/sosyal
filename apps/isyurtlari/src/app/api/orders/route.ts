@@ -8,6 +8,7 @@ import { indirimiKalemlereDagit, kuponuDogrula } from '@/lib/kupon';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { adresiYazdir } from '@/lib/adres-dogrulama';
+import { siparisMuhasebeyeIsle } from '@/lib/muhasebe-entegrasyonu';
 
 // Email sending function
 async function sendOrderEmail(
@@ -589,6 +590,31 @@ export async function POST(req: NextRequest) {
       orderWithItems?.items || [],
       tutar.kdv
     );
+
+    // Logo GO3 Muhasebe Entegrasyonu: 120 Cari Kart, Satış Faturası ve Kargo Gideri İşleme
+    try {
+      if (orderWithItems) {
+        await siparisMuhasebeyeIsle({
+          orderId: orderWithItems.id,
+          orderNumber: orderWithItems.orderNumber,
+          customerName: body.customerName,
+          email: body.email,
+          phone: body.phone,
+          shippingAddress: teslimatAdresi,
+          totalAmount: orderWithItems.totalAmount,
+          paymentMethod: orderWithItems.paymentMethod,
+          items: (orderWithItems.items || []).map((it: any) => ({
+            productId: it.productId,
+            name: it.product?.name || 'Ürün',
+            quantity: it.quantity,
+            price: it.price,
+            vatRate: it.product?.vatRate ?? 20,
+          })),
+        });
+      }
+    } catch (muhErr) {
+      console.error('Otomatik muhasebe işleme hatası:', muhErr);
+    }
 
     return NextResponse.json({
       success: true,

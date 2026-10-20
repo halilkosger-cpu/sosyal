@@ -3,6 +3,7 @@ import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
 import { logAudit } from '@/lib/audit-log';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
 import { icerikTazele } from '@/lib/kategoriler';
+import { odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -53,6 +54,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       select: {
         orderNumber: true,
         status: true,
+        totalAmount: true,
+        paymentMethod: true,
         deliveredAt: true,
         shippedAt: true,
         kargoFirmasi: true,
@@ -126,6 +129,20 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     // Stok degistiyse kategori ve urun sayfalari tazelensin (ISR).
     if (stokGeriYuklensin) icerikTazele();
+
+    // Havale/EFT Onayı: Sipariş PENDING'den CONFIRMED durumuna geçtiğinde cari tahsilatı ve banka girişi yap
+    if (status === 'CONFIRMED' && mevcut.status === 'PENDING') {
+      try {
+        await odemeTahsilatiIsle({
+          orderId: params.id,
+          orderNumber: mevcut.orderNumber,
+          paymentMethod: mevcut.paymentMethod,
+          tutar: mevcut.totalAmount,
+        });
+      } catch (tahsilatErr) {
+        console.error('Havale tahsilatı muhasebeye işlenirken hata:', tahsilatErr);
+      }
+    }
 
     /**
      * Sipariş durumu ve kargo bilgisi müşteriye görünen, paraya dokunan
