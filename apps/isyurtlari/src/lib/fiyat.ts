@@ -41,6 +41,13 @@ export const KARGO_UCRETI = 0;
 /** Bu tutar ve uzeri siparislerde kargo ucretsiz (0 = esik yok). */
 export const UCRETSIZ_KARGO_ESIGI = 0;
 
+/**
+ * Büyük Açılış & Efsane Kasım Kampanyası:
+ * Tüm ürünlerde sepette net %10 otomatik indirim.
+ */
+export const KASIM_KAMPANYASI_AKTIF = true;
+export const KASIM_INDIRIM_ORANI = 10; // %10
+
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
 
 export interface FiyatKalemi {
@@ -51,7 +58,11 @@ export interface FiyatKalemi {
 }
 
 export interface SiparisTutari {
-  /** KDV dahil urun toplami. */
+  /** İndirimsiz ham ürün toplamı. */
+  hamUrunToplami: number;
+  /** Kasım kampanyası indirim tutarı (%10). */
+  kasimIndirimi: number;
+  /** KDV dahil indirimli urun toplami. */
   urunToplami: number;
   /** urunToplami ICINDEKI KDV. Toplama ayrica eklenmez. */
   kdv: number;
@@ -85,12 +96,18 @@ export function kargoBedeli(urunToplami: number): number {
  * geliyor. KDV her kalem icin kendi kategori oraniyla hesaplanip toplaniyor:
  * kategorilere farkli oranlar girildiginde de dogru sonuc verir.
  */
-export function siparisToplami(kalemler: FiyatKalemi[]): SiparisTutari {
-  const urunToplami = yuvarla(kalemler.reduce((t, k) => t + k.tutar, 0));
-  const kdv = yuvarla(kalemler.reduce((t, k) => t + icindekiKdv(k.tutar, k.kdvOrani), 0));
+export function siparisToplami(kalemler: FiyatKalemi[], kampanyaIndirimiUygula = KASIM_KAMPANYASI_AKTIF): SiparisTutari {
+  const hamUrunToplami = yuvarla(kalemler.reduce((t, k) => t + k.tutar, 0));
+  const kasimIndirimi = kampanyaIndirimiUygula ? yuvarla(hamUrunToplami * (KASIM_INDIRIM_ORANI / 100)) : 0;
+  const urunToplami = yuvarla(hamUrunToplami - kasimIndirimi);
+
+  const carpan = hamUrunToplami > 0 ? urunToplami / hamUrunToplami : 1;
+  const kdv = yuvarla(kalemler.reduce((t, k) => t + icindekiKdv(k.tutar * carpan, k.kdvOrani), 0));
   const kargo = kargoBedeli(urunToplami);
 
   return {
+    hamUrunToplami,
+    kasimIndirimi,
     urunToplami,
     kdv,
     kdvHaric: yuvarla(urunToplami - kdv),

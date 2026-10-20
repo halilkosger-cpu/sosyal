@@ -144,13 +144,18 @@ export default function CheckoutPage() {
   // Tutar hesabi lib/fiyat.ts'te; siparis ucu de ayni fonksiyonu cagiriyor ki
   // musteriye gosterilen tutar ile siparise yazilan tutar ayrismasin.
   // Fiyatlar KDV dahil: kdv toplama eklenmiyor, icinden hesaplaniyor.
-  const { urunToplami: subtotal, kargo: shipping } = siparisToplami(
+  const {
+    hamUrunToplami,
+    kasimIndirimi,
+    urunToplami: subtotal,
+    kargo: shipping,
+  } = siparisToplami(
     cart.map((item) => ({
       tutar: getItemPrice(item) * item.quantity,
       kdvOrani: item.kdvOrani,
     }))
   );
-  const totalDiscount = originalSubtotal - subtotal;
+  const totalDiscount = originalSubtotal - (hamUrunToplami || subtotal);
 
   /**
    * Kupon.
@@ -497,7 +502,15 @@ export default function CheckoutPage() {
             <dl className="space-y-2.5 text-sm pt-4">
               <div className="flex justify-between text-gray-600"><dt>Ara toplam</dt><dd>₺{originalSubtotal.toFixed(2)}</dd></div>
               {totalDiscount > 0 && (
-                <div className="flex justify-between text-green-700 font-semibold"><dt>İndirim</dt><dd>-₺{totalDiscount.toFixed(2)}</dd></div>
+                <div className="flex justify-between text-green-700 font-semibold"><dt>Ürün İndirimi</dt><dd>-₺{totalDiscount.toFixed(2)}</dd></div>
+              )}
+              {kasimIndirimi > 0 && (
+                <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
+                  <dt className="flex items-center gap-1.5">
+                    <span>🔥</span> Açılış &amp; Kasım İndirimi (%10)
+                  </dt>
+                  <dd>-₺{kasimIndirimi.toFixed(2)}</dd>
+                </div>
               )}
               {kuponIndirimi > 0 && (
                 <div className="flex justify-between text-green-700 font-semibold"><dt>Kupon ({uygulananKupon})</dt><dd>-₺{kuponIndirimi.toFixed(2)}</dd></div>

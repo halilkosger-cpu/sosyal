@@ -145,6 +145,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* ─── TOP BAR ─── */}
         <header className="sticky top-0 z-50 shadow-sm">
+          {/* Kampanya Duyuru Bandı */}
+          <div className="bg-gradient-to-r from-[#BA4700] via-[#CC4E00] to-[#BA4700] text-white text-[11px] sm:text-xs py-1.5 px-3 text-center font-medium tracking-wide">
+            <span className="inline-flex items-center gap-1.5 justify-center flex-wrap">
+              <span>🔥</span>
+              <span><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%10 indirim</strong> anında uygulanır!</span>
+            </span>
+          </div>
 
           {/* Main nav row - 2026 Eylul tasarimi: beyaz baslik */}
           <div className="bg-white border-b border-gray-100">

@@ -87,6 +87,8 @@ export default function CartPage() {
   // yazilmisti; iki yerde duran hesap birbirinden ayrisabiliyordu.
   // Fiyatlar KDV dahil oldugu icin kdv toplama EKLENMIYOR, icinden cikiyor.
   const {
+    hamUrunToplami,
+    kasimIndirimi,
     urunToplami: subtotal,
     kdv: tax,
     kargo: shipping,
@@ -97,7 +99,7 @@ export default function CartPage() {
       kdvOrani: item.kdvOrani,
     }))
   );
-  const totalDiscount = originalSubtotal - subtotal;
+  const totalDiscount = originalSubtotal - (hamUrunToplami || subtotal);
 
   if (loading) {
     return (
@@ -224,8 +226,16 @@ export default function CartPage() {
               <h2 className="text-lg font-bold text-gray-900 mb-4">Sipariş özeti</h2>
               <dl className="space-y-2.5 text-sm">
                 <div className="flex justify-between text-gray-600"><dt>Ara toplam</dt><dd>{tl(originalSubtotal)}</dd></div>
+                {kasimIndirimi > 0 && (
+                  <div className="flex justify-between items-center text-emerald-800 bg-emerald-50/90 border border-emerald-200/70 px-2.5 py-1.5 rounded-xl font-semibold text-xs md:text-sm shadow-xs">
+                    <dt className="flex items-center gap-1.5">
+                      <span>🔥 Açılış &amp; Kasım İndirimi (%10)</span>
+                    </dt>
+                    <dd className="font-bold text-emerald-700">-{tl(kasimIndirimi)}</dd>
+                  </div>
+                )}
                 {totalDiscount > 0 && (
-                  <div className="flex justify-between text-green-700 font-semibold"><dt>İndirim</dt><dd>-{tl(totalDiscount)}</dd></div>
+                  <div className="flex justify-between text-green-700 font-semibold"><dt>Ürün Kampanyası</dt><dd>-{tl(totalDiscount)}</dd></div>
                 )}
                 <div className="flex justify-between text-gray-600">
                   <dt>Kargo</dt>

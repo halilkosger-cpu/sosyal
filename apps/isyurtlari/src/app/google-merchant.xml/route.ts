@@ -3,6 +3,7 @@ import { prisma } from '@isyurtlari/database';
 import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { urunGorseli } from '@/lib/urun-gorsel';
+import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // 1 saat önbellek
@@ -39,7 +40,19 @@ export async function GET() {
             `${p.name} - Adalet Bakanlığı İşyurtları atölyelerinde hükümlülerin el emeğiyle üretilen doğal ve kaliteli ürün.`
         );
         const categoryName = xmlEscape(p.category?.name || 'Genel');
-        const price = `${Number(p.price).toFixed(2)} TRY`;
+        const normalFiyat = Number(p.price);
+        const price = `${normalFiyat.toFixed(2)} TRY`;
+
+        // Büyük Açılış & Efsane Kasım: Sepette %10 indirim
+        // Google Merchant sale_price etiketi Google Alışveriş'te orijinal fiyatın üzerini çizer ve indirim rozeti ekler
+        let salePriceXml = '';
+        let customLabelXml = '';
+        if (KASIM_KAMPANYASI_AKTIF && KASIM_INDIRIM_ORANI > 0) {
+          const indirimliFiyat = Math.round(normalFiyat * (1 - KASIM_INDIRIM_ORANI / 100) * 100) / 100;
+          salePriceXml = `\n      <g:sale_price>${indirimliFiyat.toFixed(2)} TRY</g:sale_price>`;
+          customLabelXml = `\n      <g:custom_label_0>Efsane Kasim %10 Indirim</g:custom_label_0>`;
+        }
+
         const availability = p.quantity > 0 ? 'in_stock' : 'out_of_stock';
         
         const yerelGorsel = urunGorseli(p.slug, p.imageUrl);
@@ -57,9 +70,9 @@ export async function GET() {
       <g:image_link>${imageUrl}</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>${availability}</g:availability>
-      <g:price>${price}</g:price>
+      <g:price>${price}</g:price>${salePriceXml}
       <g:brand>İşyurtları</g:brand>
-      <g:product_type>${categoryName}</g:product_type>
+      <g:product_type>${categoryName}</g:product_type>${customLabelXml}
       <g:identifier_exists>no</g:identifier_exists>
     </item>`;
       })
