@@ -154,14 +154,48 @@ Bu doküman, **isyurtlari.com.tr** e-ticaret platformunda yöneticinin operasyon
 
 ---
 
-### ⚪ Aşama 12: Gelecek Geliştirmeler & Kalan Eksikler
-- [ ] **Katalog Fiyat & Maliyet Girişi:** Fiyatı veya girdi maliyeti eksik ürünlerin `/admin/fiyatlar` ekranından veya CSV indirilerek doldurulması.
+### 🟢 Aşama 12: 320 Tedarikçi Cezaevi Cari Kartları & Mal Kabulü
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - `apps/isyurtlari/src/app/api/admin/muhasebe/seed-suppliers/route.ts` API rotası oluşturuldu.
+  - Niğde, Foça, Edirne, Bozkurt ve Menemen Açık CİK İşyurtları 320 Tedarikçi Cari Kartları (Vergi No, Adres, İletişim) standart kod yapısıyla hazırlandı.
+  - `/admin/muhasebe` ekranında Cari Kartlar sekmesine *"🏛️ Cezaevi Tedarikçilerini Tanımla"* tek tıkla kurulum butonu entegre edildi.
+  - İrsaliye kabulünde bu cezaevleri seçilerek Ağırlıklı Ortalama Maliyet (WAV) hesaplaması bağlandı.
+
+---
+
+### 🟢 Aşama 13: Ön Talep & Sipariş Rezervasyon Akışı (Geçici Ödeme Süreci)
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - iyzico Sanal POS ve banka hesap onayları tamamlanana kadar sepet terkini ve müşteri kaybını önlemek için ödeme adımına *"Ön Talep / Sipariş Rezervasyonu (Banka Onayı Bekleniyor - Şimdi Ödeme Alınmaz)"* opsiyonu eklendi.
+  - Kullanıcılar siparişlerini oluşturabiliyor; sipariş numarası üretiliyor ve yönetim paneline doğrudan *"Ön Talep / Rezervasyon"* statüsünde düşüyor.
+  - Banka hesapları onaylandığında müşteriye otomatik IBAN/EFT veya ödeme linki iletilebilmesi için veri akışı sağlandı.
+
+---
+
+### 🟢 Aşama 14: Koli Sevk Etiketi & Kargo Takip Altyapısı
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - Anlaşmalı kargo entegrasyonu henüz aktif olmasa bile standart koli sevk etiketi yapısı kuruldu.
+  - `/admin/siparisler` paneline tek tıkla A4/A5 ebatında resmi **"Koli Sevk Etiketi Yazdır"** özelliği eklendi.
+  - Etikette: Gönderici (İşyurtları Kurumu), Alıcı Bilgileri, Sipariş Numarası, Ürün Kalemleri, Koli Barkodu ve Kargo Takip Alanı yer almaktadır.
+
+---
+
+### 🟢 Aşama 15: Güvenlik, 2FA OTP & Çerez/Önbellek Mimarisi
+- **Durum:** ✅ Tamamlandı
+- **Yapılanlar:**
+  - Sabit şifre ve parola formu kökten kaldırıldı; girişler salt kriptografik e-posta OTP ile sınırlandırıldı.
+  - Çerez `domain: .isyurtlari.com.tr`, `sameSite: lax` ve `secure: true` yapılandırmasıyla apex ve subdomain uyumlu hale getirildi.
+  - `/admin` ve `/api/admin` sayfalarında disk ve tarayıcı önbelleği `no-store, no-cache, must-revalidate` başlıklarıyla kapatıldı.
+  - Güvenli çıkış için resmi `/admin/logout` sayfası devreye alındı.
 
 ---
 
 ## 📌 Durum Özeti
-* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu ve Tüm Katalog Görselleri (63/63 ürün eksiksiz) sıfır hatayla tamamlandı ve canlıya alındı.
+* **Mevcut Durum:** ✅ Logo GO3 Ön Muhasebe, Cari Kartlar (120/320), Fatura & İrsaliye, Banka & Kasa, Gider Yönetimi, Mal Kabulü (WAV), 7 Sekmeli Yönetici Kokpiti, Otomatik Kargo Gideri, iyzico Callback & POS Komisyon Kesintisi, Fiyat/Maliyet Paneli, Logo İşNet GİB e-Arşiv Entegrasyonu, Tüm Katalog Görselleri (63/63), 320 Cezaevi Tedarikçileri, Ön Talep Rezervasyonu, Koli Sevk Etiketi ve 2FA OTP Güvenlik Mimarisi sıfır hatayla tamamlandı ve canlıya alındı.
 * **Canlı Erişim:**
   * Muhasebe & e-Arşiv Kokpiti: `https://isyurtlari.com.tr/admin/muhasebe`
+  * Sipariş & Koli Sevk Etiketleri: `https://isyurtlari.com.tr/admin/siparisler`
   * Fiyat & Maliyet Paneli: `https://isyurtlari.com.tr/admin/fiyatlar`
 * **Son Güncelleme:** 20 Ekim 2026
