@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken';
 import { verifyOTP, getRemainingAttempts, kodlariTemizle } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
+import { jwtAnahtari } from '@/lib/admin-auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   let email = 'unknown';
@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    email = body.email;
-    const code = body.code;
+    email = (body.email || '').trim().toLowerCase();
+    const code = (body.code || '').trim();
 
     if (!email || !code) {
       return NextResponse.json(
@@ -23,18 +23,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Hiz siniri: dakikada 10 dogrulama denemesi.
-    //
-    // Kodun kendi deneme sayaci (5) tek bir kod icin gecerli; bu sinir ise
-    // surekli yeni kod isteyip denemeyi de yavaslatiyor. Sayac veritabaninda
-    // oldugu icin sunucusuz ortamda gercekten isliyor.
     const sinir = await hizSiniriGuard(req, 'otp-verify', 10, 60);
     if (sinir) {
       await logAudit('OTP_VERIFY', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
     }
 
-    if (email !== ADMIN_EMAIL) {
+    const ADMIN_EMAILS = [
+      (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
+      'info@isyurtlari.com.tr',
+      'halil.kosger@gmail.com',
+    ].filter(Boolean);
+
+    if (!ADMIN_EMAILS.includes(email)) {
       await logAudit('OTP_VERIFY', email, 'failed', 'Yetkisiz e-posta', ip);
       return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
     }
@@ -57,26 +58,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create JWT token
+    // Create JWT token using common secure key
     const token = jwt.sign(
       { admin: true, email, iat: Math.floor(Date.now() / 1000) },
-      JWT_SECRET,
-      { expiresIn: '1h' }
+      jwtAnahtari(),
+      { expiresIn: '24h' }
     );
 
-    // Set secure cookie
+    // Set secure cookie with 'lax' sameSite to prevent cookie dropping on client navigation
     const res = NextResponse.json({ success: true });
     res.cookies.set('admin-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60, // 1 saat
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 24 saat
       path: '/',
     });
 
     await logAudit('OTP_VERIFY', email, 'success', 'Yönetici girişi başarılı', ip);
 
-    // Suresi gecmis kodlari ara sira temizle
+    // Süresi geçmiş kodları ara sıra temizle
     await kodlariTemizle();
 
     return res;

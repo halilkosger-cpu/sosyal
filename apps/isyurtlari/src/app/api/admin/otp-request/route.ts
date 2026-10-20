@@ -19,12 +19,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email gereklidir' }, { status: 400 });
     }
 
-    // Validate email (should be admin email)
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'halil.kosger@gmail.com';
-    if (email !== ADMIN_EMAIL) {
+    // Validate email (admin email listesi normalize edildi)
+    const normalizedEmail = email.toLowerCase().trim();
+    const ALLOWED_EMAILS = [
+      (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
+      'halil.kosger@gmail.com',
+      'info@isyurtlari.com.tr'
+    ].filter(Boolean);
+
+    if (!ALLOWED_EMAILS.includes(normalizedEmail)) {
       await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta', ip);
-      return NextResponse.json({ error: 'Yetkisiz email' }, { status: 403 });
+      return NextResponse.json({ error: 'Yetkisiz email adresi. Lütfen kayıtlı yönetici e-postasını kullanın.' }, { status: 403 });
     }
+    email = normalizedEmail;
 
     // Hiz siniri: dakikada 5 kod istegi.
     //
