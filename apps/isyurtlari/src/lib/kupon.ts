@@ -59,7 +59,26 @@ export async function kuponuDogrula({
   const normal = kuponKodunuNormalize(kod);
   if (!normal) return gecersiz('Kupon kodu girin');
 
-  const kupon = await prisma.kupon.findUnique({ where: { kod: normal } });
+  let kupon = await prisma.kupon.findUnique({ where: { kod: normal } });
+
+  if (!kupon && normal === 'HOSGELDIN10') {
+    try {
+      kupon = await prisma.kupon.create({
+        data: {
+          kod: 'HOSGELDIN10',
+          tur: 'YUZDE',
+          deger: 10,
+          asgariTutar: 0,
+          aktif: true,
+          hesapZorunlu: false,
+          musteriBasina: 1,
+          aciklama: 'VIP Açılış Bülteni Hoş Geldin İndirimi (%10)',
+        },
+      });
+    } catch {
+      kupon = await prisma.kupon.findUnique({ where: { kod: normal } });
+    }
+  }
 
   /**
    * "Kupon yok" ile "kupon geçersiz" aynı mesajı veriyor.

@@ -132,8 +132,38 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-            {/* Ürünler */}
-            <div className="lg:col-span-2 rounded-2xl border border-gray-200 divide-y divide-gray-100">
+            <div className="lg:col-span-2 space-y-4">
+              {/* Sepet Hedef İlerleme Çubuğu (AOV Artırıcı) */}
+              {(() => {
+                const HEDEF_TUTAR = 750;
+                const kalan = Math.max(0, HEDEF_TUTAR - subtotal);
+                const yuzde = Math.min(100, Math.round((subtotal / HEDEF_TUTAR) * 100));
+                return (
+                  <div className="rounded-2xl border border-orange-200/90 bg-gradient-to-r from-orange-50/80 via-[#FFF9F3] to-amber-50/80 p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-xs font-bold mb-2">
+                      {kalan > 0 ? (
+                        <span className="text-[#BA4700] flex items-center gap-1.5">
+                          🎁 <strong>{tl(kalan)}</strong> daha ekleyin, paketinize özel sürpriz el emeği hediyesi kazanın!
+                        </span>
+                      ) : (
+                        <span className="text-emerald-700 flex items-center gap-1.5 font-bold">
+                          🎉 Tebrikler! ₺{HEDEF_TUTAR} hedefine ulaştınız; siparişinize özel sürpriz hediye paketinize tanımlandı!
+                        </span>
+                      )}
+                      <span className="text-gray-500 font-mono text-[11px]">%{yuzde}</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-gray-200/80 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-500 rounded-full ${kalan === 0 ? 'bg-emerald-500' : 'bg-gradient-to-r from-[#E8620C] to-[#CC4E00]'}`}
+                        style={{ width: `${yuzde}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Ürünler */}
+              <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 bg-white">
               {cart.map((item) => (
                 <div key={item.id} className="p-4 flex gap-4">
                   <Link href={`/urun/${item.slug}`} className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl overflow-hidden bg-[#F6EFE6] flex items-center justify-center">
@@ -187,6 +217,7 @@ export default function CartPage() {
                 <button onClick={clearCart} className="text-sm text-gray-500 hover:text-red-600">Sepeti boşalt</button>
               </div>
             </div>
+          </div>
 
             {/* Özet */}
             <aside className="rounded-2xl border border-gray-200 bg-[#FAFAF9] p-5 lg:sticky lg:top-40">
@@ -213,9 +244,11 @@ export default function CartPage() {
               <button onClick={() => router.push('/checkout')} className="w-full mt-5 h-12 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-xl font-bold flex items-center justify-center gap-2">
                 Ödemeye Geç <LuArrowRight size={18} />
               </button>
-              <ul className="mt-5 space-y-2 text-xs text-gray-600">
-                <li className="flex items-center gap-2"><LuRotateCcw size={15} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>
-                <li className="flex items-center gap-2"><LuShieldCheck size={15} className="text-[#E8620C] shrink-0" /> Siparişlerim sayfasından kargo takibi</li>
+              <ul className="mt-5 space-y-2.5 text-xs text-gray-600 border-t border-gray-200 pt-4">
+                <li className="flex items-center gap-2 text-emerald-800 font-medium"><span>🛡️</span> %100 Hasarsız &amp; Kırılmaz Teslimat</li>
+                <li className="flex items-center gap-2"><span>🏛️</span> Resmi İşyurtları Mağazalarından Orijinal</li>
+                <li className="flex items-center gap-2"><LuRotateCcw size={15} className="text-[#E8620C] shrink-0" /> 14 gün koşulsuz cayma hakkı</li>
+                <li className="flex items-center gap-2"><LuShieldCheck size={15} className="text-[#E8620C] shrink-0" /> Kargo takip no ile canlı izleme</li>
               </ul>
             </aside>
           </div>

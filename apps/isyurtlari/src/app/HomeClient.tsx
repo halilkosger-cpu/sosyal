@@ -7,6 +7,7 @@ import UrunKarti from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture } from '@/components/Icons';
 import { content } from '@/config/content';
+import VipBulten from '@/components/VipBulten';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -326,6 +327,9 @@ export default function HomeClient({
           </div>
         )}
       </section>
+
+      {/* ─── VIP ERKEN ERİŞİM & AÇILIŞ İNDİRİM BÜLTENİ ─── */}
+      <VipBulten />
 
       {/* ─── SEO AÇIKLAMA METNİ ───
           Arama motoru sayfanin ne sattigini ve fiyatlarin nasil islediğini
