@@ -583,20 +583,24 @@ model Product {
   description String
   categoryId  String
   price       Float
+  purchasePrice Float   @default(0)    // Malın birim alış/girdi maliyeti (KDV dahil)
+  vatRate       Float   @default(20)   // KDV Oranı (%1 veya %20)
+  minStockLevel Int     @default(5)    // Kritik stok eşik uyarısı seviyesi
   quantity    Int      @default(0)    // Stok
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems  OrderItem[]
-  cartItems   CartItem[]
-  campaigns   CampaignProduct[]
-  reviews     Review[]
-  favorites   Favorite[]
-  preOrders   PreOrder[]
-  images      ProductImage[]
-  attributes  ProductAttribute[]
+  category       ProductCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems     OrderItem[]
+  cartItems      CartItem[]
+  campaigns      CampaignProduct[]
+  reviews        Review[]
+  favorites      Favorite[]
+  preOrders      PreOrder[]
+  images         ProductImage[]
+  attributes     ProductAttribute[]
+  stockMovements StockMovement[]
 
   @@index([categoryId])
   @@index([slug])
@@ -791,7 +795,8 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
-  price     Float    // Ürünün satın alındığı fiyat
+  price     Float    // Ürünün satın alındığı satış fiyatı (KDV dahil)
+  purchasePrice Float @default(0) // Satış anındaki birim maliyet (kârlılık hesabı için)
   createdAt DateTime @default(now())
 
   order       Order        @relation(fields: [orderId],   references: [id], onDelete: Cascade)
@@ -1150,3 +1155,46 @@ model KuponKullanimi {
   @@index([customerId])
   @@index([eposta])
 }
+
+// ─── ÖN MUHASEBE & GİDERLER ──────────────────────────────────
+enum ExpenseCategory {
+  SHIPPING     // Kargo ve Paketleme Giderleri
+  MARKETING    // Reklam & Pazarlama (Google, Meta vb.)
+  COMMISSION   // Ödeme/Sanal POS Komisyonları
+  OPERATIONAL  // Genel İşletme (Kira, muhasebe, ambalaj, sunucu vb.)
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  date        DateTime        @default(now())
+  title       String          // Gider açıklaması (Örn: Mart Ayı Yurtiçi Kargo Faturası)
+  category    ExpenseCategory
+  amount      Float           // Toplam Tutar (KDV Dahil)
+  vatRate     Float           @default(20) // KDV Oranı (%20, %10, %1 veya %0)
+  invoiceNo   String?         // Fatura / Fiş No
+  supplier    String?         // Tedarikçi / Kurum
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([category])
+  @@index([date])
+}
+
+model StockMovement {
+  id            String   @id @default(cuid())
+  productId     String
+  quantity      Int      // Giriş miktarı (+) veya düzeltme (+/-)
+  unitCost      Float    // Giriş anındaki birim maliyet (KDV Dahil)
+  totalCost     Float    // Toplam tutar
+  invoiceNo     String?  // Alış Fatura / İrsaliye No
+  supplier      String?  // Tedarikçi / İşyurdu adı
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([createdAt])
+}
+

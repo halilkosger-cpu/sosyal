@@ -154,6 +154,18 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</p>
+                    {(() => {
+                      const cost = order.items.reduce((s: number, it: any) => {
+                        const unitCost = it.purchasePrice > 0 ? it.purchasePrice : (it.product?.purchasePrice || 0);
+                        return s + unitCost * it.quantity;
+                      }, 0);
+                      const profit = order.totalAmount - cost;
+                      return cost > 0 ? (
+                        <p className={`text-[11px] font-bold ${profit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                          Kâr: ₺{profit.toFixed(2)}
+                        </p>
+                      ) : null;
+                    })()}
                     <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</p>
                   </div>
                 </div>
@@ -165,12 +177,23 @@ export default function AdminOrdersPage() {
                     <div>
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Ürünler</p>
                       <div className="space-y-1">
-                        {order.items.map((item, i) => (
-                          <div key={i} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">{item.product?.name || 'Bilinmeyen Ürün'} <span className="text-gray-400">x{item.quantity}</span></span>
-                            <span className="font-semibold text-gray-900">₺{(item.price * item.quantity).toFixed(2)}</span>
-                          </div>
-                        ))}
+                        {order.items.map((item: any, i) => {
+                          const unitCost = item.purchasePrice > 0 ? item.purchasePrice : (item.product?.purchasePrice || 0);
+                          const lineProfit = (item.price - unitCost) * item.quantity;
+                          return (
+                            <div key={i} className="flex items-center justify-between text-sm py-1 border-b border-gray-50">
+                              <div>
+                                <span className="text-gray-700 font-medium">{item.product?.name || 'Bilinmeyen Ürün'} <span className="text-gray-400">x{item.quantity}</span></span>
+                                {unitCost > 0 && (
+                                  <span className="block text-[11px] text-gray-400">
+                                    Birim Alış: ₺{unitCost.toFixed(2)} • Brüt Kâr: <strong className={lineProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}>₺{lineProfit.toFixed(2)}</strong>
+                                  </span>
+                                )}
+                              </div>
+                              <span className="font-semibold text-gray-900">₺{(item.price * item.quantity).toFixed(2)}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 

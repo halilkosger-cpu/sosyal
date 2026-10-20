@@ -115,6 +115,63 @@ async function sendOrderEmail(
         subject: `✅ Siparişiniz Onaylandı - #${orderNumber}`,
         html: customerEmailHtml,
       });
+
+      // Kritik Stok Kontrolü: Bu siparişle stoğu eşik değerin altına düşen ürün varsa yöneticiye bildir
+      try {
+        const productIds = items.map((it: any) => it.productId || it.product?.id).filter(Boolean);
+        if (productIds.length > 0) {
+          const dusenUrunler = await prisma.product.findMany({
+            where: {
+              id: { in: productIds },
+            },
+            select: { id: true, name: true, quantity: true, minStockLevel: true },
+          });
+
+          const alarmlar = dusenUrunler.filter((p) => p.quantity <= (p.minStockLevel ?? 5));
+          if (alarmlar.length > 0) {
+            await resend.emails.send({
+              from: 'info@isyurtlari.com.tr',
+              to: recipientEmail,
+              subject: `⚠️ Kritik Stok Uyarısı (${alarmlar.length} Ürün)`,
+              html: `
+                <div style="font-family: sans-serif; padding: 20px; max-width: 600px;">
+                  <h2 style="color: #BA4700;">⚠️ Kritik Stok Seviyesi Uyarısı</h2>
+                  <p>Aşağıdaki ürünlerin stoğu #${orderNumber} numaralı sipariş sonrasında kritik eşiğe veya altına inmiştir:</p>
+                  <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                      <tr style="background: #f4f4f5; text-align: left;">
+                        <th style="padding: 8px; border: 1px solid #e4e4e7;">Ürün</th>
+                        <th style="padding: 8px; border: 1px solid #e4e4e7; text-align: center;">Kalan Stok</th>
+                        <th style="padding: 8px; border: 1px solid #e4e4e7; text-align: center;">Kritik Eşik</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${alarmlar
+                        .map(
+                          (a) => `
+                        <tr>
+                          <td style="padding: 8px; border: 1px solid #e4e4e7;"><strong>${a.name}</strong></td>
+                          <td style="padding: 8px; border: 1px solid #e4e4e7; text-align: center; color: red; font-weight: bold;">${a.quantity} adet</td>
+                          <td style="padding: 8px; border: 1px solid #e4e4e7; text-align: center;">${a.minStockLevel ?? 5} adet</td>
+                        </tr>
+                      `
+                        )
+                        .join('')}
+                    </tbody>
+                  </table>
+                  <p style="margin-top: 20px;">
+                    <a href="https://isyurtlari.com.tr/admin/muhasebe/stok-girisi" style="background: #BA4700; color: white; padding: 10px 16px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                      Stok Kabulü / Girişi Yap &rarr;
+                    </a>
+                  </p>
+                </div>
+              `,
+            });
+          }
+        }
+      } catch (stokErr) {
+        console.error('Kritik stok e-posta bildirimi hatası:', stokErr);
+      }
     } else {
       // Fallback: log to console
       console.log(`📧 Email would be sent to ${recipientEmail}: Order ${orderNumber}`);
@@ -294,6 +351,7 @@ export async function POST(req: NextRequest) {
         listeFiyati: product.price,
         kdvOrani: product.category?.kdvOrani ?? null,
         ad: product.name,
+        purchasePrice: (product as any).purchasePrice || 0,
       });
     }
 
@@ -415,6 +473,7 @@ export async function POST(req: NextRequest) {
                 productId: k.id,
                 quantity: k.adet,
                 price: k.birimFiyat,
+                purchasePrice: k.purchasePrice || 0,
               })),
             },
           },
