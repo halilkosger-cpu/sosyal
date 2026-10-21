@@ -19,6 +19,8 @@ import HesapMenusu from '@/components/HesapMenusu';
 const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
+const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
+const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import './globals.css';
 
@@ -219,10 +221,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     {kisaAd(cat.name)}
                   </Link>
                 ))}
-                <div className="ml-auto flex-shrink-0">
+                <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
+                  <Link
+                    href="/hediye-kutusu-yap"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-[#CC4E00] hover:bg-[#a83f00] text-white shadow-sm hover:shadow transition-all whitespace-nowrap mr-1"
+                  >
+                    <span>🎁</span> Hediye Kutusu Yap
+                  </Link>
                   <Link
                     href="/hakkimizda"
-                    className="flex items-center gap-1 px-4 py-3 text-sm text-gray-500 hover:text-[#BA4700] transition-colors whitespace-nowrap"
+                    className="flex items-center gap-1 px-3 py-3 text-sm text-gray-500 hover:text-[#BA4700] transition-colors whitespace-nowrap"
                   >
                     Hakkımızda
                   </Link>
@@ -307,6 +315,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SenkronKopru />
         {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
         <AltGezinme />
+        {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
+        <CanliSosyalKanit />
+        <HediyeDanismaniModal />
       </body>
     </html>
   );
