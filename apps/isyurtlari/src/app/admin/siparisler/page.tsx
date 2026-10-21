@@ -8,11 +8,71 @@ interface OrderItem { quantity: number; price: number; product?: { name: string 
 interface Order {
   id: string; orderNumber: string; status: string; totalAmount: number;
   paymentMethod: string; shippingAddress: string; createdAt: string;
+  notes?: string | null;
   user?: { name: string; email: string } | null;
+  customer?: { name: string; email: string; phone?: string | null } | null;
   items: OrderItem[];
   kargoFirmasi?: string | null;
   kargoTakipNo?: string | null;
   shippedAt?: string | null;
+}
+
+function nottanCikar(notes: string | null | undefined, anahtar: string): string {
+  if (!notes) return '';
+  const eslesme = notes.match(new RegExp(`${anahtar}:\\s*([^|\\n]+)`, 'i'));
+  return eslesme ? eslesme[1].trim() : '';
+}
+
+function kacisHtml(str: string | null | undefined): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function siparisMusteriBilgisi(order: Order) {
+  const notAd = nottanCikar(order.notes, 'Müşteri');
+  const notEposta = nottanCikar(order.notes, 'Email') || nottanCikar(order.notes, 'E-posta');
+  const notTelefon = nottanCikar(order.notes, 'Telefon') || nottanCikar(order.notes, 'Tel');
+
+  // Adres ilk satırında "Ad Soyad (05xxxxxxxxx)" varsa
+  const satirlar = (order.shippingAddress || '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const ilkSatir = satirlar[0] || '';
+  const adresEslesme = ilkSatir.match(/^(.*?)\s*\((.+?)\)\s*$/);
+  const adresAd = adresEslesme ? adresEslesme[1].trim() : '';
+  const adresTelefon = adresEslesme ? adresEslesme[2].trim() : '';
+
+  const ad =
+    order.customer?.name ||
+    notAd ||
+    order.user?.name ||
+    adresAd ||
+    'Müşteri';
+
+  const telefon =
+    order.customer?.phone ||
+    notTelefon ||
+    adresTelefon ||
+    '';
+
+  const eposta =
+    order.customer?.email ||
+    notEposta ||
+    order.user?.email ||
+    '';
+
+  const temizAdres =
+    adresEslesme && satirlar.length > 1
+      ? satirlar.slice(1).join('\n')
+      : (order.shippingAddress || '-');
+
+  return { ad, telefon, eposta, temizAdres };
 }
 
 const statusConfig: Record<string, { label: string; color: string; Icon: React.ElementType }> = {
@@ -132,6 +192,7 @@ export default function AdminOrdersPage() {
             const Icon = cfg?.Icon ?? LuClock;
             const isExp = expanded === order.id;
             const currentIdx = statusFlow.indexOf(order.status);
+            const musteri = siparisMusteriBilgisi(order);
 
             return (
               <div key={order.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -150,7 +211,11 @@ export default function AdminOrdersPage() {
                         {order.paymentMethod === 'TRANSFER' ? '🏦 Havale' : '💳 Kredi Kartı'}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{order.user?.name || 'Misafir'} · {order.user?.email || 'Bilinmiyor'}</p>
+                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                      <strong className="text-gray-900 font-semibold">{musteri.ad}</strong>
+                      {musteri.telefon && <span className="text-gray-700">· 📞 {musteri.telefon}</span>}
+                      {musteri.eposta && <span className="text-gray-400">· ✉️ {musteri.eposta}</span>}
+                    </p>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</p>
@@ -197,10 +262,17 @@ export default function AdminOrdersPage() {
                       </div>
                     </div>
 
-                    {/* Address */}
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Teslimat Adresi</p>
-                      <p className="text-sm text-gray-700">{order.shippingAddress}</p>
+                    {/* Address & Customer details */}
+                    <div className="bg-gray-50/70 p-3.5 rounded-xl border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Teslimat ve Alıcı Bilgileri</p>
+                      <p className="text-sm font-bold text-gray-900 flex items-center gap-2 flex-wrap">
+                        <span>{musteri.ad}</span>
+                        {musteri.telefon && <span className="text-xs font-semibold text-gray-700">📞 {musteri.telefon}</span>}
+                        {musteri.eposta && <span className="text-xs font-normal text-gray-500">✉️ {musteri.eposta}</span>}
+                      </p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap mt-2 pt-2 border-t border-gray-200/60 leading-relaxed">
+                        {order.shippingAddress}
+                      </p>
                     </div>
 
                     {/* Kargo & Sevk İrsaliyesi */}
@@ -216,21 +288,30 @@ export default function AdminOrdersPage() {
                               if (!printWindow) return;
                               const firmaAd = KARGO_FIRMALARI.find(f => f.kod === kargoAlanlari(order).firma)?.ad || 'Standart Kargo';
                               printWindow.document.write(`
+                                <!DOCTYPE html>
                                 <html>
                                   <head>
-                                    <title>Koli Sevk Fişi - #${order.orderNumber}</title>
+                                    <meta charset="UTF-8">
+                                    <title>Koli Sevk Fişi - #${kacisHtml(order.orderNumber)}</title>
                                     <style>
-                                      body { font-family: Arial, sans-serif; padding: 24px; color: #111; }
-                                      .box { border: 2px solid #000; padding: 20px; max-width: 500px; margin: 0 auto; border-radius: 8px; }
-                                      .header { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
-                                      .title { font-size: 18px; font-weight: bold; }
-                                      .meta { font-size: 12px; }
-                                      .section { margin-bottom: 14px; }
-                                      .label { font-size: 11px; text-transform: uppercase; font-weight: bold; color: #555; }
-                                      .val { font-size: 14px; font-weight: bold; margin-top: 2px; }
-                                      .items { font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 8px; }
-                                      .items td, .items th { border: 1px solid #ddd; padding: 6px; }
-                                      .barcode { font-family: monospace; font-size: 24px; letter-spacing: 4px; text-align: center; margin: 16px 0; border: 1px dashed #999; padding: 10px; }
+                                      @page { size: auto; margin: 8mm; }
+                                      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 16px; color: #111; margin: 0; background: #fff; }
+                                      .box { border: 2px solid #000; padding: 18px; max-width: 520px; margin: 0 auto; border-radius: 8px; box-sizing: border-box; }
+                                      .header { border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+                                      .title { font-size: 17px; font-weight: 800; color: #000; letter-spacing: -0.2px; }
+                                      .meta { font-size: 12px; color: #555; }
+                                      .section { margin-bottom: 12px; }
+                                      .label { font-size: 10px; text-transform: uppercase; font-weight: 800; color: #555; letter-spacing: 0.5px; margin-bottom: 2px; }
+                                      .val { font-size: 14px; font-weight: 700; color: #000; }
+                                      .buyer-box { background: #fcfcfc; border: 1.5px solid #111; border-radius: 6px; padding: 10px 12px; margin-top: 3px; }
+                                      .items { font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 6px; }
+                                      .items td, .items th { border: 1px solid #ccc; padding: 5px 8px; }
+                                      .items th { background: #f2f2f2; text-align: left; font-size: 11px; text-transform: uppercase; }
+                                      .barcode { font-family: monospace; font-size: 24px; font-weight: bold; letter-spacing: 4px; text-align: center; margin: 12px 0; border: 1.5px dashed #444; padding: 6px; background: #fafafa; }
+                                      @media print {
+                                        body { padding: 0; }
+                                        .box { border: 2px solid #000; }
+                                      }
                                     </style>
                                   </head>
                                   <body>
@@ -241,7 +322,7 @@ export default function AdminOrdersPage() {
                                           <div class="meta">isyurtlari.com.tr · Sipariş Sevk ve Teslimat Fişi</div>
                                         </div>
                                         <div style="text-align: right;">
-                                          <div style="font-weight: bold; font-size: 16px;">#${order.orderNumber}</div>
+                                          <div style="font-weight: 800; font-size: 16px;">#${kacisHtml(order.orderNumber)}</div>
                                           <div class="meta">${new Date(order.createdAt).toLocaleDateString('tr-TR')}</div>
                                         </div>
                                       </div>
@@ -253,30 +334,47 @@ export default function AdminOrdersPage() {
                                       </div>
 
                                       <div class="section">
-                                        <div class="label">ALICI (MÜŞTERİ) BİLGİLERİ</div>
-                                        <div class="val">${order.user?.name || 'Müşteri'}</div>
-                                        <div style="font-size: 13px; margin-top: 4px; line-height: 1.4;">${order.shippingAddress}</div>
-                                        <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">Tel: ${order.user?.email || ''}</div>
+                                        <div class="label" style="color: #000; font-size: 11px;">ALICI (MÜŞTERİ) BİLGİLERİ</div>
+                                        <div class="buyer-box">
+                                          <div style="font-size: 16px; font-weight: 800; color: #000; margin-bottom: 4px;">
+                                            ${kacisHtml(musteri.ad)}
+                                          </div>
+                                          <div style="font-size: 13px; font-weight: 700; color: #111; margin-bottom: 6px;">
+                                            📞 Tel: ${kacisHtml(musteri.telefon || 'Belirtilmedi')}
+                                            ${musteri.eposta ? `<span style="font-weight: normal; color: #555; margin-left: 8px;">✉️ ${kacisHtml(musteri.eposta)}</span>` : ''}
+                                          </div>
+                                          <div style="font-size: 11px; font-weight: bold; color: #555; margin-top: 6px; text-transform: uppercase;">Teslimat Adresi:</div>
+                                          <div style="font-size: 13px; line-height: 1.45; white-space: pre-wrap; margin-top: 2px;">${kacisHtml(musteri.temizAdres)}</div>
+                                        </div>
                                       </div>
 
                                       <div class="barcode">
-                                        *${order.orderNumber}*
+                                        *${kacisHtml(order.orderNumber)}*
                                       </div>
 
                                       <div class="section">
-                                        <div class="label">KARGO BİLGİSİ</div>
-                                        <div class="val">${firmaAd} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kargoAlanlari(order).takipNo}` : '· (Karşı Ödemeli / Anlaşmalı)'}</div>
+                                        <div class="label">KARGO VE ÖDEME BİLGİSİ</div>
+                                        <div class="val" style="font-size: 13px;">
+                                          ${kacisHtml(firmaAd)} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kacisHtml(kargoAlanlari(order).takipNo)}` : '· (Karşı Ödemeli / Anlaşmalı)'}
+                                        </div>
+                                        <div style="font-size: 11px; color: #555; margin-top: 2px;">
+                                          Ödeme: ${order.paymentMethod === 'TRANSFER' ? 'Banka Havalesi / EFT' : 'Kredi Kartı'} · Sipariş Tutarı: ₺${order.totalAmount.toFixed(2)}
+                                        </div>
                                       </div>
 
                                       <div class="section">
                                         <div class="label">PAKET İÇERİĞİ (${order.items.length} Kalem)</div>
                                         <table class="items">
-                                          <tr><th>Ürün</th><th>Adet</th></tr>
-                                          ${order.items.map(it => `<tr><td>${it.product?.name || 'Ürün'}</td><td align="center">${it.quantity}</td></tr>`).join('')}
+                                          <thead>
+                                            <tr><th>Ürün</th><th style="width: 50px; text-align: center;">Adet</th></tr>
+                                          </thead>
+                                          <tbody>
+                                            ${order.items.map(it => `<tr><td>${kacisHtml(it.product?.name || 'Ürün')}</td><td align="center"><strong>${it.quantity}</strong></td></tr>`).join('')}
+                                          </tbody>
                                         </table>
                                       </div>
                                       
-                                      <div style="font-size: 10px; text-align: center; color: #777; margin-top: 14px;">
+                                      <div style="font-size: 10px; text-align: center; color: #777; margin-top: 12px; border-top: 1px dotted #ccc; padding-top: 6px;">
                                         Bu belge koli üzeri teslimat ve sevk etiketi olarak düzenlenmiştir.
                                       </div>
                                     </div>
