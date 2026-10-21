@@ -27,6 +27,7 @@ const navItems = [
   { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
   { href: '/admin/kuponlar',   label: 'Kuponlar',    Icon: LuTicket         },
   { href: '/admin/audit-logs', label: 'Denetim Günlüğü', Icon: LuActivity    },
+  { href: '/admin/guvenlik-2fa', label: '2FA & Authenticator', Icon: LuShieldCheck },
   { href: '/admin/yedek',      label: 'Yedek',       Icon: LuDatabase       },
 ];
 
