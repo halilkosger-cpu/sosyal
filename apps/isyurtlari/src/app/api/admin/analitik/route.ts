@@ -39,85 +39,109 @@ export async function GET(req: NextRequest) {
       baslangicTarihi = new Date(2025, 0, 1);
     }
 
-    // 1. GENEL ZİYARETÇİ METRİKLERİ (İNSAN TRAFİĞİ)
-    const [ozetMetriklerRaw]: any = await prisma.$queryRawUnsafe(`
-      SELECT
-        COUNT(*)::int AS "toplamSayfa",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekilZiyaretci",
-        COUNT(DISTINCT "oturumId")::int AS "toplamOturum",
-        COALESCE(ROUND(AVG("sureSaniye")), 0)::int AS "ortalamaSure"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-    `, baslangicTarihi, bitisTarihi);
+    // Prisma Model üzerinden güvenli sorgulama (SQL Type Mismatch ve PgBouncer hatalarını engeller)
+    let insanKayitlari: any[] = [];
+    let botKayitlari: any[] = [];
 
-    const toplamSayfa = ozetMetriklerRaw?.toplamSayfa || 0;
-    const tekilZiyaretci = ozetMetriklerRaw?.tekilZiyaretci || 0;
-    const toplamOturum = ozetMetriklerRaw?.toplamOturum || 0;
-    const ortalamaSure = ozetMetriklerRaw?.ortalamaSure || 0;
-
-    // 2. SAATLİK VEYA GÜNLÜK ZAMAN SERİSİ (GRAFİK İÇİN)
-    let zamanSerisi: any[] = [];
-    if (period === 'bugun' || period === 'dun') {
-      // Saat bazlı 00:00 - 23:00
-      const saatlerRaw: any[] = await prisma.$queryRawUnsafe(`
-        SELECT
-          TO_CHAR("olusturulma", 'HH24:00') AS "saat",
-          COUNT(*)::int AS "sayfa",
-          COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-        FROM "ZiyaretKaydi"
-        WHERE "isBot" = false
-          AND "olusturulma" >= $1 AND "olusturulma" <= $2
-        GROUP BY 1
-        ORDER BY 1 ASC
-      `, baslangicTarihi, bitisTarihi);
-
-      // 24 saati doldur
-      const saatMap = new Map(saatlerRaw.map((r) => [r.saat, r]));
-      for (let s = 0; s < 24; s++) {
-        const saatStr = `${String(s).padStart(2, '0')}:00`;
-        const kayit = saatMap.get(saatStr);
-        zamanSerisi.push({
-          etiket: saatStr,
-          sayfa: kayit?.sayfa || 0,
-          tekil: kayit?.tekil || 0,
-        });
-      }
+    if ((prisma as any).ziyaretKaydi) {
+      [insanKayitlari, botKayitlari] = await Promise.all([
+        (prisma as any).ziyaretKaydi.findMany({
+          where: {
+            isBot: false,
+            olusturulma: { gte: baslangicTarihi, lte: bitisTarihi },
+          },
+          orderBy: { olusturulma: 'desc' },
+          take: 1000,
+        }),
+        (prisma as any).ziyaretKaydi.findMany({
+          where: {
+            isBot: true,
+            olusturulma: { gte: baslangicTarihi, lte: bitisTarihi },
+          },
+          orderBy: { olusturulma: 'desc' },
+          take: 200,
+        }),
+      ]);
     } else {
-      // Gün bazlı
-      const gunlerRaw: any[] = await prisma.$queryRawUnsafe(`
-        SELECT
-          TO_CHAR("olusturulma", 'YYYY-MM-DD') AS "gun",
-          COUNT(*)::int AS "sayfa",
-          COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-        FROM "ZiyaretKaydi"
+      // Raw fallback
+      insanKayitlari = await prisma.$queryRawUnsafe(`
+        SELECT * FROM "ZiyaretKaydi"
         WHERE "isBot" = false
-          AND "olusturulma" >= $1 AND "olusturulma" <= $2
-        GROUP BY 1
-        ORDER BY 1 ASC
-      `, baslangicTarihi, bitisTarihi);
-
-      zamanSerisi = gunlerRaw.map((r) => ({
-        etiket: r.gun.split('-').slice(1).join('/'),
-        sayfa: r.sayfa,
-        tekil: r.tekil,
-      }));
+        ORDER BY "olusturulma" DESC
+        LIMIT 500
+      `);
+      botKayitlari = await prisma.$queryRawUnsafe(`
+        SELECT * FROM "ZiyaretKaydi"
+        WHERE "isBot" = true
+        ORDER BY "olusturulma" DESC
+        LIMIT 100
+      `);
     }
 
-    // 3. TRAFİK KAYNAKLARI (Arama Motorları, Sosyal Medya, Doğrudan)
-    const kaynaklarRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        "kaynak",
-        COUNT(*)::int AS "sayfa",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "tekil" DESC
-      LIMIT 10
-    `, baslangicTarihi, bitisTarihi);
+    // Eğer 'bugün' seçildiğinde insan kaydı henüz 0 ise ama son 24 saatte kayıt varsa,
+    // boş ekran göstermek yerine kullanıcıyı aydınlatmak için son 24 saatin kayıtlarını da topla
+    let gosterilecekKayitlar = insanKayitlari;
+    if (gosterilecekKayitlar.length === 0 && period === 'bugun') {
+      const son24Saat = await (prisma as any).ziyaretKaydi?.findMany({
+        where: {
+          isBot: false,
+          olusturulma: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        },
+        orderBy: { olusturulma: 'desc' },
+        take: 500,
+      }).catch(() => []);
 
+      if (son24Saat && son24Saat.length > 0) {
+        gosterilecekKayitlar = son24Saat;
+      }
+    }
+
+    // 1. GENEL ZİYARET METRİKLERİ
+    const toplamSayfa = gosterilecekKayitlar.length;
+    const tekilZiyaretciler = new Set(gosterilecekKayitlar.map((k) => k.ziyaretciId));
+    const tekilZiyaretci = tekilZiyaretciler.size;
+    const oturumlar = new Set(gosterilecekKayitlar.map((k) => k.oturumId));
+    const toplamOturum = oturumlar.size;
+    const toplamSure = gosterilecekKayitlar.reduce((sum, k) => sum + (k.sureSaniye || 0), 0);
+    const ortalamaSure = toplamSayfa > 0 ? Math.round(toplamSure / toplamSayfa) : 0;
+
+    // 2. SAATLİK VEYA GÜNLÜK ZAMAN SERİSİ
+    const zamanMap = new Map<string, { sayfa: number; tekiller: Set<string> }>();
+
+    if (period === 'bugun' || period === 'dun') {
+      for (let s = 0; s < 24; s++) {
+        const saatStr = `${String(s).padStart(2, '0')}:00`;
+        zamanMap.set(saatStr, { sayfa: 0, tekiller: new Set() });
+      }
+
+      gosterilecekKayitlar.forEach((k) => {
+        const d = new Date(k.olusturulma);
+        // Türkiye saatine göre saat dilimi
+        const saatNum = (d.getUTCHours() + 3) % 24;
+        const saatStr = `${String(saatNum).padStart(2, '0')}:00`;
+        const entry = zamanMap.get(saatStr) || { sayfa: 0, tekiller: new Set() };
+        entry.sayfa++;
+        entry.tekiller.add(k.ziyaretciId);
+        zamanMap.set(saatStr, entry);
+      });
+    } else {
+      gosterilecekKayitlar.forEach((k) => {
+        const d = new Date(k.olusturulma);
+        const gunStr = `${d.getMonth() + 1}/${d.getDate()}`;
+        const entry = zamanMap.get(gunStr) || { sayfa: 0, tekiller: new Set() };
+        entry.sayfa++;
+        entry.tekiller.add(k.ziyaretciId);
+        zamanMap.set(gunStr, entry);
+      });
+    }
+
+    const zamanSerisi = Array.from(zamanMap.entries()).map(([etiket, v]) => ({
+      etiket,
+      sayfa: v.sayfa,
+      tekil: v.tekiller.size,
+    }));
+
+    // 3. TRAFİK KAYNAKLARI
     const kaynakAdlari: Record<string, string> = {
       google: 'Google Arama',
       bing: 'Bing Arama',
@@ -134,118 +158,141 @@ export async function GET(req: NextRequest) {
       internal: 'Site İçi Dolaşım',
     };
 
-    const kaynaklar = kaynaklarRaw.map((k) => ({
-      kaynak: k.kaynak,
-      ad: kaynakAdlari[k.kaynak] || k.kaynak,
-      sayfa: k.sayfa,
-      tekil: k.tekil,
-      yuzde: tekilZiyaretci > 0 ? Math.round((k.tekil / tekilZiyaretci) * 100) : 0,
-    }));
+    const kaynakMap = new Map<string, { sayfa: number; tekiller: Set<string> }>();
+    gosterilecekKayitlar.forEach((k) => {
+      const kod = k.kaynak || 'direct';
+      const entry = kaynakMap.get(kod) || { sayfa: 0, tekiller: new Set() };
+      entry.sayfa++;
+      entry.tekiller.add(k.ziyaretciId);
+      kaynakMap.set(kod, entry);
+    });
 
-    // 4. ŞEHİR VE COĞRAFİ DAĞILIM (TÜRKİYE İLLERİ)
-    const sehirlerRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        COALESCE("sehir", 'Belirtilmedi') AS "sehir",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil",
-        COUNT(*)::int AS "sayfa"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "tekil" DESC
-      LIMIT 12
-    `, baslangicTarihi, bitisTarihi);
+    const kaynaklar = Array.from(kaynakMap.entries())
+      .map(([kaynak, v]) => ({
+        kaynak,
+        ad: kaynakAdlari[kaynak] || kaynak,
+        sayfa: v.sayfa,
+        tekil: v.tekiller.size,
+        yuzde: tekilZiyaretci > 0 ? Math.round((v.tekiller.size / tekilZiyaretci) * 100) : 0,
+      }))
+      .sort((a, b) => b.tekil - a.tekil);
 
-    // 5. CİHAZ, TARAYICI VE İŞLETİM SİSTEMİ DAĞILIMI
-    const cihazlarRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        "cihaz",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "tekil" DESC
-    `, baslangicTarihi, bitisTarihi);
+    // 4. ŞEHİRLER
+    const sehirMap = new Map<string, { sayfa: number; tekiller: Set<string> }>();
+    gosterilecekKayitlar.forEach((k) => {
+      const sehir = k.sehir || 'Belirtilmedi';
+      const entry = sehirMap.get(sehir) || { sayfa: 0, tekiller: new Set() };
+      entry.sayfa++;
+      entry.tekiller.add(k.ziyaretciId);
+      sehirMap.set(sehir, entry);
+    });
 
-    const isletimSistemiRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        COALESCE("isletimSistemi", 'Diğer') AS "os",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "tekil" DESC
-      LIMIT 6
-    `, baslangicTarihi, bitisTarihi);
+    const sehirler = Array.from(sehirMap.entries())
+      .map(([sehir, v]) => ({
+        sehir,
+        sayfa: v.sayfa,
+        tekil: v.tekiller.size,
+      }))
+      .sort((a, b) => b.tekil - a.tekil)
+      .slice(0, 15);
 
-    const tarayiciRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        COALESCE("tarayici", 'Diğer') AS "tarayici",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "tekil" DESC
-      LIMIT 6
-    `, baslangicTarihi, bitisTarihi);
+    // 5. CİHAZ, TARAYICI VE İŞLETİM SİSTEMİ
+    const cihazMap = new Map<string, Set<string>>();
+    const osMap = new Map<string, Set<string>>();
+    const tarayiciMap = new Map<string, Set<string>>();
 
-    // 6. EN ÇOK ZİYARET EDİLEN SAYFALAR VE ÜRÜNLER
-    const sayfalarRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        "sayfa",
-        MAX("baslik") AS "baslik",
-        COUNT(*)::int AS "goruntuleme",
-        COUNT(DISTINCT "ziyaretciId")::int AS "tekil",
-        COALESCE(ROUND(AVG("sureSaniye")), 0)::int AS "ortalamaSure"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "goruntuleme" DESC
-      LIMIT 15
-    `, baslangicTarihi, bitisTarihi);
+    gosterilecekKayitlar.forEach((k) => {
+      const c = k.cihaz || 'MASAUSTU';
+      if (!cihazMap.has(c)) cihazMap.set(c, new Set());
+      cihazMap.get(c)!.add(k.ziyaretciId);
 
-    // 7. GERÇEK ZAMANLI CANLI ZİYARETÇİ AKIŞI (SON 30 ZİYARET)
-    const canliAkisRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        "id",
-        "ziyaretciId",
-        "sayfa",
-        "baslik",
-        "kaynak",
-        "aramaMotoru",
-        "ip",
-        "ulke",
-        "sehir",
-        "cihaz",
-        "tarayici",
-        "isletimSistemi",
-        "sureSaniye",
-        "isBot",
-        "olusturulma"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = false
-      ORDER BY "olusturulma" DESC
-      LIMIT 30
-    `);
+      const os = k.isletimSistemi || 'Diğer';
+      if (!osMap.has(os)) osMap.set(os, new Set());
+      osMap.get(os)!.add(k.ziyaretciId);
 
-    // 8. BOT VE ARAMA MOTORU TARAMALARI (GOOGLEBOT, BINGBOT...)
-    const botlarRaw: any[] = await prisma.$queryRawUnsafe(`
-      SELECT
-        COALESCE("aramaMotoru", 'Bot') AS "bot",
-        COUNT(*)::int AS "taramaSayisi",
-        MAX("olusturulma") AS "sonTarama"
-      FROM "ZiyaretKaydi"
-      WHERE "isBot" = true
-        AND "olusturulma" >= $1 AND "olusturulma" <= $2
-      GROUP BY 1
-      ORDER BY "taramaSayisi" DESC
-    `, baslangicTarihi, bitisTarihi);
+      const t = k.tarayici || 'Diğer';
+      if (!tarayiciMap.has(t)) tarayiciMap.set(t, new Set());
+      tarayiciMap.get(t)!.add(k.ziyaretciId);
+    });
 
-    // 9. DÖNÜŞÜM VE MÜŞTERİ DEMOGRAFİK ANALİTİĞİ (SİPARİŞLERDEN)
+    const cihazlar = Array.from(cihazMap.entries()).map(([cihaz, set]) => ({
+      cihaz,
+      tekil: set.size,
+    })).sort((a, b) => b.tekil - a.tekil);
+
+    const isletimSistemleri = Array.from(osMap.entries()).map(([os, set]) => ({
+      os,
+      tekil: set.size,
+    })).sort((a, b) => b.tekil - a.tekil);
+
+    const tarayicilar = Array.from(tarayiciMap.entries()).map(([tarayici, set]) => ({
+      tarayici,
+      tekil: set.size,
+    })).sort((a, b) => b.tekil - a.tekil);
+
+    // 6. POPÜLER SAYFALAR
+    const sayfaMap = new Map<string, { baslik?: string; goruntuleme: number; tekiller: Set<string>; toplamSure: number }>();
+    gosterilecekKayitlar.forEach((k) => {
+      const s = k.sayfa || '/';
+      const entry = sayfaMap.get(s) || { baslik: k.baslik, goruntuleme: 0, tekiller: new Set(), toplamSure: 0 };
+      entry.goruntuleme++;
+      entry.tekiller.add(k.ziyaretciId);
+      entry.toplamSure += (k.sureSaniye || 0);
+      if (k.baslik) entry.baslik = k.baslik;
+      sayfaMap.set(s, entry);
+    });
+
+    const sayfalar = Array.from(sayfaMap.entries())
+      .map(([sayfa, v]) => ({
+        sayfa,
+        baslik: v.baslik,
+        goruntuleme: v.goruntuleme,
+        tekil: v.tekiller.size,
+        ortalamaSure: v.goruntuleme > 0 ? Math.round(v.toplamSure / v.goruntuleme) : 0,
+      }))
+      .sort((a, b) => b.goruntuleme - a.goruntuleme)
+      .slice(0, 15);
+
+    // 7. CANLI AKIŞ (HER ZAMAN EN SON 30 GERÇEK ZİYARETÇİ)
+    let canliAkis: any[] = [];
+    let toplamVeritabaniKaydi = gosterilecekKayitlar.length;
+
+    try {
+      if ((prisma as any).ziyaretKaydi) {
+        [canliAkis, toplamVeritabaniKaydi] = await Promise.all([
+          (prisma as any).ziyaretKaydi.findMany({
+            where: { isBot: false },
+            orderBy: { olusturulma: 'desc' },
+            take: 30,
+          }),
+          (prisma as any).ziyaretKaydi.count({
+            where: { isBot: false },
+          }),
+        ]);
+      } else {
+        canliAkis = gosterilecekKayitlar.slice(0, 30);
+      }
+    } catch {
+      canliAkis = gosterilecekKayitlar.slice(0, 30);
+    }
+
+    // 8. BOT TARAMALARI
+    const botMap = new Map<string, { taramaSayisi: number; sonTarama: Date }>();
+    botKayitlari.forEach((b) => {
+      const botAdi = b.aramaMotoru || 'Bot';
+      const entry = botMap.get(botAdi) || { taramaSayisi: 0, sonTarama: new Date(b.olusturulma) };
+      entry.taramaSayisi++;
+      if (new Date(b.olusturulma) > entry.sonTarama) entry.sonTarama = new Date(b.olusturulma);
+      botMap.set(botAdi, entry);
+    });
+
+    const botTaramalari = Array.from(botMap.entries()).map(([bot, v]) => ({
+      bot,
+      taramaSayisi: v.taramaSayisi,
+      sonTarama: v.sonTarama.toISOString(),
+    })).sort((a, b) => b.taramaSayisi - a.taramaSayisi);
+
+    // 9. DÖNÜŞÜM VE MÜŞTERİ DEMOGRAFİSİ (SİPARİŞLERDEN)
     const siparisler = await prisma.order.findMany({
       where: {
         createdAt: { gte: baslangicTarihi, lte: bitisTarihi },
@@ -257,7 +304,7 @@ export async function GET(req: NextRequest) {
         city: true,
         createdAt: true,
       },
-    });
+    }).catch(() => []);
 
     const siparisSayisi = siparisler.length;
     const toplamCiro = siparisler.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
@@ -265,7 +312,6 @@ export async function GET(req: NextRequest) {
       ? Number(((siparisSayisi / tekilZiyaretci) * 100).toFixed(2))
       : 0;
 
-    // Cinsiyet Dağılımı Tahmini (Türk İsim Sözlüğü ile)
     let kadinSayisi = 0;
     let erkekSayisi = 0;
     let belirsizSayisi = 0;
@@ -300,16 +346,17 @@ export async function GET(req: NextRequest) {
         siparisSayisi,
         toplamCiro,
         donusumOrani,
+        toplamVeritabaniKaydi,
       },
       zamanSerisi,
       kaynaklar,
-      sehirler: sehirlerRaw,
-      cihazlar: cihazlarRaw,
-      isletimSistemleri: isletimSistemiRaw,
-      tarayicilar: tarayiciRaw,
-      sayfalar: sayfalarRaw,
-      canliAkis: canliAkisRaw,
-      botTaramalari: botlarRaw,
+      sehirler,
+      cihazlar,
+      isletimSistemleri,
+      tarayicilar,
+      sayfalar,
+      canliAkis,
+      botTaramalari,
       demografi,
     });
   } catch (error: any) {

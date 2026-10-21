@@ -20,19 +20,24 @@ export default function AdminAnalitikPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('genel');
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
   const veriYukle = async (p = period) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/admin/analitik?period=${p}`);
-      if (res.ok) {
-        const d = await res.json();
-        setData(d);
-        setLastUpdated(new Date().toLocaleTimeString('tr-TR'));
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `Sunucu hatası (${res.status})`);
       }
-    } catch (err) {
+      const d = await res.json();
+      setData(d);
+      setLastUpdated(new Date().toLocaleTimeString('tr-TR'));
+    } catch (err: any) {
       console.error('Analitik yükleme hatası:', err);
+      setError(err?.message || 'Veriler yüklenirken hata oluştu.');
     } finally {
       setLoading(false);
     }
@@ -40,6 +45,11 @@ export default function AdminAnalitikPage() {
 
   useEffect(() => {
     veriYukle(period);
+    // 30 saniyede bir otomatik canli veri tazeleme
+    const timer = setInterval(() => {
+      veriYukle(period);
+    }, 30000);
+    return () => clearInterval(timer);
   }, [period]);
 
   const sureFormatla = (saniye: number) => {
@@ -58,17 +68,38 @@ export default function AdminAnalitikPage() {
 
   return (
     <div className="space-y-6">
+      {/* Hata Bildirimi */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
+            <span className="font-extrabold text-red-600">⚠️ Bağlantı Uyarısı:</span>
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={() => veriYukle()}
+            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+          >
+            Yeniden Dene
+          </button>
+        </div>
+      )}
+
       {/* ─── 1. ÜST BAŞLIK, ZAMAN FİLTRESİ & CANLI YENİLEME ─── */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <span className="bg-[#0F2040] text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md tracking-wider">
               ENTERPRISE INTELLIGENCE
             </span>
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Canlı Sistem Aktif
+              Canlı Akış Aktif
             </span>
+            {ozet?.toplamVeritabaniKaydi !== undefined && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                📊 {ozet.toplamVeritabaniKaydi} Kayıtlı Ziyaret
+              </span>
+            )}
           </div>
           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight mt-2 flex items-center gap-2">
             <LuActivity className="text-[#CC4E00]" /> Ziyaretçi & Trafik Analitiği
@@ -202,7 +233,7 @@ export default function AdminAnalitikPage() {
           { id: 'demografi', label: '👥 Demografi & Müşteri Analizi', icon: LuUsers },
           { id: 'sayfalar', label: '📄 Popüler Sayfalar & Ürünler', icon: LuCompass },
           { id: 'cihazlar', label: '📱 Cihaz & Tarayıcı', icon: LuSmartphone },
-          { id: 'canli', label: '⚡ Canlı Akış (Son 30)', icon: LuActivity },
+          { id: 'canli', label: `⚡ Canlı Akış (${data?.canliAkis?.length || 0})`, icon: LuActivity },
           { id: 'botlar', label: '🤖 Bot & Crawler Taramaları', icon: LuBot },
         ].map((t) => (
           <button
