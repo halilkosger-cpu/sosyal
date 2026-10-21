@@ -9,6 +9,7 @@ import {
   LuShoppingBag, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
   LuReceipt, LuPackagePlus, LuDownload, LuHistory, LuTrash2, LuCheck,
   LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye, LuSend,
+  LuPencil, LuPrinter, LuX, LuExternalLink,
 } from 'react-icons/lu';
 
 type Tab = 'ozet' | 'cariler' | 'faturalar' | 'banka' | 'giderler' | 'stok-girisi' | 'kritik-stok';
@@ -35,6 +36,22 @@ export default function LogoGo3MuhasebeMerkezi() {
   const [seciliCariEkstre, setSeciliCariEkstre] = useState<any>(null);
   const [ekstreModal, setEkstreModal] = useState(false);
 
+  // Cari Düzenle / İncele State
+  const [seciliCariDuzenle, setSeciliCariDuzenle] = useState<any>(null);
+  const [cariDuzenleModal, setCariDuzenleModal] = useState(false);
+  const [cariGuncelleLoading, setCariGuncelleLoading] = useState(false);
+  const [cariDuzenleForm, setCariDuzenleForm] = useState({
+    unvan: '',
+    tur: 'ALICI',
+    vergiTcNo: '',
+    vergiDairesi: '',
+    eposta: '',
+    telefon: '',
+    adres: '',
+    sehir: '',
+    muhasebeKodu: '',
+  });
+
   // Yeni Cari Formu
   const [yeniCariModal, setYeniCariModal] = useState(false);
   const [cariForm, setCariForm] = useState({
@@ -54,6 +71,17 @@ export default function LogoGo3MuhasebeMerkezi() {
   const [gonderiliyorId, setGonderiliyorId] = useState<string | null>(null);
   const [yeniFaturaModal, setYeniFaturaModal] = useState(false);
   const [faturaSyncing, setFaturaSyncing] = useState(false);
+
+  // Fatura Önizle / Düzenle State
+  const [seciliFaturaOnizle, setSeciliFaturaOnizle] = useState<any>(null);
+  const [faturaOnizleModal, setFaturaOnizleModal] = useState(false);
+  const [faturaGuncelleLoading, setFaturaGuncelleLoading] = useState(false);
+  const [faturaDuzenleForm, setFaturaDuzenleForm] = useState({
+    faturaNo: '',
+    aciklama: '',
+    durum: 'ONAYLANDI',
+  });
+
   const [faturaForm, setFaturaForm] = useState({
     tur: 'SATIS',
     cariId: '',
@@ -276,6 +304,145 @@ export default function LogoGo3MuhasebeMerkezi() {
       setYeniCariModal(false);
       setCariForm({ unvan: '', tur: 'ALICI', vergiTcNo: '', vergiDairesi: '', eposta: '', telefon: '', adres: '', sehir: '' });
       carileriYukle();
+    }
+  };
+
+  // Cari Düzenle / İncele Aç
+  const cariDuzenleAc = async (cariId: string) => {
+    try {
+      const res = await fetch(`/api/admin/muhasebe/cariler/${cariId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setSeciliCariDuzenle(data);
+        setCariDuzenleForm({
+          unvan: data.unvan || '',
+          tur: data.tur || 'ALICI',
+          vergiTcNo: data.vergiTcNo || '',
+          vergiDairesi: data.vergiDairesi || '',
+          eposta: data.eposta || '',
+          telefon: data.telefon || '',
+          adres: data.adres || '',
+          sehir: data.sehir || '',
+          muhasebeKodu: data.muhasebeKodu || '',
+        });
+        setCariDuzenleModal(true);
+      } else {
+        alert(data.error || 'Cari kart detayları alınamadı');
+      }
+    } catch {
+      alert('Cari kart yüklenirken bağlantı hatası oluştu');
+    }
+  };
+
+  // Cari Bilgilerini Güncelle
+  const handleCariGuncelle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!seciliCariDuzenle) return;
+    setCariGuncelleLoading(true);
+    try {
+      const res = await fetch(`/api/admin/muhasebe/cariler/${seciliCariDuzenle.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cariDuzenleForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Cari kart bilgileri başarıyla güncellendi!');
+        setCariDuzenleModal(false);
+        carileriYukle();
+        if (activeTab === 'faturalar') faturalariYukle();
+      } else {
+        alert(`⚠️ Hata: ${data.error || 'Güncelleme başarısız'}`);
+      }
+    } catch {
+      alert('⚠️ Cari kart güncellenirken hata oluştu.');
+    } finally {
+      setCariGuncelleLoading(false);
+    }
+  };
+
+  // Cari Kartı Sil
+  const handleCariSil = async (cariId: string) => {
+    if (!confirm('Bu cari kartı silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/admin/muhasebe/cariler/${cariId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Cari kart silindi.');
+        setCariDuzenleModal(false);
+        carileriYukle();
+      } else {
+        alert(`⚠️ Hata: ${data.error}`);
+      }
+    } catch {
+      alert('⚠️ Cari kart silinirken hata oluştu.');
+    }
+  };
+
+  // Fatura Önizle / Detay Aç
+  const faturaOnizleAc = async (faturaId: string) => {
+    try {
+      const res = await fetch(`/api/admin/muhasebe/faturalar/${faturaId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setSeciliFaturaOnizle(data);
+        setFaturaDuzenleForm({
+          faturaNo: data.faturaNo || '',
+          aciklama: data.aciklama || '',
+          durum: data.durum || 'ONAYLANDI',
+        });
+        setFaturaOnizleModal(true);
+      } else {
+        alert(data.error || 'Fatura detayları alınamadı');
+      }
+    } catch {
+      alert('Fatura bilgileri yüklenirken hata oluştu');
+    }
+  };
+
+  // Fatura Bilgilerini Güncelle
+  const handleFaturaGuncelle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!seciliFaturaOnizle) return;
+    setFaturaGuncelleLoading(true);
+    try {
+      const res = await fetch(`/api/admin/muhasebe/faturalar/${seciliFaturaOnizle.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(faturaDuzenleForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Fatura bilgileri başarıyla güncellendi!');
+        setSeciliFaturaOnizle(data);
+        faturalariYukle();
+      } else {
+        alert(`⚠️ Hata: ${data.error || 'Güncelleme başarısız'}`);
+      }
+    } catch {
+      alert('⚠️ Fatura güncellenirken hata oluştu.');
+    } finally {
+      setFaturaGuncelleLoading(false);
+    }
+  };
+
+  // Faturayı Sil (Taslak ise)
+  const handleFaturaSil = async (faturaId: string) => {
+    if (!confirm('Bu faturayı silmek istediğinize emin misiniz? Cari hesaptaki borç/alacak kaydı da geri alınacaktır.')) return;
+    try {
+      const res = await fetch(`/api/admin/muhasebe/faturalar/${faturaId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        alert('✅ Fatura silindi ve cari bakiye düzeltildi.');
+        setFaturaOnizleModal(false);
+        faturalariYukle();
+        carileriYukle();
+        ozetYukle();
+      } else {
+        alert(`⚠️ Hata: ${data.error}`);
+      }
+    } catch {
+      alert('⚠️ Fatura silinirken hata oluştu.');
     }
   };
 
@@ -601,16 +768,26 @@ export default function LogoGo3MuhasebeMerkezi() {
                     <th className="py-3 px-3">Tür / Muh. Kodu</th>
                     <th className="py-3 px-3">İletişim</th>
                     <th className="py-3 px-3 text-right">Güncel Bakiye</th>
-                    <th className="py-3 px-3 text-center">Ekstre</th>
+                    <th className="py-3 px-3 text-center">İşlemler</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {cariler.map((c) => (
-                    <tr key={c.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr
+                      key={c.id}
+                      onClick={() => cariDuzenleAc(c.id)}
+                      className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
+                      title="Detayları incelemek ve tüzel kişilik bilgilerini düzenlemek için tıklayın"
+                    >
                       <td className="py-3 px-3 font-mono text-xs font-bold text-blue-900">{c.kod}</td>
-                      <td className="py-3 px-3 font-semibold text-gray-900">
-                        {c.unvan}
-                        {c.vergiTcNo && <span className="block text-[11px] text-gray-400">TC/VKN: {c.vergiTcNo}</span>}
+                      <td className="py-3 px-3 font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                        <div className="flex items-center gap-1.5">
+                          <span>{c.unvan}</span>
+                          <span className="opacity-0 group-hover:opacity-100 text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded transition-opacity">
+                            ✏️ Düzenle
+                          </span>
+                        </div>
+                        {c.vergiTcNo && <span className="block text-[11px] text-gray-400 font-normal">TC/VKN: {c.vergiTcNo}</span>}
                       </td>
                       <td className="py-3 px-3 text-xs">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${c.tur === 'ALICI' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'}`}>
@@ -626,14 +803,23 @@ export default function LogoGo3MuhasebeMerkezi() {
                           {paraFormat(c.bakiye)}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-center">
-                        <button
-                          onClick={() => ekstreAc(c.id)}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-blue-600 transition-colors"
-                          title="Cari Hesap Ekstresi"
-                        >
-                          <LuEye size={18} />
-                        </button>
+                      <td className="py-3 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => cariDuzenleAc(c.id)}
+                            className="p-1.5 bg-amber-50 hover:bg-amber-100 rounded-lg text-amber-800 transition-colors flex items-center gap-1 text-xs font-semibold px-2.5 border border-amber-200"
+                            title="Tüzel Kişilik / Cari Bilgilerini İncele ve Düzenle"
+                          >
+                            <LuPencil size={13} /> Düzenle
+                          </button>
+                          <button
+                            onClick={() => ekstreAc(c.id)}
+                            className="p-1.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-800 transition-colors flex items-center gap-1 text-xs font-semibold px-2.5 border border-blue-200"
+                            title="Cari Hesap Ekstresi (Borç/Alacak Dökümü)"
+                          >
+                            <LuEye size={14} /> Ekstre
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -697,10 +883,35 @@ export default function LogoGo3MuhasebeMerkezi() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {faturalar.map((f) => (
-                    <tr key={f.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="py-3 px-3 font-mono text-xs font-bold text-[#BA4700]">{f.faturaNo}</td>
+                    <tr
+                      key={f.id}
+                      onClick={() => faturaOnizleAc(f.id)}
+                      className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
+                      title="Faturayı önizlemek ve detaylarını incelemek için tıklayın"
+                    >
+                      <td className="py-3 px-3 font-mono text-xs font-bold text-[#BA4700]">
+                        <span className="group-hover:underline flex items-center gap-1">
+                          {f.faturaNo}
+                          <span className="opacity-0 group-hover:opacity-100 text-[10px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded">
+                            👁️ Önizle
+                          </span>
+                        </span>
+                      </td>
                       <td className="py-3 px-3 text-xs text-gray-500 whitespace-nowrap">{new Date(f.tarih).toLocaleDateString('tr-TR')}</td>
-                      <td className="py-3 px-3 font-semibold text-gray-900">{f.cari?.unvan}</td>
+                      <td className="py-3 px-3 font-semibold text-gray-900">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            cariDuzenleAc(f.cariId);
+                          }}
+                          className="hover:text-blue-700 hover:underline text-left inline-flex items-center gap-1"
+                          title="Tüzel Kişilik / Cari Kartını Düzenle"
+                        >
+                          {f.cari?.unvan}
+                          <LuPencil size={11} className="opacity-0 group-hover:opacity-100 text-gray-400" />
+                        </button>
+                      </td>
                       <td className="py-3 px-3 text-xs">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${f.tur === 'SATIS' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
                           {f.tur === 'SATIS' ? 'Satış' : 'Satınalma'}
@@ -725,17 +936,24 @@ export default function LogoGo3MuhasebeMerkezi() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-3 text-center">
+                      <td className="py-3 px-3 text-center" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => faturaOnizleAc(f.id)}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700 hover:text-blue-800 bg-gray-100 hover:bg-gray-200 px-2.5 py-1 rounded-lg transition-colors border border-gray-200"
+                            title="Fatura Detaylarını ve Kalemlerini Önizle / Düzenle"
+                          >
+                            <LuEye size={13} /> Önizle
+                          </button>
                           {f.gibFaturaNo ? (
                             <a
                               href={`/api/admin/muhasebe/faturalar/${f.id}/pdf`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors"
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors border border-blue-200"
                               title="Resmi e-Arşiv Faturasını Görüntüle ve Yazdır"
                             >
-                              <LuEye size={13} /> Resmi Gör
+                              <LuPrinter size={13} /> Resmi Gör
                             </a>
                           ) : (
                             <button
@@ -1484,6 +1702,476 @@ export default function LogoGo3MuhasebeMerkezi() {
           </div>
         );
       })()}
+
+      {/* ─── MODAL: CARİ / TÜZEL KİŞİLİK İNCELE & DÜZENLE ─── */}
+      {cariDuzenleModal && seciliCariDuzenle && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 my-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    {seciliCariDuzenle.tur === 'SATICI' ? '🏛️ Tedarikçi / İşyurdu Kartı' : '👤 Müşteri Cari Kartı'}
+                  </h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                    seciliCariDuzenle.tur === 'ALICI' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                  }`}>
+                    {seciliCariDuzenle.tur === 'ALICI' ? '120 Alıcı' : '320 Satıcı'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5 font-mono">
+                  Cari Kodu: <strong className="text-blue-900">{seciliCariDuzenle.kod}</strong> · Muhasebe Planı: {seciliCariDuzenle.muhasebeKodu || '—'}
+                </p>
+              </div>
+              <button
+                onClick={() => setCariDuzenleModal(false)}
+                className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none p-1"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Bakiye & İstatistik Kartı */}
+            <div className="grid grid-cols-3 gap-3 bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <div>
+                <span className="text-[11px] text-gray-500 block">Güncel Hesap Bakiyesi</span>
+                <span className={`text-base font-extrabold font-mono ${
+                  seciliCariDuzenle.bakiye > 0 ? 'text-emerald-600' : seciliCariDuzenle.bakiye < 0 ? 'text-red-600' : 'text-gray-900'
+                }`}>
+                  {paraFormat(seciliCariDuzenle.bakiye)}
+                </span>
+                <span className="text-[10px] text-gray-400 block mt-0.5">
+                  {seciliCariDuzenle.bakiye > 0 ? '(Alacaklıyız)' : seciliCariDuzenle.bakiye < 0 ? '(Borçluyuz)' : '(Bakiye Sıfır)'}
+                </span>
+              </div>
+              <div>
+                <span className="text-[11px] text-gray-500 block">Kayıtlı Fatura Sayısı</span>
+                <span className="text-base font-bold text-gray-900">{seciliCariDuzenle._count?.faturalar ?? seciliCariDuzenle.faturalar?.length ?? 0} Adet</span>
+              </div>
+              <div>
+                <span className="text-[11px] text-gray-500 block">Hesap Hareketleri</span>
+                <span className="text-base font-bold text-gray-900">{seciliCariDuzenle._count?.hareketler ?? seciliCariDuzenle.hareketler?.length ?? 0} Kayıt</span>
+              </div>
+            </div>
+
+            {/* Düzenleme Formu */}
+            <form onSubmit={handleCariGuncelle} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-semibold text-gray-700 mb-1">
+                  Cari Unvan / Şirket veya Kişi Adı *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={cariDuzenleForm.unvan}
+                  onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, unvan: e.target.value })}
+                  className="w-full border border-gray-300 rounded-xl p-2.5 font-semibold text-gray-900 focus:ring-2 focus:ring-[#BA4700]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Cari Türü</label>
+                  <select
+                    value={cariDuzenleForm.tur}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, tur: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl p-2.5 bg-white font-medium"
+                  >
+                    <option value="ALICI">120 Alıcılar (Müşteri)</option>
+                    <option value="SATICI">320 Satıcılar (Tedarikçi / Cezaevi İşyurdu)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Tekdüzen Muhasebe Kodu</label>
+                  <input
+                    type="text"
+                    value={cariDuzenleForm.muhasebeKodu}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, muhasebeKodu: e.target.value })}
+                    placeholder="Örn: 120.01.001 veya 320.01.005"
+                    className="w-full border border-gray-300 rounded-xl p-2.5 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Vergi No / T.C. Kimlik No</label>
+                  <input
+                    type="text"
+                    value={cariDuzenleForm.vergiTcNo}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, vergiTcNo: e.target.value })}
+                    placeholder="10 veya 11 Haneli VKN/TCKN"
+                    className="w-full border border-gray-300 rounded-xl p-2.5 font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Vergi Dairesi</label>
+                  <input
+                    type="text"
+                    value={cariDuzenleForm.vergiDairesi}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, vergiDairesi: e.target.value })}
+                    placeholder="Örn: Ulus Vergi Dairesi"
+                    className="w-full border border-gray-300 rounded-xl p-2.5"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">E-Posta Adresi</label>
+                  <input
+                    type="email"
+                    value={cariDuzenleForm.eposta}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, eposta: e.target.value })}
+                    placeholder="ornek@alanadi.com"
+                    className="w-full border border-gray-300 rounded-xl p-2.5"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Telefon Numarası</label>
+                  <input
+                    type="text"
+                    value={cariDuzenleForm.telefon}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, telefon: e.target.value })}
+                    placeholder="05xx xxx xx xx"
+                    className="w-full border border-gray-300 rounded-xl p-2.5"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="block font-semibold text-gray-700 mb-1">Şehir / İl</label>
+                  <input
+                    type="text"
+                    value={cariDuzenleForm.sehir}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, sehir: e.target.value })}
+                    placeholder="Ankara, İstanbul..."
+                    className="w-full border border-gray-300 rounded-xl p-2.5"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block font-semibold text-gray-700 mb-1">Açık Adres</label>
+                  <textarea
+                    rows={2}
+                    value={cariDuzenleForm.adres}
+                    onChange={(e) => setCariDuzenleForm({ ...cariDuzenleForm, adres: e.target.value })}
+                    placeholder="Mahalle, Cadde, No, İlçe..."
+                    className="w-full border border-gray-300 rounded-xl p-2.5"
+                  />
+                </div>
+              </div>
+
+              {/* Modal Butonları */}
+              <div className="flex items-center justify-between pt-3 border-t">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCariDuzenleModal(false);
+                      ekstreAc(seciliCariDuzenle.id);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl font-semibold transition-colors"
+                  >
+                    <LuEye size={14} /> Hesap Ekstresi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCariSil(seciliCariDuzenle.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-semibold transition-colors"
+                    title="Cariyi Sil (Hareket kaydı yoksa)"
+                  >
+                    <LuTrash2 size={14} /> Sil
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCariDuzenleModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 font-semibold"
+                  >
+                    Vazgeç
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={cariGuncelleLoading}
+                    className="px-5 py-2.5 bg-[#CC4E00] hover:bg-[#b04300] text-white font-bold rounded-xl shadow-md transition-colors disabled:opacity-50"
+                  >
+                    {cariGuncelleLoading ? 'Kaydediliyor…' : '💾 Değişiklikleri Kaydet'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL: FATURA ÖNİZLEME & DÜZENLEME ─── */}
+      {faturaOnizleModal && seciliFaturaOnizle && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-4 my-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    {seciliFaturaOnizle.tur === 'SATIS' ? '🧾 Satış Faturası Önizleme' : '📦 Alış Faturası Önizleme'}
+                  </h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                    seciliFaturaOnizle.tur === 'SATIS' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {seciliFaturaOnizle.tur === 'SATIS' ? '600 Satış' : '153 Satınalma'}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                    seciliFaturaOnizle.durum === 'ONAYLANDI' ? 'bg-green-100 text-green-800' :
+                    seciliFaturaOnizle.durum === 'IPTAL' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {seciliFaturaOnizle.durum}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5 font-mono">
+                  Fatura No: <strong className="text-[#BA4700]">{seciliFaturaOnizle.faturaNo}</strong> · Tarih: {new Date(seciliFaturaOnizle.tarih).toLocaleDateString('tr-TR')}
+                </p>
+              </div>
+              <button
+                onClick={() => setFaturaOnizleModal(false)}
+                className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none p-1"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* GİB e-Arşiv Durumu Kutusu */}
+            <div className={`p-4 rounded-xl border flex items-center justify-between flex-wrap gap-3 ${
+              seciliFaturaOnizle.gibFaturaNo
+                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+                : 'bg-amber-50/70 border-amber-200 text-amber-950'
+            }`}>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded font-bold text-xs ${
+                    seciliFaturaOnizle.gibFaturaNo ? 'bg-emerald-700 text-white' : 'bg-amber-600 text-white'
+                  }`}>
+                    {seciliFaturaOnizle.gibFaturaNo ? 'GİB e-ARŞİV ONAYLI' : 'TASLAK / İLETİLMEDİ'}
+                  </span>
+                  {seciliFaturaOnizle.gibFaturaNo && (
+                    <span className="font-mono font-bold text-sm text-emerald-800">
+                      {seciliFaturaOnizle.gibFaturaNo}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs mt-1 text-gray-600">
+                  {seciliFaturaOnizle.gibFaturaNo ? (
+                    <>
+                      <strong>ETTN:</strong> <span className="font-mono">{seciliFaturaOnizle.ettn}</span>
+                    </>
+                  ) : (
+                    'Bu fatura henüz Gelir İdaresi Başkanlığı / Logo İşNet sistemine resmi olarak iletilmedi.'
+                  )}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {seciliFaturaOnizle.gibFaturaNo ? (
+                  <a
+                    href={`/api/admin/muhasebe/faturalar/${seciliFaturaOnizle.id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                  >
+                    <LuPrinter size={14} /> Resmi e-Arşiv / PDF Aç
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      gibeGonder(seciliFaturaOnizle.id);
+                      setFaturaOnizleModal(false);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                  >
+                    <LuSend size={14} /> Logo İşNet ile GİB'e Gönder
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cari & Müşteri Bilgileri Kutusu */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-gray-700 uppercase tracking-wide text-[11px]">
+                  Cari Hesap (Alıcı / Satıcı)
+                </span>
+                {seciliFaturaOnizle.cari && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFaturaOnizleModal(false);
+                      cariDuzenleAc(seciliFaturaOnizle.cari.id);
+                    }}
+                    className="inline-flex items-center gap-1 text-xs text-blue-700 font-bold hover:underline"
+                  >
+                    <LuPencil size={12} /> Bu Müşteri/Tedarikçi Kartını Düzenle
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-800">
+                <div>
+                  <p className="text-sm font-bold text-gray-900">{seciliFaturaOnizle.cari?.unvan}</p>
+                  <p className="text-gray-500 mt-0.5">
+                    <strong>VKN/TCKN:</strong> {seciliFaturaOnizle.cari?.vergiTcNo || 'Belirtilmedi'}
+                    {seciliFaturaOnizle.cari?.vergiDairesi && ` · ${seciliFaturaOnizle.cari.vergiDairesi}`}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600">
+                    <strong>İletişim:</strong> {seciliFaturaOnizle.cari?.telefon || '—'} · {seciliFaturaOnizle.cari?.eposta || '—'}
+                  </p>
+                  <p className="text-gray-600 mt-0.5">
+                    <strong>Adres:</strong> {seciliFaturaOnizle.cari?.adres || '—'} {seciliFaturaOnizle.cari?.sehir ? `/${seciliFaturaOnizle.cari.sehir}` : ''}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Fatura Kalemleri Tablosu */}
+            <div>
+              <h4 className="font-bold text-gray-800 uppercase tracking-wide text-[11px] mb-2">
+                Fatura Kalemleri ({seciliFaturaOnizle.satirlar?.length || 0} Kalem)
+              </h4>
+              <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-100/80 text-gray-600 font-semibold">
+                    <tr>
+                      <th className="py-2.5 px-3">#</th>
+                      <th className="py-2.5 px-3">Mal / Hizmet Açıklaması</th>
+                      <th className="py-2.5 px-3 text-center">Miktar</th>
+                      <th className="py-2.5 px-3 text-right">Birim Fiyat</th>
+                      <th className="py-2.5 px-3 text-center">KDV %</th>
+                      <th className="py-2.5 px-3 text-right">KDV Tutarı</th>
+                      <th className="py-2.5 px-3 text-right">Satır Toplamı</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {seciliFaturaOnizle.satirlar?.map((satir: any, idx: number) => (
+                      <tr key={satir.id || idx} className="hover:bg-gray-50">
+                        <td className="py-2 px-3 text-gray-400 font-mono">{idx + 1}</td>
+                        <td className="py-2 px-3 font-semibold text-gray-900">{satir.aciklama}</td>
+                        <td className="py-2 px-3 text-center font-bold">{satir.miktar}</td>
+                        <td className="py-2 px-3 text-right font-mono">₺{Number(satir.birimFiyat).toFixed(2)}</td>
+                        <td className="py-2 px-3 text-center">%{satir.kdvOrani}</td>
+                        <td className="py-2 px-3 text-right font-mono text-purple-700">₺{Number(satir.kdvTutari).toFixed(2)}</td>
+                        <td className="py-2 px-3 text-right font-mono font-bold text-gray-900">₺{Number(satir.satirToplam).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Tutar Özeti */}
+            <div className="bg-gray-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <span className="text-gray-400 text-xs block">KDV Hariç Matrah</span>
+                <span className="font-mono font-bold text-sm">₺{seciliFaturaOnizle.matrah?.toFixed(2)}</span>
+              </div>
+              <div>
+                <span className="text-gray-400 text-xs block">Toplam KDV</span>
+                <span className="font-mono font-bold text-sm text-purple-300">₺{seciliFaturaOnizle.kdvTutari?.toFixed(2)}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-amber-400 text-xs font-bold block uppercase tracking-wider">Genel Toplam</span>
+                <span className="font-mono font-extrabold text-xl text-emerald-400">₺{seciliFaturaOnizle.genelToplam?.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Düzenleme Formu (Açıklama, Fatura No, Durum) */}
+            <form onSubmit={handleFaturaGuncelle} className="space-y-3 text-xs pt-2 border-t">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Fatura Numarası</label>
+                  <input
+                    type="text"
+                    disabled={seciliFaturaOnizle.gibFaturaNo}
+                    value={faturaDuzenleForm.faturaNo}
+                    onChange={(e) => setFaturaDuzenleForm({ ...faturaDuzenleForm, faturaNo: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl p-2 font-mono disabled:bg-gray-100"
+                  />
+                  {seciliFaturaOnizle.gibFaturaNo && (
+                    <span className="text-[10px] text-gray-400">GİB onaylı faturanın numarası değiştirilemez.</span>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Fatura Durumu</label>
+                  <select
+                    value={faturaDuzenleForm.durum}
+                    onChange={(e) => setFaturaDuzenleForm({ ...faturaDuzenleForm, durum: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl p-2 bg-white"
+                  >
+                    <option value="ONAYLANDI">ONAYLANDI</option>
+                    <option value="TASLAK">TASLAK</option>
+                    <option value="IPTAL">İPTAL</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Açıklama / Not</label>
+                  <input
+                    type="text"
+                    value={faturaDuzenleForm.aciklama}
+                    onChange={(e) => setFaturaDuzenleForm({ ...faturaDuzenleForm, aciklama: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl p-2"
+                  />
+                </div>
+              </div>
+
+              {/* Alt Aksiyon Butonları */}
+              <div className="flex items-center justify-between pt-3 border-t">
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/api/admin/muhasebe/faturalar/${seciliFaturaOnizle.id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl font-semibold transition-colors"
+                  >
+                    <LuPrinter size={14} /> Resmi e-Arşiv Görünümü
+                  </a>
+                  {!seciliFaturaOnizle.gibFaturaNo && (
+                    <button
+                      type="button"
+                      onClick={() => handleFaturaSil(seciliFaturaOnizle.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-xl font-semibold transition-colors"
+                      title="Taslak Faturayı Sil (Cari kaydı geri alınır)"
+                    >
+                      <LuTrash2 size={14} /> Faturayı Sil
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFaturaOnizleModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 font-semibold"
+                  >
+                    Kapat
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={faturaGuncelleLoading}
+                    className="px-5 py-2.5 bg-[#CC4E00] hover:bg-[#b04300] text-white font-bold rounded-xl shadow-md transition-colors disabled:opacity-50"
+                  >
+                    {faturaGuncelleLoading ? 'Kaydediliyor…' : '💾 Bilgileri Güncelle'}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
