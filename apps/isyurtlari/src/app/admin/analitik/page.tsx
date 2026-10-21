@@ -21,6 +21,7 @@ export default function AdminAnalitikPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [seciliZaman, setSeciliZaman] = useState<any>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
   const veriYukle = async (p = period) => {
@@ -270,27 +271,61 @@ export default function AdminAnalitikPage() {
             </div>
 
             {data?.zamanSerisi && data.zamanSerisi.length > 0 ? (
-              <div className="space-y-3 pt-2">
-                <div className="h-56 flex items-end gap-1.5 sm:gap-2 pt-6 pb-2 px-1 border-b border-gray-100">
+              <div className="space-y-4 pt-2">
+                {/* Çubuk Grafiği */}
+                <div className="h-60 flex items-end gap-1 sm:gap-2 pt-8 pb-2 px-1 border-b border-gray-100">
                   {data.zamanSerisi.map((z: any, idx: number) => {
                     const maxVal = Math.max(...data.zamanSerisi.map((item: any) => item.sayfa), 1);
-                    const yukseklik = Math.max(Math.round((z.sayfa / maxVal) * 100), z.sayfa > 0 ? 12 : 2);
+                    const yukseklik = z.sayfa > 0
+                      ? Math.max(Math.round((z.sayfa / maxVal) * 100), 18)
+                      : z.suAnMi ? 10 : z.gelecekMi ? 3 : 5;
+
+                    const isSelected = seciliZaman?.etiket === z.etiket;
 
                     return (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
-                        {/* Hover Tooltip */}
-                        <div className="absolute -top-12 hidden group-hover:flex flex-col items-center z-20 pointer-events-none">
-                          <div className="bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap">
-                            <strong>{z.etiket}</strong>: {z.tekil} Tekil · {z.sayfa} Sayfa
+                      <div
+                        key={idx}
+                        onClick={() => setSeciliZaman(z)}
+                        className="flex-1 flex flex-col items-center gap-1 group relative cursor-pointer"
+                      >
+                        {/* Aktif Saatlerde Sayfa Sayısı Rozeti (Doğrudan görünür) */}
+                        {z.sayfa > 0 && (
+                          <span className="text-[10px] font-mono font-extrabold text-[#CC4E00] -mb-1 select-none animate-fadeIn">
+                            {z.sayfa}
+                          </span>
+                        )}
+
+                        {/* Şu an Saati Yanıp Sönen Yeşil Nokta */}
+                        {z.suAnMi && z.sayfa === 0 && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mb-1" title="Şu anki saat" />
+                        )}
+
+                        {/* Hover & Tıklama Tooltip Balonu */}
+                        <div className={`absolute -top-14 ${isSelected ? 'flex' : 'hidden group-hover:flex'} flex-col items-center z-30 pointer-events-none transition-all`}>
+                          <div className="bg-[#0F2040] text-white text-[11px] py-1 px-2.5 rounded-lg shadow-xl whitespace-nowrap border border-blue-900">
+                            <span className="font-bold text-orange-400">{z.etiket}</span>
+                            {z.suAnMi && <span className="ml-1 text-emerald-400 font-bold">(Şu an)</span>}
+                            {z.gelecekMi && <span className="ml-1 text-gray-400">(Gelecek Saat)</span>}
+                            <div className="text-[10px] text-gray-200 mt-0.5">
+                              {z.sayfa > 0 ? `${z.tekil} Tekil · ${z.sayfa} Sayfa Gösterimi` : 'Henüz ziyaret kaydedilmedi'}
+                            </div>
                           </div>
-                          <div className="w-1.5 h-1.5 bg-gray-900 rotate-45 -mt-0.5" />
+                          <div className="w-2 h-2 bg-[#0F2040] rotate-45 -mt-1" />
                         </div>
 
                         {/* Çubuk */}
                         <div
                           style={{ height: `${yukseklik}%` }}
                           className={`w-full rounded-t transition-all ${
-                            z.tekil > 0 ? 'bg-[#0F2040] group-hover:bg-[#CC4E00]' : 'bg-gray-100'
+                            z.sayfa > 0
+                              ? isSelected
+                                ? 'bg-[#CC4E00] shadow-md shadow-orange-500/30 ring-2 ring-orange-400'
+                                : 'bg-gradient-to-t from-[#0F2040] to-blue-700 hover:from-[#CC4E00] hover:to-orange-500 shadow-sm'
+                              : z.suAnMi
+                              ? 'bg-emerald-300 border-t-2 border-emerald-500'
+                              : z.gelecekMi
+                              ? 'bg-gray-100/60 border-t border-dashed border-gray-300'
+                              : 'bg-gray-200/70 hover:bg-gray-300'
                           }`}
                         />
                       </div>
@@ -299,10 +334,66 @@ export default function AdminAnalitikPage() {
                 </div>
 
                 {/* X Ekseni Etiketleri */}
-                <div className="flex justify-between text-[10px] text-gray-400 px-1 font-mono">
-                  <span>{data.zamanSerisi[0]?.etiket}</span>
-                  <span>{data.zamanSerisi[Math.floor(data.zamanSerisi.length / 2)]?.etiket}</span>
-                  <span>{data.zamanSerisi[data.zamanSerisi.length - 1]?.etiket}</span>
+                <div className="flex justify-between text-[10px] text-gray-500 px-1 font-mono">
+                  {period === 'bugun' || period === 'dun' ? (
+                    <>
+                      <span>00:00</span>
+                      <span className="hidden sm:inline">04:00</span>
+                      <span>08:00</span>
+                      <span className="font-bold text-[#CC4E00]">12:00</span>
+                      <span className="hidden sm:inline">16:00</span>
+                      <span>20:00</span>
+                      <span>23:00</span>
+                    </>
+                  ) : (
+                    data.zamanSerisi.map((z: any, idx: number) => (
+                      <span key={idx} className="truncate max-w-[45px] text-center">{z.etiket}</span>
+                    ))
+                  )}
+                </div>
+
+                {/* Seçili Saat Detayı (Tıklandığında) */}
+                {seciliZaman && (
+                  <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 text-xs text-blue-900 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold">Seçili Saat Dilimi ({seciliZaman.etiket}):</span>{' '}
+                      {seciliZaman.sayfa > 0 ? (
+                        <span>
+                          <strong>{seciliZaman.tekil}</strong> tekil ziyaretçi, <strong>{seciliZaman.sayfa}</strong> sayfa görüntüleme kaydedildi.
+                        </span>
+                      ) : (
+                        <span className="text-blue-700">Bu saat diliminde henüz ziyaret gerçekleşmedi.</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setSeciliZaman(null)}
+                      className="text-[11px] font-bold text-blue-700 hover:text-blue-900 px-2 py-0.5"
+                    >
+                      ✕ Kapat
+                    </button>
+                  </div>
+                )}
+
+                {/* Durum Açıklama Kutusu */}
+                <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900 flex items-start gap-2.5">
+                  <span className="text-base leading-none">💡</span>
+                  <div className="space-y-0.5">
+                    <p className="font-bold">
+                      {period === 'bugun'
+                        ? 'Günün Canlı Saatlik Akışı Hakkında:'
+                        : 'Dönemsel Ziyaret Akışı:'}
+                    </p>
+                    <p className="text-amber-800 text-[11px] leading-relaxed">
+                      {period === 'bugun' ? (
+                        <>
+                          Şu an günün sabah saatlerindeyiz. Sistem sabah gerçekleşen (09:00 - 10:00 vb.) ziyaretleri çubukların üzerinde sayılarla göstermektedir.
+                          Günün henüz yaşanmamış saatleri (11:00 - 23:00) doğal olarak boştur ve saat ilerledikçe ziyaretçiler geldikçe çubuklar <strong>otomatik ve canlı olarak dolacaktır</strong>.
+                        </>
+                      ) : (
+                        'Seçilen zaman periyodundaki tüm günlerin sayfa ve tekil ziyaretçi akışları grafikte gün gün gösterilmektedir.'
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             ) : (

@@ -39,6 +39,10 @@ export async function GET(req: NextRequest) {
       baslangicTarihi = new Date(2025, 0, 1);
     }
 
+    const whereTarih = period === 'dun'
+      ? { gte: baslangicTarihi, lte: bitisTarihi }
+      : { gte: baslangicTarihi };
+
     // Prisma Model üzerinden güvenli sorgulama (SQL Type Mismatch ve PgBouncer hatalarını engeller)
     let insanKayitlari: any[] = [];
     let botKayitlari: any[] = [];
@@ -48,18 +52,18 @@ export async function GET(req: NextRequest) {
         (prisma as any).ziyaretKaydi.findMany({
           where: {
             isBot: false,
-            olusturulma: { gte: baslangicTarihi, lte: bitisTarihi },
+            olusturulma: whereTarih,
           },
           orderBy: { olusturulma: 'desc' },
-          take: 1000,
+          take: 2000,
         }),
         (prisma as any).ziyaretKaydi.findMany({
           where: {
             isBot: true,
-            olusturulma: { gte: baslangicTarihi, lte: bitisTarihi },
+            olusturulma: whereTarih,
           },
           orderBy: { olusturulma: 'desc' },
-          take: 200,
+          take: 300,
         }),
       ]);
     } else {
@@ -68,13 +72,13 @@ export async function GET(req: NextRequest) {
         SELECT * FROM "ZiyaretKaydi"
         WHERE "isBot" = false
         ORDER BY "olusturulma" DESC
-        LIMIT 500
+        LIMIT 1000
       `);
       botKayitlari = await prisma.$queryRawUnsafe(`
         SELECT * FROM "ZiyaretKaydi"
         WHERE "isBot" = true
         ORDER BY "olusturulma" DESC
-        LIMIT 100
+        LIMIT 200
       `);
     }
 
@@ -106,28 +110,52 @@ export async function GET(req: NextRequest) {
     const ortalamaSure = toplamSayfa > 0 ? Math.round(toplamSure / toplamSayfa) : 0;
 
     // 2. SAATLİK VEYA GÜNLÜK ZAMAN SERİSİ
-    const zamanMap = new Map<string, { sayfa: number; tekiller: Set<string> }>();
+    const suAnkiSaat = (simdi.getUTCHours() + 3) % 24;
+    const zamanMap = new Map<string, { sayfa: number; tekiller: Set<string>; saat?: number; gelecekMi?: boolean }>();
 
     if (period === 'bugun' || period === 'dun') {
       for (let s = 0; s < 24; s++) {
         const saatStr = `${String(s).padStart(2, '0')}:00`;
-        zamanMap.set(saatStr, { sayfa: 0, tekiller: new Set() });
+        zamanMap.set(saatStr, {
+          sayfa: 0,
+          tekiller: new Set(),
+          saat: s,
+          gelecekMi: period === 'bugun' && s > suAnkiSaat,
+        });
       }
 
       gosterilecekKayitlar.forEach((k) => {
         const d = new Date(k.olusturulma);
-        // Türkiye saatine göre saat dilimi
+        // Türkiye saatine göre saat dilimi (UTC+3)
         const saatNum = (d.getUTCHours() + 3) % 24;
         const saatStr = `${String(saatNum).padStart(2, '0')}:00`;
-        const entry = zamanMap.get(saatStr) || { sayfa: 0, tekiller: new Set() };
-        entry.sayfa++;
-        entry.tekiller.add(k.ziyaretciId);
-        zamanMap.set(saatStr, entry);
+        const entry = zamanMap.get(saatStr);
+        if (entry) {
+          entry.sayfa++;
+          entry.tekiller.add(k.ziyaretciId);
+        }
+      });
+    } else if (period === '7gun') {
+      // Son 7 günün tamamını baştan oluştur
+      for (let g = 6; g >= 0; g--) {
+        const hedefGun = new Date(simdi.getTime() - g * 24 * 60 * 60 * 1000);
+        const gunStr = `${hedefGun.getDate().toString().padStart(2, '0')}/${(hedefGun.getMonth() + 1).toString().padStart(2, '0')}`;
+        zamanMap.set(gunStr, { sayfa: 0, tekiller: new Set() });
+      }
+
+      gosterilecekKayitlar.forEach((k) => {
+        const d = new Date(k.olusturulma);
+        const gunStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+        const entry = zamanMap.get(gunStr);
+        if (entry) {
+          entry.sayfa++;
+          entry.tekiller.add(k.ziyaretciId);
+        }
       });
     } else {
       gosterilecekKayitlar.forEach((k) => {
         const d = new Date(k.olusturulma);
-        const gunStr = `${d.getMonth() + 1}/${d.getDate()}`;
+        const gunStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
         const entry = zamanMap.get(gunStr) || { sayfa: 0, tekiller: new Set() };
         entry.sayfa++;
         entry.tekiller.add(k.ziyaretciId);
@@ -139,6 +167,9 @@ export async function GET(req: NextRequest) {
       etiket,
       sayfa: v.sayfa,
       tekil: v.tekiller.size,
+      saat: v.saat,
+      gelecekMi: v.gelecekMi ?? false,
+      suAnMi: period === 'bugun' && v.saat === suAnkiSaat,
     }));
 
     // 3. TRAFİK KAYNAKLARI
