@@ -4,12 +4,13 @@ let tabloOlusturuldu = false;
 
 /**
  * ZiyaretKaydi tablosunun veritabanında var olduğunu garanti eder.
- * İlk istekte DDL çalıştırır, sonraki isteklerde doğrudan devam eder.
+ * Neon / PgBouncer uyumluluğu için her DDL ifadesini bağımsız çalıştırır.
  */
 export async function tabloyuHazirla(): Promise<void> {
   if (tabloOlusturuldu) return;
 
   try {
+    // 1. Ana Tablo
     await prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS "ZiyaretKaydi" (
         "id" TEXT PRIMARY KEY,
@@ -33,17 +34,19 @@ export async function tabloyuHazirla(): Promise<void> {
         "sureSaniye" INTEGER DEFAULT 0,
         "isBot" BOOLEAN DEFAULT false,
         "olusturulma" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_olusturulma_idx" ON "ZiyaretKaydi"("olusturulma");
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_ziyaretciId_idx" ON "ZiyaretKaydi"("ziyaretciId");
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_kaynak_idx" ON "ZiyaretKaydi"("kaynak");
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_sehir_idx" ON "ZiyaretKaydi"("sehir");
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_sayfa_idx" ON "ZiyaretKaydi"("sayfa");
-      CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_isBot_idx" ON "ZiyaretKaydi"("isBot");
+      )
     `);
+
+    // 2. İndeksler (Ayrı ifadeler halinde, hata atsa bile devam eder)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_olusturulma_idx" ON "ZiyaretKaydi"("olusturulma")`).catch(() => {});
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_ziyaretciId_idx" ON "ZiyaretKaydi"("ziyaretciId")`).catch(() => {});
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_kaynak_idx" ON "ZiyaretKaydi"("kaynak")`).catch(() => {});
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_sehir_idx" ON "ZiyaretKaydi"("sehir")`).catch(() => {});
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_sayfa_idx" ON "ZiyaretKaydi"("sayfa")`).catch(() => {});
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "ZiyaretKaydi_isBot_idx" ON "ZiyaretKaydi"("isBot")`).catch(() => {});
+
     tabloOlusturuldu = true;
-  } catch (err) {
-    console.warn('[ANALITIK] Tablo kontrolü / hazırlama uyarısı:', err);
+  } catch (err: any) {
+    console.error('[ANALITIK DB HATASI]:', err?.message);
   }
 }

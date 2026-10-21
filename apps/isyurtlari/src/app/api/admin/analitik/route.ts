@@ -21,11 +21,15 @@ export async function GET(req: NextRequest) {
     let baslangicTarihi: Date;
     let bitisTarihi: Date = simdi;
 
+    // Türkiye Saati (UTC+3) gün başı
+    const trTarihStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' }).format(simdi);
+    const trBugunBaslangic = new Date(`${trTarihStr}T00:00:00+03:00`);
+
     if (period === 'bugun') {
-      baslangicTarihi = new Date(simdi.getFullYear(), simdi.getMonth(), simdi.getDate(), 0, 0, 0);
+      baslangicTarihi = trBugunBaslangic;
     } else if (period === 'dun') {
-      baslangicTarihi = new Date(simdi.getFullYear(), simdi.getMonth(), simdi.getDate() - 1, 0, 0, 0);
-      bitisTarihi = new Date(simdi.getFullYear(), simdi.getMonth(), simdi.getDate() - 1, 23, 59, 59, 999);
+      baslangicTarihi = new Date(trBugunBaslangic.getTime() - 24 * 60 * 60 * 1000);
+      bitisTarihi = new Date(trBugunBaslangic.getTime() - 1);
     } else if (period === '7gun') {
       baslangicTarihi = new Date(simdi.getTime() - 7 * 24 * 60 * 60 * 1000);
     } else if (period === '30gun') {

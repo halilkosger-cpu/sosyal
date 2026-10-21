@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const VID_KEY = '_isyurtlari_vid';
 const SID_KEY = '_isyurtlari_sid';
@@ -37,7 +37,6 @@ function oturumKimligiAl(): string {
       sid = idUret('s');
       localStorage.setItem(SID_KEY, sid);
     }
-    // Süreyi 30 dk uzat
     localStorage.setItem(SID_EXP_KEY, String(simdi + OTURUM_SURESI_MS));
     return sid;
   } catch {
@@ -47,17 +46,18 @@ function oturumKimligiAl(): string {
 
 export default function DahiliAnalitikTracker() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const baslangicZamani = useRef<number>(Date.now());
   const sonSayfa = useRef<string>('');
 
   useEffect(() => {
-    // Admin sayfalarını takip etme
+    // Admin ve dahili API sayfalarını kesinlikle kaydetme
     if (!pathname || pathname.startsWith('/admin') || pathname.startsWith('/api')) {
       return;
     }
 
-    const tamYol = searchParams?.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
+    const searchStr = typeof window !== 'undefined' ? window.location.search : '';
+    const tamYol = searchStr ? `${pathname}${searchStr}` : pathname;
+
     if (tamYol === sonSayfa.current) return;
 
     // Önceki sayfada kalınan süreyi gönder
@@ -85,21 +85,25 @@ export default function DahiliAnalitikTracker() {
       dil: typeof navigator !== 'undefined' ? navigator.language : 'tr-TR',
     };
 
-    // Hafif ve engellemesiz veri iletimi (Beacon veya keepalive fetch)
     const jsonStr = JSON.stringify(payload);
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([jsonStr], { type: 'application/json' }));
-    } else {
+
+    // Birinci parti güvenli ve anlık fetch (VPN / AdBlock / Mobil Safari engellemelerine takılmaz)
+    try {
       fetch('/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: jsonStr,
         keepalive: true,
-      }).catch(() => {});
-    }
-  }, [pathname, searchParams]);
+      }).catch(() => {
+        // Fallback sendBeacon
+        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+          navigator.sendBeacon('/api/track', new Blob([jsonStr], { type: 'text/plain' }));
+        }
+      });
+    } catch {}
+  }, [pathname]);
 
-  // Sayfadan çıkarken veya sekme arka plana geçerken kalma süresini ilet
+  // Sayfadan çıkışta veya arka plana geçişte süreyi ilet
   useEffect(() => {
     const handleCikis = () => {
       if (!sonSayfa.current || sonSayfa.current.startsWith('/admin')) return;
@@ -134,8 +138,8 @@ function sureyiIlet(sayfa: string, sureSaniye: number) {
       sureSaniye,
     });
 
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      navigator.sendBeacon('/api/track', new Blob([payload], { type: 'text/plain' }));
     } else {
       fetch('/api/track', {
         method: 'POST',
