@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LuCheckCircle, LuX, LuSparkles, LuShoppingBag } from 'react-icons/lu';
+import { LuCircleCheck, LuX, LuSparkles, LuShoppingBag } from 'react-icons/lu';
 
 interface SosyalKanitOlayi {
   id: string;
@@ -167,7 +167,7 @@ export default function CanliSosyalKanit() {
             <span className="text-gray-900 font-bold">{aktifOlay.ad}</span>
             <span>({aktifOlay.sehir})</span>
             <span className="inline-flex items-center gap-0.5 text-emerald-600 font-bold text-[10px]">
-              <LuCheckCircle size={11} /> Onaylı
+              <LuCircleCheck size={11} /> Onaylı
             </span>
           </div>
 
