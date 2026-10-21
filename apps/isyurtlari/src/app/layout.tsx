@@ -19,6 +19,7 @@ import HesapMenusu from '@/components/HesapMenusu';
 const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
+const DahiliAnalitikTracker = dynamic(() => import('@/components/DahiliAnalitikTracker'), { ssr: false });
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -301,6 +302,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <CookieConsent />
         <KampanyaModal />
         <Olcumler />
+        <DahiliAnalitikTracker />
         {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
         <SenkronKopru />
         {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}

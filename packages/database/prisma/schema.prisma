@@ -1345,4 +1345,36 @@ model BankaHareketi {
   @@index([tarih])
 }
 
+// ─── ZİYARETÇİ & TRAFİK ANALİTİĞİ ───────────────────────────
+model ZiyaretKaydi {
+  id             String   @id @default(cuid())
+  ziyaretciId    String
+  oturumId       String
+  sayfa          String
+  baslik         String?
+  kaynak         String   @default("direct") // google, bing, yandex, instagram, direct, vb.
+  tamKaynak      String?  // document.referrer
+  aramaMotoru    String?  // Google, Bing, Yandex
+  aramaKelimesi  String?
+  ip             String?
+  ulke           String?  @default("TR")
+  sehir          String?  // Istanbul, Ankara, Izmir vb.
+  bolge          String?
+  cihaz          String?  @default("MASAUSTU") // MOBIL, MASAUSTU, TABLET
+  tarayici       String?  // Chrome, Safari, Edge, Firefox vb.
+  isletimSistemi String?  // iOS, Android, Windows, macOS vb.
+  ekran          String?  // 390x844, 1920x1080 vb.
+  dil            String?  // tr-TR
+  sureSaniye     Int      @default(0)
+  isBot          Boolean  @default(false)
+  olusturulma    DateTime @default(now())
+
+  @@index([olusturulma])
+  @@index([ziyaretciId])
+  @@index([kaynak])
+  @@index([sehir])
+  @@index([sayfa])
+  @@index([isBot])
+}
+
 

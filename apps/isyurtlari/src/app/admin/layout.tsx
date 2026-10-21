@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
 
 const navItems = [
   { href: '/admin',            label: 'Dashboard',   Icon: LuLayoutDashboard },
+  { href: '/admin/analitik',   label: 'Ziyaretçi Analitiği', Icon: LuActivity },
   { href: '/admin/urunler',    label: 'Ürünler',     Icon: LuPackage         },
   { href: '/admin/fiyatlar',   label: 'Fiyatlar',    Icon: LuPrice           },
   { href: '/admin/gorseller',  label: 'Görseller',   Icon: LuImage           },
