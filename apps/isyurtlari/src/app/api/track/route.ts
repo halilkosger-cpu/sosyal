@@ -5,6 +5,25 @@ import { botMu, cihazCozumle, kaynakCozumle, konumCozumle } from '@/lib/analitik
 
 export const dynamic = 'force-dynamic';
 
+export async function GET() {
+  try {
+    await tabloyuHazirla();
+    const countRaw: any = await prisma.$queryRawUnsafe('SELECT COUNT(*)::int as c FROM "ZiyaretKaydi"');
+    const sonKayitlar: any = await prisma.$queryRawUnsafe('SELECT * FROM "ZiyaretKaydi" ORDER BY "olusturulma" DESC LIMIT 5');
+    return NextResponse.json({
+      status: 'ok',
+      tablo: 'ZiyaretKaydi hazir',
+      toplamKayit: countRaw?.[0]?.c ?? 0,
+      sonKayitlar,
+    });
+  } catch (error: any) {
+    return NextResponse.json({
+      status: 'error',
+      mesaj: error?.message,
+    }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     let body: any = {};
@@ -33,12 +52,12 @@ export async function POST(req: NextRequest) {
       olay = 'pageview',
     } = body;
 
-    // Admin ve dahili API isteklerini kaydetme
+    // Admin ve dahili API rotalarını kaydetme
     if (!sayfa || sayfa.startsWith('/admin') || sayfa.startsWith('/api')) {
-      return new NextResponse(null, { status: 204 });
+      return NextResponse.json({ skipped: true, reason: 'admin_or_api' });
     }
 
-    // IP Tespiti (Vercel, Cloudflare, Nginx proxy uyumlu)
+    // IP Tespiti
     const ip =
       req.headers.get('cf-connecting-ip') ||
       req.headers.get('x-real-ip') ||
@@ -64,16 +83,26 @@ export async function POST(req: NextRequest) {
 
     const id = `zk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // Prisma Model üzerinden güvenli kayıt
-    if ((prisma as any).ziyaretKaydi) {
-      if (olay === 'duration' && oturumId && sureSaniye > 0) {
+    // Süre güncellemesi ise
+    if (olay === 'duration' && oturumId && sureSaniye > 0) {
+      if ((prisma as any).ziyaretKaydi) {
         await (prisma as any).ziyaretKaydi.updateMany({
           where: { oturumId, sayfa },
           data: { sureSaniye: Math.min(Math.round(sureSaniye), 3600) },
         }).catch(() => {});
-        return new NextResponse(null, { status: 204 });
+      } else {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "ZiyaretKaydi" SET "sureSaniye" = GREATEST("sureSaniye", $1) WHERE "oturumId" = $2 AND "sayfa" = $3`,
+          Math.min(Math.round(sureSaniye), 3600),
+          oturumId,
+          sayfa
+        ).catch(() => {});
       }
+      return NextResponse.json({ ok: true, type: 'duration_updated' });
+    }
 
+    // Yeni sayfa ziyareti
+    if ((prisma as any).ziyaretKaydi) {
       await (prisma as any).ziyaretKaydi.create({
         data: {
           id,
@@ -99,7 +128,6 @@ export async function POST(req: NextRequest) {
         },
       });
     } else {
-      // Fallback Raw SQL
       await prisma.$executeRawUnsafe(
         `INSERT INTO "ZiyaretKaydi" (
           "id", "ziyaretciId", "oturumId", "sayfa", "baslik",
@@ -121,9 +149,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ ok: true, id, sayfa });
   } catch (error: any) {
     console.error('[TRACK API HATASI]:', error?.message);
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ ok: false, error: error?.message }, { status: 500 });
   }
 }

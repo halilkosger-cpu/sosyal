@@ -19,7 +19,7 @@ import HesapMenusu from '@/components/HesapMenusu';
 const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
-const DahiliAnalitikTracker = dynamic(() => import('@/components/DahiliAnalitikTracker'), { ssr: false });
+import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
