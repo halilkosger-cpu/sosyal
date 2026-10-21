@@ -39,17 +39,17 @@ const KUTULAR: KutuSecenegi[] = [
     id: 'kutu-kraft',
     ad: 'Özel Tasarım Kraft Hediye Kutusu',
     aciklama: 'Keten kurdeleli, saman dolgulu çevre dostu şık hediye kutusu.',
-    fiyat: 120,
+    fiyat: 180,
     kapasite: 4,
-    gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426318188-kuru-fasulye-tahillar-efuxKijQTaJERnTqBBZvBckXGLw0AI.jpg',
+    gorsel: '/images/hediye-kutulari/kraft-kutu.jpg',
   },
   {
     id: 'kutu-ahsap',
     ad: 'El Oyması Ahşap Hatıra Sandığı',
     aciklama: 'İşyurtları marangoz atölyelerinden ceviz vernikli el yapımı ahşap sandık.',
-    fiyat: 450,
+    fiyat: 2000,
     kapasite: 6,
-    gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426316977-badem-RlGZD3us6lcFfykxWV3opmLpGvkY4z.jpg',
+    gorsel: '/images/hediye-kutulari/ahsap-sandik.jpg',
   },
   {
     id: 'kutu-kese',
@@ -57,7 +57,7 @@ const KUTULAR: KutuSecenegi[] = [
     aciklama: 'Büzgülü, geleneksel el dikimi bez çanta sunumu.',
     fiyat: 80,
     kapasite: 3,
-    gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426318188-kuru-fasulye-tahillar-efuxKijQTaJERnTqBBZvBckXGLw0AI.jpg',
+    gorsel: '/images/hediye-kutulari/bez-torba.jpg',
   },
 ];
 
