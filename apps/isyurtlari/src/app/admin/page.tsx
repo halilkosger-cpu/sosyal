@@ -61,9 +61,9 @@ export default function AdminDashboard() {
       {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
+          { href: '/admin/terk-edilmis-sepetler', label: 'Terk Edilmiş Sepetler', desc: 'Sepette bekleyen ürünleri kurtarın', color: 'bg-amber-50 border-amber-200' },
           { href: '/admin/analitik',       label: 'Ziyaretçi Analitiği', desc: 'Arama motoru, IP ve konum takibi', color: 'bg-indigo-50 border-indigo-200' },
           { href: '/admin/urunler/yeni',   label: 'Yeni Ürün Ekle',      desc: 'Kataloğa yeni ürün ekleyin',      color: 'bg-blue-50 border-blue-200'    },
-          { href: '/admin/kategoriler',    label: 'Kategori Yönet',       desc: 'Kategorileri düzenleyin',         color: 'bg-violet-50 border-violet-200' },
           { href: '/admin/siparisler',     label: 'Siparişleri Görüntüle', desc: 'Bekleyen siparişleri inceleyin', color: 'bg-orange-50 border-orange-200' },
         ].map(({ href, label, desc, color }) => (
           <Link key={href} href={href}

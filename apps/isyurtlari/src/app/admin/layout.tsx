@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import {
-  LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag,
+  LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag, LuShoppingCart,
   LuLogOut, LuMenu, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
   LuRotateCcw, LuTicket, LuFileText, LuShieldCheck,
 } from 'react-icons/lu';
@@ -21,6 +21,7 @@ const navItems = [
   { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
   { href: '/admin/muhasebe',   label: 'Ön Muhasebe & Kâr', Icon: LuLayoutDashboard },
   { href: '/admin/siparisler', label: 'Siparişler',  Icon: LuShoppingBag    },
+  { href: '/admin/terk-edilmis-sepetler', label: 'Terk Edilmiş Sepetler', Icon: LuShoppingCart },
   { href: '/admin/on-talepler', label: 'Ön Talepler', Icon: LuBell          },
   { href: '/admin/iadeler',    label: 'İadeler',      Icon: LuRotateCcw      },
   { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
