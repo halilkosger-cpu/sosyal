@@ -10,7 +10,7 @@ import {
   LuReceipt, LuPackagePlus, LuDownload, LuHistory, LuTrash2, LuCheck,
   LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye, LuSend,
   LuPencil, LuPrinter, LuX, LuExternalLink, LuSearch, LuSlidersHorizontal,
-  LuAlertCircle, LuBoxes,
+  LuBoxes,
 } from 'react-icons/lu';
 
 type Tab = 'ozet' | 'cariler' | 'faturalar' | 'banka' | 'giderler' | 'stok-girisi' | 'kritik-stok';
@@ -1454,9 +1454,9 @@ export default function LogoGo3MuhasebeMerkezi() {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  <LuAlertCircle size={13} />
+                  <LuTriangleAlert size={13} />
                   Kritik Stok
-                  {critStats.criticalCount > 0 && (
+                  {(critStats?.criticalCount ?? 0) > 0 && (
                     <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-0.5">
                       {critStats.criticalCount}
                     </span>
@@ -1470,7 +1470,7 @@ export default function LogoGo3MuhasebeMerkezi() {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
-                  Tükenenler ({critStats.outOfStockCount})
+                  Tükenenler ({critStats?.outOfStockCount ?? 0})
                 </button>
                 <button
                   onClick={() => setCritFilter('all')}
@@ -1481,7 +1481,7 @@ export default function LogoGo3MuhasebeMerkezi() {
                   }`}
                 >
                   <LuBoxes size={13} />
-                  Tüm Envanter ({critStats.totalCount})
+                  Tüm Envanter ({critStats?.totalCount ?? 0})
                 </button>
               </div>
 
@@ -1614,10 +1614,10 @@ export default function LogoGo3MuhasebeMerkezi() {
                           {p.minStockLevel ?? 5} Adet
                         </td>
                         <td className="py-3 px-3 text-right font-mono text-gray-600">
-                          {paraFormat(p.purchasePrice || p.price * 0.55)}
+                          {paraFormat(p.purchasePrice || (p.price || 0) * 0.55)}
                         </td>
                         <td className="py-3 px-3 text-right font-mono font-bold text-gray-900">
-                          {paraFormat(p.price)}
+                          {paraFormat(p.price || 0)}
                         </td>
                         <td className="py-3 px-3 text-center">
                           {isOutOfStock ? (
