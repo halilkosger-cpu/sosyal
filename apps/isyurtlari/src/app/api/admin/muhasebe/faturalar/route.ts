@@ -1,5 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
+import { siparisMuhasebeyeIsle, odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -33,13 +34,90 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST: Siparişten Otomatik Satış Faturası Kes veya Manuel Fatura Oluştur
+// POST: Siparişten Otomatik Satış Faturası Kes, Eksik Siparişleri Eşitle veya Manuel Fatura Oluştur
 export async function POST(req: NextRequest) {
   const red = adminGuard(req);
   if (red) return red;
 
   try {
     const body = await req.json();
+
+    // 0. Geçmiş Siparişlerin Faturalarını Eşitle / Geriye Dönük Oluştur
+    if (body.syncOrders) {
+      const existingFaturalar = await prisma.fatura.findMany({
+        where: { orderId: { not: null } },
+        select: { orderId: true },
+      });
+      const invoicedOrderIds = new Set(existingFaturalar.map((f) => f.orderId));
+
+      const ordersToSync = await prisma.order.findMany({
+        where: {
+          status: { not: 'CANCELLED' },
+        },
+        include: {
+          customer: { select: { name: true, email: true, phone: true } },
+          user: { select: { name: true, email: true } },
+          items: {
+            include: {
+              product: { select: { name: true, vatRate: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      const missingOrders = ordersToSync.filter((o) => !invoicedOrderIds.has(o.id));
+
+      let count = 0;
+      for (const ord of missingOrders) {
+        const notes = ord.notes || '';
+        const emailMatch = notes.match(/Email:\s*([^|\n]+)/i);
+        const nameMatch = notes.match(/Müşteri:\s*([^|\n]+)/i);
+        const phoneMatch = notes.match(/Telefon:\s*([^|\n]+)/i);
+
+        const customerName =
+          ord.customer?.name || (nameMatch ? nameMatch[1].trim() : ord.user?.name || 'Müşteri');
+        const email =
+          ord.customer?.email || (emailMatch ? emailMatch[1].trim() : ord.user?.email || `musteri_${ord.orderNumber}@isyurtlari.com.tr`);
+        const phone =
+          ord.customer?.phone || (phoneMatch ? phoneMatch[1].trim() : undefined);
+
+        await siparisMuhasebeyeIsle({
+          orderId: ord.id,
+          orderNumber: ord.orderNumber,
+          customerName,
+          email,
+          phone,
+          shippingAddress: ord.shippingAddress,
+          totalAmount: ord.totalAmount,
+          paymentMethod: ord.paymentMethod,
+          items: ord.items.map((it: any) => ({
+            productId: it.productId,
+            name: it.product?.name || 'Ürün',
+            quantity: it.quantity,
+            price: it.price,
+            vatRate: it.product?.vatRate ?? 20,
+          })),
+        });
+
+        if (ord.status === 'CONFIRMED' || ord.status === 'SHIPPED' || ord.status === 'DELIVERED') {
+          await odemeTahsilatiIsle({
+            orderId: ord.id,
+            orderNumber: ord.orderNumber,
+            paymentMethod: ord.paymentMethod,
+            tutar: ord.totalAmount,
+          });
+        }
+        count++;
+      }
+
+      return NextResponse.json({
+        success: true,
+        count,
+        message: `${count} adet sipariş muhasebeye aktarıldı ve faturalandırıldı.`,
+      });
+    }
+
     const { orderId, cariId, tur, satirlar, faturaNo: ozelFaturaNo, aciklama } = body;
 
     // 1. Sıradaki Fatura Numarasını Belirle

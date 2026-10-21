@@ -86,9 +86,8 @@ export async function siparisMuhasebeyeIsle(girdi: SiparisMuhasebeGirdisi) {
           miktar: it.quantity,
           birimFiyat: it.price,
           kdvOrani,
-          matrah: Math.round(matrah * 100) / 100,
-          kdvTutari: Math.round(kdv * 100) / 100,
-          toplam: Math.round(toplamBirim * 100) / 100,
+          kdvTutari: Math.round((kdv + Number.EPSILON) * 100) / 100,
+          satirToplam: Math.round((toplamBirim + Number.EPSILON) * 100) / 100,
         };
       });
 
@@ -100,9 +99,9 @@ export async function siparisMuhasebeyeIsle(girdi: SiparisMuhasebeGirdisi) {
             tur: 'SATIS',
             cariId: cari!.id,
             orderId: girdi.orderId,
-            matrah: Math.round(toplamMatrah * 100) / 100,
-            kdvTutari: Math.round(toplamKdv * 100) / 100,
-            genelToplam: Math.round(girdi.totalAmount * 100) / 100,
+            matrah: Math.round((toplamMatrah + Number.EPSILON) * 100) / 100,
+            kdvTutari: Math.round((toplamKdv + Number.EPSILON) * 100) / 100,
+            genelToplam: Math.round((girdi.totalAmount + Number.EPSILON) * 100) / 100,
             aciklama: `Sipariş #${girdi.orderNumber} Satış Faturası (${girdi.paymentMethod})`,
             durum: 'ONAYLANDI',
             satirlar: {
@@ -215,10 +214,9 @@ export async function odemeTahsilatiIsle({
         data: {
           hesapAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico Sanal POS Hesabı' : 'Ziraat Bankası Ticari',
           bankaAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico / Sanal POS' : 'T.C. Ziraat Bankası',
-          sube: 'Merkez',
+          subeKodu: 'Merkez',
           hesapNo: '1001-POS',
           iban: 'TR000000000000000000000000',
-          paraBirimi: 'TRY',
           bakiye: 0,
         },
       });
@@ -253,8 +251,8 @@ export async function odemeTahsilatiIsle({
       const yeniBankaBakiye = Math.round((bankaHesabi!.bakiye + netHesabaGecen) * 100) / 100;
       await tx.bankaHareketi.create({
         data: {
-          bankaId: bankaHesabi!.id,
-          hareketTuru: 'GIRIS',
+          bankaHesapId: bankaHesabi!.id,
+          tur: 'GIRIS',
           tutar: netHesabaGecen,
           aciklama: `Sipariş #${orderNumber} Tahsilatı (${cari.unvan})`,
           belgeNo: `THS-${orderNumber}`,

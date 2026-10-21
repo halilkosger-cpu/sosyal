@@ -52,6 +52,17 @@ export default function LogoGo3MuhasebeMerkezi() {
   const [faturalar, setFaturalar] = useState<any[]>([]);
   const [faturaLoading, setFaturaLoading] = useState(false);
   const [gonderiliyorId, setGonderiliyorId] = useState<string | null>(null);
+  const [yeniFaturaModal, setYeniFaturaModal] = useState(false);
+  const [faturaSyncing, setFaturaSyncing] = useState(false);
+  const [faturaForm, setFaturaForm] = useState({
+    tur: 'SATIS',
+    cariId: '',
+    faturaNo: '',
+    aciklama: '',
+    satirlar: [
+      { productId: '', aciklama: '', miktar: 1, birimFiyat: '', kdvOrani: 20 },
+    ],
+  });
 
   // 4. Banka & Kasa State
   const [bankaHesaplari, setBankaHesaplari] = useState<any[]>([]);
@@ -117,6 +128,88 @@ export default function LogoGo3MuhasebeMerkezi() {
       alert('⚠️ Bağlantı hatası, fatura iletilemedi.');
     } finally {
       setGonderiliyorId(null);
+    }
+  };
+
+  const siparisleriFaturalandir = async () => {
+    if (!confirm('Geçmişte faturası henüz kesilmemiş siparişler taranacak ve otomatik satış faturaları oluşturulacaktır. Onaylıyor musunuz?')) return;
+    setFaturaSyncing(true);
+    try {
+      const res = await fetch('/api/admin/muhasebe/faturalar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ syncOrders: true }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(`✅ ${data.message || 'Siparişler başarıyla eşitlendi!'}`);
+        faturalariYukle();
+        carileriYukle();
+        ozetYukle();
+      } else {
+        alert(`⚠️ Hata: ${data.error || 'İşlem başarısız'}`);
+      }
+    } catch {
+      alert('⚠️ Bağlantı hatası oluştu.');
+    } finally {
+      setFaturaSyncing(false);
+    }
+  };
+
+  const handleFaturaSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!faturaForm.cariId) {
+      alert('Lütfen faturanın bağlanacağı cari kartı seçin.');
+      return;
+    }
+    const gecerliSatirlar = faturaForm.satirlar.filter(
+      (s) => s.aciklama.trim() && Number(s.birimFiyat) > 0
+    );
+    if (gecerliSatirlar.length === 0) {
+      alert('Lütfen en az bir geçerli fatura kalemi (açıklama ve birim fiyat) girin.');
+      return;
+    }
+
+    try {
+      const payload = {
+        tur: faturaForm.tur,
+        cariId: faturaForm.cariId,
+        faturaNo: faturaForm.faturaNo.trim() || undefined,
+        aciklama: faturaForm.aciklama.trim() || (faturaForm.tur === 'SATIS' ? 'Satış Faturası' : 'Alış Faturası'),
+        satirlar: gecerliSatirlar.map((s) => ({
+          productId: s.productId || null,
+          aciklama: s.aciklama.trim(),
+          miktar: Number(s.miktar) || 1,
+          birimFiyat: Number(s.birimFiyat),
+          kdvOrani: Number(s.kdvOrani) || 20,
+        })),
+      };
+
+      const res = await fetch('/api/admin/muhasebe/faturalar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const d = await res.json();
+      if (res.ok) {
+        alert(`✅ Fatura (${d.faturaNo}) başarıyla kaydedildi!`);
+        setYeniFaturaModal(false);
+        setFaturaForm({
+          tur: 'SATIS',
+          cariId: '',
+          faturaNo: '',
+          aciklama: '',
+          satirlar: [{ productId: '', aciklama: '', miktar: 1, birimFiyat: '', kdvOrani: 20 }],
+        });
+        faturalariYukle();
+        carileriYukle();
+        ozetYukle();
+      } else {
+        alert(`⚠️ Hata: ${d.error}`);
+      }
+    } catch {
+      alert('⚠️ Fatura kaydedilirken bir hata oluştu.');
     }
   };
 
@@ -554,10 +647,31 @@ export default function LogoGo3MuhasebeMerkezi() {
       {/* TAB 3: FATURALAR */}
       {activeTab === 'faturalar' && (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h2 className="text-base font-bold text-gray-900">Satış ve Satınalma Faturaları</h2>
               <p className="text-xs text-gray-500 mt-0.5">Siparişlerden otomatik kesilen ve mal alımlarına ait resmi fatura kayıtları.</p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={siparisleriFaturalandir}
+                disabled={faturaSyncing}
+                className="flex items-center gap-1.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-gray-700 text-xs font-semibold px-3 py-2 rounded-xl transition-colors border border-gray-200"
+                title="Sitedeki geçmiş siparişleri tarayarak faturası henüz kesilmemiş olanları otomatik muhasebeleştirir"
+              >
+                <LuReceipt size={14} />
+                {faturaSyncing ? 'Eşitleniyor...' : '🔄 Sipariş Faturalarını Eşitle'}
+              </button>
+              <button
+                onClick={() => {
+                  carileriYukle();
+                  stokYukle();
+                  setYeniFaturaModal(true);
+                }}
+                className="flex items-center gap-1.5 bg-[#CC4E00] hover:bg-[#b04300] text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors shadow-sm"
+              >
+                <LuPlus size={16} /> Yeni Fatura Kes / Girişi Yap
+              </button>
             </div>
           </div>
 
@@ -1068,6 +1182,308 @@ export default function LogoGo3MuhasebeMerkezi() {
           </div>
         </div>
       )}
+
+      {/* ─── MODAL: YENİ FATURA DÜZENLE (MANUEL GİRİŞ) ─── */}
+      {yeniFaturaModal && (() => {
+        const toplamGenel = faturaForm.satirlar.reduce(
+          (acc, s) => acc + (Number(s.miktar) || 0) * (Number(s.birimFiyat) || 0),
+          0
+        );
+        const toplamMatrah = faturaForm.satirlar.reduce((acc, s) => {
+          const lineTotal = (Number(s.miktar) || 0) * (Number(s.birimFiyat) || 0);
+          const vatRate = Number(s.kdvOrani) || 20;
+          return acc + lineTotal / (1 + vatRate / 100);
+        }, 0);
+        const toplamKdv = Math.max(0, toplamGenel - toplamMatrah);
+
+        const uygunCariler = cariler.filter((c) =>
+          faturaForm.tur === 'SATIS' ? c.tur === 'ALICI' : c.tur === 'SATICI'
+        );
+        const listelenecekCariler = uygunCariler.length > 0 ? uygunCariler : cariler;
+
+        return (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-4 my-8 max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="flex items-center justify-between border-b pb-3">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-base">
+                    {faturaForm.tur === 'SATIS' ? '🧾 Manuel Satış Faturası Kes' : '📦 Manuel Satınalma / Alış Faturası Girişi'}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Resmi e-Arşiv / muhasebe standartlarında doğrudan cari hesaba ve stoklara işlenen fatura düzenleyin.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setYeniFaturaModal(false)}
+                  className="text-gray-400 hover:text-gray-700 text-2xl font-bold leading-none"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <form onSubmit={handleFaturaSubmit} className="space-y-4 text-xs">
+                {/* Fatura Türü & Cari Kart */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">Fatura Türü *</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setFaturaForm({ ...faturaForm, tur: 'SATIS', cariId: '' })}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
+                          faturaForm.tur === 'SATIS'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                        }`}
+                      >
+                        600 Satış Faturası
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFaturaForm({ ...faturaForm, tur: 'SATINALMA', cariId: '' })}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold border transition-colors ${
+                          faturaForm.tur === 'SATINALMA'
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                        }`}
+                      >
+                        153 Mal Alış Faturası
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-gray-700 mb-1">
+                      {faturaForm.tur === 'SATIS' ? 'Müşteri / Cari Kart (120 Alıcılar) *' : 'Tedarikçi / İşyurdu (320 Satıcılar) *'}
+                    </label>
+                    <select
+                      required
+                      value={faturaForm.cariId}
+                      onChange={(e) => setFaturaForm({ ...faturaForm, cariId: e.target.value })}
+                      className="w-full border border-gray-300 rounded-xl p-2 bg-white font-medium"
+                    >
+                      <option value="">Cari Kart Seçiniz...</option>
+                      {listelenecekCariler.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          [{c.kod}] {c.unvan} {c.bakiye !== 0 ? `(Bakiye: ₺${c.bakiye.toFixed(2)})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Fatura No & Açıklama */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">
+                      Fatura No (Opsiyonel)
+                    </label>
+                    <input
+                      type="text"
+                      value={faturaForm.faturaNo}
+                      onChange={(e) => setFaturaForm({ ...faturaForm, faturaNo: e.target.value })}
+                      placeholder={faturaForm.tur === 'SATIS' ? 'Örn: FTR-2026-00001 (Boşsa otomatik üretilir)' : 'Örn: ALIS-2026-00001 veya İrsaliye No'}
+                      className="w-full border border-gray-300 rounded-xl p-2 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">Açıklama / Not</label>
+                    <input
+                      type="text"
+                      value={faturaForm.aciklama}
+                      onChange={(e) => setFaturaForm({ ...faturaForm, aciklama: e.target.value })}
+                      placeholder="Örn: Kurumsal Toptan Satış veya Isparta İşyurdu Sabun Alımı"
+                      className="w-full border border-gray-300 rounded-xl p-2"
+                    />
+                  </div>
+                </div>
+
+                {/* Fatura Kalemleri (Satırlar) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-bold text-gray-800 uppercase tracking-wide text-[11px]">
+                      Fatura Kalemleri ({faturaForm.satirlar.length} Kalem)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFaturaForm({
+                          ...faturaForm,
+                          satirlar: [
+                            ...faturaForm.satirlar,
+                            { productId: '', aciklama: '', miktar: 1, birimFiyat: '', kdvOrani: 20 },
+                          ],
+                        })
+                      }
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors"
+                    >
+                      <LuPlus size={13} /> Kalem Ekle
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    {faturaForm.satirlar.map((satir, idx) => {
+                      const lineTotal = (Number(satir.miktar) || 0) * (Number(satir.birimFiyat) || 0);
+                      return (
+                        <div
+                          key={idx}
+                          className="p-2.5 bg-gray-50/80 border border-gray-200 rounded-xl grid grid-cols-12 gap-2 items-center"
+                        >
+                          <div className="col-span-12 md:col-span-5">
+                            <input
+                              type="text"
+                              required
+                              placeholder="Ürün / Hizmet Açıklaması *"
+                              value={satir.aciklama}
+                              onChange={(e) => {
+                                const newSatirlar = [...faturaForm.satirlar];
+                                newSatirlar[idx].aciklama = e.target.value;
+                                setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                              }}
+                              className="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white font-medium"
+                            />
+                            {products.length > 0 && (
+                              <select
+                                onChange={(e) => {
+                                  const p = products.find((prod) => prod.id === e.target.value);
+                                  if (p) {
+                                    const newSatirlar = [...faturaForm.satirlar];
+                                    newSatirlar[idx].productId = p.id;
+                                    newSatirlar[idx].aciklama = p.name;
+                                    newSatirlar[idx].birimFiyat = String(
+                                      faturaForm.tur === 'SATINALMA' && p.purchasePrice > 0
+                                        ? p.purchasePrice
+                                        : p.price
+                                    );
+                                    newSatirlar[idx].kdvOrani = p.vatRate ?? 20;
+                                    setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                                  }
+                                }}
+                                className="w-full border border-gray-200 rounded-md p-1 mt-1 text-[10px] text-gray-500 bg-white"
+                                defaultValue=""
+                              >
+                                <option value="" disabled>Katalogdan Ürün Seç (Otomatik Doldur)...</option>
+                                {products.map((p) => (
+                                  <option key={p.id} value={p.id}>
+                                    {p.name} (Satış: ₺{p.price} · Alış: ₺{p.purchasePrice || 0})
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          <div className="col-span-4 md:col-span-2">
+                            <label className="block text-[10px] text-gray-400 mb-0.5">Adet</label>
+                            <input
+                              type="number"
+                              min="1"
+                              required
+                              value={satir.miktar}
+                              onChange={(e) => {
+                                const newSatirlar = [...faturaForm.satirlar];
+                                newSatirlar[idx].miktar = parseInt(e.target.value, 10) || 1;
+                                setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                              }}
+                              className="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white text-center font-bold"
+                            />
+                          </div>
+
+                          <div className="col-span-4 md:col-span-2">
+                            <label className="block text-[10px] text-gray-400 mb-0.5">Birim Fiyat (₺)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              required
+                              placeholder="0.00"
+                              value={satir.birimFiyat}
+                              onChange={(e) => {
+                                const newSatirlar = [...faturaForm.satirlar];
+                                newSatirlar[idx].birimFiyat = e.target.value;
+                                setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                              }}
+                              className="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white text-right font-bold"
+                            />
+                          </div>
+
+                          <div className="col-span-3 md:col-span-2">
+                            <label className="block text-[10px] text-gray-400 mb-0.5">KDV %</label>
+                            <select
+                              value={satir.kdvOrani}
+                              onChange={(e) => {
+                                const newSatirlar = [...faturaForm.satirlar];
+                                newSatirlar[idx].kdvOrani = parseInt(e.target.value, 10);
+                                setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                              }}
+                              className="w-full border border-gray-300 rounded-lg p-1.5 text-xs bg-white text-center font-semibold"
+                            >
+                              <option value="20">%20</option>
+                              <option value="10">%10</option>
+                              <option value="1">%1</option>
+                              <option value="0">%0</option>
+                            </select>
+                          </div>
+
+                          <div className="col-span-1 flex items-center justify-center pt-3">
+                            <button
+                              type="button"
+                              disabled={faturaForm.satirlar.length === 1}
+                              onClick={() => {
+                                const newSatirlar = faturaForm.satirlar.filter((_, i) => i !== idx);
+                                setFaturaForm({ ...faturaForm, satirlar: newSatirlar });
+                              }}
+                              className="text-gray-400 hover:text-red-500 disabled:opacity-30 p-1"
+                              title="Satırı Sil"
+                            >
+                              <LuTrash2 size={16} />
+                            </button>
+                          </div>
+
+                          <div className="col-span-12 text-right text-[11px] text-gray-500 font-mono pr-2">
+                            Satır Toplamı (KDV Dahil): <strong className="text-gray-900">₺{lineTotal.toFixed(2)}</strong>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Fatura Toplam Özeti */}
+                <div className="bg-gray-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-3">
+                  <div>
+                    <span className="text-gray-400 text-xs block">KDV Hariç Matrah</span>
+                    <span className="font-mono font-bold text-sm">₺{toplamMatrah.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 text-xs block">Hesaplanan KDV</span>
+                    <span className="font-mono font-bold text-sm text-purple-300">₺{toplamKdv.toFixed(2)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-amber-400 text-xs font-bold block uppercase tracking-wider">Fatura Genel Toplamı</span>
+                    <span className="font-mono font-extrabold text-lg text-emerald-400">₺{toplamGenel.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                  <button
+                    type="button"
+                    onClick={() => setYeniFaturaModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 font-semibold"
+                  >
+                    Vazgeç
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-[#CC4E00] hover:bg-[#b04300] text-white font-bold rounded-xl shadow-md transition-colors"
+                  >
+                    Faturayı Oluştur ve Muhasebeye Kaydet
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
