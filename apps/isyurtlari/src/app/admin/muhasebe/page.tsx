@@ -9,7 +9,8 @@ import {
   LuShoppingBag, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
   LuReceipt, LuPackagePlus, LuDownload, LuHistory, LuTrash2, LuCheck,
   LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye, LuSend,
-  LuPencil, LuPrinter, LuX, LuExternalLink,
+  LuPencil, LuPrinter, LuX, LuExternalLink, LuSearch, LuSlidersHorizontal,
+  LuAlertCircle, LuBoxes,
 } from 'react-icons/lu';
 
 type Tab = 'ozet' | 'cariler' | 'faturalar' | 'banka' | 'giderler' | 'stok-girisi' | 'kritik-stok';
@@ -23,7 +24,7 @@ const KATEGORI_ETIKETLERI: Record<string, string> = {
 
 export default function LogoGo3MuhasebeMerkezi() {
   const [activeTab, setActiveTab] = useState<Tab>('ozet');
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState(0);
 
   // 1. Özet State
   const [ozetData, setOzetData] = useState<any>(null);
@@ -116,9 +117,20 @@ export default function LogoGo3MuhasebeMerkezi() {
     productId: '', quantity: '', unitCost: '', invoiceNo: '', supplier: '', notes: '',
   });
 
-  // 7. Kritik Stok
+  // 7. Kritik Stok & Envanter State
   const [criticalList, setCriticalList] = useState<any[]>([]);
   const [critLoading, setCritLoading] = useState(false);
+  const [critFilter, setCritFilter] = useState<'critical' | 'outOfStock' | 'all'>('critical');
+  const [critSearch, setCritSearch] = useState('');
+  const [critStats, setCritStats] = useState({ totalCount: 0, criticalCount: 0, outOfStockCount: 0 });
+  const [stokDuzenleModal, setStokDuzenleModal] = useState(false);
+  const [seciliUrunStok, setSeciliUrunStok] = useState<any>(null);
+  const [stokDuzenleForm, setStokDuzenleForm] = useState({
+    quantity: '',
+    minStockLevel: '',
+    purchasePrice: '',
+  });
+  const [stokGuncelleLoading, setStokGuncelleLoading] = useState(false);
 
   // ─── VERİ YÜKLEYİCİLER ───────────────────────────────────────
   const ozetYukle = () => {
@@ -268,7 +280,84 @@ export default function LogoGo3MuhasebeMerkezi() {
 
   const kritikYukle = () => {
     setCritLoading(true);
-    fetch('/api/admin/muhasebe/kritik-stok').then((r) => r.json()).then((d) => { setCriticalList(Array.isArray(d.products) ? d.products : []); setCritLoading(false); });
+    const params = new URLSearchParams();
+    params.set('filter', critFilter);
+    if (critSearch.trim()) params.set('q', critSearch.trim());
+
+    fetch(`/api/admin/muhasebe/kritik-stok?${params.toString()}`)
+      .then((r) => r.json())
+      .then((d) => {
+        setCriticalList(Array.isArray(d.products) ? d.products : []);
+        setCritStats({
+          totalCount: d.totalCount || 0,
+          criticalCount: d.criticalCount || 0,
+          outOfStockCount: d.outOfStockCount || 0,
+        });
+        setCritLoading(false);
+      })
+      .catch(() => setCritLoading(false));
+  };
+
+  const stokDuzenleAc = (urun: any) => {
+    setSeciliUrunStok(urun);
+    setStokDuzenleForm({
+      quantity: String(urun.quantity ?? 0),
+      minStockLevel: String(urun.minStockLevel ?? 5),
+      purchasePrice: String(urun.purchasePrice ?? 0),
+    });
+    setStokDuzenleModal(true);
+  };
+
+  const handleStokDuzenleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!seciliUrunStok) return;
+    setStokGuncelleLoading(true);
+    try {
+      const res = await fetch('/api/admin/muhasebe/kritik-stok', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: seciliUrunStok.id,
+          quantity: stokDuzenleForm.quantity,
+          minStockLevel: stokDuzenleForm.minStockLevel,
+          purchasePrice: stokDuzenleForm.purchasePrice,
+        }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        alert('✅ Ürün stok ve kritik eşik bilgileri güncellendi!');
+        setStokDuzenleModal(false);
+        kritikYukle();
+        ozetYukle();
+      } else {
+        alert(`⚠️ Hata: ${d.error}`);
+      }
+    } catch {
+      alert('⚠️ Stok güncellenirken hata oluştu');
+    } finally {
+      setStokGuncelleLoading(false);
+    }
+  };
+
+  const hizliStokEkle = async (urun: any, miktar: number) => {
+    const yeniStok = (urun.quantity || 0) + miktar;
+    try {
+      const res = await fetch('/api/admin/muhasebe/kritik-stok', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: urun.id,
+          quantity: yeniStok,
+        }),
+      });
+      if (res.ok) {
+        alert(`✅ ${urun.name} stoğu +${miktar} artırıldı (Yeni Stok: ${yeniStok})`);
+        kritikYukle();
+        ozetYukle();
+      }
+    } catch {
+      alert('⚠️ Stok güncellenemedi');
+    }
   };
 
   useEffect(() => { ozetYukle(); }, [days]);
@@ -280,7 +369,7 @@ export default function LogoGo3MuhasebeMerkezi() {
     if (activeTab === 'giderler') giderleriYukle();
     if (activeTab === 'stok-girisi') stokYukle();
     if (activeTab === 'kritik-stok') kritikYukle();
-  }, [activeTab, cariTurFiltre, seciliGiderKat]);
+  }, [activeTab, cariTurFiltre, seciliGiderKat, critFilter]);
 
   // Ekstre Aç
   const ekstreAc = (cariId: string) => {
@@ -563,16 +652,23 @@ export default function LogoGo3MuhasebeMerkezi() {
         </button>
 
         <button
-          onClick={() => setActiveTab('kritik-stok')}
+          onClick={() => {
+            setCritFilter('critical');
+            setActiveTab('kritik-stok');
+          }}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
             activeTab === 'kritik-stok' ? 'bg-amber-600 text-white shadow-sm' : 'text-amber-800 hover:bg-amber-50'
           }`}
         >
           <LuTriangleAlert size={16} />
           Kritik Stok
-          {ozetData?.criticalStockCount > 0 && (
-            <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">
+          {ozetData?.criticalStockCount > 0 ? (
+            <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1 animate-pulse">
               {ozetData.criticalStockCount}
+            </span>
+          ) : (
+            <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">
+              0
             </span>
           )}
         </button>
@@ -580,26 +676,73 @@ export default function LogoGo3MuhasebeMerkezi() {
 
       {/* ─── 3. SEKME İÇERİKLERİ ─── */}
 
-      {/* TAB 1: P&L GELİR TABLOSU */}
+      {/* TAB 1: P&L GELİR TABLOSU & KÂRLILIK */}
       {activeTab === 'ozet' && (
         <div className="space-y-6">
+          {/* Dönem Filtresi & Başlık */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
+            <div>
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                📊 Finansal Tablolar, P&L & Kârlılık Analizi
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Sipariş gelirleri, satılan mal maliyetleri (621 SMM), faaliyet giderleri ve net kâr hesaplamaları.
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl self-start sm:self-auto">
+              <button
+                onClick={() => setDays(0)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  days === 0 ? 'bg-[#0F2040] text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Tüm Zamanlar
+              </button>
+              <button
+                onClick={() => setDays(365)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  days === 365 ? 'bg-[#0F2040] text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Bu Yıl (2026)
+              </button>
+              <button
+                onClick={() => setDays(90)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  days === 90 ? 'bg-[#0F2040] text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Son 90 Gün
+              </button>
+              <button
+                onClick={() => setDays(30)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  days === 30 ? 'bg-[#0F2040] text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Son 30 Gün
+              </button>
+            </div>
+          </div>
+
           {ozetLoading ? (
-            <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">Hesaplanıyor...</div>
+            <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100">Finansal veriler hesaplanıyor...</div>
           ) : !ozetData || ozetData.error ? (
             <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm">Finansal özet yüklenemedi.</div>
           ) : (
             <>
+              {/* 4 Özet Kart */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 block mb-2">Net Hasılat (600)</span>
                   <div className="text-2xl font-bold text-gray-900">{paraFormat(ozetData.metrics.netRevenue)}</div>
-                  <div className="text-xs text-gray-500 mt-1">KDV Dahil: {paraFormat(ozetData.metrics.totalRevenue)}</div>
+                  <div className="text-xs text-gray-500 mt-1">KDV Dahil Ciro: {paraFormat(ozetData.metrics.totalRevenue)}</div>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 block mb-2">Mal Maliyeti (621 SMM)</span>
                   <div className="text-2xl font-bold text-gray-900">{paraFormat(ozetData.metrics.cogs)}</div>
-                  <div className="text-xs text-gray-500 mt-1">{ozetData.orderCount} siparişin toplam girdi maliyeti</div>
+                  <div className="text-xs text-gray-500 mt-1">{ozetData.orderCount} sipariş + {ozetData.manualInvoiceCount || 0} fatura maliyeti</div>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
@@ -702,6 +845,68 @@ export default function LogoGo3MuhasebeMerkezi() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* ÜRÜN BAZLI KÂRLILIK ANALİZİ (TOP KÂRLI ÜRÜNLER) */}
+              <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                      <LuTrendingUp className="text-emerald-600" /> Ürün Bazlı Kârlılık Analizi (Top Kârlı Ürünler)
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Satışı yapılan ürünlerin toplam cirosu, girdi maliyeti, sağladığı brüt kâr ve net kâr marjı dökümü.
+                    </p>
+                  </div>
+                  <span className="text-xs bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-xl border border-emerald-200 self-start sm:self-auto">
+                    Kârlılık Sıralı ({ozetData.productProfitability?.length || 0} Ürün)
+                  </span>
+                </div>
+
+                {ozetData.productProfitability && ozetData.productProfitability.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-100 text-gray-400 uppercase text-[11px]">
+                          <th className="py-2.5 px-3">#</th>
+                          <th className="py-2.5 px-3">Ürün Adı</th>
+                          <th className="py-2.5 px-3 text-center">Satılan Adet</th>
+                          <th className="py-2.5 px-3 text-right">Toplam Hasılat</th>
+                          <th className="py-2.5 px-3 text-right">Girdi Maliyeti (SMM)</th>
+                          <th className="py-2.5 px-3 text-right">Brüt Kâr</th>
+                          <th className="py-2.5 px-3 text-center">Kâr Marjı (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {ozetData.productProfitability.map((p: any, idx: number) => (
+                          <tr key={idx} className="hover:bg-gray-50/60 transition-colors">
+                            <td className="py-2.5 px-3 text-gray-400 font-mono">{idx + 1}</td>
+                            <td className="py-2.5 px-3 font-semibold text-gray-900">{p.name}</td>
+                            <td className="py-2.5 px-3 text-center font-bold text-gray-800">{p.quantitySold} Adet</td>
+                            <td className="py-2.5 px-3 text-right font-medium text-gray-900">{paraFormat(p.totalRevenue)}</td>
+                            <td className="py-2.5 px-3 text-right font-medium text-red-600">-{paraFormat(p.totalCost)}</td>
+                            <td className="py-2.5 px-3 text-right font-extrabold text-emerald-600">{paraFormat(p.grossProfit)}</td>
+                            <td className="py-2.5 px-3 text-center">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                %{p.margin}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400 text-xs bg-gray-50 rounded-xl space-y-2">
+                    <p>Seçilen dönemde henüz satılan ürün veya sipariş kaydı bulunmuyor.</p>
+                    <button
+                      onClick={() => setDays(0)}
+                      className="text-xs text-blue-600 font-bold hover:underline"
+                    >
+                      Dönemi "Tüm Zamanlar" Olarak Değiştir
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -1219,34 +1424,241 @@ export default function LogoGo3MuhasebeMerkezi() {
         </div>
       )}
 
-      {/* TAB 7: KRİTİK STOK */}
+      {/* TAB 7: KRİTİK STOK & ENVANTER KONTROL */}
       {activeTab === 'kritik-stok' && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <h2 className="text-base font-bold text-gray-900 mb-4">Kritik Stok Seviyesindeki Ürünler</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase">
-                  <th className="py-2.5 px-3">Ürün</th>
-                  <th className="py-2.5 px-3 text-center">Kalan Stok</th>
-                  <th className="py-2.5 px-3 text-center">Kritik Eşik</th>
-                  <th className="py-2.5 px-3 text-right">Alış Fiyatı</th>
-                  <th className="py-2.5 px-3 text-right">Satış Fiyatı</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {criticalList.map((p) => (
-                  <tr key={p.id}>
-                    <td className="py-2.5 px-3 font-semibold text-gray-900">{p.name}</td>
-                    <td className="py-2.5 px-3 text-center font-bold text-red-600">{p.quantity} adet</td>
-                    <td className="py-2.5 px-3 text-center text-xs text-gray-500">{p.minStockLevel ?? 5} adet</td>
-                    <td className="py-2.5 px-3 text-right">{paraFormat(p.purchasePrice)}</td>
-                    <td className="py-2.5 px-3 text-right font-bold">{paraFormat(p.price)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-5">
+          {/* Üst Bar: Başlık, Filtreler & Arama */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-gray-100 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <LuTriangleAlert className="text-amber-600" /> Kritik Stok & Envanter Kontrolü
+                </h2>
+                <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                  Canlı Takip
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Kritik eşiğin altına düşen ürünleri tespit edin, stok seviyelerini ve uyarı limitlerini doğrudan güncelleyin.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Filtre Tabları */}
+              <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl text-xs">
+                <button
+                  onClick={() => setCritFilter('critical')}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                    critFilter === 'critical'
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <LuAlertCircle size={13} />
+                  Kritik Stok
+                  {critStats.criticalCount > 0 && (
+                    <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ml-0.5">
+                      {critStats.criticalCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setCritFilter('outOfStock')}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                    critFilter === 'outOfStock'
+                      ? 'bg-red-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Tükenenler ({critStats.outOfStockCount})
+                </button>
+                <button
+                  onClick={() => setCritFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
+                    critFilter === 'all'
+                      ? 'bg-[#0F2040] text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <LuBoxes size={13} />
+                  Tüm Envanter ({critStats.totalCount})
+                </button>
+              </div>
+
+              {/* Arama Input */}
+              <div className="relative">
+                <LuSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Ürün adı ara..."
+                  value={critSearch}
+                  onChange={(e) => setCritSearch(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && kritikYukle()}
+                  className="pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-xl w-44 focus:w-56 transition-all focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+
+              <button
+                onClick={() => setActiveTab('stok-girisi')}
+                className="flex items-center gap-1 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl transition-colors shadow-sm"
+              >
+                <LuPlus size={14} /> Mal Kabul Yap
+              </button>
+            </div>
           </div>
+
+          {/* İstatistik Çubuğu */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className={`p-3.5 rounded-xl border ${
+              critStats.criticalCount > 0 ? 'bg-amber-50/80 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-100 text-gray-700'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold">⚠️ Kritik Eşik Altındaki Ürünler</span>
+                <span className="text-lg font-extrabold">{critStats.criticalCount}</span>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">Stok adedi belirlenen kritik eşiğin altında kalanlar</p>
+            </div>
+
+            <div className={`p-3.5 rounded-xl border ${
+              critStats.outOfStockCount > 0 ? 'bg-red-50/80 border-red-200 text-red-900' : 'bg-gray-50 border-gray-100 text-gray-700'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold">🔴 Tamamen Tükenen Ürünler</span>
+                <span className="text-lg font-extrabold">{critStats.outOfStockCount}</span>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1">Stok miktarı sıfır (0) olan ürünler</p>
+            </div>
+
+            <div className="p-3.5 rounded-xl border bg-blue-50/60 border-blue-100 text-blue-900">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold">📦 Toplam Takip Edilen Ürün</span>
+                <span className="text-lg font-extrabold">{critStats.totalCount}</span>
+              </div>
+              <p className="text-[11px] text-blue-600 mt-1">Katalogda aktif bulunan ürün çeşidi</p>
+            </div>
+          </div>
+
+          {/* Tablo veya Durum Kartı */}
+          {critLoading ? (
+            <div className="text-center py-12 text-gray-400 text-xs">Stok verileri yükleniyor...</div>
+          ) : criticalList.length === 0 ? (
+            <div className="p-8 text-center bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+              {critFilter === 'critical' ? (
+                <>
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                    ✓
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">Tüm Ürünlerin Stok Seviyesi Güvenli Bölgede!</h3>
+                  <p className="text-xs text-gray-500 max-w-md mx-auto">
+                    Şu anda kritik stok eşiğinin (varsayılan: 5 adet) altında hiçbir ürün bulunmuyor. Depo stoklarınız yeterli seviyede.
+                  </p>
+                  <button
+                    onClick={() => setCritFilter('all')}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F2040] hover:bg-[#1a3360] text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+                  >
+                    <LuBoxes size={14} /> Tüm Ürünlerin Stok ve Eşik Ayarlarını Görüntüle
+                  </button>
+                </>
+              ) : critFilter === 'outOfStock' ? (
+                <>
+                  <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+                    ✓
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900">Tükenen Ürün Bulunmuyor</h3>
+                  <p className="text-xs text-gray-500">Katalogdaki tüm ürünlerin stoğu mevcuttur.</p>
+                </>
+              ) : (
+                <p className="text-gray-500 text-xs">Aradığınız kriterlere uygun ürün bulunamadı.</p>
+              )}
+            </div>
+          ) : (
+            <div className="overflow-x-auto border border-gray-100 rounded-xl">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/70 text-gray-500 uppercase text-[11px]">
+                    <th className="py-3 px-3">Ürün Adı</th>
+                    <th className="py-3 px-3">Kategori</th>
+                    <th className="py-3 px-3 text-center">Kalan Stok</th>
+                    <th className="py-3 px-3 text-center">Kritik Alarm Eşiği</th>
+                    <th className="py-3 px-3 text-right">Birim Alış (SMM)</th>
+                    <th className="py-3 px-3 text-right">Satış Fiyatı</th>
+                    <th className="py-3 px-3 text-center">Durum</th>
+                    <th className="py-3 px-3 text-center">Hızlı İşlem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {criticalList.map((p) => {
+                    const isOutOfStock = (p.quantity ?? 0) <= 0;
+                    const isCritical = (p.quantity ?? 0) <= (p.minStockLevel ?? 5);
+
+                    return (
+                      <tr key={p.id} className="hover:bg-amber-50/30 transition-colors">
+                        <td className="py-3 px-3 font-semibold text-gray-900">
+                          {p.name}
+                        </td>
+                        <td className="py-3 px-3 text-gray-500">
+                          {p.category?.name || 'Genel'}
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          <span className={`inline-block font-extrabold px-2.5 py-1 rounded-lg text-xs ${
+                            isOutOfStock
+                              ? 'bg-red-100 text-red-800'
+                              : isCritical
+                              ? 'bg-amber-100 text-amber-900'
+                              : 'bg-emerald-50 text-emerald-800'
+                          }`}>
+                            {p.quantity} Adet
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-medium text-gray-600">
+                          {p.minStockLevel ?? 5} Adet
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono text-gray-600">
+                          {paraFormat(p.purchasePrice || p.price * 0.55)}
+                        </td>
+                        <td className="py-3 px-3 text-right font-mono font-bold text-gray-900">
+                          {paraFormat(p.price)}
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          {isOutOfStock ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
+                              Tükendi
+                            </span>
+                          ) : isCritical ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                              Kritik Seviye
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              Yeterli
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => hizliStokEkle(p, 10)}
+                              className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold border border-emerald-200 transition-colors"
+                              title="+10 Adet Hızlı Stok Ekle"
+                            >
+                              +10 Ekle
+                            </button>
+                            <button
+                              onClick={() => stokDuzenleAc(p)}
+                              className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
+                              title="Stok Miktarı ve Kritik Eşiği Düzenle"
+                            >
+                              <LuPencil size={11} /> Düzenle
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
@@ -2167,6 +2579,106 @@ export default function LogoGo3MuhasebeMerkezi() {
                     {faturaGuncelleLoading ? 'Kaydediliyor…' : '💾 Bilgileri Güncelle'}
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL: HIZLI STOK & KRİTİK EŞİK DÜZENLE ─── */}
+      {stokDuzenleModal && seciliUrunStok && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-gray-100">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h3 className="font-bold text-gray-900 text-base">Stok & Kritik Eşik Düzenle</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{seciliUrunStok.name}</p>
+              </div>
+              <button
+                onClick={() => setStokDuzenleModal(false)}
+                className="text-gray-400 hover:text-gray-700 text-xl font-bold leading-none p-1"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleStokDuzenleSubmit} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-semibold text-gray-700 mb-1">Mevcut Stok Adedi *</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    value={stokDuzenleForm.quantity}
+                    onChange={(e) => setStokDuzenleForm({ ...stokDuzenleForm, quantity: e.target.value })}
+                    className="w-full border border-gray-300 rounded-xl p-2.5 font-bold text-base text-gray-900"
+                  />
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setStokDuzenleForm({ ...stokDuzenleForm, quantity: String((parseInt(stokDuzenleForm.quantity, 10) || 0) + 10) })}
+                      className="px-2.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg whitespace-nowrap"
+                    >
+                      +10
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStokDuzenleForm({ ...stokDuzenleForm, quantity: String((parseInt(stokDuzenleForm.quantity, 10) || 0) + 50) })}
+                      className="px-2.5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg whitespace-nowrap"
+                    >
+                      +50
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-gray-700 mb-1">
+                  Kritik Stok Uyarı Eşiği (Adet) *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  required
+                  value={stokDuzenleForm.minStockLevel}
+                  onChange={(e) => setStokDuzenleForm({ ...stokDuzenleForm, minStockLevel: e.target.value })}
+                  placeholder="Varsayılan: 5"
+                  className="w-full border border-gray-300 rounded-xl p-2.5 font-bold text-amber-900"
+                />
+                <p className="text-[11px] text-gray-400 mt-1">
+                  Stok bu sayının altına düştüğünde sistem otomatik olarak "Kritik Stok" uyarısı verir.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-gray-700 mb-1">Birim Alış / Maliyet Fiyatı (₺)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={stokDuzenleForm.purchasePrice}
+                  onChange={(e) => setStokDuzenleForm({ ...stokDuzenleForm, purchasePrice: e.target.value })}
+                  placeholder="0.00"
+                  className="w-full border border-gray-300 rounded-xl p-2.5 font-mono"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setStokDuzenleModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-50 font-semibold"
+                >
+                  Vazgeç
+                </button>
+                <button
+                  type="submit"
+                  disabled={stokGuncelleLoading}
+                  className="px-5 py-2.5 bg-[#CC4E00] hover:bg-[#b04300] text-white font-bold rounded-xl shadow-md transition-colors disabled:opacity-50"
+                >
+                  {stokGuncelleLoading ? 'Kaydediliyor…' : '💾 Bilgileri Güncelle'}
+                </button>
               </div>
             </form>
           </div>

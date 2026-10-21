@@ -13,21 +13,35 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const daysParam = parseInt(searchParams.get('days') || '30', 10);
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysParam);
+    // Varsayılan: 0 (Tüm Zamanlar) böylece veriler boş görünmez, kullanıcı isterse 30/90 gün seçebilir
+    const daysParam = parseInt(searchParams.get('days') ?? '0', 10);
 
-    // 1. Siparişleri ve Sipariş Kalemlerini Çek (İptal edilmemiş siparişler)
+    const whereOrder: any = {
+      status: { notIn: ['CANCELLED', 'REFUNDED'] },
+    };
+    const whereExpense: any = {};
+    const whereFatura: any = {
+      orderId: null, // Sipariş faturalarıyla çift sayımı engellemek için sadece bağımsız faturalar
+      durum: { not: 'IPTAL' },
+    };
+
+    if (daysParam > 0) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - daysParam);
+      whereOrder.createdAt = { gte: startDate };
+      whereExpense.date = { gte: startDate };
+      whereFatura.tarih = { gte: startDate };
+    }
+
+    // 1. Siparişleri ve Sipariş Kalemlerini Çek
     const orders = await prisma.order.findMany({
-      where: {
-        createdAt: { gte: startDate },
-        status: { notIn: ['CANCELLED', 'REFUNDED'] },
-      },
+      where: whereOrder,
       include: {
         items: {
           include: {
             product: {
               select: {
+                id: true,
                 name: true,
                 vatRate: true,
                 purchasePrice: true,
@@ -36,22 +50,38 @@ export async function GET(req: NextRequest) {
           },
         },
       },
+      orderBy: { createdAt: 'desc' },
     });
 
     // 2. Giderleri Çek
     const expenses = await prisma.expense.findMany({
-      where: {
-        date: { gte: startDate },
-      },
+      where: whereExpense,
       orderBy: { date: 'desc' },
     });
 
+    // 3. Manuel Düzenlenen Bağımsız Faturaları Çek
+    const manuelFaturalar = await prisma.fatura.findMany({
+      where: whereFatura,
+      include: { satirlar: true },
+      orderBy: { tarih: 'desc' },
+    });
+
     // ─── HESAPLAMALAR ──────────────────────────────────────────
-    // Satışlar & KDV & Maliyet
     let toplamSatisBrut = 0;       // KDV Dahil Ciro
     let toplamSatisKdv = 0;        // Hesaplanan KDV (Müşteriden tahsil edilen)
     let toplamSatisNetMatrah = 0;  // KDV Hariç Net Satış Hasılatı
     let satilanMalinMaliyeti = 0;   // SMM (Satılan ürünlerin alış maliyeti)
+
+    // Ürün bazlı kârlılık haritası
+    const urunKarlilikMap: Record<string, {
+      id: string;
+      name: string;
+      quantitySold: number;
+      totalRevenue: number;
+      totalCost: number;
+      grossProfit: number;
+      margin: number;
+    }> = {};
 
     orders.forEach((order) => {
       toplamSatisBrut += order.totalAmount;
@@ -59,18 +89,88 @@ export async function GET(req: NextRequest) {
       order.items.forEach((item) => {
         const vatRate = item.product?.vatRate ?? 20;
         const lineTotal = item.price * item.quantity;
-        // KDV dahil tutardan matrah ve KDV ayrıştırma
         const lineMatrah = lineTotal / (1 + vatRate / 100);
         const lineKdv = lineTotal - lineMatrah;
 
         toplamSatisNetMatrah += lineMatrah;
         toplamSatisKdv += lineKdv;
 
-        // Maliyet: Sipariş anındaki birim maliyet varsa onu, yoksa ürünün güncel alış fiyatını al
-        const unitCost = item.purchasePrice > 0 ? item.purchasePrice : (item.product?.purchasePrice ?? 0);
-        satilanMalinMaliyeti += unitCost * item.quantity;
+        // Maliyet: Sipariş anındaki maliyet > ürünün güncel maliyeti > satış fiyatının %55'i varsayılan girdi
+        const unitCost =
+          item.purchasePrice > 0
+            ? item.purchasePrice
+            : item.product?.purchasePrice && item.product.purchasePrice > 0
+            ? item.product.purchasePrice
+            : Math.round(item.price * 0.55 * 100) / 100;
+
+        const lineCost = unitCost * item.quantity;
+        satilanMalinMaliyeti += lineCost;
+
+        // Ürün kârlılık dökümü
+        const prodKey = item.productId || item.product?.name || 'Bilinmeyen Ürün';
+        const prodName = item.product?.name || 'Ürün';
+
+        if (!urunKarlilikMap[prodKey]) {
+          urunKarlilikMap[prodKey] = {
+            id: prodKey,
+            name: prodName,
+            quantitySold: 0,
+            totalRevenue: 0,
+            totalCost: 0,
+            grossProfit: 0,
+            margin: 0,
+          };
+        }
+        urunKarlilikMap[prodKey].quantitySold += item.quantity;
+        urunKarlilikMap[prodKey].totalRevenue += lineTotal;
+        urunKarlilikMap[prodKey].totalCost += lineCost;
+        urunKarlilikMap[prodKey].grossProfit += (lineTotal - lineCost);
       });
     });
+
+    // Bağımsız Manuel Satış Faturalarını Ekle
+    manuelFaturalar.forEach((f) => {
+      if (f.tur === 'SATIS') {
+        toplamSatisBrut += f.genelToplam;
+        toplamSatisNetMatrah += f.matrah;
+        toplamSatisKdv += f.kdvTutari;
+
+        // Satır maliyetleri
+        f.satirlar.forEach((s) => {
+          const unitCost = Math.round(s.birimFiyat * 0.55 * 100) / 100;
+          const lineCost = unitCost * s.miktar;
+          satilanMalinMaliyeti += lineCost;
+
+          const key = s.aciklama;
+          if (!urunKarlilikMap[key]) {
+            urunKarlilikMap[key] = {
+              id: key,
+              name: s.aciklama,
+              quantitySold: 0,
+              totalRevenue: 0,
+              totalCost: 0,
+              grossProfit: 0,
+              margin: 0,
+            };
+          }
+          urunKarlilikMap[key].quantitySold += s.miktar;
+          urunKarlilikMap[key].totalRevenue += s.satirToplam;
+          urunKarlilikMap[key].totalCost += lineCost;
+          urunKarlilikMap[key].grossProfit += (s.satirToplam - lineCost);
+        });
+      }
+    });
+
+    // Kârlılık marjlarını hesapla ve sırala
+    const productProfitability = Object.values(urunKarlilikMap)
+      .map((p) => ({
+        ...p,
+        totalRevenue: ikiHane(p.totalRevenue),
+        totalCost: ikiHane(p.totalCost),
+        grossProfit: ikiHane(p.grossProfit),
+        margin: p.totalRevenue > 0 ? ikiHane((p.grossProfit / p.totalRevenue) * 100) : 0,
+      }))
+      .sort((a, b) => b.grossProfit - a.grossProfit);
 
     // Brüt Satış Kârı (Net Hasılat - SMM)
     const brutKar = toplamSatisNetMatrah - satilanMalinMaliyeti;
@@ -98,7 +198,6 @@ export async function GET(req: NextRequest) {
     });
 
     // Net Faaliyet Kârı = Brüt Kâr - Faaliyet Giderleri (KDV hariç net işletme kârı)
-    // Giderlerin KDV hariç matrahı:
     const netGiderler = toplamGider - toplamGiderKdv;
     const netFaaliyetKari = brutKar - netGiderler;
     const netKarMarji = toplamSatisNetMatrah > 0 ? (netFaaliyetKari / toplamSatisNetMatrah) * 100 : 0;
@@ -136,8 +235,10 @@ export async function GET(req: NextRequest) {
         operational: ikiHane(giderKategorileri.OPERATIONAL),
       },
       orderCount: orders.length,
+      manualInvoiceCount: manuelFaturalar.length,
       expenseCount: expenses.length,
       criticalStockCount: kritikStokAdedi,
+      productProfitability: productProfitability.slice(0, 10), // En kârlı ilk 10 ürün
     });
   } catch (error) {
     console.error('Ön muhasebe özet hatası:', error);

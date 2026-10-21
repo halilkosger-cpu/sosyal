@@ -6,7 +6,7 @@ import { LuMail, LuLock, LuLoader, LuArrowRight, LuShieldCheck, LuRotateCcw } fr
 
 export default function AdminLoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email');
-  const [email, setEmail] = useState('halil.kosger@gmail.com');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -138,14 +138,31 @@ export default function AdminLoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="halil.kosger@gmail.com"
+                    placeholder="Örn: tahaberke0312@gmail.com veya halil.kosger@gmail.com"
                     required
                     autoFocus
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
                   />
                 </div>
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <span className="text-[11px] text-gray-400 mr-1">Hızlı Seçim:</span>
+                  <button
+                    type="button"
+                    onClick={() => setEmail('tahaberke0312@gmail.com')}
+                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
+                  >
+                    tahaberke0312@gmail.com
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEmail('halil.kosger@gmail.com')}
+                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
+                  >
+                    halil.kosger@gmail.com
+                  </button>
+                </div>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
-                  Yalnızca yetkili yönetici e-posta adresine tek kullanımlık güvenlik kodu gönderilir.
+                  Yalnızca yetkili yönetici e-posta adreslerine tek kullanımlık güvenlik kodu gönderilir.
                 </p>
               </div>
 

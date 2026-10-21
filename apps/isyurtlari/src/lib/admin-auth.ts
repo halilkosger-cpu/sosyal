@@ -16,6 +16,21 @@ export function jwtAnahtari(): string {
 }
 
 /**
+ * Yetkili Yönetici E-Posta Listesi
+ */
+export const YETKILI_ADMIN_EMAILLER: string[] = [
+  (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
+  'halil.kosger@gmail.com',
+  'tahaberke0312@gmail.com',
+  'info@isyurtlari.com.tr',
+].filter(Boolean);
+
+export function isAdminEmail(email: string): boolean {
+  if (!email) return false;
+  return YETKILI_ADMIN_EMAILLER.includes(email.toLowerCase().trim());
+}
+
+/**
  * /api/admin/* uçlarında admin oturumunu doğrular.
  */
 export function isAdminRequest(req: NextRequest): boolean {

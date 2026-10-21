@@ -22,7 +22,7 @@ async function sendOrderEmail(
   kdvTutari: number
 ) {
   try {
-    const recipientEmail = process.env.EMAIL_RECIPIENT || 'halil.kosger@gmail.com';
+    const recipientEmail = process.env.EMAIL_RECIPIENT || ['halil.kosger@gmail.com', 'tahaberke0312@gmail.com'];
     const banka = bankaBilgileri();
     const bankName = banka.bankName;
     const accountName = banka.accountName;

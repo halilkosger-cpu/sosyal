@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { verifyOTP, getRemainingAttempts, kodlariTemizle, normalizeEmail, normalizeCode } from '@/lib/otp';
 import { logAudit } from '@/lib/audit-log';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
-import { jwtAnahtari } from '@/lib/admin-auth';
+import { jwtAnahtari, isAdminEmail } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,13 +40,7 @@ export async function POST(req: NextRequest) {
       return sinir;
     }
 
-    const ADMIN_EMAILS = [
-      (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
-      'info@isyurtlari.com.tr',
-      'halil.kosger@gmail.com',
-    ].filter(Boolean);
-
-    if (!ADMIN_EMAILS.includes(email)) {
+    if (!isAdminEmail(email)) {
       await logAudit('OTP_VERIFY', email, 'failed', 'Yetkisiz e-posta ile kod onayı', ip);
       return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
     }

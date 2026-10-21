@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { generateOTP, storeOTP, normalizeEmail } from '@/lib/otp';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { logAudit } from '@/lib/audit-log';
+import { isAdminEmail } from '@/lib/admin-auth';
 
 const resendApiKey = process.env.SEND_MAIL_API_KEY || process.env.RESEND_API_KEY || 're_mock_key';
 const resend = new Resend(resendApiKey);
@@ -20,13 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Yetkili yönetici e-posta kontrolü
-    const ALLOWED_EMAILS = [
-      (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
-      'halil.kosger@gmail.com',
-      'info@isyurtlari.com.tr',
-    ].filter(Boolean);
-
-    if (!ALLOWED_EMAILS.includes(email)) {
+    if (!isAdminEmail(email)) {
       await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta ile kod talebi', ip);
       return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
     }
