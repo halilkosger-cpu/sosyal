@@ -6,6 +6,7 @@ This is a **production-ready AI coding plugin** providing 71 specialized agents,
 
 ## Core Principles
 
+0. **Constitution (En Üst Kural)** — Sadece düzeltilmiş kod parçasını ver. Uzun açıklamalar veya laf kalabalığı yapma, doğrudan çözüme odaklan.
 1. **Agent-First** — Delegate to specialized agents for domain tasks
 2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
 3. **Security-First** — Never compromise on security; validate all inputs

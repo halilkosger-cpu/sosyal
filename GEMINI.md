@@ -8,6 +8,9 @@ ECC is a cross-harness coding system with 71 specialized agents, 311 skills, and
 
 Gemini support is currently focused on a strong project-local instruction layer via `.gemini/GEMINI.md`, plus the shared MCP catalog and package-manager setup assets shipped by the installer.
 
+## Constitution / Temel Kural
+- **Sadece düzeltilmiş kod parçasını ver. Uzun açıklamalar veya laf kalabalığı yapma, doğrudan çözüme odaklan.**
+
 ## Core Workflow
 
 1. Plan before editing large features.
