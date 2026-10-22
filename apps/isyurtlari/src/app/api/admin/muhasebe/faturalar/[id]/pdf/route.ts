@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { generateOfficialEArsivHTML, VARSAYILAN_SIRKET } from '@/lib/e-fatura/logo-isnet';
+import { adminGuard } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const red = adminGuard(req);
+  if (red) return red;
+
   try {
+    if (!params?.id) {
+      return new NextResponse('Fatura ID belirtilmedi', { status: 400 });
+    }
+
     const fatura = await prisma.fatura.findUnique({
       where: { id: params.id },
       include: {
@@ -43,9 +51,17 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       })),
     });
 
+    const { searchParams } = new URL(req.url);
+    const isDownload = searchParams.get('download') === '1' || searchParams.get('indir') === '1';
+    const dosyaAdi = `e-arsiv-fatura-${fatura.gibFaturaNo || fatura.faturaNo}.html`;
+
     return new NextResponse(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
+        'Content-Disposition': isDownload
+          ? `attachment; filename="${dosyaAdi}"`
+          : `inline; filename="${dosyaAdi}"`,
       },
     });
   } catch (error) {

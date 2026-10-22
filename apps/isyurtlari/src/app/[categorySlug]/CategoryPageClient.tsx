@@ -16,6 +16,7 @@ import {
 } from '@/components/Icons';
 import { kisaAd, type Kategori } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
+import HarvestFilter, { HarvestSeasonType } from '@/components/HarvestFilter';
 
 interface Campaign {
   id: string;
@@ -295,7 +296,27 @@ function KategoriIcerigi({
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const products = veri?.urunler ?? [];
-  const sorted = products;
+  const urlSeason = (aramaParametreleri.get('sezon') as HarvestSeasonType) || 'tumu';
+
+  const filteredSorted = products.filter((p) => {
+    if (urlSeason === 'tumu') return true;
+    if (urlSeason === 'taze-hasat') {
+      const isFood = p.category?.slug === 'gida' || p.category?.slug === 'gida-urunleri' || categorySlug === 'gida';
+      const nameL = p.name.toLowerCase();
+      const foodTerms = ['bal', 'reçel', 'zeytin', 'zeytinya', 'pekmez', 'sirke', 'salça', 'ceviz', 'fıstık', 'nohut', 'fasulye', 'tarhana', 'çay'];
+      return isFood || foodTerms.some((term) => nameL.includes(term));
+    }
+    if (urlSeason === 'on-siparis') {
+      return p.quantity <= 0;
+    }
+    if (urlSeason === 'dort-mevsim') {
+      const craftSlugs = ['ahsap', 'ahsap-urunler', 'tekstil', 'tekstil-urunleri', 'dokuma', 'sanat-zanaat', 'mobilya', 'hediyelik'];
+      return craftSlugs.includes(p.category?.slug || '') || craftSlugs.includes(categorySlug);
+    }
+    return true;
+  });
+
+  const sorted = filteredSorted;
 
   const fasetMin = veri?.fasetler.fiyat.min ?? 0;
   const fasetMax = veri?.fasetler.fiyat.max ?? 5000;
@@ -333,7 +354,7 @@ function KategoriIcerigi({
   };
 
   const suzgecleriTemizle = () =>
-    parametreDegistir({ minFiyat: null, maxFiyat: null, stok: null, sirala: null });
+    parametreDegistir({ minFiyat: null, maxFiyat: null, stok: null, sirala: null, sezon: null });
 
   useEffect(() => {
     let iptal = false;
@@ -564,6 +585,14 @@ function KategoriIcerigi({
               </div>
             </div>
 
+            {/* ─── HASAT & MEVSİM FİLTRESİ ─── */}
+            <div className="mb-5">
+              <HarvestFilter
+                activeSeason={urlSeason}
+                onSeasonChange={(s) => parametreDegistir({ sezon: s === 'tumu' ? null : s })}
+              />
+            </div>
+
             {/* ─── LOADING ─── */}
             {loading && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -587,7 +616,7 @@ function KategoriIcerigi({
             )}
 
             {/* ─── NO RESULTS WITH FILTERS ─── */}
-            {!loading && products.length === 0 && kategoriToplam > 0 && (
+            {!loading && sorted.length === 0 && kategoriToplam > 0 && (
               <div className="bg-white rounded-2xl p-12 text-center col-span-full">
                 <span className="text-5xl block mb-4">🔍</span>
                 <h3 className="text-lg font-bold text-gray-700 mb-2">Filtrelerinizi eşleşen ürün bulunamadı</h3>

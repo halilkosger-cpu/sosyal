@@ -7,6 +7,7 @@ import PreOrderBadge from '@/components/PreOrderBadge';
 import FavoriteButton from '@/components/FavoriteButton';
 import AddToCartButton from '@/components/AddToCartButton';
 import { urunGorseli, urunSrcSet } from '@/lib/urun-gorsel';
+import { HarvestBadge, HarvestSeasonType } from '@/components/HarvestFilter';
 
 /**
  * Urun karti.
@@ -87,6 +88,10 @@ export interface UrunKartiProps {
   /** Kartin altina eklenecek serbest icerik (or. "favorilerden cikar"). */
   altAlan?: ReactNode;
   /**
+   * Hasat/sezon rozeti: Belirtilirse özel HarvestBadge çizilir.
+   */
+  harvestSeason?: HarvestSeasonType;
+  /**
    * Kartin tamami baglanti mi olsun?
    *
    * Favoriler sayfasinda kartin icinde kendi butonlari var; ic ice buton
@@ -110,6 +115,7 @@ export default function UrunKarti({
   genisSepet = false,
   kompakt = false,
   altAlan,
+  harvestSeason,
   sarmalaLink = true,
 }: UrunKartiProps) {
   const tukendi = urun.quantity <= 0;
@@ -179,6 +185,13 @@ export default function UrunKarti({
       {/* Akıllı Mahsul & Zanaat Rozeti */}
       {(() => {
         if (tukendi) return null;
+        if (harvestSeason && harvestSeason !== 'tumu') {
+          return (
+            <div className="absolute top-2 left-2 z-10">
+              <HarvestBadge season={harvestSeason} />
+            </div>
+          );
+        }
         if (urun.quantity > 0 && urun.quantity <= 5) {
           return (
             <span className="absolute top-2 left-2 bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { LuPackage, LuX, LuSearch, LuCopy, LuCheck, LuExternalLink, LuTruck, LuClock } from 'react-icons/lu';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
+import PreOrderTimeline from '@/components/PreOrderTimeline';
 
 interface SiparisSonuc {
   orderNumber: string;
@@ -264,6 +265,25 @@ export default function KargoTakipModal() {
                     <div className="flex items-center gap-2 p-2.5 rounded-lg bg-orange-50 border border-orange-100 text-[11px] text-orange-900">
                       <LuClock size={15} className="shrink-0 text-orange-600" />
                       <span>Kargo takip numaranız koli şubeye teslim edildiğinde burada görünecektir.</span>
+                    </div>
+                  )}
+
+                  {/* Ön Sipariş / Sipariş Üretim Aşamaları Çizelgesi */}
+                  {sonuc.status !== 'CANCELLED' && (
+                    <div className="pt-2">
+                      <PreOrderTimeline
+                        currentStepIndex={
+                          sonuc.status === 'DELIVERED'
+                            ? 4
+                            : sonuc.status === 'SHIPPED'
+                            ? 3
+                            : sonuc.status === 'CONFIRMED'
+                            ? 1
+                            : 0
+                        }
+                        orderDate={sonuc.createdAt}
+                        className="p-4 shadow-none border border-gray-200"
+                      />
                     </div>
                   )}
 

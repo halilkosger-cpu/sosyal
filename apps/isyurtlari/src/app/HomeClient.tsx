@@ -10,6 +10,7 @@ import { content } from '@/config/content';
 import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
 import KampanyaHeroBanner from '@/components/KampanyaHeroBanner';
+import HarvestFilter, { HarvestSeasonType } from '@/components/HarvestFilter';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -128,6 +129,27 @@ export default function HomeClient({
       campaign: { discount: cp.discount, discountedPrice: indirimliFiyat(cp.product.price, cp.discount) },
     }))
   );
+
+  const [activeSeason, setActiveSeason] = useState<HarvestSeasonType>('tumu');
+
+  const filteredProducts = products.filter((p) => {
+    if (!p.category) return false;
+    if (activeSeason === 'tumu') return true;
+    if (activeSeason === 'taze-hasat') {
+      const isFood = p.category.slug === 'gida' || p.category.slug === 'gida-urunleri';
+      const nameL = p.name.toLowerCase();
+      const foodTerms = ['bal', 'reçel', 'zeytin', 'zeytinya', 'pekmez', 'sirke', 'salça', 'ceviz', 'fıstık', 'nohut', 'fasulye', 'tarhana', 'çay'];
+      return isFood || foodTerms.some((term) => nameL.includes(term));
+    }
+    if (activeSeason === 'on-siparis') {
+      return p.quantity <= 0;
+    }
+    if (activeSeason === 'dort-mevsim') {
+      const craftSlugs = ['ahsap', 'ahsap-urunler', 'tekstil', 'tekstil-urunleri', 'dokuma', 'sanat-zanaat', 'mobilya', 'hediyelik'];
+      return craftSlugs.includes(p.category.slug);
+    }
+    return true;
+  });
 
   const tumUrunler = `/${categories[0]?.slug ?? 'gida'}`;
 
@@ -313,13 +335,33 @@ export default function HomeClient({
           </Link>
         </div>
 
-        {loading || products.length === 0 ? (
+        {/* ─── HASAT & MEVSİM FİLTRESİ ─── */}
+        <div className="mb-6">
+          <HarvestFilter
+            activeSeason={activeSeason}
+            onSeasonChange={setActiveSeason}
+          />
+        </div>
+
+        {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-8">
             {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-gray-100 rounded-xl aspect-square animate-pulse" />)}
           </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="bg-orange-50/50 rounded-2xl border border-orange-100 p-8 text-center my-4">
+            <span className="text-3xl block mb-2">🌿</span>
+            <p className="text-sm font-semibold text-gray-800 mb-1">Bu sezona/kategoriye ait ürün bulunamadı</p>
+            <p className="text-xs text-gray-500 mb-4">Diğer mevsim ve zanaat ürünlerini inceleyebilirsiniz.</p>
+            <button
+              onClick={() => setActiveSeason('tumu')}
+              className="px-4 py-2 bg-[#CC4E00] text-white text-xs font-semibold rounded-lg hover:bg-[#A63F00] transition"
+            >
+              Tüm Ürünleri Göster
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-8">
-            {products.filter((p) => p.category).map((product, sira) => (
+            {filteredProducts.map((product, sira) => (
               <UrunKarti
                 key={product.id}
                 urun={product}
