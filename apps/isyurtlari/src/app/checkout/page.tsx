@@ -9,6 +9,7 @@ import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
 import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
+import WorkshopDeliveryCommitment from '@/components/WorkshopDeliveryCommitment';
 
 interface Campaign {
   id: string;
@@ -368,6 +369,9 @@ export default function CheckoutPage() {
             <div>{error}</div>
           </div>
         )}
+
+        {/* Atölye & Hasat Teslimat Taahhüdü */}
+        <WorkshopDeliveryCommitment items={cart} className="mb-6" />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
           <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-5">

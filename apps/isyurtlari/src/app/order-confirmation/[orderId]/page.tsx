@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight } from 'react-icons/lu';
 import { siparisTamamlandi } from '@/lib/analiz';
+import PreOrderTimeline from '@/components/PreOrderTimeline';
 
 interface OrderData {
   id: string;
@@ -188,6 +189,17 @@ export default function OrderConfirmationPage() {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* ─── CANLI ATÖLYE & SİPARİŞ ÇİZELGESİ ─── */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">Canlı Sipariş &amp; Atölye Süreci</h2>
+                <p className="text-xs text-gray-500 mt-1">
+                  Siparişiniz adalet bakanlığı işyurtları atölyelerinde meslek öğrenen ustalarımız tarafından adım adım hazırlanıyor.
+                </p>
+              </div>
+              <PreOrderTimeline currentStepIndex={order.status === 'CONFIRMED' ? 1 : 0} />
             </div>
 
             {/* Impact Celebration */}
