@@ -12,6 +12,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
 import SensorySpotlight from '@/components/SensorySpotlight';
+import MagneticButton from '@/components/MagneticButton';
 import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
@@ -259,6 +260,21 @@ export default function ProductDetailPage({
    */
   const anaSrcSet = seciliGorsel === 0 ? urunSrcSet(product.slug) : undefined;
 
+  const KATEGORI_HIKAYE_GORSELLERI: Record<string, string> = {
+    gida: '/kategori/gida.webp',
+    hediyelik: '/kategori/hediyelik.webp',
+    ahsap: '/kategori/ahsap.webp',
+    temizlik: '/kategori/temizlik.webp',
+    tekstil: '/kategori/tekstil.webp',
+    peyzaj: '/kategori/peyzaj.webp',
+    'sanat-zanaat': '/kategori/sanat-zanaat.webp',
+  };
+
+  const hikayeGorseli =
+    gorseller.length >= 2
+      ? gorseller[1].url
+      : KATEGORI_HIKAYE_GORSELLERI[product.category.slug] || '/hero/anasayfa-hero.webp';
+
   const sekmeler: { id: Sekme; ad: string }[] = [
     { id: 'aciklama', ad: 'Açıklama' },
     ...(product.ozellikler && product.ozellikler.length > 0 ? [{ id: 'ozellikler' as Sekme, ad: 'Özellikler' }] : []),
@@ -283,13 +299,13 @@ export default function ProductDetailPage({
         {/* ─── GALERİ ─── */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
-            {sensoryAktif && gorseller.length >= 2 ? (
+            {sensoryAktif && (secili?.url || gorseller[0]?.url) ? (
               <SensorySpotlight
-                packageImage={gorseller[0].url}
-                storyImage={gorseller[1].url}
+                packageImage={secili?.url || gorseller[0]?.url}
+                storyImage={hikayeGorseli}
                 packageAlt={product.name}
-                storyAlt={`${product.name} - Doğal Doku ve Hasat`}
-                storyBadge="Doğal Hasat & Saf Doku"
+                storyAlt={`${product.name} - Atölye ve Hasat Hikayesi`}
+                storyBadge={`${product.category.name} Atölyesi & Doku`}
                 className="w-full h-full"
               />
             ) : secili && anaSrcSet ? (
@@ -324,7 +340,7 @@ export default function ProductDetailPage({
             )}
 
             {/* Duyusal Keşif (Spotlight) Etkileşim Butonu */}
-            {gorseller.length >= 2 && (
+            {(gorseller.length > 0 || yerelGorselVar(product.slug) || product.imageUrl) && (
               <button
                 type="button"
                 onClick={() => setSensoryAktif((prev) => !prev)}
@@ -336,7 +352,7 @@ export default function ProductDetailPage({
                 title="Duyusal Doku / Hasat Maskesini Aç/Kapat"
               >
                 <LuSparkles size={13} className={sensoryAktif ? 'animate-spin' : 'text-amber-500'} />
-                {sensoryAktif ? 'Standart Görünüm' : 'Duyusal Hikaye (Spotlight)'}
+                {sensoryAktif ? 'Standart Görünüm' : '✨ Duyusal Hikaye (Spotlight)'}
               </button>
             )}
           </div>
@@ -434,12 +450,12 @@ export default function ProductDetailPage({
                   <span className="w-10 text-center font-bold text-gray-900">{quantity}</span>
                   <button onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))} className="w-11 h-12 flex items-center justify-center text-gray-600 hover:bg-gray-100" aria-label="Arttır"><LuPlus size={16} /></button>
                 </div>
-                <button
+                <MagneticButton
                   onClick={handleAddToCart}
-                  className={`flex-1 h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}
+                  className={`flex-1 h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 transition-colors cursor-pointer ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}
                 >
                   {added ? <><LuCheck size={18} /> Sepete eklendi</> : <><LuShoppingCart size={18} /> Sepete Ekle</>}
-                </button>
+                </MagneticButton>
               </div>
             ) : !inStock ? (
               <div className="space-y-4">

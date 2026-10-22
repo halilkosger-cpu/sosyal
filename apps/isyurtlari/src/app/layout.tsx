@@ -19,6 +19,7 @@ const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
+const CustomCursor = dynamic(() => import('@/components/CustomCursor'), { ssr: false });
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';
 import PushBackLayout from '@/components/PushBackLayout';
@@ -315,6 +316,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
           <CanliSosyalKanit />
           <HediyeDanismaniModal />
+          {/* 2026 Mikro-Etkileşim: Özel İmleç */}
+          <CustomCursor />
         </CartDrawerProvider>
       </body>
     </html>

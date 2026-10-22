@@ -46,9 +46,14 @@ export default function CustomCursor({
   const smoothY = useSpring(cursorY, springConfig);
 
   useEffect(() => {
-    // Dokunmatik cihazlarda özel imleci devre dışı bırak
-    if (typeof window !== 'undefined' && 'ontouchstart' in window) {
-      return;
+    // Yalnızca fare/işaretçi olmayan saf dokunmatik mobil cihazlarda devre dışı bırak.
+    // Masaüstü ve dokunmatik ekranlı dizüstü bilgisayarlarda (fine pointer mevcutsa) çalışmaya devam eder.
+    if (typeof window !== 'undefined') {
+      const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+      const isTouchOnly = !hasFinePointer && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      if (isTouchOnly) {
+        return;
+      }
     }
 
     const handleMouseMove = (e: MouseEvent) => {
