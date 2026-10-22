@@ -25,6 +25,25 @@ const nextConfig = {
   // 'optimizeImages'" uyarisi veriyordu; hicbir etkisi yoktu. Gorsel
   // ayarlari asagidaki images bloğunda.
 
+  async redirects() {
+    return [
+      { source: '/urun/lokum', destination: '/gida', permanent: true },
+      { source: '/urun/susam-yagi', destination: '/gida', permanent: true },
+      { source: '/urun/burdur-cezerye', destination: '/gida', permanent: true },
+      { source: '/urun/tarsus-cezerye', destination: '/gida', permanent: true },
+      { source: '/urun/baklava', destination: '/gida', permanent: true },
+      { source: '/urun/gul-serbeti', destination: '/gida', permanent: true },
+      { source: '/urun/yumurta', destination: '/gida', permanent: true },
+      { source: '/urun/lavaanta-kolonyasi', destination: '/urun/lavanta-kolonyasi', permanent: true },
+      { source: '/urun/pamuklu-tshirt', destination: '/tekstil', permanent: true },
+      { source: '/urun/el-dokuma-ortusu', destination: '/tekstil', permanent: true },
+      { source: '/urun/oya-dantel', destination: '/tekstil', permanent: true },
+      { source: '/urun/tiras-losyonu', destination: '/temizlik', permanent: true },
+      { source: '/urun/seramik-set', destination: '/hediyelik', permanent: true },
+      { source: '/urun/ahsap-tahtalar', destination: '/ahsap', permanent: true },
+    ];
+  },
+
   async headers() {
     return [
       {
