@@ -3,13 +3,11 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import {
-  LuTrendingUp, LuTrendingDown, LuDollarSign, LuPackage,
-  LuShoppingBag, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
-  LuReceipt, LuPackagePlus, LuDownload, LuHistory, LuTrash2, LuCheck,
-  LuUsers, LuCreditCard, LuBuilding2, LuArrowRight, LuEye, LuSend,
-  LuPencil, LuPrinter, LuX, LuExternalLink, LuSearch, LuSlidersHorizontal,
+  LuTrendingUp, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
+  LuReceipt, LuPackagePlus, LuDownload, LuTrash2, LuCheck,
+  LuUsers, LuBuilding2, LuEye, LuSend,
+  LuPencil, LuPrinter, LuSearch,
   LuBoxes,
 } from 'react-icons/lu';
 
@@ -95,14 +93,14 @@ export default function LogoGo3MuhasebeMerkezi() {
 
   // 4. Banka & Kasa State
   const [bankaHesaplari, setBankaHesaplari] = useState<any[]>([]);
-  const [bankaLoading, setBankaLoading] = useState(false);
+  const [, setBankaLoading] = useState(false);
   const [yeniHesapModal, setYeniHesapModal] = useState(false);
   const [hesapForm, setHesapForm] = useState({ hesapAdi: '', bankaAdi: '', iban: '' });
 
   // 5. Giderler State
   const [expenses, setExpenses] = useState<any[]>([]);
-  const [expLoading, setExpLoading] = useState(false);
-  const [seciliGiderKat, setSeciliGiderKat] = useState('');
+  const [, setExpLoading] = useState(false);
+  const [seciliGiderKat] = useState('');
   const [giderForm, setGiderForm] = useState({
     title: '', category: 'SHIPPING', amount: '', vatRate: '20',
     invoiceNo: '', supplier: '', notes: '', date: new Date().toISOString().split('T')[0],
@@ -111,8 +109,8 @@ export default function LogoGo3MuhasebeMerkezi() {
   // 6. Stok & WAV State
   const [products, setProducts] = useState<any[]>([]);
   const [movements, setMovements] = useState<any[]>([]);
-  const [stokLoading, setStokLoading] = useState(false);
-  const [stokMesaj, setStokMesaj] = useState<{ tur: 'basari' | 'hata'; text: string } | null>(null);
+  const [, setStokLoading] = useState(false);
+  const [, setStokMesaj] = useState<{ tur: 'basari' | 'hata'; text: string } | null>(null);
   const [stokForm, setStokForm] = useState({
     productId: '', quantity: '', unitCost: '', invoiceNo: '', supplier: '', notes: '',
   });

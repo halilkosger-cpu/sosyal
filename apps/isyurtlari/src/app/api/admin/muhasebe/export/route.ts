@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     const orders = await prisma.order.findMany({
       where: {
         createdAt: { gte: startDate },
-        status: { notIn: ['CANCELLED', 'REFUNDED'] },
+        status: { not: 'CANCELLED' },
       },
       include: {
         items: {

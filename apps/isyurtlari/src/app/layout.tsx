@@ -6,11 +6,9 @@ import dynamic from 'next/dynamic';
 import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
 
 import Olcumler from '@/components/Olcumler';
-import CartBadge from '@/components/CartBadge';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
 const KargoTakipModal = dynamic(() => import('@/components/KargoTakipModal'), { ssr: false });
-import { IconCart } from '@/components/Icons';
 import { defaultMetadata, organizationJsonLd, paylasimGorseli, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { kisaAd } from '@/lib/kategori-gorunum';
@@ -22,6 +20,10 @@ const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr:
 const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
+import { CartDrawerProvider } from '@/context/CartDrawerContext';
+import PushBackLayout from '@/components/PushBackLayout';
+import CartDrawer from '@/components/CartDrawer';
+import CartTrigger from '@/components/CartTrigger';
 import './globals.css';
 
 const spaceGrotesk = Space_Grotesk({
@@ -146,9 +148,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="bg-gray-100 text-gray-900">
-
-        {/* ─── TOP BAR ─── */}
-        <header className="sticky top-0 z-50 shadow-sm">
+        <CartDrawerProvider>
+          <PushBackLayout>
+            {/* ─── TOP BAR ─── */}
+            <header className="sticky top-0 z-50 shadow-sm">
           {/* Kampanya Duyuru Bandı */}
           <div className="bg-gradient-to-r from-[#BA4700] via-[#CC4E00] to-[#BA4700] text-white text-[11px] sm:text-xs py-1.5 px-3 text-center font-medium tracking-wide">
             <span className="inline-flex items-center gap-1.5 justify-center flex-wrap">
@@ -192,17 +195,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <HesapMenusu />
 
               {/* Cart */}
-              <Link
-                href="/sepet"
-                aria-label="Sepetim"
-                className="relative flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors flex-shrink-0"
-              >
-                <div className="relative">
-                  <IconCart className="w-6 h-6" />
-                  <CartBadge />
-                </div>
-                <span className="hidden sm:inline text-sm font-medium">Sepetim</span>
-              </Link>
+              <CartTrigger />
 
             </div>
           </div>
@@ -306,18 +299,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </div>
         </footer>
+          </PushBackLayout>
 
-        <CookieConsent />
-        <KampanyaModal />
-        <Olcumler />
-        <DahiliAnalitikTracker />
-        {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
-        <SenkronKopru />
-        {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
-        <AltGezinme />
-        {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
-        <CanliSosyalKanit />
-        <HediyeDanismaniModal />
+          {/* Sağdan Açılan Sepet Çekmecesi */}
+          <CartDrawer />
+
+          <CookieConsent />
+          <KampanyaModal />
+          <Olcumler />
+          <DahiliAnalitikTracker />
+          {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
+          <SenkronKopru />
+          {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
+          <AltGezinme />
+          {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
+          <CanliSosyalKanit />
+          <HediyeDanismaniModal />
+        </CartDrawerProvider>
       </body>
     </html>
   );

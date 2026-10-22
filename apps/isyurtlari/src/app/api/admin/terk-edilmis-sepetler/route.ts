@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma, Prisma } from '@isyurtlari/database';
+import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
 import { sepetHatirlatmaEpostasiGonder, epostaTabanAdresi } from '@/lib/musteri-eposta';
 import { iletiRetBaglantisi } from '@/lib/ileti-izni';

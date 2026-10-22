@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck, LuPercent } from 'react-icons/lu';
+import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck } from 'react-icons/lu';
 import { fiyatiCoz } from '@/lib/csv';
 
 interface Urun {

@@ -123,7 +123,7 @@ export default function HediyeDanismaniModal() {
   const [adim, setAdim] = useState(1);
   const [kime, setKime] = useState<string>('');
   const [tercih, setTercih] = useState<string>('gida');
-  const [butce, setButce] = useState<string>('');
+  const [, setButce] = useState<string>('');
   const [eklenenSlug, setEklenenSlug] = useState<string | null>(null);
 
   const sifirla = () => {

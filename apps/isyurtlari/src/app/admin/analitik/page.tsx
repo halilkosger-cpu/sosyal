@@ -7,9 +7,9 @@ import Link from 'next/link';
 import {
   LuUsers, LuEye, LuClock, LuPercent, LuTrendingUp,
   LuSearch, LuGlobe, LuSmartphone, LuMonitor, LuTablet,
-  LuRefreshCw, LuCalendar, LuShieldCheck, LuSparkles,
-  LuBot, LuShoppingBag, LuDollarSign, LuArrowUpRight,
-  LuChevronRight, LuCompass, LuActivity,
+  LuRefreshCw, LuShieldCheck,
+  LuBot, LuDollarSign, LuArrowUpRight,
+  LuCompass, LuActivity,
 } from 'react-icons/lu';
 
 type Period = 'bugun' | 'dun' | '7gun' | '30gun' | 'tum-zamanlar';

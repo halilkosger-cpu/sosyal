@@ -13,13 +13,10 @@ import {
   LuTrendingUp,
   LuTriangleAlert,
   LuDollarSign,
-  LuShieldCheck,
   LuSend,
   LuMessageCircle,
   LuPackage,
-  LuExternalLink,
   LuSparkles,
-  LuUserCheck,
   LuCalendar,
 } from 'react-icons/lu';
 

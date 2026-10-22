@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('TOTP doğrulama hatası:', error);
-    await logAudit('TOTP_VERIFY', email, 'error', error?.message || 'Sunucu hatası', ip);
+    await logAudit('TOTP_VERIFY', email, 'failed', error?.message || 'Sunucu hatası', ip);
     return NextResponse.json({ error: 'Doğrulama sırasında hata oluştu.' }, { status: 500 });
   }
 }

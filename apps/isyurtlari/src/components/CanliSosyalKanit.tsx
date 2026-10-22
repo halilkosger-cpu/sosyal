@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LuCircleCheck, LuX, LuSparkles, LuShoppingBag } from 'react-icons/lu';
+import { LuCircleCheck, LuX, LuShoppingBag } from 'react-icons/lu';
 
 interface SosyalKanitOlayi {
   id: string;

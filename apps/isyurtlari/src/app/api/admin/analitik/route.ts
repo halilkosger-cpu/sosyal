@@ -330,9 +330,9 @@ export async function GET(req: NextRequest) {
       },
       select: {
         id: true,
-        customerName: true,
+        customer: { select: { name: true } },
+        user: { select: { name: true } },
         totalAmount: true,
-        city: true,
         createdAt: true,
       },
     }).catch(() => []);
@@ -348,7 +348,8 @@ export async function GET(req: NextRequest) {
     let belirsizSayisi = 0;
 
     siparisler.forEach((s) => {
-      const cinsiyet = isimdenCinsiyetTahminEt(s.customerName);
+      const musteriAdi = s.customer?.name || s.user?.name || '';
+      const cinsiyet = isimdenCinsiyetTahminEt(musteriAdi);
       if (cinsiyet === 'KADIN') kadinSayisi++;
       else if (cinsiyet === 'ERKEK') erkekSayisi++;
       else belirsizSayisi++;

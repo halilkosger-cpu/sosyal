@@ -6,10 +6,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   LuHouse, LuCheck, LuShoppingCart, LuTruck, LuRotateCcw, LuShieldCheck,
-  LuHandHeart, LuStar, LuMinus, LuPlus, LuChevronRight,
+  LuHandHeart, LuStar, LuMinus, LuPlus, LuChevronRight, LuSparkles,
 } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
+import PreOrderTimeline from '@/components/PreOrderTimeline';
+import SensorySpotlight from '@/components/SensorySpotlight';
 import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
@@ -17,6 +19,7 @@ import { urunGoruntulendi } from '@/lib/analiz';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
+import { useCartDrawer } from '@/context/CartDrawerContext';
 import BirlikteAl from '@/components/BirlikteAl';
 
 /**
@@ -115,10 +118,12 @@ export default function ProductDetailPage({
   const [submittingReview, setSubmittingReview] = useState(false);
   /** Galeride seçili görselin sırası. */
   const [seciliGorsel, setSeciliGorsel] = useState(0);
+  const [sensoryAktif, setSensoryAktif] = useState(false);
   const [sekme, setSekme] = useState<Sekme>('aciklama');
   /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
   const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
   const { musteri } = useMusteri();
+  const { openCart } = useCartDrawer();
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -170,6 +175,7 @@ export default function ProductDetailPage({
     if (!eklendi) return;
     setAdded(true);
     setQuantity(1);
+    openCart();
     setTimeout(() => setAdded(false), 3000);
   };
 
@@ -277,7 +283,16 @@ export default function ProductDetailPage({
         {/* ─── GALERİ ─── */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
-            {secili && anaSrcSet ? (
+            {sensoryAktif && gorseller.length >= 2 ? (
+              <SensorySpotlight
+                packageImage={gorseller[0].url}
+                storyImage={gorseller[1].url}
+                packageAlt={product.name}
+                storyAlt={`${product.name} - Doğal Doku ve Hasat`}
+                storyBadge="Doğal Hasat & Saf Doku"
+                className="w-full h-full"
+              />
+            ) : secili && anaSrcSet ? (
               /**
                * Yerel boyutlandirilmis surumu olan urunde duz <img>:
                * images.unoptimized acikken next/image srcset uretmiyor,
@@ -302,10 +317,27 @@ export default function ProductDetailPage({
               <KategoriIkon slug={product.category.slug} className="w-40 h-40" />
             )}
             {!inStock && (
-              <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-4 py-1.5 rounded-full">Tükendi</span>
+              <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-4 py-1.5 rounded-full z-10">Tükendi</span>
             )}
             {product.campaign && (
-              <span className="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full">%{product.campaign.discount} İndirim</span>
+              <span className="absolute top-4 right-4 bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full z-10">%{product.campaign.discount} İndirim</span>
+            )}
+
+            {/* Duyusal Keşif (Spotlight) Etkileşim Butonu */}
+            {gorseller.length >= 2 && (
+              <button
+                type="button"
+                onClick={() => setSensoryAktif((prev) => !prev)}
+                className={`absolute bottom-4 right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md ${
+                  sensoryAktif
+                    ? 'bg-[#CC4E00] text-white ring-2 ring-orange-200'
+                    : 'bg-white/95 backdrop-blur text-gray-800 border border-gray-200 hover:bg-orange-50 hover:text-[#CC4E00]'
+                }`}
+                title="Duyusal Doku / Hasat Maskesini Aç/Kapat"
+              >
+                <LuSparkles size={13} className={sensoryAktif ? 'animate-spin' : 'text-amber-500'} />
+                {sensoryAktif ? 'Standart Görünüm' : 'Duyusal Hikaye (Spotlight)'}
+              </button>
             )}
           </div>
           {gorseller.length > 1 && (
@@ -410,7 +442,10 @@ export default function ProductDetailPage({
                 </button>
               </div>
             ) : !inStock ? (
-              <PreOrderForm productId={product.id} productName={product.name} />
+              <div className="space-y-4">
+                <PreOrderForm productId={product.id} productName={product.name} />
+                <PreOrderTimeline currentStepIndex={0} orderDate={new Date()} />
+              </div>
             ) : (
               <button disabled className="w-full h-12 bg-gray-100 text-gray-500 rounded-xl font-bold cursor-not-allowed">Fiyat belirlenince satışa açılacak</button>
             )}

@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LuShieldCheck, LuArrowRight, LuLoader } from 'react-icons/lu';
 
 export default function AdminLogoutPage() {
-  const [done, setDone] = useState(false);
-
   useEffect(() => {
     const doLogout = async () => {
       try {
@@ -16,7 +14,6 @@ export default function AdminLogoutPage() {
 
       // Çerezi sıfırla
       document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
-      setDone(true);
 
       // 1.5 saniye sonra otomatik login sayfasına aktar
       const timer = setTimeout(() => {

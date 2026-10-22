@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuPackage, LuTag, LuShoppingBag, LuClock, LuArrowRight, LuActivity, LuUsers, LuTrendingUp } from 'react-icons/lu';
+import { LuPackage, LuTag, LuShoppingBag, LuClock, LuArrowRight, LuActivity, LuUsers } from 'react-icons/lu';
 
 interface Stats { products: number; categories: number; orders: number; pendingOrders: number; }
 

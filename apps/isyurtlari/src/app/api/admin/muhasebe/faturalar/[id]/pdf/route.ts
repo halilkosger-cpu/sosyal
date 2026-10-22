@@ -4,7 +4,7 @@ import { generateOfficialEArsivHTML, VARSAYILAN_SIRKET } from '@/lib/e-fatura/lo
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const fatura = await prisma.fatura.findUnique({
       where: { id: params.id },

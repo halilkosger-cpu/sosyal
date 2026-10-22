@@ -2,17 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import {
-  LuShieldCheck,
   LuSmartphone,
-  LuKeyRound,
   LuCopy,
   LuCheck,
   LuRefreshCw,
   LuTriangleAlert,
   LuLock,
-  LuDownload,
   LuSparkles,
-  LuShieldAlert,
 } from 'react-icons/lu';
 
 interface StatusData {

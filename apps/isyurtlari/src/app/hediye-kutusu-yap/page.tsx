@@ -11,9 +11,7 @@ import {
   LuTrash2,
   LuShoppingBag,
   LuShieldCheck,
-  LuArrowRight,
   LuHeartHandshake,
-  LuPackageCheck,
 } from 'react-icons/lu';
 import { sepeteEkle } from '@/lib/cart';
 

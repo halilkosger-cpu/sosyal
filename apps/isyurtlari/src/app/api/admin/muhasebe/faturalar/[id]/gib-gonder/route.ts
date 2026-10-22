@@ -11,7 +11,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   try {
     const sonuc = await logoIsNetGibGonder(params.id);
     return NextResponse.json({
-      success: true,
       message: 'Fatura Logo İşNet üzerinden GİB e-Arşiv sistemine başarıyla iletildi.',
       ...sonuc,
     });

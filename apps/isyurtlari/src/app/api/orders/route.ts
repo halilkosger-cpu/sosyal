@@ -302,6 +302,7 @@ export async function POST(req: NextRequest) {
       listeFiyati: number;  // indirimsiz liste fiyati; indirim toplami icin
       kdvOrani: number | null;
       ad: string;
+      purchasePrice?: number;
     }[] = [];
 
     for (const item of body.items) {
