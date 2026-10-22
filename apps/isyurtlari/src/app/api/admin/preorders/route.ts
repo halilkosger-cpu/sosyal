@@ -71,26 +71,48 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ preOrders, summary }, { headers: NO_CACHE });
 }
 
-/** Bir ön talebin durumunu günceller (ör. CONVERTED / CANCELLED). */
+/** Bir ön talebin durumunu veya atölye üretim aşamasını günceller. */
 export async function PATCH(req: NextRequest) {
   const red = adminGuard(req);
   if (red) return red;
-
 
   if (!hasDatabaseUrl()) {
     return NextResponse.json({ error: 'Servis kullanılamıyor' }, { status: 503 });
   }
 
-  const { id, status } = await req.json();
-  const allowed = ['WAITING', 'NOTIFIED', 'CONVERTED', 'CANCELLED'];
+  const body = await req.json();
+  const { id, status, stage, note } = body;
 
-  if (!id || !allowed.includes(status)) {
-    return NextResponse.json({ error: 'Geçersiz istek' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: 'Geçersiz istek: id gerekli' }, { status: 400 });
+  }
+
+  const dataToUpdate: any = {};
+
+  if (status) {
+    const allowed = ['WAITING', 'NOTIFIED', 'CONVERTED', 'CANCELLED'];
+    if (!allowed.includes(status)) {
+      return NextResponse.json({ error: 'Geçersiz durum' }, { status: 400 });
+    }
+    dataToUpdate.status = status;
+  }
+
+  if (stage !== undefined) {
+    const stageNum = Number(stage);
+    if (isNaN(stageNum) || stageNum < 0 || stageNum > 4) {
+      return NextResponse.json({ error: 'Geçersiz aşama (0-4 olmalı)' }, { status: 400 });
+    }
+    const current = await prisma.preOrder.findUnique({ where: { id }, select: { note: true } });
+    const existingNote = note !== undefined ? note : (current?.note || '');
+    const cleanNote = existingNote.replace(/\[AŞAMA:\s*\d\]/g, '').trim();
+    dataToUpdate.note = `[AŞAMA: ${stageNum}] ${cleanNote}`.trim();
+  } else if (note !== undefined) {
+    dataToUpdate.note = note;
   }
 
   const updated = await prisma.preOrder.update({
     where: { id },
-    data: { status },
+    data: dataToUpdate,
   });
 
   return NextResponse.json({ success: true, preOrder: updated });

@@ -32,6 +32,8 @@ const statusConfig: Record<string, { label: string; color: string; Icon: React.E
   CANCELLED: { label: 'İptal',       color: 'bg-red-50 text-red-700 border-red-200',          Icon: LuX       },
 };
 
+import { ATOLYE_ASAMALARI, parseStageFromNote } from '@/lib/on-talep-asama';
+
 export default function AdminPreOrdersPage() {
   const [preOrders, setPreOrders] = useState<PreOrder[]>([]);
   const [summary, setSummary]     = useState<Summary[]>([]);
@@ -90,6 +92,38 @@ export default function AdminPreOrdersPage() {
       body: JSON.stringify({ id, status }),
     });
     load();
+  };
+
+  const updateStage = async (id: string, stage: number) => {
+    await fetch('/api/admin/preorders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, stage }),
+    });
+    load();
+  };
+
+  const sendStageNotification = async (preOrderId: string, stage: number, name: string) => {
+    const ok = window.confirm(
+      `${name} müşterisine Aşama ${stage + 1} ("${ATOLYE_ASAMALARI[stage]?.baslik}") bilgilendirme e-postası gönderilsin mi?`
+    );
+    if (!ok) return;
+
+    try {
+      const res = await fetch('/api/admin/preorders/stage-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preOrderId, stage }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage(`✅ ${name} müşterisine aşama bildirimi başarıyla gönderildi.`);
+      } else {
+        setMessage(`⚠️ ${data.error || 'Aşama bildirimi gönderilemedi'}`);
+      }
+    } catch {
+      setMessage('⚠️ Bağlantı hatası, bildirim gönderilemedi.');
+    }
   };
 
   const filtered = filter === 'ALL' ? preOrders : preOrders.filter((p) => p.status === filter);
@@ -190,10 +224,14 @@ export default function AdminPreOrdersPage() {
         <div className="space-y-3">
           {filtered.map((p) => {
             const cfg = statusConfig[p.status] ?? statusConfig.WAITING;
+            const currentStage = parseStageFromNote(p.note);
+            const activeStageConfig = ATOLYE_ASAMALARI[currentStage] || ATOLYE_ASAMALARI[0];
+            const cleanNote = p.note ? p.note.replace(/\[AŞAMA:\s*\d\]/g, '').trim() : null;
+
             return (
               <div key={p.id} className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold text-gray-900">{p.product?.name ?? 'Silinmiş ürün'}</p>
                       <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${cfg.color}`}>
@@ -212,11 +250,47 @@ export default function AdminPreOrdersPage() {
                       )}
                     </p>
 
-                    {p.note && (
+                    {cleanNote && (
                       <p className="text-sm text-gray-600 mt-1.5 bg-gray-50 rounded-lg px-3 py-2">
-                        {p.note}
+                        {cleanNote}
                       </p>
                     )}
+
+                    {/* ─── ATÖLYE ÜRETİM AŞAMASI YÖNETİMİ ─── */}
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <label htmlFor={`stage-${p.id}`} className="text-xs font-bold text-gray-700">
+                          Üretim Aşaması:
+                        </label>
+                        <select
+                          id={`stage-${p.id}`}
+                          aria-label="Üretim Aşaması"
+                          value={currentStage}
+                          onChange={(e) => updateStage(p.id, Number(e.target.value))}
+                          className="text-xs font-semibold rounded-lg border border-gray-300 px-2.5 py-1.5 bg-white text-gray-800 focus:outline-none focus:border-[#CC4E00]"
+                        >
+                          {ATOLYE_ASAMALARI.map((st) => (
+                            <option key={st.id} value={st.id}>
+                              Aşama {st.id + 1}: {st.baslik}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${activeStageConfig.renk}`}>
+                        Aşama {currentStage + 1}: {activeStageConfig.baslik}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => sendStageNotification(p.id, currentStage, p.name)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-orange-200 bg-orange-50/80 text-[#BA4700] hover:bg-orange-100 transition-colors"
+                        title="Müşteriye Aşama Bilgilendirme E-postası Gönder"
+                      >
+                        <LuBell size={13} />
+                        <span>Aşama Bildirimi Gönder</span>
+                      </button>
+                    </div>
 
                     <p className="text-xs text-gray-400 mt-2">
                       {new Date(p.createdAt).toLocaleString('tr-TR')}

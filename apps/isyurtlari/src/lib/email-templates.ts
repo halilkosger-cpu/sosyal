@@ -350,6 +350,71 @@ export const emailTemplates = {
     </body>
     </html>
   `,
+
+  preOrderStageUpdate: (data: {
+    name: string;
+    productName: string;
+    stageTitle: string;
+    stageDescription: string;
+    productUrl: string;
+  }) => `
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Atölye Üretim Durumu Güncellendi</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #FF6000 0%, #BA4700 100%); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px 20px; background: #f9f9f9; }
+        .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #FF6000; }
+        .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #999; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔨 Atölye Üretim Güncellemesi</h1>
+        </div>
+
+        <div class="content">
+          <div class="section">
+            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p style="margin-top: 15px;">
+              Ön talep oluşturduğunuz <strong>${data.productName}</strong> için atölye üretim sürecinde yeni bir aşamaya geçildi:
+            </p>
+            <div style="background: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 15px; margin: 15px 0;">
+              <p style="font-size: 16px; font-weight: bold; color: #BA4700;">${data.stageTitle}</p>
+              <p style="font-size: 13px; color: #4B5563; margin-top: 5px;">${data.stageDescription}</p>
+            </div>
+            <p style="font-size: 13px; color: #6B7280;">
+              İşyurtları atölyelerinde meslek öğrenen ustalarımız ve zanaatkârlarımız ürününüzü özenle hazırlamaya devam ediyor.
+            </p>
+          </div>
+
+          <div class="section" style="text-align: center;">
+            <a href="${data.productUrl}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+              Ürünü Görüntüle →
+            </a>
+          </div>
+
+          <div class="section">
+            <p style="font-size: 13px; color: #666;">
+              Sorularınız ve bilgi için: info@isyurtlari.com.tr
+            </p>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>© 2026 isyurtlari.com.tr · Adalet Bakanlığı İşyurtları Ürünleri</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
 };
 
 export type TemplateKey = keyof typeof emailTemplates;

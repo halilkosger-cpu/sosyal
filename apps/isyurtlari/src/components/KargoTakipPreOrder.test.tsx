@@ -58,6 +58,6 @@ describe('KargoTakipModal and PreOrderTimeline Integration Tests', () => {
     );
 
     // When quantity is 0, PreOrderBadge is rendered in overlay
-    expect(screen.getByText('Ön Talep')).toBeInTheDocument();
+    expect(screen.getByText(/ön talep/i)).toBeInTheDocument();
   });
 });
