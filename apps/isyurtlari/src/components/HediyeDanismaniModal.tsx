@@ -160,7 +160,7 @@ export default function HediyeDanismaniModal() {
           setAcik(true);
           sifirla();
         }}
-        className="fixed bottom-24 md:bottom-6 right-4 z-40 flex items-center gap-2 px-3.5 py-2.5 bg-[#0F2040] hover:bg-[#CC4E00] text-white rounded-full shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 group border border-white/20"
+        className="fixed bottom-32 md:bottom-6 left-4 md:left-auto md:right-6 z-40 flex items-center gap-2 px-3 py-2.5 md:px-3.5 md:py-2.5 bg-[#0F2040] hover:bg-[#CC4E00] text-white rounded-full shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 group border border-white/20"
         title="30 Saniyede Hediye & Ürün Bulucu"
         aria-label="Hediye Danışmanı"
       >
