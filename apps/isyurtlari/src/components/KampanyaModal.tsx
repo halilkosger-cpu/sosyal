@@ -45,6 +45,7 @@ export default function KampanyaModal() {
     <div
       role="dialog"
       aria-modal="true"
+      aria-labelledby="kampanya-modal-baslik"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
       onClick={kapat}
     >
@@ -64,12 +65,11 @@ export default function KampanyaModal() {
         {/* Görsel Alanı */}
         <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-amber-50">
           <Image
-            src="/kampanya/kasim-firsati.jpg"
+            src="/kampanya/kasim-firsati.webp"
             alt="Büyük Açılış & Efsane Kasım Fırsatları"
             fill
             sizes="(max-width: 640px) 100vw, 520px"
             className="object-cover"
-            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
@@ -83,7 +83,7 @@ export default function KampanyaModal() {
 
           {/* Görsel Üzeri Alt Başlık */}
           <div className="absolute bottom-3 left-4 right-4 text-white">
-            <p className="text-2xl sm:text-3xl font-extrabold tracking-tight drop-shadow-md">
+            <p id="kampanya-modal-baslik" className="text-2xl sm:text-3xl font-extrabold tracking-tight drop-shadow-md">
               Sepette Net <span className="text-amber-300 underline decoration-amber-400">%10 İndirim</span>
             </p>
           </div>

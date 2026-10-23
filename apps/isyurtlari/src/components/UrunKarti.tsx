@@ -313,7 +313,7 @@ export default function UrunKarti({
           {fiyatVar ? (
             urun.campaign ? (
               <>
-                <span className="text-xs text-gray-400 line-through tracking-tight">
+                <span className="text-xs text-gray-600 line-through tracking-tight">
                   ₺{urun.price.toFixed(2)}
                 </span>
                 <span className="text-lg font-bold text-red-600 tracking-tight">
@@ -391,7 +391,7 @@ export default function UrunKarti({
               ₺{gecerliFiyat.toFixed(2).replace('.', ',')}
             </span>
             {urun.campaign && (
-              <span className="text-[11px] text-gray-400 line-through">₺{urun.price.toFixed(2).replace('.', ',')}</span>
+              <span className="text-[11px] text-gray-600 line-through">₺{urun.price.toFixed(2).replace('.', ',')}</span>
             )}
           </span>
         ) : (

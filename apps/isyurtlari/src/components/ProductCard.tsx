@@ -243,7 +243,7 @@ export default function ProductCard({
         <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-col">
             {originalPrice && originalPrice > price && (
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-xs text-gray-600 line-through">
                 {originalPrice.toLocaleString('tr-TR', {
                   style: 'currency',
                   currency: 'TRY',

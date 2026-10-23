@@ -123,11 +123,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        <link rel="preconnect" href="https://mclmi5w9lcfqj48x.public.blob.vercel-storage.com" />
+        <link rel="preconnect" href="https://bsvzh3olpntnziyt.public.blob.vercel-storage.com" crossOrigin="anonymous" />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
             (body'nin sonunda). Sebep: admin panelinde calismamalari gerekiyor,
             bunun icin de yolu okuyabilen bir istemci bileseni sart. */}

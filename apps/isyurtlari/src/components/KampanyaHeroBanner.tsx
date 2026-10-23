@@ -62,10 +62,10 @@ export default function KampanyaHeroBanner() {
           {/* Sağ: Büyük Doğal Gıda & El Sanatları Görseli */}
           <div className="lg:col-span-6 relative h-64 sm:h-80 md:h-96 lg:h-full min-h-[300px] lg:min-h-[420px] overflow-hidden">
             <Image
-              src="/kampanya/kasim-firsati.jpg"
+              src="/kampanya/kasim-firsati.webp"
               alt="İşyurtları Doğal Gıda ve El Sanatları Büyük Açılış İndirimi"
               fill
-              sizes="(max-width: 1024px) 100vw, 600px"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
               className="object-cover object-center transition-transform duration-700 hover:scale-105"
               priority
             />
