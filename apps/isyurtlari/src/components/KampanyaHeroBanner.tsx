@@ -67,7 +67,7 @@ export default function KampanyaHeroBanner() {
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
               className="object-cover object-center transition-transform duration-700 hover:scale-105"
-              priority
+              loading="lazy"
             />
             {/* Yumuşak degradeler: mobilde üstten, masaüstünde soldan geçiş */}
             <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#1C130D] via-[#1C130D]/40 to-transparent" />

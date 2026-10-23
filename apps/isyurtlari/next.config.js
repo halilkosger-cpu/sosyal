@@ -5,7 +5,7 @@ const nextConfig = {
   transpilePackages: ['@isyurtlari/database'],
   poweredByHeader: false,
   experimental: {
-    optimizePackageImports: ['@isyurtlari/database'],
+    optimizePackageImports: ['@isyurtlari/database', 'react-icons', 'framer-motion'],
   },
   typescript: {
     ignoreBuildErrors: true,

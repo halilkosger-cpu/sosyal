@@ -126,6 +126,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://bsvzh3olpntnziyt.public.blob.vercel-storage.com" crossOrigin="anonymous" />
+        {/* LCP Görseli Ön Yükleme (Mobile & Desktop) */}
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="/hero/anasayfa-hero-mobil.webp"
+          media="(max-width: 1023px)"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          type="image/webp"
+          href="/hero/anasayfa-hero.webp"
+          media="(min-width: 1024px)"
+          fetchPriority="high"
+        />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
             (body'nin sonunda). Sebep: admin panelinde calismamalari gerekiyor,
             bunun icin de yolu okuyabilen bir istemci bileseni sart. */}

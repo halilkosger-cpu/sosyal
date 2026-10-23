@@ -36,7 +36,7 @@ export default function PushBackLayout({
 
   return (
     <div className="relative w-full min-h-screen bg-neutral-900 overflow-x-hidden">
-      <motion.main
+      <motion.div
         data-testid={testId}
         data-is-cart-open={isCartOpen ? 'true' : 'false'}
         data-scale={targetScale.toString()}
@@ -58,7 +58,7 @@ export default function PushBackLayout({
         style={{
           transformOrigin: 'top center',
         }}
-        className={`relative w-full min-h-screen bg-white overflow-hidden will-change-transform shadow-2xl ${className}`}
+        className={`relative w-full min-h-screen bg-white overflow-hidden shadow-2xl ${isCartOpen ? 'will-change-transform' : ''} ${className}`}
       >
         {children}
 
@@ -71,7 +71,7 @@ export default function PushBackLayout({
             className="absolute inset-0 z-30 bg-black/20 backdrop-blur-[1px] transition-opacity cursor-pointer"
           />
         )}
-      </motion.main>
+      </motion.div>
     </div>
   );
 }
