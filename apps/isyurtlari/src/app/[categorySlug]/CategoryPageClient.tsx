@@ -390,17 +390,10 @@ function KategoriIcerigi({
   const kategoriToplam = (veri?.fasetler.stok.var ?? 0) + (veri?.fasetler.stok.yok ?? 0);
 
   return (
-    <div>
-
-      
-
-      <div className="max-w-screen-xl mx-auto px-4 py-6">
-
-        {/* Buradaki "Sosyal etki" kutusu afiştekiyle aynı metni tekrarlıyordu;
-            afişteki tek blokta birleştirildi. Bkz. yukarıdaki açıklama. */}
-
+    <div className="w-full overflow-x-hidden">
+      <div className="max-w-screen-xl mx-auto px-3 sm:px-4 py-6">
         {/* ─── MAIN LAYOUT: FILTERS + PRODUCTS ─── */}
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
 
           {/* ─── FILTER PANEL (Desktop + Mobile) ─── */}
           <div className={`
@@ -552,12 +545,12 @@ function KategoriIcerigi({
           </div>
 
           {/* ─── PRODUCTS SECTION ─── */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0 w-full">
             {/* ─── MOBILE FILTER BUTTON + SORT BAR ─── */}
-            <div className="flex items-center justify-between gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-4 py-3">
+            <div className="flex items-center justify-between gap-2 sm:gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-3 sm:px-4 py-3">
               <button
                 onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                className="md:hidden flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 font-medium"
+                className="md:hidden flex items-center gap-1.5 text-xs sm:text-sm text-gray-700 hover:text-gray-900 font-medium shrink-0"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -569,12 +562,12 @@ function KategoriIcerigi({
                 {loading ? '' : <><span className="text-gray-900 font-bold">{veri?.toplam ?? 0}</span> ürün</>}
               </p>
 
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 hidden sm:inline">Sırala:</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
+                <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">Sırala:</span>
                 <select
                   value={sort}
                   onChange={(e) => parametreDegistir({ sirala: e.target.value === 'varsayilan' ? null : e.target.value })}
-                  className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer"
+                  className="text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer max-w-[130px] sm:max-w-none truncate"
                 >
                   <option value="varsayilan">Varsayılan</option>
                   <option value="fiyat-artan">Fiyat: Düşükten Yükseğe</option>
@@ -586,7 +579,7 @@ function KategoriIcerigi({
             </div>
 
             {/* ─── HASAT & MEVSİM FİLTRESİ ─── */}
-            <div className="mb-5">
+            <div className="mb-5 w-full max-w-full overflow-hidden">
               <HarvestFilter
                 activeSeason={urlSeason}
                 onSeasonChange={(s) => parametreDegistir({ sezon: s === 'tumu' ? null : s })}
@@ -632,21 +625,21 @@ function KategoriIcerigi({
 
             {/* ─── PRODUCT GRID ─── */}
             {!loading && sorted.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sorted.map((product) => (
-              <UrunKarti
-                key={product.id}
-                urun={product}
-                gorselYedek={<Icon className="w-24 h-24 object-contain" />}
-                gorselArkaPlani={meta?.imgBg ?? 'from-orange-100 to-amber-100'}
-                gorselYuksekligi="h-48"
-                gorselBoyutlari="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                aciklamaGoster
-                etkiRozeti={meta?.impact || 'Eğitim desteği'}
-                favoriButonu
-                sepetButonu
-              />
-              ))}
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {sorted.map((product) => (
+                  <UrunKarti
+                    key={product.id}
+                    urun={product}
+                    gorselYedek={<Icon className="w-16 h-16 sm:w-24 sm:h-24 object-contain" />}
+                    gorselArkaPlani={meta?.imgBg ?? 'from-orange-100 to-amber-100'}
+                    gorselYuksekligi="aspect-square w-full"
+                    gorselBoyutlari="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    aciklamaGoster={false}
+                    etkiRozeti={meta?.impact || 'Eğitim desteği'}
+                    favoriButonu
+                    sepetButonu
+                  />
+                ))}
               </div>
             )}
 
