@@ -27,9 +27,9 @@ export default function FavoriteButton({ productId, size = 'md', showLabel = fal
   const [bildirim, setBildirim] = useState<string | null>(null);
 
   const boyutlar = {
-    sm: 'w-6 h-6',
-    md: 'w-8 h-8',
-    lg: 'w-10 h-10',
+    sm: 'w-7 h-7 rounded-full shadow-xs',
+    md: 'w-8 h-8 rounded-lg',
+    lg: 'w-10 h-10 rounded-lg',
   };
 
   useEffect(() => {
@@ -58,10 +58,12 @@ export default function FavoriteButton({ productId, size = 'md', showLabel = fal
       <button
         onClick={tikla}
         aria-pressed={favori}
-        className={`${boyutlar[size]} flex items-center justify-center rounded-lg transition ${
+        className={`${boyutlar[size]} flex items-center justify-center transition shrink-0 ${
           favori
-            ? 'bg-red-100 hover:bg-red-200 text-red-600'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+            ? 'bg-red-50 hover:bg-red-100 text-red-600'
+            : size === 'sm'
+              ? 'bg-white/90 hover:bg-white text-gray-500 hover:text-red-500 backdrop-blur-xs'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
         }`}
         title={favori ? 'Favorilerden çıkar' : 'Favorilere ekle'}
         aria-label={favori ? 'Favorilerden çıkar' : 'Favorilere ekle'}

@@ -248,14 +248,25 @@ export default function UrunKarti({
         return null;
       })()}
 
+      {/* Favori butonu: E-ticaret standardında görselin sağ üstünde */}
+      {favoriButonu && (
+        <div className="absolute top-2 right-2 z-20">
+          <FavoriteButton productId={urun.id} size="sm" />
+        </div>
+      )}
+
       {urun.campaign && (
-        <span className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm">
+        <span
+          className={`absolute ${
+            favoriButonu ? 'bottom-2 left-2' : 'top-2 right-2'
+          } bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm z-10`}
+        >
           %{urun.campaign.discount} İndirim
         </span>
       )}
 
       {etkiRozeti && (
-        <span className="absolute bottom-2 right-2 bg-[#0F2040] text-white text-[10px] font-semibold px-2.5 py-1 rounded-full max-w-[150px] line-clamp-2">
+        <span className="absolute bottom-2 right-2 bg-[#0F2040] text-white text-[10px] font-semibold px-2.5 py-1 rounded-full max-w-[150px] line-clamp-2 z-10">
           {etkiRozeti}
         </span>
       )}
@@ -308,20 +319,20 @@ export default function UrunKarti({
         </p>
       )}
 
-      <div className="flex items-end justify-between gap-2 pt-2 mt-auto border-t border-gray-100">
-        <div className="flex flex-col">
+      <div className="flex items-center justify-between gap-2 pt-2 mt-auto border-t border-gray-100">
+        <div className="flex flex-col min-w-0 flex-1">
           {fiyatVar ? (
             urun.campaign ? (
               <>
-                <span className="text-xs text-gray-600 line-through tracking-tight">
+                <span className="text-[11px] text-gray-500 line-through tracking-tight truncate">
                   ₺{urun.price.toFixed(2)}
                 </span>
-                <span className="text-lg font-bold text-red-600 tracking-tight">
+                <span className="text-base sm:text-lg font-bold text-red-600 tracking-tight truncate">
                   ₺{gecerliFiyat.toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="text-lg font-bold text-[#BA4700] tracking-tight">
+              <span className="text-base sm:text-lg font-bold text-[#BA4700] tracking-tight truncate">
                 ₺{urun.price.toFixed(2)}
               </span>
             )
@@ -330,23 +341,20 @@ export default function UrunKarti({
           )}
         </div>
 
-        {(favoriButonu || sepetButonu) && (
-          <div className="flex items-center gap-2">
-            {favoriButonu && <FavoriteButton productId={urun.id} size="sm" />}
-            {sepetButonu && (
-              <AddToCartButton
-                product={{
-                  id: urun.id,
-                  name: urun.name,
-                  price: gecerliFiyat,
-                  slug: urun.slug,
-                  imageUrl: urun.imageUrl,
-                  quantity: urun.quantity,
-                  campaign: urun.campaign ?? null,
-                  kdvOrani: urun.category?.kdvOrani ?? null,
-                }}
-              />
-            )}
+        {sepetButonu && (
+          <div className="shrink-0">
+            <AddToCartButton
+              product={{
+                id: urun.id,
+                name: urun.name,
+                price: gecerliFiyat,
+                slug: urun.slug,
+                imageUrl: urun.imageUrl,
+                quantity: urun.quantity,
+                campaign: urun.campaign ?? null,
+                kdvOrani: urun.category?.kdvOrani ?? null,
+              }}
+            />
           </div>
         )}
       </div>

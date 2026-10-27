@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   LuSparkles,
   LuX,
@@ -152,25 +153,30 @@ export default function HediyeDanismaniModal() {
     setTimeout(() => setEklenenSlug(null), 2500);
   };
 
+  const pathname = usePathname();
+  const GIZLI_SAYFALAR = ['/checkout', '/admin', '/order-confirmation'];
+  if (GIZLI_SAYFALAR.some((p) => pathname?.startsWith(p))) return null;
+
   return (
     <>
-      {/* Sabit Sağ Tetikleyici Buton */}
+      {/* Sabit Tetikleyici Buton: Mobilde sağ kenarda kompakt ikon, masaüstünde tam hap buton */}
       <button
         onClick={() => {
           setAcik(true);
           sifirla();
         }}
-        className="fixed bottom-32 md:bottom-6 left-4 md:left-auto md:right-6 z-40 flex items-center gap-2 px-3 py-2.5 md:px-3.5 md:py-2.5 bg-[#0F2040] hover:bg-[#CC4E00] text-white rounded-full shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 group border border-white/20"
+        className="fixed bottom-20 md:bottom-6 right-3 md:right-6 z-30 flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto p-0 md:px-3.5 md:py-2.5 bg-[#0F2040]/95 hover:bg-[#CC4E00] text-white rounded-full shadow-xl hover:shadow-orange-500/30 transition-all duration-300 group border border-white/20 backdrop-blur-xs"
         title="30 Saniyede Hediye & Ürün Bulucu"
         aria-label="Hediye Danışmanı"
       >
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
-        </span>
-        <LuGift className="text-orange-400 group-hover:rotate-12 transition-transform" size={17} />
-        <span className="text-xs font-bold tracking-wide hidden sm:inline">Hediye & Ürün Bulucu</span>
-        <span className="text-xs font-bold sm:hidden">Hediye Bulucu</span>
+        <div className="relative flex items-center justify-center">
+          <span className="relative flex h-2 w-2 mr-0 md:mr-1">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
+          </span>
+          <LuGift className="text-orange-400 group-hover:rotate-12 transition-transform" size={17} />
+        </div>
+        <span className="text-xs font-bold tracking-wide hidden md:inline">Hediye &amp; Ürün Bulucu</span>
       </button>
 
       {/* Modal Dialog */}

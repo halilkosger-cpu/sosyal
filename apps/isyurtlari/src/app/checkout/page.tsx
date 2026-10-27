@@ -359,7 +359,7 @@ export default function CheckoutPage() {
     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#CC4E00] text-white text-sm font-bold">{n}</span>
   );
   const secenek = (secili: boolean) =>
-    `flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition ${secili ? 'border-[#CC4E00] bg-orange-50/60' : 'border-gray-200 hover:bg-gray-50'}`;
+    `flex items-start gap-3 p-3.5 sm:p-4 border rounded-xl cursor-pointer transition min-w-0 max-w-full overflow-hidden ${secili ? 'border-[#CC4E00] bg-orange-50/60' : 'border-gray-200 hover:bg-gray-50'}`;
 
   return (
     <div className="bg-[#FAFAF9] min-h-[70vh]">
@@ -453,31 +453,32 @@ export default function CheckoutPage() {
               <h2 className={baslik}>{adim(3)} Ödeme & Sipariş Yöntemi</h2>
               <div className="space-y-3 mt-5">
                 <label className={secenek(paymentMethod === 'TRANSFER')}>
-                  <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00]" />
-                  <span className="flex-1">
-                    <span className="flex items-center gap-2 font-bold text-gray-900">
-                      <LuLandmark size={17} className="text-[#BA4700]" /> Havale / EFT ile Güvenli Ödeme (Halkbank Şirket Hesabı)
+                  <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00] shrink-0" />
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center gap-2 font-bold text-gray-900 flex-wrap">
+                      <LuLandmark size={17} className="text-[#BA4700] shrink-0" />
+                      <span className="break-words">Havale / EFT ile Güvenli Ödeme (Halkbank Şirket Hesabı)</span>
                     </span>
                     <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
                       Sipariş onayından sonra Türkiye Halk Bankası şirket hesabımıza havale veya EFT yapabilirsiniz.
                     </span>
                     {paymentMethod === 'TRANSFER' && (
-                      <div className="mt-3 p-4 bg-white border border-gray-200 rounded-xl text-xs space-y-3 shadow-xs">
-                        <div className="flex items-center justify-between text-gray-700 font-semibold border-b border-gray-100 pb-2">
-                          <span>Türkiye Halk Bankası (Halkbank)</span>
-                          <span className="text-gray-500 font-normal">Ovacık Ankara Şb. (1553)</span>
+                      <div className="mt-3 p-3.5 sm:p-4 bg-white border border-gray-200 rounded-xl text-xs space-y-3 shadow-xs max-w-full overflow-hidden">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-gray-700 font-semibold border-b border-gray-100 pb-2 gap-1">
+                          <span className="truncate">Türkiye Halk Bankası (Halkbank)</span>
+                          <span className="text-gray-500 font-normal text-[11px] sm:text-xs shrink-0">Ovacık Ankara Şb. (1553)</span>
                         </div>
                         <div>
                           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Hesap Sahibi</p>
-                          <p className="font-bold text-gray-900">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
+                          <p className="font-bold text-gray-900 break-words">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
                         </div>
                         <div>
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-[11px] text-gray-500 uppercase tracking-wide">IBAN</span>
                             <span className="text-[11px] text-gray-400">Tek tıkla kopyalayın</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 font-mono font-bold text-[#BA4700] text-xs sm:text-sm bg-orange-50/60 p-2.5 rounded-lg border border-orange-100 select-all overflow-x-auto whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 sm:gap-2 max-w-full">
+                            <div className="flex-1 min-w-0 font-mono font-bold text-[#BA4700] text-[11px] sm:text-xs md:text-sm bg-orange-50/60 p-2 sm:p-2.5 rounded-lg border border-orange-100 select-all overflow-x-auto whitespace-nowrap">
                               TR43 0001 2001 5530 0010 1022 58
                             </div>
                             <button
@@ -486,7 +487,7 @@ export default function CheckoutPage() {
                                 e.preventDefault();
                                 ibanKopyala('TR43 0001 2001 5530 0010 1022 58');
                               }}
-                              className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 rounded-lg font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0"
+                              className="px-2.5 sm:px-3 py-2 sm:py-2.5 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 rounded-lg font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0"
                               title="IBAN'ı Kopyala"
                             >
                               {ibanKopyalandi ? (
@@ -600,16 +601,16 @@ export default function CheckoutPage() {
                     )}
                   </span>
                 </label>
-                <div className="flex items-start gap-3 p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50/80 cursor-not-allowed select-none">
+                <div className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50/80 cursor-not-allowed select-none min-w-0 max-w-full overflow-hidden">
                   <input
                     type="radio"
                     name="paymentMethod"
                     value="CREDIT_CARD"
                     disabled
                     checked={false}
-                    className="mt-1 w-4 h-4 accent-gray-400 cursor-not-allowed opacity-50"
+                    className="mt-1 w-4 h-4 accent-gray-400 cursor-not-allowed opacity-50 shrink-0"
                   />
-                  <span className="flex-1 space-y-2">
+                  <span className="flex-1 min-w-0 space-y-2">
                     <span className="flex items-center justify-between gap-2 font-bold text-gray-700 flex-wrap">
                       <span className="flex items-center gap-2">
                         <LuCreditCard size={17} className="text-gray-400" /> Kredi / Banka Kartı ile Ödeme
