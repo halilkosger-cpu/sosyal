@@ -24,5 +24,6 @@
   - [x] Gradle JDK 21 (LTS) ortamı sabitlendi (`android/gradle.properties`)
   - [x] Android derlemesi doğrulandı (`./gradlew assembleDebug` -> `BUILD SUCCESSFUL`)
   - [x] Test APK üretildi: `android/app/build/outputs/apk/debug/app-debug.apk` (19 MB)
-  - [ ] Google Play Release Bundle (`./gradlew bundleRelease` -> `.aab`) üretimi
+  - [x] Google Play Release Bundle (`./gradlew bundleRelease` -> `app-release.aab`, 15 MB) üretildi
+  - [x] Standalone Release APK (`./gradlew assembleRelease` -> `app-release-unsigned.apk`, 15 MB) üretildi
   - [ ] Xcode / iOS ortamı açılış ve arşiv testi (`pnpm exec cap open ios`)
