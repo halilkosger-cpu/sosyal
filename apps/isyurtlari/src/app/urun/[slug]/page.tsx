@@ -77,7 +77,7 @@ const urunuSorgula = (slug: string) =>
           text: true,
           createdAt: true,
           customer: {
-            select: { firstName: true, lastName: true },
+            select: { name: true },
           },
         },
       },
@@ -257,9 +257,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               },
               author: {
                 '@type': 'Person',
-                name:
-                  [r.customer?.firstName, r.customer?.lastName].filter(Boolean).join(' ') ||
-                  'Doğrulanmış Müşteri',
+                name: r.customer?.name || 'Doğrulanmış Müşteri',
               },
               datePublished: r.createdAt.toISOString().split('T')[0],
               reviewBody: r.text || 'İşyurtları el emeği doğal ürün.',

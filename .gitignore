@@ -39,3 +39,6 @@ yarn-error.log*
 tasarim-adaylari/
 apps/isyurtlari/.tasarim-tmp/
 apps/isyurtlari/src/app/tasarim-onizleme/
+
+.idea/
+.vscode/

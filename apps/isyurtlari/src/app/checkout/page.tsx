@@ -453,15 +453,31 @@ export default function CheckoutPage() {
                     </span>
                   </span>
                 </label>
-                <div className="flex items-center justify-between p-4 border border-dashed border-gray-200 rounded-xl text-xs text-gray-500 bg-gray-50/50">
-                  <div className="flex items-center gap-2.5">
-                    <LuCreditCard size={18} className="shrink-0 text-gray-400" />
-                    <span>Kredi / Banka Kartı (iyzico Sanal POS)</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                    Entegrasyon Hazırlığında
+                <label className={secenek(paymentMethod === 'CREDIT_CARD')}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="CREDIT_CARD"
+                    checked={paymentMethod === 'CREDIT_CARD'}
+                    onChange={() => setPaymentMethod('CREDIT_CARD')}
+                    className="mt-1 w-4 h-4 accent-[#CC4E00]"
+                  />
+                  <span className="flex-1">
+                    <span className="flex items-center justify-between gap-2 font-bold text-gray-900 flex-wrap">
+                      <span className="flex items-center gap-2">
+                        <LuCreditCard size={17} className="text-[#BA4700]" /> Kredi / Banka Kartı (iyzico Güvenli Ödeme)
+                      </span>
+                      <span className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded border border-gray-200">
+                        <Image src="/visa.png" alt="Visa" width={28} height={16} className="h-3 w-auto object-contain" />
+                        <Image src="/mastercard.png" alt="MasterCard" width={24} height={16} className="h-3.5 w-auto object-contain" />
+                        <Image src="/iyzico.png" alt="iyzico" width={40} height={16} className="h-3 w-auto object-contain" />
+                      </span>
+                    </span>
+                    <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
+                      iyzico korumalı hesap güvencesiyle 256-bit SSL şifrelemeli tüm kredi ve banka kartlarıyla güvenli ödeme.
+                    </span>
                   </span>
-                </div>
+                </label>
               </div>
             </section>
 
@@ -480,7 +496,7 @@ export default function CheckoutPage() {
                 </>
               ) : (
                 <>
-                  <LuLock size={16} /> Siparişi Tamamla · ₺{kuponluToplam.toFixed(2).replace('.', ',')}
+                  <LuLock size={16} /> {paymentMethod === 'CREDIT_CARD' ? 'Kartla Güvenli Öde' : 'Siparişi Tamamla'} · ₺{kuponluToplam.toFixed(2).replace('.', ',')}
                 </>
               )}
             </button>

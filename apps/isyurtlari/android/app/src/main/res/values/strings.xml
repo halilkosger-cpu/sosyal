@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">İşyurtları</string>
+    <string name="title_activity_main">İşyurtları</string>
+    <string name="package_name">tr.com.isyurtlari.app</string>
+    <string name="custom_url_scheme">tr.com.isyurtlari.app</string>
+</resources>

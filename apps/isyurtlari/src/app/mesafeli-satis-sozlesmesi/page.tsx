@@ -43,14 +43,15 @@ export default function DistanceSalesPage() {
 
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">Satıcı (İşletmeci):</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
-                <strong>Şirket Adı:</strong> isyurtlari.com.tr<br/>
-                <strong>Türü:</strong> Hükümlü el emeği ürünlerinin online satışı<br/>
-                <strong>Web Sitesi:</strong> https://isyurtlari.com.tr<br/>
+                <strong>Ticari Ünvan:</strong> İŞ-YRT E-Ticaret Ltd. Şti.<br/>
+                <strong>Platform / Web Sitesi:</strong> isyurtlari.com.tr<br/>
+                <strong>E-posta:</strong> info@isyurtlari.com.tr<br/>
+                <strong>Faaliyet Konusu:</strong> İşyurtları meslek eğitimi ürünlerinin e-ticaret satışı ve dağıtımı<br/>
               </p>
 
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">Alıcı (Müşteri):</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
-                Platform'dan ürün satın alan gerçek kişi
+                Platform üzerinden elektronik ortamda sipariş veren ve fatura/teslimat bilgileri sipariş formunda yer alan gerçek veya tüzel kişi.
               </p>
             </section>
 
@@ -95,8 +96,8 @@ export default function DistanceSalesPage() {
 
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">5.2 Ödeme Yöntemleri</h3>
               <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
-                <li>Kredi Kartı (Iyzico aracılığıyla)</li>
-                <li>Banka Transferi / Havale</li>
+                <li>Kredi Kartı / Banka Kartı (Visa, MasterCard ile iyzico güvenli ödeme altyapısı - 256-Bit SSL şifrelemeli)</li>
+                <li>Banka Havalesi / EFT</li>
               </ul>
 
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">5.3 Ödeme Onayı</h3>

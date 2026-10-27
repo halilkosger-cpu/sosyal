@@ -98,9 +98,13 @@ export default function ShippingReturnsPage() {
             </section>
 
             {/* İletişim */}
-            <section className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Sorularınız mı var?</h3>
-              <p className="text-gray-700 mb-4">
+            <section className="bg-orange-50 border border-orange-200 rounded-lg p-6 mt-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sorularınız ve İade Bildirimi</h3>
+              <p className="text-gray-700 text-sm mb-3">
+                <strong>Firma:</strong> İŞ-YRT E-Ticaret Ltd. Şti.<br />
+                <strong>E-posta:</strong> info@isyurtlari.com.tr
+              </p>
+              <p className="text-gray-700 text-sm">
                 Teslimat, iade veya değişim hakkında sorularınız varsa lütfen <Link href="/bize-ulasin" className="text-[#BA4700] font-semibold hover:text-[#cc4e00]">bizimle iletişime geçin</Link>.
               </p>
             </section>

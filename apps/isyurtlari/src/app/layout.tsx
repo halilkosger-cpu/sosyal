@@ -15,6 +15,7 @@ import { kisaAd } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
 import HesapMenusu from '@/components/HesapMenusu';
 const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
+const MobilKopru = dynamic(() => import('@/components/MobilKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
@@ -310,8 +311,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </ul>
               </div>
             </div>
-            <div className="border-t border-gray-100 mt-8 pt-5 text-center">
-              <p className="text-xs text-gray-500">© 2026 isyurtlari.com.tr - Tüm hakları saklıdır.</p>
+            <div className="border-t border-gray-100 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-xs text-gray-500 text-center md:text-left space-y-1">
+                <p className="font-semibold text-gray-700">İŞ-YRT E-Ticaret Ltd. Şti.</p>
+                <p>© 2026 isyurtlari.com.tr - Tüm hakları saklıdır. 256-Bit SSL ile korunmaktadır.</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="bg-white border border-gray-200 rounded-md px-2.5 py-1.5 flex items-center justify-center shadow-xs">
+                  <Image src="/visa.png" alt="Visa" width={38} height={20} className="h-4 w-auto object-contain" />
+                </div>
+                <div className="bg-white border border-gray-200 rounded-md px-2.5 py-1.5 flex items-center justify-center shadow-xs">
+                  <Image src="/mastercard.png" alt="MasterCard" width={32} height={20} className="h-4 w-auto object-contain" />
+                </div>
+                <div className="bg-white border border-gray-200 rounded-md px-3 py-1.5 flex items-center justify-center shadow-xs">
+                  <Image src="/iyzico.png" alt="iyzico ile Güvenli Ödeme" width={56} height={20} className="h-4 w-auto object-contain" />
+                </div>
+              </div>
             </div>
           </div>
         </footer>
@@ -326,6 +341,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <DahiliAnalitikTracker />
           {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
           <SenkronKopru />
+          {/* Mobil uygulama yerel koprusu ve cevrimdisi yonetimi */}
+          <MobilKopru />
           {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
           <AltGezinme />
           {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
