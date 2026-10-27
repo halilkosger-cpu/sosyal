@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight, LuQrCode } from 'react-icons/lu';
-import { generateQrSvg } from '@/lib/qr-generator';
+import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator';
 import { siparisTamamlandi } from '@/lib/analiz';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
 
@@ -50,6 +50,7 @@ export default function OrderConfirmationPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const [qrModu, setQrModu] = useState<'fast' | 'iban'>('iban');
 
   useEffect(() => {
     if (!orderId || orderId === 'undefined') {
@@ -295,22 +296,73 @@ export default function OrderConfirmationPage() {
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#BA4700] hover:text-[#8F3700] transition-colors"
                       >
                         <LuQrCode size={15} />
-                        <span>{showQr ? 'Karekodunu Gizle' : 'Mobil Bankacılık için Karekod (QR) Göster'}</span>
+                        <span>{showQr ? 'Karekodunu Gizle' : 'Karekod (QR) ile Öde'}</span>
                       </button>
 
                       {showQr && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-4">
-                          <div
-                            className="bg-white p-2 rounded-lg border border-gray-200 shadow-xs shrink-0"
-                            dangerouslySetInnerHTML={{
-                              __html: generateQrSvg(order.bankDetails.iban.replace(/\s/g, ''), 130),
-                            }}
-                          />
-                          <div className="text-left space-y-1">
-                            <p className="font-bold text-gray-900 text-xs">Mobil Bankacılık ile Hızlı Ödeme</p>
-                            <p className="text-[11px] text-gray-600 leading-relaxed">
-                              Banka uygulamanızdan <strong>Karekod ile Para Transferi / Gönder</strong> özelliğini açıp bu kodu taratarak IBAN yazmadan doğrudan ödeme yapabilirsiniz.
-                            </p>
+                        <div className="mt-3 p-3.5 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                          {/* QR Modu Seçimi */}
+                          <div className="flex items-center gap-1.5 p-1 bg-white rounded-lg border border-gray-200 text-[11px] font-medium">
+                            <button
+                              type="button"
+                              onClick={() => setQrModu('iban')}
+                              className={`flex-1 py-1.5 px-2 rounded-md transition-all text-center ${
+                                qrModu === 'iban'
+                                  ? 'bg-[#0F2040] text-white font-semibold shadow-xs'
+                                  : 'text-gray-600 hover:text-gray-900'
+                              }`}
+                            >
+                              📱 Telefon Kamerası (Düz IBAN)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setQrModu('fast')}
+                              className={`flex-1 py-1.5 px-2 rounded-md transition-all text-center ${
+                                qrModu === 'fast'
+                                  ? 'bg-[#0F2040] text-white font-semibold shadow-xs'
+                                  : 'text-gray-600 hover:text-gray-900'
+                              }`}
+                            >
+                              ⚡ Akbank & Banka FAST
+                            </button>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-center gap-4">
+                            <div
+                              className="bg-white p-2.5 rounded-xl border border-gray-200 shadow-xs shrink-0"
+                              dangerouslySetInnerHTML={{
+                                __html: generateQrSvg(
+                                  qrModu === 'fast'
+                                    ? generateTrKarekodFastPayload({
+                                        iban: order.bankDetails.iban,
+                                        name: order.bankDetails.accountName || 'İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ',
+                                      })
+                                    : order.bankDetails.iban.replace(/\s/g, ''),
+                                  150,
+                                  4
+                                ),
+                              }}
+                            />
+                            <div className="text-left space-y-1.5">
+                              {qrModu === 'iban' ? (
+                                <>
+                                  <p className="font-bold text-gray-900 text-xs">iPhone &amp; Genel Kamera ile Tara</p>
+                                  <p className="text-[11px] text-gray-600 leading-relaxed">
+                                    iPhone Kamera veya QR okuyucu ile okuttuğunuzda IBAN doğrudan ekrana gelir ve tek tıkla kopyalayabilirsiniz.
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="font-bold text-gray-900 text-xs">Akbank / Banka FAST ile Tara</p>
+                                  <p className="text-[11px] text-gray-600 leading-relaxed">
+                                    Akbank, Halkbank, İş Bankası, Garanti vb. uygulamanızdan <strong>&apos;Karekod ile Transfer / FAST&apos;</strong> menüsünü açıp bu kodu okutunuz.
+                                  </p>
+                                </>
+                              )}
+                              <p className="text-[10px] text-gray-400">
+                                {qrModu === 'iban' ? 'Standart ISO/IEC 18004 IBAN Karekodu' : 'TCMB TR-Karekod (FAST) Standardı'}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       )}
