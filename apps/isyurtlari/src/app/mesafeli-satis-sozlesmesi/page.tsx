@@ -43,7 +43,7 @@ export default function DistanceSalesPage() {
 
               <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-6">Satıcı (İşletmeci):</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
-                <strong>Ticari Ünvan:</strong> İŞ-YRT E-Ticaret Ltd. Şti.<br/>
+                <strong>Ticari Ünvan:</strong> İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ<br/>
                 <strong>Platform / Web Sitesi:</strong> isyurtlari.com.tr<br/>
                 <strong>E-posta:</strong> info@isyurtlari.com.tr<br/>
                 <strong>Faaliyet Konusu:</strong> İşyurtları meslek eğitimi ürünlerinin e-ticaret satışı ve dağıtımı<br/>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck } from 'react-icons/lu';
+import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck, LuShieldCheck } from 'react-icons/lu';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
@@ -446,11 +446,32 @@ export default function CheckoutPage() {
                   <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00]" />
                   <span className="flex-1">
                     <span className="flex items-center gap-2 font-bold text-gray-900">
-                      <LuLandmark size={17} className="text-[#BA4700]" /> Ön Talep / Sipariş Rezervasyonu (Banka Onayı Bekleniyor)
+                      <LuLandmark size={17} className="text-[#BA4700]" /> Havale / EFT ile Güvenli Ödeme (Halkbank Şirket Hesabı)
                     </span>
                     <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
-                      Banka hesaplarımız onay sürecindedir. <strong>Şu an ödeme alınmaz</strong>; siparişiniz adınıza rezerve edilir ve müşteri temsilcimiz sizinle iletişime geçer.
+                      Sipariş onayından sonra Türkiye Halk Bankası şirket hesabımıza havale veya EFT yapabilirsiniz.
                     </span>
+                    {paymentMethod === 'TRANSFER' && (
+                      <div className="mt-3 p-3.5 bg-white border border-gray-200 rounded-xl text-xs space-y-2 shadow-xs">
+                        <div className="flex items-center justify-between text-gray-700 font-semibold border-b border-gray-100 pb-2">
+                          <span>Türkiye Halk Bankası (Halkbank)</span>
+                          <span className="text-gray-500 font-normal">Ovacık Ankara Şb. (1553)</span>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-500 uppercase tracking-wide">Hesap Sahibi</p>
+                          <p className="font-bold text-gray-900">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-gray-500 uppercase tracking-wide">IBAN</p>
+                          <p className="font-mono font-bold text-[#BA4700] tracking-wide text-sm bg-orange-50/50 p-2 rounded border border-orange-100 select-all">
+                            TR43 0001 2001 5530 0010 1022 58
+                          </p>
+                        </div>
+                        <p className="text-[11px] text-gray-500 pt-1">
+                          * Siparişiniz tamamlandığında bu bilgiler ve sipariş numaranız ekranda ve e-posta adresinizde gösterilecektir.
+                        </p>
+                      </div>
+                    )}
                   </span>
                 </label>
                 <label className={secenek(paymentMethod === 'CREDIT_CARD')}>
@@ -476,6 +497,17 @@ export default function CheckoutPage() {
                     <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
                       iyzico korumalı hesap güvencesiyle 256-bit SSL şifrelemeli tüm kredi ve banka kartlarıyla güvenli ödeme.
                     </span>
+                    {paymentMethod === 'CREDIT_CARD' && (
+                      <div className="mt-3 p-3.5 bg-white border border-gray-200 rounded-xl text-xs space-y-1.5 shadow-xs">
+                        <div className="flex items-center gap-1.5 font-bold text-[#CC4E00]">
+                          <LuShieldCheck size={16} /> iyzico 3D Secure Güvenli Ödeme
+                        </div>
+                        <p className="text-gray-600 leading-relaxed">
+                          Kart bilgileriniz sistemimizde saklanmaz. Butona tıkladığınızda iyzico güvenli 3D Secure ödeme penceresi açılır. 
+                          (Canlı POS onay sürecindeyken siparişinizi dilerseniz <strong>Havale / EFT</strong> seçeneğiyle de anında tamamlayabilirsiniz.)
+                        </p>
+                      </div>
+                    )}
                   </span>
                 </label>
               </div>

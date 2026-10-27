@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Gizlilik Politikası Amacı</h2>
               <p className="text-gray-700 leading-relaxed">
-                Bu Gizlilik Sözleşmesi, <strong>İŞ-YRT E-Ticaret Ltd. Şti.</strong> ("Şirket") tarafından işletilen isyurtlari.com.tr ("Platform") tarafından sağlanan hizmetlerde kişisel verilerinizin nasıl toplandığını, işlendiğini ve korunduğunu açıklamaktadır. Platformu kullanarak bu politikayı kabul etmiş sayılırsınız.
+                Bu Gizlilik Sözleşmesi, <strong>İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</strong> ("Şirket") tarafından işletilen isyurtlari.com.tr ("Platform") tarafından sağlanan hizmetlerde kişisel verilerinizin nasıl toplandığını, işlendiğini ve korunduğunu açıklamaktadır. Platformu kullanarak bu politikayı kabul etmiş sayılırsınız.
               </p>
             </section>
 

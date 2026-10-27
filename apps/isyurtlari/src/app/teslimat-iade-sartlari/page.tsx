@@ -101,7 +101,7 @@ export default function ShippingReturnsPage() {
             <section className="bg-orange-50 border border-orange-200 rounded-lg p-6 mt-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Sorularınız ve İade Bildirimi</h3>
               <p className="text-gray-700 text-sm mb-3">
-                <strong>Firma:</strong> İŞ-YRT E-Ticaret Ltd. Şti.<br />
+                <strong>Firma:</strong> İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ<br />
                 <strong>E-posta:</strong> info@isyurtlari.com.tr
               </p>
               <p className="text-gray-700 text-sm">

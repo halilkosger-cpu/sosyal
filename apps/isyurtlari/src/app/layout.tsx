@@ -20,7 +20,6 @@ const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
-const CustomCursor = dynamic(() => import('@/components/CustomCursor'), { ssr: false });
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';
 import PushBackLayout from '@/components/PushBackLayout';
@@ -313,7 +312,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
             <div className="border-t border-gray-100 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-xs text-gray-500 text-center md:text-left space-y-1">
-                <p className="font-semibold text-gray-700">İŞ-YRT E-Ticaret Ltd. Şti.</p>
+                <p className="font-semibold text-gray-700">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
                 <p>© 2026 isyurtlari.com.tr - Tüm hakları saklıdır. 256-Bit SSL ile korunmaktadır.</p>
               </div>
               <div className="flex items-center gap-2.5">
@@ -348,8 +347,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
           <CanliSosyalKanit />
           <HediyeDanismaniModal />
-          {/* 2026 Mikro-Etkileşim: Özel İmleç */}
-          <CustomCursor />
         </CartDrawerProvider>
       </body>
     </html>
