@@ -20,6 +20,8 @@ const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
+const MobilUygulamaBanneri = dynamic(() => import('@/components/MobilUygulamaBanneri'), { ssr: false });
+import MobilKategoriSeridi from '@/components/MobilKategoriSeridi';
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';
 import PushBackLayout from '@/components/PushBackLayout';
@@ -166,6 +168,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="bg-gray-100 text-gray-900">
         <CartDrawerProvider>
           <PushBackLayout>
+            {/* Akıllı Mobil Uygulama ve PWA Kurulum Bannerı */}
+            <MobilUygulamaBanneri />
+
             {/* ─── TOP BAR ─── */}
             <header className="sticky top-0 z-50 shadow-sm">
           {/* Kampanya Duyuru Bandı */}
@@ -216,8 +221,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </div>
 
-          {/* Category bar */}
-          <div className="bg-white border-b border-gray-200">
+          {/* Category bar - Desktop */}
+          <div className="bg-white border-b border-gray-200 hidden md:block">
             <div className="max-w-screen-xl mx-auto px-4">
               <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
                 {categories.map((cat) => (
@@ -247,6 +252,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
             </div>
           </div>
+
+          {/* Category bar - Mobil Thumb-Zone Hikaye Stili */}
+          <MobilKategoriSeridi categories={categories} />
 
         </header>
 
@@ -307,6 +315,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <li><Link href="/teslimat-iade-sartlari" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Teslimat &amp; İade</Link></li>
                   <li><Link href="/siparislerim" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Siparişlerim</Link></li>
                   <li><Link href="/gizlilik-sozlesmesi" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Gizlilik Sözleşmesi</Link></li>
+                  <li>
+                    <a
+                      href="/downloads/isyurtlari.apk"
+                      className="text-sm font-medium text-[#BA4700] hover:text-[#8F3700] transition-colors inline-flex items-center gap-1.5 mt-1"
+                    >
+                      <span>📱</span> Android Uygulamasını İndir (.apk)
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>

@@ -20,11 +20,14 @@ import { FAVORI_OLAYI, favorileriGetir } from '@/lib/favoriler';
  * hepsini taşıyor.
  */
 
+import { useCartDrawer } from '@/context/CartDrawerContext';
+
 const YOK_SAYILAN_YOLLAR = ['/admin', '/checkout'];
 
 export default function AltGezinme() {
   const yol = usePathname();
   const { musteri } = useMusteri();
+  const { openCart, isCartOpen } = useCartDrawer();
   const [sepetAdedi, setSepetAdedi] = useState(0);
   const [favoriAdedi, setFavoriAdedi] = useState(0);
 
@@ -43,27 +46,7 @@ export default function AltGezinme() {
     };
   }, []);
 
-  /**
-   * Yönetim panelinde ve ödeme akışında gizli.
-   *
-   * Ödeme sayfasında müşterinin tek bir işi var; alt çubuk hem yer kaplar
-   * hem dikkat dağıtır. Pazaryerlerinin hepsi ödeme adımında gezinmeyi
-   * sadeleştiriyor.
-   */
   if (YOK_SAYILAN_YOLLAR.some((p) => yol?.startsWith(p))) return null;
-
-  const maddeler = [
-    { href: '/', Ikon: LuHouse, metin: 'Ana Sayfa', rozet: 0 },
-    { href: '/ara', Ikon: LuSearch, metin: 'Ara', rozet: 0 },
-    { href: '/favoriler', Ikon: LuHeart, metin: 'Favoriler', rozet: favoriAdedi },
-    { href: '/sepet', Ikon: LuShoppingCart, metin: 'Sepetim', rozet: sepetAdedi },
-    {
-      href: musteri ? '/hesabim' : '/giris',
-      Ikon: LuUser,
-      metin: musteri ? 'Hesabım' : 'Giriş',
-      rozet: 0,
-    },
-  ];
 
   return (
     <>
@@ -76,30 +59,86 @@ export default function AltGezinme() {
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <ul className="grid grid-cols-5">
-          {maddeler.map((madde) => {
-            const etkin = madde.href === '/' ? yol === '/' : yol?.startsWith(madde.href);
-            return (
-              <li key={madde.metin}>
-                <Link
-                  href={madde.href}
-                  aria-current={etkin ? 'page' : undefined}
-                  className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
-                    etkin ? 'text-[#BA4700]' : 'text-gray-500'
-                  }`}
-                >
-                  <span className="relative">
-                    <madde.Ikon size={20} strokeWidth={etkin ? 2.4 : 2} />
-                    {madde.rozet > 0 && (
-                      <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-[#CC4E00] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {madde.rozet > 99 ? '99+' : madde.rozet}
-                      </span>
-                    )}
+          {/* Ana Sayfa */}
+          <li>
+            <Link
+              href="/"
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                yol === '/' ? 'text-[#BA4700]' : 'text-gray-500'
+              }`}
+            >
+              <LuHouse size={20} strokeWidth={yol === '/' ? 2.4 : 2} />
+              <span className="text-[10px] font-medium">Ana Sayfa</span>
+            </Link>
+          </li>
+
+          {/* Ara */}
+          <li>
+            <Link
+              href="/ara"
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                yol?.startsWith('/ara') ? 'text-[#BA4700]' : 'text-gray-500'
+              }`}
+            >
+              <LuSearch size={20} strokeWidth={yol?.startsWith('/ara') ? 2.4 : 2} />
+              <span className="text-[10px] font-medium">Ara</span>
+            </Link>
+          </li>
+
+          {/* Favoriler */}
+          <li>
+            <Link
+              href="/favoriler"
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                yol?.startsWith('/favoriler') ? 'text-[#BA4700]' : 'text-gray-500'
+              }`}
+            >
+              <span className="relative">
+                <LuHeart size={20} strokeWidth={yol?.startsWith('/favoriler') ? 2.4 : 2} />
+                {favoriAdedi > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-[#CC4E00] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {favoriAdedi > 99 ? '99+' : favoriAdedi}
                   </span>
-                  <span className="text-[10px] font-medium">{madde.metin}</span>
-                </Link>
-              </li>
-            );
-          })}
+                )}
+              </span>
+              <span className="text-[10px] font-medium">Favoriler</span>
+            </Link>
+          </li>
+
+          {/* Sepetim - Slide-over Drawer Açar */}
+          <li>
+            <button
+              type="button"
+              onClick={() => openCart()}
+              className={`w-full flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                isCartOpen || yol === '/sepet' ? 'text-[#BA4700]' : 'text-gray-500'
+              }`}
+              aria-label="Sepeti Görüntüle"
+            >
+              <span className="relative">
+                <LuShoppingCart size={20} strokeWidth={isCartOpen ? 2.4 : 2} />
+                {sepetAdedi > 0 && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-[#CC4E00] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {sepetAdedi > 99 ? '99+' : sepetAdedi}
+                  </span>
+                )}
+              </span>
+              <span className="text-[10px] font-medium">Sepetim</span>
+            </button>
+          </li>
+
+          {/* Hesabım / Giriş */}
+          <li>
+            <Link
+              href={musteri ? '/hesabim' : '/giris'}
+              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+                yol?.startsWith('/hesabim') || yol?.startsWith('/giris') ? 'text-[#BA4700]' : 'text-gray-500'
+              }`}
+            >
+              <LuUser size={20} strokeWidth={yol?.startsWith('/hesabim') || yol?.startsWith('/giris') ? 2.4 : 2} />
+              <span className="text-[10px] font-medium">{musteri ? 'Hesabım' : 'Giriş'}</span>
+            </Link>
+          </li>
         </ul>
       </nav>
     </>
