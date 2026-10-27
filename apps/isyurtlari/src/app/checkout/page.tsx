@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck, LuShieldCheck, LuCopy, LuCheck, LuQrCode } from 'react-icons/lu';
+import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck, LuCopy, LuCheck, LuQrCode } from 'react-icons/lu';
 import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
@@ -600,42 +600,44 @@ export default function CheckoutPage() {
                     )}
                   </span>
                 </label>
-                <label className={secenek(paymentMethod === 'CREDIT_CARD')}>
+                <div className="flex items-start gap-3 p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50/80 cursor-not-allowed select-none">
                   <input
                     type="radio"
                     name="paymentMethod"
                     value="CREDIT_CARD"
-                    checked={paymentMethod === 'CREDIT_CARD'}
-                    onChange={() => setPaymentMethod('CREDIT_CARD')}
-                    className="mt-1 w-4 h-4 accent-[#CC4E00]"
+                    disabled
+                    checked={false}
+                    className="mt-1 w-4 h-4 accent-gray-400 cursor-not-allowed opacity-50"
                   />
-                  <span className="flex-1">
-                    <span className="flex items-center justify-between gap-2 font-bold text-gray-900 flex-wrap">
+                  <span className="flex-1 space-y-2">
+                    <span className="flex items-center justify-between gap-2 font-bold text-gray-700 flex-wrap">
                       <span className="flex items-center gap-2">
-                        <LuCreditCard size={17} className="text-[#BA4700]" /> Kredi / Banka Kartı (iyzico Güvenli Ödeme)
+                        <LuCreditCard size={17} className="text-gray-400" /> Kredi / Banka Kartı ile Ödeme
                       </span>
-                      <span className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded border border-gray-200">
-                        <Image src="/visa.png" alt="Visa" width={28} height={16} className="h-3 w-auto object-contain" />
-                        <Image src="/mastercard.png" alt="MasterCard" width={24} height={16} className="h-3.5 w-auto object-contain" />
-                        <Image src="/iyzico.png" alt="iyzico" width={40} height={16} className="h-3 w-auto object-contain" />
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                          Geçici Olarak Kapalı
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded border border-gray-200 opacity-60 grayscale">
+                          <Image src="/visa.png" alt="Visa" width={28} height={16} className="h-3 w-auto object-contain" />
+                          <Image src="/mastercard.png" alt="MasterCard" width={24} height={16} className="h-3.5 w-auto object-contain" />
+                          <Image src="/iyzico.png" alt="iyzico" width={40} height={16} className="h-3 w-auto object-contain" />
+                        </span>
                       </span>
                     </span>
-                    <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
-                      iyzico korumalı hesap güvencesiyle 256-bit SSL şifrelemeli tüm kredi ve banka kartlarıyla güvenli ödeme.
-                    </span>
-                    {paymentMethod === 'CREDIT_CARD' && (
-                      <div className="mt-3 p-3.5 bg-white border border-gray-200 rounded-xl text-xs space-y-1.5 shadow-xs">
-                        <div className="flex items-center gap-1.5 font-bold text-[#CC4E00]">
-                          <LuShieldCheck size={16} /> iyzico 3D Secure Güvenli Ödeme
-                        </div>
-                        <p className="text-gray-600 leading-relaxed">
-                          Kart bilgileriniz sistemimizde saklanmaz. Butona tıkladığınızda iyzico güvenli 3D Secure ödeme penceresi açılır. 
-                          (Canlı POS onay sürecindeyken siparişinizi dilerseniz <strong>Havale / EFT</strong> seçeneğiyle de anında tamamlayabilirsiniz.)
-                        </p>
+
+                    {/* Resmi ve Ağdalı Bilgilendirme */}
+                    <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-lg text-xs space-y-1 text-amber-950">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                        <LuInfo size={14} className="shrink-0 text-amber-700" />
+                        <span>Sanal POS ve Kartlı Tahsilat Altyapısı Bilgilendirmesi</span>
                       </div>
-                    )}
+                      <p className="text-[11px] text-amber-900/90 leading-relaxed">
+                        Bankacılık ve sanal POS altyapımızda gerçekleştirilen teknik modernizasyon ve güvenlik güncellemesi çalışmaları münasebetiyle, kredi kartı ile tahsilat işlemlerimiz geçici olarak hizmete kapalı bulunmaktadır. İlgili entegrasyon çalışmalarının 1 hafta içerisinde ikmal edilerek kartlı ödeme sistemimizin yeniden faaliyete sunulması planlanmaktadır. Bu geçiş sürecinde tüm siparişleriniz <strong>Banka Havalesi / EFT / FAST</strong> yöntemiyle kesintisiz olarak kabul edilmektedir. Anlayış ve teveccühünüz için teşekkür ederiz.
+                      </p>
+                    </div>
                   </span>
-                </label>
+                </div>
               </div>
             </section>
 
