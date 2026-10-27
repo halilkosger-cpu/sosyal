@@ -46,6 +46,12 @@ const ANAHTAR = 'cart';
  */
 export const SEPET_OLAYI = 'cartUpdated';
 
+/**
+ * Bir ürün sepete başarıyla eklendiğinde tetiklenen olay.
+ * Sepet toast bildirimi ve sepet ikonu animasyonunu tetikler.
+ */
+export const SEPETE_EKLENDI_OLAYI = 'itemAddedToCart';
+
 /** Tarayicidaki sepeti okur. Bozuk veri varsa bos sepet doner. */
 export function sepetiOku(): SepetUrunu[] {
   if (typeof window === 'undefined') return [];
@@ -111,6 +117,20 @@ export function sepeteEkle(urun: SepeteEklenebilirUrun, adet = 1): boolean {
       price: urun.price,
       quantity: adet,
     });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent(SEPETE_EKLENDI_OLAYI, {
+          detail: {
+            id: urun.id,
+            name: urun.name,
+            price: urun.price,
+            imageUrl: urun.imageUrl,
+            slug: urun.slug,
+          },
+        })
+      );
+    }
 
     return true;
   } catch {

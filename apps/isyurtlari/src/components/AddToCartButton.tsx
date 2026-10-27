@@ -13,7 +13,6 @@ import { sepeteEkle, sepeteEklenebilir, type SepeteEklenebilirUrun } from '@/lib
  * Fiyati girilmemis urunlerde pasif kaliyor: fiyatsiz urun sepete eklenirse
  * sepet ve odeme toplami 0 TL cikar.
  */
-import { useCartDrawer } from '@/context/CartDrawerContext';
 
 export default function AddToCartButton({
   product,
@@ -27,7 +26,6 @@ export default function AddToCartButton({
   etiketli?: boolean;
 }) {
   const [eklendi, setEklendi] = useState(false);
-  const { openCart } = useCartDrawer();
   const uygun = sepeteEklenebilir(product);
 
   if (product.quantity <= 0) return null; // stok yok - kartta on talep rozeti var
@@ -38,7 +36,6 @@ export default function AddToCartButton({
     if (!uygun) return;
     if (sepeteEkle(product, 1)) {
       setEklendi(true);
-      openCart();
       setTimeout(() => setEklendi(false), 1800);
     }
   };

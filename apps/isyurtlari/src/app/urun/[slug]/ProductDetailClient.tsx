@@ -20,7 +20,6 @@ import { urunGoruntulendi } from '@/lib/analiz';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
-import { useCartDrawer } from '@/context/CartDrawerContext';
 import BirlikteAl from '@/components/BirlikteAl';
 
 /**
@@ -124,7 +123,6 @@ export default function ProductDetailPage({
   /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
   const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
   const { musteri } = useMusteri();
-  const { openCart } = useCartDrawer();
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -176,7 +174,6 @@ export default function ProductDetailPage({
     if (!eklendi) return;
     setAdded(true);
     setQuantity(1);
-    openCart();
     setTimeout(() => setAdded(false), 3000);
   };
 

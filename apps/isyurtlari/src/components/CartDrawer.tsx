@@ -255,7 +255,7 @@ export default function CartDrawer({
                   </span>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-2.5">
                 <Link
                   href="/sepet"
                   onClick={closeCart}
@@ -272,6 +272,13 @@ export default function CartDrawer({
                   <LuArrowRight size={16} />
                 </Link>
               </div>
+              <button
+                type="button"
+                onClick={closeCart}
+                className="w-full py-2 text-center text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                ← Alışverişe Devam Et
+              </button>
             </div>
           </motion.div>
         </div>

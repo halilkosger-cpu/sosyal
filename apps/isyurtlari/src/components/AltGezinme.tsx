@@ -30,14 +30,20 @@ export default function AltGezinme() {
   const { openCart, isCartOpen } = useCartDrawer();
   const [sepetAdedi, setSepetAdedi] = useState(0);
   const [favoriAdedi, setFavoriAdedi] = useState(0);
+  const [sepetAnimasyon, setSepetAnimasyon] = useState(false);
 
   useEffect(() => {
     const guncelle = () => {
       setSepetAdedi(sepetiOku().reduce((t, k) => t + (k.quantity || 0), 0));
       setFavoriAdedi(favorileriGetir().length);
+      setSepetAnimasyon(true);
+      setTimeout(() => setSepetAnimasyon(false), 800);
     };
 
-    guncelle();
+    // İlk yüklemede animasyonsuz oku
+    setSepetAdedi(sepetiOku().reduce((t, k) => t + (k.quantity || 0), 0));
+    setFavoriAdedi(favorileriGetir().length);
+
     window.addEventListener(SEPET_OLAYI, guncelle);
     window.addEventListener(FAVORI_OLAYI, guncelle);
     return () => {
@@ -118,7 +124,11 @@ export default function AltGezinme() {
               <span className="relative">
                 <LuShoppingCart size={20} strokeWidth={isCartOpen ? 2.4 : 2} />
                 {sepetAdedi > 0 && (
-                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-[#CC4E00] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span
+                    className={`absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 bg-[#CC4E00] text-white text-[10px] font-bold rounded-full flex items-center justify-center transition-all duration-300 ${
+                      sepetAnimasyon ? 'scale-125 ring-2 ring-orange-300 shadow-md' : 'scale-100'
+                    }`}
+                  >
                     {sepetAdedi > 99 ? '99+' : sepetAdedi}
                   </span>
                 )}

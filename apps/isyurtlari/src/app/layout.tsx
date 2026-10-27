@@ -18,7 +18,7 @@ const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: f
 const MobilKopru = dynamic(() => import('@/components/MobilKopru'), { ssr: false });
 const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
-const CanliSosyalKanit = dynamic(() => import('@/components/CanliSosyalKanit'), { ssr: false });
+const SepetToastBildirimi = dynamic(() => import('@/components/SepetToastBildirimi'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
 const MobilUygulamaBanneri = dynamic(() => import('@/components/MobilUygulamaBanneri'), { ssr: false });
 import MobilKategoriSeridi from '@/components/MobilKategoriSeridi';
@@ -360,8 +360,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <MobilKopru />
           {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
           <AltGezinme />
-          {/* 2026 Trend Modüller: Canlı Sosyal Kanıt ve Akıllı Hediye Danışmanı */}
-          <CanliSosyalKanit />
+          {/* Bildirim ve Modüller */}
+          <SepetToastBildirimi />
           <HediyeDanismaniModal />
         </CartDrawerProvider>
       </body>
