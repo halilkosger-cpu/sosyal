@@ -1786,14 +1786,14 @@ export default function LogoGo3MuhasebeMerkezi() {
                 <label className="block font-semibold mb-1">Hesap Adı *</label>
                 <input
                   type="text" required value={hesapForm.hesapAdi} onChange={(e) => setHesapForm({ ...hesapForm, hesapAdi: e.target.value })}
-                  placeholder="Örn: Ziraat Bankası Ticari TL veya İyzico Havuz" className="w-full border rounded-xl p-2"
+                  placeholder="Örn: Halkbank Ticari TL veya İyzico Havuz" className="w-full border rounded-xl p-2"
                 />
               </div>
               <div>
                 <label className="block font-semibold mb-1">Banka / Kurum Adı *</label>
                 <input
                   type="text" required value={hesapForm.bankaAdi} onChange={(e) => setHesapForm({ ...hesapForm, bankaAdi: e.target.value })}
-                  placeholder="Ziraat Bankası, Vakıfbank, İyzico..." className="w-full border rounded-xl p-2"
+                  placeholder="Halkbank, Vakıfbank, İyzico..." className="w-full border rounded-xl p-2"
                 />
               </div>
               <div>

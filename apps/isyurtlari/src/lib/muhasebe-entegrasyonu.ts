@@ -203,7 +203,7 @@ export async function odemeTahsilatiIsle({
     let bankaHesabi = await prisma.bankaHesabi.findFirst({
       where: {
         OR: [
-          { hesapAdi: { contains: paymentMethod === 'CREDIT_CARD' ? 'iyzico' : 'Ziraat', mode: 'insensitive' } },
+          { hesapAdi: { contains: paymentMethod === 'CREDIT_CARD' ? 'iyzico' : 'Halkbank', mode: 'insensitive' } },
           { id: { not: '' } },
         ],
       },
@@ -212,11 +212,11 @@ export async function odemeTahsilatiIsle({
     if (!bankaHesabi) {
       bankaHesabi = await prisma.bankaHesabi.create({
         data: {
-          hesapAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico Sanal POS Hesabı' : 'Ziraat Bankası Ticari',
-          bankaAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico / Sanal POS' : 'T.C. Ziraat Bankası',
-          subeKodu: 'Merkez',
-          hesapNo: '1001-POS',
-          iban: 'TR000000000000000000000000',
+          hesapAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico Sanal POS Hesabı' : 'Halkbank Ticari Hesabı',
+          bankaAdi: paymentMethod === 'CREDIT_CARD' ? 'iyzico / Sanal POS' : 'T.C. Halk Bankası',
+          subeKodu: '1553 - Ovacık Ankara',
+          hesapNo: '10102258',
+          iban: 'TR43 0001 2001 5530 0010 1022 58',
           bakiye: 0,
         },
       });
