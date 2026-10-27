@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight } from 'react-icons/lu';
+import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight, LuQrCode } from 'react-icons/lu';
+import { generateQrSvg } from '@/lib/qr-generator';
 import { siparisTamamlandi } from '@/lib/analiz';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
 
@@ -48,6 +49,7 @@ export default function OrderConfirmationPage() {
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
     if (!orderId || orderId === 'undefined') {
@@ -261,17 +263,59 @@ export default function OrderConfirmationPage() {
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">IBAN</p>
                     <div className="flex items-center gap-2">
-                      <p className="font-mono font-bold text-gray-900">{order.bankDetails?.iban || '—'}</p>
+                      <p className="font-mono font-bold text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 select-all flex-1 text-sm sm:text-base">
+                        {order.bankDetails?.iban || '—'}
+                      </p>
                       <button
-                        onClick={() => copyToClipboard(order.bankDetails?.iban || '')}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
-                        title="Kopyala"
+                        onClick={() => copyToClipboard(order.bankDetails?.iban?.replace(/\s/g, '') || '')}
+                        className="px-3 py-2 bg-orange-50 hover:bg-orange-100 text-[#BA4700] rounded-lg font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0 border border-orange-200"
+                        title="IBAN'ı Kopyala"
                       >
-                        <LuCopy size={16} className="text-gray-600" />
+                        {copied ? (
+                          <>
+                            <LuCheck size={14} className="text-emerald-600" />
+                            <span className="text-emerald-700 font-bold">Kopyalandı!</span>
+                          </>
+                        ) : (
+                          <>
+                            <LuCopy size={14} />
+                            <span>Kopyala</span>
+                          </>
+                        )}
                       </button>
-                      {copied && <span className="text-xs text-green-600">Kopyalandı!</span>}
                     </div>
                   </div>
+
+                  {/* QR Kod ile Mobil Bankacılık Transferi */}
+                  {order.bankDetails?.iban && (
+                    <div className="pt-2 border-t border-gray-100">
+                      <button
+                        type="button"
+                        onClick={() => setShowQr((prev) => !prev)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#BA4700] hover:text-[#8F3700] transition-colors"
+                      >
+                        <LuQrCode size={15} />
+                        <span>{showQr ? 'Karekodunu Gizle' : 'Mobil Bankacılık için Karekod (QR) Göster'}</span>
+                      </button>
+
+                      {showQr && (
+                        <div className="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-4">
+                          <div
+                            className="bg-white p-2 rounded-lg border border-gray-200 shadow-xs shrink-0"
+                            dangerouslySetInnerHTML={{
+                              __html: generateQrSvg(order.bankDetails.iban.replace(/\s/g, ''), 130),
+                            }}
+                          />
+                          <div className="text-left space-y-1">
+                            <p className="font-bold text-gray-900 text-xs">Mobil Bankacılık ile Hızlı Ödeme</p>
+                            <p className="text-[11px] text-gray-600 leading-relaxed">
+                              Banka uygulamanızdan <strong>Karekod ile Para Transferi / Gönder</strong> özelliğini açıp bu kodu taratarak IBAN yazmadan doğrudan ödeme yapabilirsiniz.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>

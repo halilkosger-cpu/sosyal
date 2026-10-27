@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck, LuShieldCheck } from 'react-icons/lu';
+import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock, LuRotateCcw, LuTruck, LuShieldCheck, LuCopy, LuCheck, LuQrCode } from 'react-icons/lu';
+import { generateQrSvg } from '@/lib/qr-generator';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
@@ -65,6 +66,14 @@ export default function CheckoutPage() {
   const [kuponIsleniyor, setKuponIsleniyor] = useState(false);
   const [error, setError] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('TRANSFER');
+  const [ibanKopyalandi, setIbanKopyalandi] = useState(false);
+  const [qrAcik, setQrAcik] = useState(false);
+
+  const ibanKopyala = (iban: string) => {
+    navigator.clipboard.writeText(iban.replace(/\s/g, ''));
+    setIbanKopyalandi(true);
+    setTimeout(() => setIbanKopyalandi(false), 2000);
+  };
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -452,7 +461,7 @@ export default function CheckoutPage() {
                       Sipariş onayından sonra Türkiye Halk Bankası şirket hesabımıza havale veya EFT yapabilirsiniz.
                     </span>
                     {paymentMethod === 'TRANSFER' && (
-                      <div className="mt-3 p-3.5 bg-white border border-gray-200 rounded-xl text-xs space-y-2 shadow-xs">
+                      <div className="mt-3 p-4 bg-white border border-gray-200 rounded-xl text-xs space-y-3 shadow-xs">
                         <div className="flex items-center justify-between text-gray-700 font-semibold border-b border-gray-100 pb-2">
                           <span>Türkiye Halk Bankası (Halkbank)</span>
                           <span className="text-gray-500 font-normal">Ovacık Ankara Şb. (1553)</span>
@@ -462,11 +471,70 @@ export default function CheckoutPage() {
                           <p className="font-bold text-gray-900">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
                         </div>
                         <div>
-                          <p className="text-[11px] text-gray-500 uppercase tracking-wide">IBAN</p>
-                          <p className="font-mono font-bold text-[#BA4700] tracking-wide text-sm bg-orange-50/50 p-2 rounded border border-orange-100 select-all">
-                            TR43 0001 2001 5530 0010 1022 58
-                          </p>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[11px] text-gray-500 uppercase tracking-wide">IBAN</span>
+                            <span className="text-[11px] text-gray-400">Tek tıkla kopyalayın</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 font-mono font-bold text-[#BA4700] text-xs sm:text-sm bg-orange-50/60 p-2.5 rounded-lg border border-orange-100 select-all overflow-x-auto whitespace-nowrap">
+                              TR43 0001 2001 5530 0010 1022 58
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                ibanKopyala('TR43 0001 2001 5530 0010 1022 58');
+                              }}
+                              className="px-3 py-2.5 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 rounded-lg font-medium text-xs flex items-center gap-1.5 transition-colors shrink-0"
+                              title="IBAN'ı Kopyala"
+                            >
+                              {ibanKopyalandi ? (
+                                <>
+                                  <LuCheck size={14} className="text-emerald-600" />
+                                  <span className="text-emerald-700 font-bold">Kopyalandı</span>
+                                </>
+                              ) : (
+                                <>
+                                  <LuCopy size={14} className="text-gray-600" />
+                                  <span>Kopyala</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
+
+                        {/* QR Kod ile Kolay Ödeme */}
+                        <div className="pt-2 border-t border-gray-100">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setQrAcik((prev) => !prev);
+                            }}
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#BA4700] hover:text-[#8F3700] transition-colors"
+                          >
+                            <LuQrCode size={15} />
+                            <span>{qrAcik ? 'Karekodunu Gizle' : 'Mobil Bankacılık için Karekod (QR) Göster'}</span>
+                          </button>
+
+                          {qrAcik && (
+                            <div className="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-4">
+                              <div
+                                className="bg-white p-2 rounded-lg border border-gray-200 shadow-xs shrink-0"
+                                dangerouslySetInnerHTML={{
+                                  __html: generateQrSvg('TR430001200155300010102258', 130),
+                                }}
+                              />
+                              <div className="text-left space-y-1">
+                                <p className="font-bold text-gray-900 text-xs">Mobil Bankacılık ile Tara &amp; Öde</p>
+                                <p className="text-[11px] text-gray-600 leading-relaxed">
+                                  Halkbank veya kullandığınız bankanın mobil uygulamasından <strong>Karekod ile Para Transferi / Gönder</strong> seçeneğini açıp bu kodu okutabilirsiniz.
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         <p className="text-[11px] text-gray-500 pt-1">
                           * Siparişiniz tamamlandığında bu bilgiler ve sipariş numaranız ekranda ve e-posta adresinizde gösterilecektir.
                         </p>
