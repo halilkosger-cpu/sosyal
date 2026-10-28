@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { jsonLdMetni } from '@/lib/json-ld';
 import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
@@ -197,13 +198,27 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = sonuc.durum === 'bulundu' ? sonuc.urun : null;
 
   const hasDbReviews = Boolean(product && product.reviews && product.reviews.length > 0);
-  const ratingValue = hasDbReviews
-    ? (
-        product!.reviews.reduce((sum, review) => sum + review.rating, 0) /
-        product!.reviews.length
-      ).toFixed(1)
-    : '4.9';
-  const reviewCount = hasDbReviews ? product!.reviews.length : 12;
+  // Puan ve yorum yalnizca gercek, onayli yorumlardan; yorumsuz urunde hic basilmaz.
+  const puanBilgisi = hasDbReviews
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: (
+            product!.reviews.reduce((sum, review) => sum + review.rating, 0) / product!.reviews.length
+          ).toFixed(1),
+          reviewCount: product!.reviews.length,
+          bestRating: '5',
+          worstRating: '1',
+        },
+        review: product!.reviews.map((r) => ({
+          '@type': 'Review',
+          reviewRating: { '@type': 'Rating', ratingValue: r.rating.toString(), bestRating: '5' },
+          author: { '@type': 'Person', name: r.customer?.name || 'Müşteri' },
+          datePublished: r.createdAt.toISOString().split('T')[0],
+          ...(r.text ? { reviewBody: r.text } : {}),
+        })),
+      }
+    : {};
 
   const productJsonLd = product
     ? {
@@ -240,45 +255,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             returnMethod: 'https://schema.org/ReturnByMail',
           },
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue,
-          reviewCount,
-          bestRating: '5',
-          worstRating: '1',
-        },
-        review: hasDbReviews
-          ? product.reviews.map((r) => ({
-              '@type': 'Review',
-              reviewRating: {
-                '@type': 'Rating',
-                ratingValue: r.rating.toString(),
-                bestRating: '5',
-              },
-              author: {
-                '@type': 'Person',
-                name: r.customer?.name || 'Doğrulanmış Müşteri',
-              },
-              datePublished: r.createdAt.toISOString().split('T')[0],
-              reviewBody: r.text || 'İşyurtları el emeği doğal ürün.',
-            }))
-          : [
-              {
-                '@type': 'Review',
-                reviewRating: {
-                  '@type': 'Rating',
-                  ratingValue: '5',
-                  bestRating: '5',
-                },
-                author: {
-                  '@type': 'Person',
-                  name: 'Doğrulanmış Müşteri',
-                },
-                datePublished: new Date(product.createdAt).toISOString().split('T')[0],
-                reviewBody:
-                  'İşyurtları atölyelerinde hükümlülerin el emeğiyle özenle üretilmiş kaliteli ve doğal bir ürün.',
-              },
-            ],
+        ...puanBilgisi,
       }
     : null;
 
@@ -346,7 +323,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <script
         id={`product-structured-data-${params.slug}`}
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdMetni(jsonLd) }}
       />
       <ProductDetailClient baslangicUrun={baslangicUrun} benzerUrunler={benzerUrunler} />
     </>

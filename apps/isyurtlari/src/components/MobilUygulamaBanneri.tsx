@@ -41,7 +41,8 @@ export default function MobilUygulamaBanneri() {
     else setCihaz('other');
 
     // Sadece mobilde goster
-    if ((isIOS || isAndroid) && uygulamaBanneriGosterilebilir()) {
+    // Android'de banner yalnizca tarayici PWA kurulumu sunarsa cikar (beforeinstallprompt).
+    if (isIOS && uygulamaBanneriGosterilebilir()) {
       setGorunur(true);
     }
 
@@ -49,6 +50,7 @@ export default function MobilUygulamaBanneri() {
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
+      if (uygulamaBanneriGosterilebilir()) setGorunur(true);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
@@ -74,12 +76,10 @@ export default function MobilUygulamaBanneri() {
           setGorunur(false);
         }
       } catch {
-        // Fallback: APK indirme
-        window.location.href = '/downloads/isyurtlari.apk';
+        setGorunur(false);
       }
     } else {
-      // Dogrudan APK indir
-      window.location.href = '/downloads/isyurtlari.apk';
+      setGorunur(false);
     }
   };
 

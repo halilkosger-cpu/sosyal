@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { jsonLdMetni } from '@/lib/json-ld';
 import AnaSayfa from './AnaSayfa';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 import { varsayilanSirala } from '@/lib/urun-siralama';
@@ -178,7 +179,7 @@ export default async function HomePage() {
       <script
         id="sss-structured-data"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(sssJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdMetni(sssJsonLd) }}
       />
       <AnaSayfa
         baslangicKategoriler={kategoriler}

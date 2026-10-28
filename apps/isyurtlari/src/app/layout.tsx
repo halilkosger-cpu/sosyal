@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { jsonLdMetni } from '@/lib/json-ld';
 import { ViewTransitions } from 'next-view-transitions';
 import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 import HareketSaglayici from '@/components/HareketSaglayici';
@@ -140,7 +141,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           id="organization-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd),
+            __html: jsonLdMetni(organizationJsonLd),
           }}
         />
 
@@ -148,7 +149,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           id="website-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteJsonLd),
+            __html: jsonLdMetni(websiteJsonLd),
           }}
         />
       </head>
@@ -305,14 +306,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <li><Link href="/teslimat-iade-sartlari" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Teslimat &amp; İade</Link></li>
                   <li><Link href="/siparislerim" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Siparişlerim</Link></li>
                   <li><Link href="/gizlilik-sozlesmesi" className="text-sm text-gray-600 hover:text-[#BA4700] transition-colors">Gizlilik Sözleşmesi</Link></li>
-                  <li>
-                    <a
-                      href="/downloads/isyurtlari.apk"
-                      className="text-sm font-medium text-[#BA4700] hover:text-[#8F3700] transition-colors inline-flex items-center gap-1.5 mt-1"
-                    >
-                      <span>📱</span> Android Uygulamasını İndir (.apk)
-                    </a>
-                  </li>
                 </ul>
               </div>
             </div>

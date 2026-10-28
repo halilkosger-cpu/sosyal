@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { jsonLdMetni } from '@/lib/json-ld';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
@@ -340,7 +341,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <script
         id={`category-structured-data-${params.categorySlug}`}
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdMetni(jsonLd) }}
       />
       <CategoryPageClient
         baslangicUrunler={urunler}

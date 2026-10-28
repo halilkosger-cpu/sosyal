@@ -5,25 +5,6 @@ import { botMu, cihazCozumle, kaynakCozumle, konumCozumle } from '@/lib/analitik
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  try {
-    await tabloyuHazirla();
-    const countRaw: any = await prisma.$queryRawUnsafe('SELECT COUNT(*)::int as c FROM "ZiyaretKaydi"');
-    const sonKayitlar: any = await prisma.$queryRawUnsafe('SELECT * FROM "ZiyaretKaydi" ORDER BY "olusturulma" DESC LIMIT 5');
-    return NextResponse.json({
-      status: 'ok',
-      tablo: 'ZiyaretKaydi hazir',
-      toplamKayit: countRaw?.[0]?.c ?? 0,
-      sonKayitlar,
-    });
-  } catch (error: any) {
-    return NextResponse.json({
-      status: 'error',
-      mesaj: error?.message,
-    }, { status: 500 });
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     let body: any = {};
@@ -152,6 +133,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, id, sayfa });
   } catch (error: any) {
     console.error('[TRACK API HATASI]:', error?.message);
-    return NextResponse.json({ ok: false, error: error?.message }, { status: 500 });
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
