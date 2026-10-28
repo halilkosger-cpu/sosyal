@@ -7,25 +7,27 @@ import { SITE_URL } from '@/lib/seo';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import {
+  CookieConsent,
+  KargoTakipModal,
+  SenkronKopru,
+  MobilKopru,
+  AltGezinme,
+  KampanyaModal,
+  SepetToastBildirimi,
+  HediyeDanismaniModal,
+  MobilUygulamaBanneri,
+  SpotlightArama,
+} from '@/components/IstemciKatmanlari';
 import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 
 import Olcumler from '@/components/Olcumler';
-const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
 const SearchSuggest = dynamic(() => import('@/components/SearchSuggest'), { ssr: true });
-const KargoTakipModal = dynamic(() => import('@/components/KargoTakipModal'), { ssr: false });
 import { defaultMetadata, organizationJsonLd, paylasimGorseli, websiteJsonLd } from '@/lib/seo';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { kisaAd } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
 import HesapMenusu from '@/components/HesapMenusu';
-const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
-const MobilKopru = dynamic(() => import('@/components/MobilKopru'), { ssr: false });
-const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
-const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
-const SepetToastBildirimi = dynamic(() => import('@/components/SepetToastBildirimi'), { ssr: false });
-const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
-const MobilUygulamaBanneri = dynamic(() => import('@/components/MobilUygulamaBanneri'), { ssr: false });
-const SpotlightArama = dynamic(() => import('@/components/SpotlightArama'), { ssr: false });
 import MobilKategoriSeridi from '@/components/MobilKategoriSeridi';
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';

@@ -5,7 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 // GET: Tek bir faturanın tüm detaylarını ve satırlarını getir
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -30,7 +31,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PUT: Fatura bilgilerini güncelle (açıklama, durum veya satırlar)
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -78,7 +80,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE: Faturayı sil (resmi GİB gönderimi yapılmamışsa)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

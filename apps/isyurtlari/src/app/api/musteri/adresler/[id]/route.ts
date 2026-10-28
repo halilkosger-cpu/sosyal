@@ -38,7 +38,8 @@ async function sahipMi(adresId: string, customerId: string): Promise<boolean> {
 
 const bulunamadi = () => NextResponse.json({ error: 'Adres bulunamadı' }, { status: 404 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const musteri = await musteriGuard();
   if (musteri instanceof NextResponse) return musteri;
 
@@ -119,7 +120,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const musteri = await musteriGuard();
   if (musteri instanceof NextResponse) return musteri;
 

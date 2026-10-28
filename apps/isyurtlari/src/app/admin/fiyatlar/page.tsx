@@ -193,6 +193,7 @@ export default function AdminFiyatlarPage() {
         </div>
 
         <div className="flex gap-2">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- dosya indirme ucu */}
           <a
             href="/api/admin/products/prices"
             className="inline-flex items-center gap-1.5 bg-[#0F2040] hover:bg-[#1a3260] text-white px-3.5 py-2 rounded-xl font-bold text-xs transition-colors shadow-sm"

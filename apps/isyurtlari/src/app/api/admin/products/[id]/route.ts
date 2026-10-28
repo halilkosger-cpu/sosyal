@@ -3,7 +3,8 @@ import { adminGuard } from '@/lib/admin-auth';
 import { icerikTazele } from '@/lib/kategoriler';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -15,7 +16,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(product);
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -47,7 +49,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
  * yuzunden eksik gonderilen fiyat ve stok sifirlaniyor. Toplu gorsel
  * optimizasyonu icin guvenli olan bu uc.
  */
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -64,7 +67,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json(product);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

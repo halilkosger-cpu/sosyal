@@ -46,9 +46,9 @@ export async function generateStaticParams() {
 }
 
 type ProductPageProps = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 /**
@@ -111,7 +111,8 @@ const getProductImage = (slug: string, imageUrl?: string | null) => {
   return imageUrl ? absoluteUrl(imageUrl) : defaultOpenGraphImage;
 };
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata(props: ProductPageProps): Promise<Metadata> {
+  const params = await props.params;
   const sonuc = await getProduct(params.slug);
 
   if (sonuc.durum !== 'bulundu') {
@@ -181,7 +182,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage(props: ProductPageProps) {
+  const params = await props.params;
   const sonuc = await getProduct(params.slug);
 
   // Silinmis urun icin "Urun bulunamadi" ekrani HTTP 200 ile donuyordu. Google

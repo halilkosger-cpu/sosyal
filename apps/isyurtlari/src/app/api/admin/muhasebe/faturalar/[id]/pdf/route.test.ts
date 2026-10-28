@@ -27,7 +27,7 @@ describe('GET /api/admin/muhasebe/faturalar/[id]/pdf', () => {
     );
 
     const req = new NextRequest('http://localhost:3000/api/admin/muhasebe/faturalar/fat-123/pdf');
-    const res = await GET(req, { params: { id: 'fat-123' } });
+    const res = await GET(req, { params: Promise.resolve({ id: 'fat-123' }) });
 
     expect(res.status).toBe(401);
   });
@@ -37,7 +37,7 @@ describe('GET /api/admin/muhasebe/faturalar/[id]/pdf', () => {
     vi.mocked(prisma.fatura.findUnique).mockResolvedValue(null as any);
 
     const req = new NextRequest('http://localhost:3000/api/admin/muhasebe/faturalar/fat-999/pdf');
-    const res = await GET(req, { params: { id: 'fat-999' } });
+    const res = await GET(req, { params: Promise.resolve({ id: 'fat-999' }) });
 
     expect(res.status).toBe(404);
   });
@@ -73,7 +73,7 @@ describe('GET /api/admin/muhasebe/faturalar/[id]/pdf', () => {
     } as any);
 
     const req = new NextRequest('http://localhost:3000/api/admin/muhasebe/faturalar/fat-101/pdf');
-    const res = await GET(req, { params: { id: 'fat-101' } });
+    const res = await GET(req, { params: Promise.resolve({ id: 'fat-101' }) });
 
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toContain('text/html');

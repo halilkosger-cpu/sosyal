@@ -82,6 +82,6 @@ async function urunGetir(_req: NextRequest, { params }: { params: { slug: string
   }
 }
 
-export async function GET(req: NextRequest, baglam: { params: { slug: string } }) {
-  return vitrinOnbellegi(await urunGetir(req, baglam));
+export async function GET(req: NextRequest, baglam: { params: Promise<{ slug: string }> }) {
+  return vitrinOnbellegi(await urunGetir(req, { params: await baglam.params }));
 }

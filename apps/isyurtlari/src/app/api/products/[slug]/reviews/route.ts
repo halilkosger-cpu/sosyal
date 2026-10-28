@@ -101,7 +101,8 @@ function kisaltilmisAd(tamAd: string): string {
   return `${parcalar.slice(0, -1).join(' ')} ${son.charAt(0).toLocaleUpperCase('tr-TR')}.`;
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const sinir = await hizSiniriGuard(req, 'yorum', 10, 3600);
   if (sinir) return sinir;
 
@@ -203,6 +204,6 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
   }
 }
 
-export async function GET(req: NextRequest, baglam: { params: { slug: string } }) {
-  return vitrinOnbellegi(await yorumlariGetir(req, baglam));
+export async function GET(req: NextRequest, baglam: { params: Promise<{ slug: string }> }) {
+  return vitrinOnbellegi(await yorumlariGetir(req, { params: await baglam.params }));
 }

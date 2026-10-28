@@ -148,7 +148,7 @@ export async function oturumAc(
     },
   });
 
-  cookies().set(OTURUM_CEREZI, jeton, {
+  (await cookies()).set(OTURUM_CEREZI, jeton, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -177,7 +177,7 @@ export interface OturumdakiMusteri {
  * istekte yazmak, cok ziyaretci alan bir sitede gereksiz veritabani yuku.
  */
 export async function oturumdakiMusteri(): Promise<OturumdakiMusteri | null> {
-  const jeton = cookies().get(OTURUM_CEREZI)?.value;
+  const jeton = (await cookies()).get(OTURUM_CEREZI)?.value;
   if (!jeton) return null;
 
   try {
@@ -225,8 +225,8 @@ export async function oturumdakiMusteri(): Promise<OturumdakiMusteri | null> {
 
 /** Bu cihazdaki oturumu kapatir. */
 export async function oturumKapat(): Promise<void> {
-  const jeton = cookies().get(OTURUM_CEREZI)?.value;
-  cookies().delete(OTURUM_CEREZI);
+  const jeton = (await cookies()).get(OTURUM_CEREZI)?.value;
+  (await cookies()).delete(OTURUM_CEREZI);
   if (!jeton) return;
 
   await prisma.customerSession

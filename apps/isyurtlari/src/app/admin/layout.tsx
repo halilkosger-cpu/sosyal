@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag, LuShoppingCart,
@@ -49,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className={`flex flex-col h-full ${mobile ? '' : 'w-64 flex-shrink-0'}`}>
       {/* Logo */}
       <div className="p-5 border-b border-blue-900/50">
-        <a href="/admin" className="flex items-center gap-3">
+        <Link href="/admin" className="flex items-center gap-3">
           <div className="bg-white rounded-xl p-1.5">
             <Image src="/logo.jpg" alt="Logo" width={80} height={30} className="object-contain h-7 w-auto" />
           </div>
@@ -57,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="text-white text-xs font-bold">Admin Paneli</p>
             <p className="text-blue-400 text-[10px]">isyurtlari.com.tr</p>
           </div>
-        </a>
+        </Link>
       </div>
 
       {/* Nav: Standart temiz ve tam sayfa geçişleri ile çerezin düşmesini önler */}

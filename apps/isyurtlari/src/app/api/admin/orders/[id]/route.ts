@@ -20,7 +20,8 @@ const takipNoTemizle = (deger: unknown): string | null => {
   return t ? t.slice(0, 60) : null;
 };
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

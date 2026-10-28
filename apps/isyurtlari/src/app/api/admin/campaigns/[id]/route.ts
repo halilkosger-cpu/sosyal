@@ -4,7 +4,8 @@ import { adminGuard } from '@/lib/admin-auth';
 import { prisma } from '@isyurtlari/database';
 import { icerikTazele } from '@/lib/kategoriler';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -43,7 +44,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

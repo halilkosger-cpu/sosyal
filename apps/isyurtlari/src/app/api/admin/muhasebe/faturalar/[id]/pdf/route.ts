@@ -5,7 +5,8 @@ import { adminGuard } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

@@ -55,9 +55,9 @@ export async function generateStaticParams() {
 }
 
 type CategoryPageProps = {
-  params: {
+  params: Promise<{
     categorySlug: string;
-  };
+  }>;
 };
 
 const kategoriyiSorgula = (slug: string) =>
@@ -196,7 +196,8 @@ const getCategoryTitle = (categoryName: string, categorySlug?: string) => {
   return `${taban} — ${ek}`;
 };
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata(props: CategoryPageProps): Promise<Metadata> {
+  const params = await props.params;
   const sonuc = await getCategory(params.categorySlug);
 
   if (sonuc.durum !== 'bulundu') {
@@ -259,7 +260,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage(props: CategoryPageProps) {
+  const params = await props.params;
   const [sonuc, urunler, kategoriler] = await Promise.all([
     getCategory(params.categorySlug),
     getCategoryProducts(params.categorySlug),

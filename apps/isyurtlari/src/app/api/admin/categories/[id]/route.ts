@@ -8,7 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * Kategorinin ikonunu belirler. imageUrl null gonderilirse ikon kaldirilir ve
  * kategori yerlesik ikon esleme tablosuna geri doner.
  */
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 
@@ -29,7 +30,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json(category);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const red = adminGuard(req);
   if (red) return red;
 

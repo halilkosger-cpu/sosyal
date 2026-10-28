@@ -379,7 +379,7 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 ### G. 28 Ekim — 2. tur güvenlik denetimi
 - [x] G1 YÜKSEK `GET /api/track` herkese açık: son ziyaretlerin ip/şehir/oturum bilgisi (KVKK) → GET'i kaldır/adminGuard, hata mesajını gizle.
 - [x] G2 YÜKSEK Ürün JSON-LD'de yorumsuz ürüne sahte 4.9 puan / 12 yorum / "Doğrulanmış Müşteri" (`urun/[slug]/page.tsx:200-206,265-281`) → yorum yoksa hiç basma.
-- [ ] G3 YÜKSEK Next 14.2.35: RSC DoS + rewrite SSRF yalnızca 15.5.x'te yamalı; `@vercel/blob@0.21` undici → Next 15 geçişi planla.
+- [x] G3 YÜKSEK Next 14.2.35: RSC DoS + rewrite SSRF yalnızca 15.5.x'te yamalı; `@vercel/blob@0.21` undici → Next 15 geçişi planla. (Next 15.5.28 + React 19 + @vercel/blob 2.x; async params codemod, ssr:false katmanları IstemciKatmanlari.tsx)
 - [x] G4 YÜKSEK `/downloads/isyurtlari.apk` debuggable debug derleme → imzalı release APK ya da Play Store linki. (APK dosyası ve tüm bağlantılar kaldırıldı; Android banner yalnızca PWA kurulumu varsa)
 - [x] G5 ORTA JSON-LD `<` kaçışı yok (saklı XSS, admin onaylı yorumla) → `.replace(/</g,'\\u003c')`.
 - [ ] G6 ORTA CSV formül enjeksiyonu (`lib/csv.ts`) → `= + - @` başına `'`.
