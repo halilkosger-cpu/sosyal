@@ -62,8 +62,8 @@ const nextConfig = {
             value: 'max-age=63072000; includeSubDomains',
           },
           {
-            // Once yalnizca rapor: ihlaller tarayici konsolunda gorunur, hicbir sey engellenmez.
-            key: 'Content-Security-Policy-Report-Only',
+            // 28 Eki 2026: 12 sayfa (cerez onayli, GA dahil) gercek Chrome'da tarandi, ihlal yok -> zorunlu.
+            key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://*.iyzipay.com https://*.iyzico.com",
@@ -76,6 +76,8 @@ const nextConfig = {
               "base-uri 'self'",
               "form-action 'self' https://*.iyzipay.com",
               "object-src 'none'",
+              'upgrade-insecure-requests',
+              'report-uri /api/csp-rapor',
             ].join('; '),
           },
           {

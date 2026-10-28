@@ -332,7 +332,7 @@ Sıra: yukarıdan aşağı. Biten maddeyi [x] yap.
 - [x] B3 E-posta HTML kaçışı: `contactConfirmation`, `orders` admin maili → `kacir()`; iletişim formuna Turnstile. (kaçış yapıldı; Turnstile ertelendi — form zaten saatte 5 istekle sınırlı)
 - [x] B4 `api/stats/sales` ciroyu herkese açıyor → aggregate, ciroyu çıkar, cache.
 - [x] B5 `HOSGELDIN10` e-posta değiştirerek sınırsız → sadece doğrulanmış hesap.
-- [x] B6 CSP (önce Report-Only) + HSTS; `X-XSS-Protection` kaldır.
+- [x] B6 CSP (önce Report-Only) + HSTS; `X-XSS-Protection` kaldır. — 28 Eki: 12 sayfa tarandı, ihlal yok → CSP zorunlu + report-uri /api/csp-rapor (Vercel log). Kart ödemesi açılırken iyzico formuyla yeniden test et
 - [x] B7 `hiz-siniri.ts:66-70` DB hatasında admin OTP'yi reddet.
 - [x] B8 `totp-check`/`otp-request` admin e-posta ifşası → tek tip yanıt.
 - [x] B9 `admin/upload` SVG kabul + ham dosya adı → SVG kapat, slug.
