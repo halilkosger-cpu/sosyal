@@ -126,6 +126,7 @@ export default function AltGezinme() {
             <button
               type="button"
               onClick={() => openCart()}
+              data-sepet-hedef
               className={`w-full flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
                 isCartOpen || yol === '/sepet' ? 'text-[#BA4700]' : 'text-gray-500'
               }`}

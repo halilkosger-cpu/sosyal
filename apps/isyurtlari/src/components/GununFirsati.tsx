@@ -181,7 +181,7 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
                 <span className="text-xl font-extrabold text-[#BA4700]">
                   ₺{Number(firsatUrunu.price).toLocaleString('tr-TR')}
                 </span>
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-gray-500 line-through">
                   ₺{eskiFiyat.toLocaleString('tr-TR')}
                 </span>
               </div>

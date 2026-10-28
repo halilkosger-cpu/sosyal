@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { sepeteUcur } from '@/lib/sepete-ucus';
 import { LuShoppingCart, LuCheck } from 'react-icons/lu';
 import { sepeteEkle, sepeteEklenebilir, type SepeteEklenebilirUrun } from '@/lib/cart';
 
@@ -35,6 +36,8 @@ export default function AddToCartButton({
     e.stopPropagation();
     if (!uygun) return;
     if (sepeteEkle(product, 1)) {
+      const kart = (e.currentTarget as HTMLElement).closest('[data-urun-karti]');
+      sepeteUcur(kart?.querySelector('img'));
       setEklendi(true);
       setTimeout(() => setEklendi(false), 1800);
     }

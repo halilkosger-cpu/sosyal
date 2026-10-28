@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import MagneticButton from '@/components/MagneticButton';
 import UrunKarti, { type KartUrunu } from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
+import { sepeteUcur } from '@/lib/sepete-ucus';
 import { urunGoruntulendi } from '@/lib/analiz';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
@@ -123,6 +124,19 @@ export default function ProductDetailPage({
   /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
   const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
   const { musteri } = useMusteri();
+  const satinAlmaRef = useRef<HTMLDivElement>(null);
+  const [cubukGorunur, setCubukGorunur] = useState(false);
+
+  // Mobil cubuk yalnizca ana "Sepete Ekle" ekrandan ciktiginda (asagi kaydirilinca) gorunur.
+  useEffect(() => {
+    const hedef = satinAlmaRef.current;
+    if (!hedef) return;
+    const gozlemci = new IntersectionObserver(([g]) => {
+      setCubukGorunur(!g.isIntersecting && g.boundingClientRect.top < 0);
+    });
+    gozlemci.observe(hedef);
+    return () => gozlemci.disconnect();
+  }, [product?.id]);
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -158,9 +172,6 @@ export default function ProductDetailPage({
    */
   const handleAddToCart = () => {
     if (!product) return;
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      try { navigator.vibrate(25); } catch {}
-    }
     const eklendi = sepeteEkle(
       {
         id: product.id,
@@ -175,6 +186,7 @@ export default function ProductDetailPage({
       quantity
     );
     if (!eklendi) return;
+    sepeteUcur(document.querySelector<HTMLImageElement>('.urun-gorsel-gecis img'));
     setAdded(true);
     setQuantity(1);
     setTimeout(() => setAdded(false), 3000);
@@ -298,7 +310,7 @@ export default function ProductDetailPage({
 
         {/* ─── GALERİ ─── */}
         <div>
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
+          <div className="urun-gorsel-gecis relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
             {sensoryAktif && (secili?.url || gorseller[0]?.url) ? (
               <SensorySpotlight
                 packageImage={secili?.url || gorseller[0]?.url}
@@ -425,7 +437,7 @@ export default function ProductDetailPage({
               <>
                 <div className="flex items-baseline gap-3">
                   <span className={`text-4xl font-extrabold tracking-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</span>
-                  {product.campaign && <span className="text-lg text-gray-400 line-through">{fiyat(product.price)}</span>}
+                  {product.campaign && <span className="text-lg text-gray-500 line-through">{fiyat(product.price)}</span>}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">KDV dahil · Kargo karşı ödemeli</p>
               </>
@@ -442,7 +454,7 @@ export default function ProductDetailPage({
           )}
 
           {/* Satın alma */}
-          <div className="mt-6">
+          <div className="mt-6" ref={satinAlmaRef}>
             {hasPrice && inStock ? (
               <div className="flex gap-3">
                 <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden shrink-0">
@@ -658,13 +670,16 @@ export default function ProductDetailPage({
 
       {/* Mobilde sabit satın alma çubuğu (alt gezinmenin üstünde) */}
       {hasPrice && inStock && (
-        <div className="md:hidden fixed bottom-16 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+        <div
+          aria-hidden={!cubukGorunur}
+          className={`md:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-[0_-2px_12px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3 transition-all duration-300 ease-out motion-reduce:transition-none ${cubukGorunur ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}
+        >
           <div className="min-w-0 flex-1">
-            {product.campaign && <p className="text-[11px] text-gray-400 line-through leading-none">{fiyat(product.price)}</p>}
+            {product.campaign && <p className="text-[11px] text-gray-500 line-through leading-none">{fiyat(product.price)}</p>}
             <p className={`text-lg font-bold leading-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</p>
             <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli</p>
           </div>
-          <button onClick={handleAddToCart} className={`shrink-0 px-6 py-3 rounded-xl font-semibold text-white transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}>
+          <button onClick={handleAddToCart} tabIndex={cubukGorunur ? 0 : -1} className={`shrink-0 min-h-[44px] px-6 py-3 rounded-xl font-semibold text-white transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}>
             {added ? 'Sepete eklendi' : 'Sepete Ekle'}
           </button>
         </div>

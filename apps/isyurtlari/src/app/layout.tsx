@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { ViewTransitions } from 'next-view-transitions';
 import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 import HareketSaglayici from '@/components/HareketSaglayici';
 import { SITE_URL } from '@/lib/seo';
@@ -120,6 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const categories = await kategorileriGetir();
 
   return (
+    <ViewTransitions>
     <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
       <head>
         <meta charSet="utf-8" />
@@ -346,5 +348,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </HareketSaglayici>
       </body>
     </html>
+    </ViewTransitions>
   );
 }

@@ -22,6 +22,7 @@ export default function CartTrigger({ className = '' }: CartTriggerProps) {
     <button
       type="button"
       onClick={toggleCart}
+      data-sepet-hedef
       aria-label="Alışveriş sepetini aç"
       className={`relative flex items-center gap-2 text-gray-800 hover:text-[#CC4E00] transition-colors flex-shrink-0 cursor-pointer ${className}`}
     >

@@ -166,7 +166,7 @@ export default function CartPage() {
                       <span className={`font-semibold ${item.campaign ? 'text-red-600' : 'text-gray-700'}`}>{tl(getItemPrice(item))}</span>
                       {item.campaign && (
                         <>
-                          <span className="text-gray-400 line-through text-xs">{tl(item.price)}</span>
+                          <span className="text-gray-500 line-through text-xs">{tl(item.price)}</span>
                           <span className="bg-red-50 text-red-700 text-[11px] font-bold px-1.5 py-0.5 rounded">%{item.campaign.discount}</span>
                         </>
                       )}

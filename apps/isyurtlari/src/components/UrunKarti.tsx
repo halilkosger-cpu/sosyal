@@ -1,7 +1,7 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import Link from 'next/link';
+import { useRef, type ReactNode } from 'react';
+import { Link } from 'next-view-transitions';
 import Image from 'next/image';
 import PreOrderBadge from '@/components/PreOrderBadge';
 import FavoriteButton from '@/components/FavoriteButton';
@@ -129,8 +129,17 @@ export default function UrunKarti({
   /** Yerel boyutlandirilmis surumu varsa srcset, yoksa undefined. */
   const yerelSrcSet = urunSrcSet(urun.slug, urun.imageUrl);
 
+  // Gecis adi yalnizca tiklanan kartin gorseline verilir; ayni adi tasiyan iki oge gecisi bozar.
+  const gorselRef = useRef<HTMLDivElement>(null);
+  const gecisiHazirla = () => {
+    const el = gorselRef.current;
+    if (!el) return;
+    el.style.setProperty('view-transition-name', 'urun-gorsel');
+    setTimeout(() => el.style.removeProperty('view-transition-name'), 1000);
+  };
+
   const gorsel = (
-    <div className={`relative ${gorselYuksekligi} bg-gradient-to-br ${gorselArkaPlani} flex items-center justify-center overflow-hidden`}>
+    <div ref={gorselRef} className={`relative ${gorselYuksekligi} bg-gradient-to-br ${gorselArkaPlani} flex items-center justify-center overflow-hidden`}>
       {yerelSrcSet ? (
         /**
          * Yerel surumu olan urunde duz <img> kullaniliyor, next/image
@@ -194,7 +203,7 @@ export default function UrunKarti({
         }
         if (urun.quantity > 0 && urun.quantity <= 5) {
           return (
-            <span className="absolute top-2 left-2 bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+            <span className="absolute top-2 left-2 bg-amber-700 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
               ⚡ Son {urun.quantity} Adet
             </span>
           );
@@ -287,7 +296,7 @@ export default function UrunKarti({
         </p>
       )}
 
-      {sarmalaLink ? baslik : <Link href={hedef}>{baslik}</Link>}
+      {sarmalaLink ? baslik : <Link href={hedef} onClick={gecisiHazirla}>{baslik}</Link>}
 
       {/* Puan.
           Burada bir zamanlar her urune sabit bes dolu yildiz ve "5.0"
@@ -309,7 +318,7 @@ export default function UrunKarti({
             ))}
           </span>
           <span className="text-[11px] font-semibold text-gray-700 ml-0.5">{urun.puan.toFixed(1)}</span>
-          <span className="text-[11px] text-gray-400">({urun.yorumSayisi})</span>
+          <span className="text-[11px] text-gray-500">({urun.yorumSayisi})</span>
         </div>
       )}
 
@@ -438,7 +447,7 @@ export default function UrunKarti({
 
   if (!sarmalaLink) {
     return (
-      <div className={kartSiniflari}>
+      <div className={kartSiniflari} data-urun-karti>
         {gorsel}
         {icerik}
       </div>
@@ -446,7 +455,7 @@ export default function UrunKarti({
   }
 
   return (
-    <Link href={hedef} className={kartSiniflari}>
+    <Link href={hedef} className={kartSiniflari} onClick={gecisiHazirla} data-urun-karti>
       {gorsel}
       {icerik}
     </Link>

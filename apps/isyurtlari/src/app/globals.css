@@ -206,3 +206,23 @@
     font-size: 16px !important;
   }
 }
+
+/* Urun karti -> detay gecisi (View Transitions; desteklemeyen tarayici normal acar). */
+.urun-gorsel-gecis {
+  view-transition-name: urun-gorsel;
+}
+::view-transition-group(urun-gorsel) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.2s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

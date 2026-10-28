@@ -172,7 +172,7 @@ function KategoriAfisi({
 
         <div className="relative max-w-screen-xl mx-auto px-4 py-7 md:py-10 md:min-h-[340px]">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-gray-500 text-sm mb-5">
+          <div className="flex items-center gap-2 text-gray-600 text-sm mb-5">
             <Link href="/" className="hover:text-[#BA4700] flex items-center gap-1 transition-colors">
               <LuHouse size={14} />
               Ana Sayfa
@@ -195,7 +195,7 @@ function KategoriAfisi({
             </div>
             {/* Burada bir zamanlar "{kategoriToplam} cezaevi hükümlüsü"
                 yaziyordu; oysa sayi URUN sayisi. Yazan da o. */}
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-600 text-sm mt-2">
               {kategoriToplam === null ? '' : `${kategoriToplam} ürün`} · İsyurtları Cezaevi Ürünleri
             </p>
 
@@ -237,14 +237,14 @@ function StatikIzgara({ urunler, categorySlug }: { urunler: Product[]; categoryS
   const meta = categoryMeta[categorySlug];
   return (
     <div className="max-w-screen-xl mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {urunler.map((product) => (
           <UrunKarti
             key={product.id}
             urun={product}
             gorselArkaPlani={meta?.imgBg ?? 'from-orange-100 to-amber-100'}
             gorselYuksekligi="h-48"
-            gorselBoyutlari="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            gorselBoyutlari="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
             aciklamaGoster
             etkiRozeti={meta?.impact || 'Eğitim desteği'}
             favoriButonu={false}
@@ -565,6 +565,7 @@ function KategoriIcerigi({
               <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
                 <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">Sırala:</span>
                 <select
+                  aria-label="Sıralama"
                   value={sort}
                   onChange={(e) => parametreDegistir({ sirala: e.target.value === 'varsayilan' ? null : e.target.value })}
                   className="text-xs sm:text-sm border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-[#FF6000] cursor-pointer max-w-[130px] sm:max-w-none truncate"
@@ -624,6 +625,7 @@ function KategoriIcerigi({
             )}
 
             {/* ─── PRODUCT GRID ─── */}
+            {!loading && sorted.length > 0 && <h2 className="sr-only">Ürünler</h2>}
             {!loading && sorted.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {sorted.map((product) => (
