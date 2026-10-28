@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useReducedMotion, type HTMLMotionProps } from 'framer-motion';
+import { m, useMotionValue, useSpring, useReducedMotion, type HTMLMotionProps } from 'framer-motion';
 
 export interface MagneticButtonProps extends HTMLMotionProps<'button'> {
   children: React.ReactNode;
@@ -97,7 +97,7 @@ export default function MagneticButton({
   };
 
   return (
-    <motion.button
+    <m.button
       ref={buttonRef}
       data-testid={testId}
       data-reduced-motion={shouldReduceMotion ? 'true' : 'false'}
@@ -115,6 +115,6 @@ export default function MagneticButton({
       {...rest}
     >
       <span className="relative z-10 pointer-events-none">{children}</span>
-    </motion.button>
+    </m.button>
   );
 }

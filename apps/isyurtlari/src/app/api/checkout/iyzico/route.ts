@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { iyzicoIstek, IYZICO_YOLLARI } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
@@ -34,9 +34,6 @@ import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
 export const dynamic = 'force-dynamic';
 
-function imzaUret(istek: string, gizliAnahtar: string): string {
-  return crypto.createHmac('sha1', gizliAnahtar).update(istek).digest('base64');
-}
 
 /** Kurus farklarinin birikmemesi icin her tutar iki haneye yuvarlaniyor. */
 const ikiHane = (n: number) => Math.round(n * 100) / 100;
@@ -240,23 +237,7 @@ export async function POST(req: NextRequest) {
       basketItems: sepet,
     };
 
-    const istekMetni = JSON.stringify(istekGovdesi);
-    const imza = imzaUret(istekMetni, gizliAnahtar);
-
-    const ucAdresi =
-      process.env.NODE_ENV === 'production'
-        ? 'https://api.iyzipay.com/v2/checkoutform/initialize'
-        : 'https://sandbox-api.iyzipay.com/v2/checkoutform/initialize';
-
-    const yanit = await fetch(ucAdresi, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${apiAnahtari}:${gizliAnahtar}`).toString('base64')}`,
-        'X-IYZIPAY-REQUEST-SIGNATURE': imza,
-      },
-      body: istekMetni,
-    });
+    const yanit = await iyzicoIstek(IYZICO_YOLLARI.formBaslat, istekGovdesi, apiAnahtari, gizliAnahtar);
 
     const yanitMetni = await yanit.text();
 

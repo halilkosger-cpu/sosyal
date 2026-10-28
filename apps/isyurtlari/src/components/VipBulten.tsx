@@ -97,7 +97,7 @@ export default function VipBulten() {
                 <LuCheck size={18} /> Tebrikler! Kupon Kodunuz Tanımlandı
               </div>
               <p className="text-xs text-gray-300 mb-4">
-                Aşağıdaki kodu ödeme sayfasında kullanarak sepetinize anında %10 indirim uygulayabilirsiniz:
+                Üye girişi yaptıktan sonra aşağıdaki kodu ödeme sayfasında kullanarak ilk siparişinizde %10 indirim alabilirsiniz:
               </p>
               <div className="flex items-center justify-between bg-black/40 border border-orange-500/40 rounded-xl px-4 py-2.5">
                 <span className="font-mono text-lg font-extrabold tracking-widest text-orange-400">

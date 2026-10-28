@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { useCartDrawer } from '../context/CartDrawerContext';
 
 export interface PushBackLayoutProps {
@@ -36,7 +36,7 @@ export default function PushBackLayout({
 
   return (
     <div className="relative w-full min-h-screen bg-neutral-900 overflow-x-hidden">
-      <motion.div
+      <m.div
         data-testid={testId}
         data-is-cart-open={isCartOpen ? 'true' : 'false'}
         data-scale={targetScale.toString()}
@@ -71,7 +71,7 @@ export default function PushBackLayout({
             className="absolute inset-0 z-30 bg-black/20 backdrop-blur-[1px] transition-opacity cursor-pointer"
           />
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

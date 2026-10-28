@@ -8,10 +8,10 @@ const nextConfig = {
     optimizePackageImports: ['@isyurtlari/database', 'react-icons', 'framer-motion'],
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   compress: true,
@@ -58,8 +58,25 @@ const nextConfig = {
             value: 'SAMEORIGIN',
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains',
+          },
+          {
+            // Once yalnizca rapor: ihlaller tarayici konsolunda gorunur, hicbir sey engellenmez.
+            key: 'Content-Security-Policy-Report-Only',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://*.iyzipay.com https://*.iyzico.com",
+              "style-src 'self' 'unsafe-inline' https://*.iyzipay.com",
+              "img-src 'self' data: blob: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://*.iyzipay.com",
+              "frame-src https://*.iyzipay.com https://*.iyzico.com",
+              "frame-ancestors 'self'",
+              "base-uri 'self'",
+              "form-action 'self' https://*.iyzipay.com",
+              "object-src 'none'",
+            ].join('; '),
           },
           {
             key: 'Referrer-Policy',
@@ -228,7 +245,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'isyurtlari.com.tr',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.isyurtlari.com.tr',
       },
     ],
     formats: ['image/avif', 'image/webp'],

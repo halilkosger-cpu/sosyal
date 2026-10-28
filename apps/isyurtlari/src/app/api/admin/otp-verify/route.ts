@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Hız sınırı: dakikada en fazla 6 deneme
-    const sinir = await hizSiniriGuard(req, 'otp-verify', 6, 60);
+    const sinir = await hizSiniriGuard(req, 'otp-verify', 6, 60, true);
     if (sinir) {
       await logAudit('OTP_VERIFY', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
@@ -74,7 +74,6 @@ export async function POST(req: NextRequest) {
 
     const res = NextResponse.json({
       success: true,
-      token,
       redirect: '/admin',
       message: 'Kimlik doğrulama başarılı',
     });
@@ -84,7 +83,8 @@ export async function POST(req: NextRequest) {
       path: '/',
       domain: cookieDomain,
       maxAge: 4 * 60 * 60, // 4 saat
-      sameSite: 'lax',
+      httpOnly: true,
+      sameSite: 'strict',
       secure: isHttps,
     });
 

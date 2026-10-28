@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { vitrinUrunu } from '@/lib/vitrin';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -57,7 +58,7 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
     ].filter((g, i, hepsi) => hepsi.findIndex((x) => x.url === g.url) === i);
 
     return NextResponse.json({
-      ...product,
+      ...vitrinUrunu(product),
       images: undefined,
       campaigns: undefined,
       galeri,

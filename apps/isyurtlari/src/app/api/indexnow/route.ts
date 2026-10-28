@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { isAdminRequest } from '@/lib/admin-auth';
 import { prisma } from '@isyurtlari/database';
 import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
@@ -7,7 +8,16 @@ export const dynamic = 'force-dynamic';
 
 const INDEXNOW_KEY = 'c133a8b46e3940188bb3e97017df8ef5';
 
-export async function POST() {
+function yetkili(req: NextRequest): boolean {
+  const gizli = process.env.CRON_SECRET;
+  const cron = Boolean(gizli) && req.headers.get('authorization') === `Bearer ${gizli}`;
+  return cron || isAdminRequest(req);
+}
+
+export async function POST(req: NextRequest) {
+  if (!yetkili(req)) {
+    return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+  }
   try {
     const [categories, products] = await Promise.all([
       prisma.productCategory.findMany({
@@ -52,12 +62,12 @@ export async function POST() {
   } catch (error: any) {
     console.error('IndexNow submission error:', error);
     return NextResponse.json(
-      { success: false, error: error?.message || 'IndexNow iletim hatası' },
+      { success: false, error: 'IndexNow iletim hatası' },
       { status: 500 }
     );
   }
 }
 
-export async function GET() {
-  return POST();
+export async function GET(req: NextRequest) {
+  return POST(req);
 }

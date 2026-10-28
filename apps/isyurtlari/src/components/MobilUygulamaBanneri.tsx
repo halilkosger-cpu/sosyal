@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { uygulamaBanneriGosterilebilir } from '@/lib/katman-sirasi';
 import Image from 'next/image';
 import { LuX, LuShare, LuSquarePlus, LuDownload } from 'react-icons/lu';
 
@@ -40,7 +41,7 @@ export default function MobilUygulamaBanneri() {
     else setCihaz('other');
 
     // Sadece mobilde goster
-    if (isIOS || isAndroid) {
+    if ((isIOS || isAndroid) && uygulamaBanneriGosterilebilir()) {
       setGorunur(true);
     }
 

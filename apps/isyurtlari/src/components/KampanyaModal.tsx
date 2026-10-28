@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { kampanyaGosterilebilir, sayfaGoruntulendi } from '@/lib/katman-sirasi';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LuX, LuSparkles, LuCheck, LuArrowRight } from 'react-icons/lu';
@@ -10,6 +12,7 @@ const GIZLEME_SURESI_MS = 24 * 60 * 60 * 1000; // 24 saat
 
 export default function KampanyaModal() {
   const [acik, setAcik] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     try {
@@ -24,13 +27,14 @@ export default function KampanyaModal() {
       // localStorage erişim hatası durumunda devam et
     }
 
-    // Kullanıcı sayfaya girdikten 2 saniye sonra zarifçe aç
+    if (!kampanyaGosterilebilir(sayfaGoruntulendi())) return;
+
     const timer = setTimeout(() => {
       setAcik(true);
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [pathname]);
 
   const kapat = () => {
     setAcik(false);

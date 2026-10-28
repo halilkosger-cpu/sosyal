@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
+import HareketSaglayici from '@/components/HareketSaglayici';
 import { SITE_URL } from '@/lib/seo';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,6 +23,7 @@ const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr:
 const SepetToastBildirimi = dynamic(() => import('@/components/SepetToastBildirimi'), { ssr: false });
 const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
 const MobilUygulamaBanneri = dynamic(() => import('@/components/MobilUygulamaBanneri'), { ssr: false });
+const SpotlightArama = dynamic(() => import('@/components/SpotlightArama'), { ssr: false });
 import MobilKategoriSeridi from '@/components/MobilKategoriSeridi';
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';
@@ -128,23 +131,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://bsvzh3olpntnziyt.public.blob.vercel-storage.com" crossOrigin="anonymous" />
-        {/* LCP Görseli Ön Yükleme (Mobile & Desktop) */}
-        <link
-          rel="preload"
-          as="image"
-          type="image/webp"
-          href="/hero/anasayfa-hero-mobil.webp"
-          media="(max-width: 1023px)"
-          fetchPriority="high"
-        />
-        <link
-          rel="preload"
-          as="image"
-          type="image/webp"
-          href="/hero/anasayfa-hero.webp"
-          media="(min-width: 1024px)"
-          fetchPriority="high"
-        />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
             (body'nin sonunda). Sebep: admin panelinde calismamalari gerekiyor,
             bunun icin de yolu okuyabilen bir istemci bileseni sart. */}
@@ -166,6 +152,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="bg-gray-100 text-gray-900">
+        <HareketSaglayici>
         <CartDrawerProvider>
           <PushBackLayout>
             {/* Akıllı Mobil Uygulama ve PWA Kurulum Bannerı */}
@@ -174,12 +161,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {/* ─── TOP BAR ─── */}
             <header className="sticky top-0 z-50 shadow-sm">
           {/* Kampanya Duyuru Bandı */}
+          {KASIM_KAMPANYASI_AKTIF && (
           <div className="bg-gradient-to-r from-[#BA4700] via-[#CC4E00] to-[#BA4700] text-white text-[11px] sm:text-xs py-1.5 px-3 text-center font-medium tracking-wide">
             <span className="inline-flex items-center gap-1.5 justify-center flex-wrap">
               <span>🔥</span>
-              <span><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%10 indirim</strong> anında uygulanır!</span>
+              <span><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong> anında uygulanır!</span>
             </span>
           </div>
+          )}
 
           {/* Main nav row - 2026 Eylul tasarimi: beyaz baslik */}
           <div className="bg-white border-b border-gray-100">
@@ -331,17 +320,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <p className="font-semibold text-gray-700">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
                 <p>© 2026 isyurtlari.com.tr - Tüm hakları saklıdır. 256-Bit SSL ile korunmaktadır.</p>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="bg-white border border-gray-200 rounded-md px-2.5 py-1.5 flex items-center justify-center shadow-xs">
-                  <Image src="/visa.png" alt="Visa" width={38} height={20} className="h-4 w-auto object-contain" />
-                </div>
-                <div className="bg-white border border-gray-200 rounded-md px-2.5 py-1.5 flex items-center justify-center shadow-xs">
-                  <Image src="/mastercard.png" alt="MasterCard" width={32} height={20} className="h-4 w-auto object-contain" />
-                </div>
-                <div className="bg-white border border-gray-200 rounded-md px-3 py-1.5 flex items-center justify-center shadow-xs">
-                  <Image src="/iyzico.png" alt="iyzico ile Güvenli Ödeme" width={56} height={20} className="h-4 w-auto object-contain" />
-                </div>
-              </div>
             </div>
           </div>
         </footer>
@@ -363,7 +341,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* Bildirim ve Modüller */}
           <SepetToastBildirimi />
           <HediyeDanismaniModal />
+          <SpotlightArama />
         </CartDrawerProvider>
+        </HareketSaglayici>
       </body>
     </html>
   );

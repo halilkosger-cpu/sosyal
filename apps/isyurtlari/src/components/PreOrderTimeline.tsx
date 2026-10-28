@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import {
   LuPackageCheck,
   LuBoxes,
@@ -142,7 +142,7 @@ export default function PreOrderTimeline({
         <div className="absolute top-16 left-6 right-6 sm:left-12 sm:right-12 h-1.5 bg-gray-100 rounded-full z-0 -translate-y-1/2" />
 
         {/* Aktif renkli dolgu çubuğu (Framer Motion) */}
-        <motion.div
+        <m.div
           data-testid="preorder-progress-bar"
           data-progress-percent={`${progressPercent}%`}
           data-transition-duration={isReduced ? '0' : '0.65'}

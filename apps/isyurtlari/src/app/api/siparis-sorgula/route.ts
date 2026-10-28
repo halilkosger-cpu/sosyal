@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { siparisEpostasiUyuyor } from '@/lib/siparis-eposta';
 import { NextRequest, NextResponse } from 'next/server';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
         paymentMethod: true,
         createdAt: true,
         notes: true,
+        customer: { select: { email: true } },
         // Kargo takibi: misafir siparisleri de gonderiyi izleyebilmeli.
         kargoFirmasi: true,
         kargoTakipNo: true,
@@ -70,7 +72,7 @@ export async function POST(req: NextRequest) {
      * Farkli yanit verilseydi, saldirgan hangi siparis numaralarinin var
      * oldugunu ogrenebilirdi.
      */
-    const epostaUyuyor = siparis?.notes?.toLowerCase().includes(email) ?? false;
+    const epostaUyuyor = siparis ? siparisEpostasiUyuyor(email, siparis.notes, siparis.customer?.email) : false;
 
     if (!siparis || !epostaUyuyor) {
       return NextResponse.json(
@@ -80,7 +82,7 @@ export async function POST(req: NextRequest) {
     }
 
     // notes musteri adi, e-posta ve telefonu iceriyor; disari verilmiyor.
-    const { notes, ...disariVerilebilir } = siparis;
+    const { notes: _notlar, customer: _musteri, ...disariVerilebilir } = siparis;
 
     return NextResponse.json({
       ...disariVerilebilir,

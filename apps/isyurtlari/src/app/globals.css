@@ -197,3 +197,12 @@
     transition: none;
   }
 }
+
+/* iOS Safari 16px altindaki alanlara odaklaninca sayfayi yakinlastiriyor. */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

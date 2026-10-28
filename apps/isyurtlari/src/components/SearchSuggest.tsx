@@ -233,7 +233,7 @@ export default function SearchSuggest() {
             type="submit"
             className="flex w-full items-center justify-between border-t border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-orange-50 hover:text-[#BA4700]"
           >
-            <span>"{trimmedQuery}" için tüm sonuçları gör</span>
+            <span>&quot;{trimmedQuery}&quot; için tüm sonuçları gör</span>
             <span aria-hidden="true">→</span>
           </button>
         </div>

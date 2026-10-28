@@ -1,11 +1,8 @@
 import React from 'react';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import fs from 'fs';
-import path from 'path';
 import * as framerMotion from 'framer-motion';
-import CustomCursor from './CustomCursor';
 import MagneticButton from './MagneticButton';
 
 // Mock framer-motion useReducedMotion
@@ -17,40 +14,10 @@ vi.mock('framer-motion', async () => {
   };
 });
 
-describe('CustomCursor & MagneticButton TDD Tests', () => {
+describe('MagneticButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(framerMotion.useReducedMotion).mockReturnValue(false);
-  });
-
-  // 1. Test: CustomCursor window mousemove dinleme & React state yerine MotionValue/useSpring kullanımı
-  it('1. CustomCursor bileşeni mousemove dinleyerek useSpring/useMotionValue ile koordinat günceller ve React state kullanmaz', () => {
-    // Statik kod analizi: Performans için re-render yaratan useState kullanılmamalı, MotionValue ve useSpring kullanılmalı
-    const cursorFilePath = path.resolve(__dirname, 'CustomCursor.tsx');
-    const cursorSource = fs.readFileSync(cursorFilePath, 'utf8');
-
-    expect(cursorSource).toMatch(/useMotionValue/);
-    expect(cursorSource).toMatch(/useSpring/);
-    expect(cursorSource).not.toMatch(/useState.*(mouse|coord|position|cursorX|cursorY)/i);
-
-    // DOM render ve mix-blend-difference kontrolü
-    render(<CustomCursor data-testid="custom-cursor" />);
-    const cursor = screen.getByTestId('custom-cursor');
-    expect(cursor).toBeInTheDocument();
-    expect(cursor).toHaveClass('mix-blend-difference');
-    expect(cursor).toHaveClass('pointer-events-none', 'fixed');
-
-    // mousemove tetikleme
-    act(() => {
-      window.dispatchEvent(
-        new MouseEvent('mousemove', {
-          clientX: 250,
-          clientY: 400,
-        })
-      );
-    });
-
-    expect(cursor).toBeInTheDocument();
   });
 
   // 2. Test: MagneticButton hover anında getBoundingClientRect ile merkez noktasını hesaplar ve imlece iletir

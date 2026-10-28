@@ -70,7 +70,7 @@ export async function kuponuDogrula({
           deger: 10,
           asgariTutar: 0,
           aktif: true,
-          hesapZorunlu: false,
+          hesapZorunlu: true,
           musteriBasina: 1,
           aciklama: 'VIP Açılış Bülteni Hoş Geldin İndirimi (%10)',
         },
@@ -92,7 +92,8 @@ export async function kuponuDogrula({
   if (kupon.baslangic && kupon.baslangic > simdi) return gecersiz('Bu kupon henüz başlamadı');
   if (kupon.bitis && kupon.bitis < simdi) return gecersiz('Bu kuponun süresi dolmuş');
 
-  if (kupon.hesapZorunlu && !customerId) {
+  // Hoş geldin kuponu e-posta değiştirilerek tekrar kullanılmasın diye hesaba bağlı.
+  if ((kupon.hesapZorunlu || kupon.kod === 'HOSGELDIN10') && !customerId) {
     return gecersiz('Bu kuponu kullanmak için giriş yapmanız gerekiyor');
   }
 

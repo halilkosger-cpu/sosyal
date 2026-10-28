@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { kacir } from '@/lib/html-kacis';
 import { Resend } from 'resend';
 import { emailTemplates } from '@/lib/email-templates';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
@@ -11,12 +12,6 @@ const resend = new Resend(resendApiKey);
  * mesajin icine istedigi HTML'i - ornegin sahte bir bag - koyabiliyor ve
  * e-postayi okuyan yoneticiyi hedef alabiliyordu. Alanlar artik kacisli.
  */
-const kacir = (s: unknown) =>
-  String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 
 export async function POST(request: NextRequest) {
   // Hiz siniri: ayni adresten saatte 5 mesaj. Bu uc her istekte e-posta

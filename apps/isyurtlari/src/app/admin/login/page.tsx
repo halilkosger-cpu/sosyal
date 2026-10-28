@@ -76,20 +76,11 @@ export default function AdminLoginPage() {
     }
   };
 
-  const kaydetVeYonlendir = (token: string) => {
+  const paneleGec = () => {
     try {
-      const isHttps = window.location.protocol === 'https:';
-      const isCustomDomain = window.location.hostname.includes('isyurtlari.com.tr');
-      const domainPart = isCustomDomain ? '; domain=.isyurtlari.com.tr' : '';
-
-      // Hem host-only hem domain genelinde çerezi mühürle
-      document.cookie = `admin-token=${encodeURIComponent(token)}; path=/${domainPart}; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
-      document.cookie = `admin-token=${encodeURIComponent(token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
-
-      localStorage.setItem('admin_token', token);
-      sessionStorage.setItem('admin_token', token);
+      localStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_token');
     } catch {}
-
     setTimeout(() => {
       window.location.href = '/admin';
     }, 150);
@@ -122,9 +113,7 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         setMessage('Doğrulama başarılı! Yönetici paneline aktarılıyorsunuz...');
-        if (data.token) {
-          kaydetVeYonlendir(data.token);
-        }
+        paneleGec();
       } else {
         setError(data.error || 'Geçersiz veya süresi dolmuş kod.');
       }
@@ -162,9 +151,7 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         setMessage('Doğrulama başarılı! Yönetici paneline aktarılıyorsunuz...');
-        if (data.token) {
-          kaydetVeYonlendir(data.token);
-        }
+        paneleGec();
       } else {
         setError(data.error || 'Geçersiz veya süresi dolmuş kod.');
       }

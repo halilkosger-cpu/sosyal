@@ -7,7 +7,7 @@ import {
   LuLogOut, LuMenu, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
   LuRotateCcw, LuTicket, LuFileText, LuShieldCheck,
 } from 'react-icons/lu';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,29 +35,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Oturum Güvenlik Bekçisi: Sayfa geçişlerinde çerezi taze tutar
-  useEffect(() => {
-    if (pathname === '/admin/login' || pathname === '/admin/logout') return;
-    try {
-      const token = localStorage.getItem('admin_token');
-      if (token && !document.cookie.includes('admin-token=')) {
-        const isHttps = window.location.protocol === 'https:';
-        const isCustomDomain = window.location.hostname.includes('isyurtlari.com.tr');
-        const domainPart = isCustomDomain ? '; domain=.isyurtlari.com.tr' : '';
-        document.cookie = `admin-token=${encodeURIComponent(token)}; path=/${domainPart}; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
-        document.cookie = `admin-token=${encodeURIComponent(token)}; path=/; max-age=14400; SameSite=Lax;${isHttps ? ' Secure;' : ''}`;
-      }
-    } catch {}
-  }, [pathname]);
-
   if (pathname === '/admin/login' || pathname === '/admin/logout') return <>{children}</>;
 
   const handleLogout = () => {
     try {
       localStorage.removeItem('admin_token');
       sessionStorage.clear();
-      document.cookie = 'admin-token=; path=/; domain=.isyurtlari.com.tr; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
-      document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
     } catch {}
     window.location.href = '/admin/logout';
   };

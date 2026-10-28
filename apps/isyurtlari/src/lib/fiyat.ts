@@ -38,14 +38,15 @@ export const KARGO_KARSI_ODEMELI = true;
 /** Karsi odemeli degilken uygulanacak sabit kargo bedeli (TL). */
 export const KARGO_UCRETI = 0;
 
-/** Bu tutar ve uzeri siparislerde kargo ucretsiz (0 = esik yok). */
-export const UCRETSIZ_KARGO_ESIGI = 0;
+/** Bu tutar ve uzeri siparislerde kargo ucretsiz (1500 TL). */
+export const UCRETSIZ_KARGO_ESIGI = 1500;
 
 /**
  * Büyük Açılış & Efsane Kasım Kampanyası:
  * Tüm ürünlerde sepette net %10 otomatik indirim.
  */
-export const KASIM_KAMPANYASI_AKTIF = true;
+export const KASIM_KAMPANYASI_BITIS = new Date('2026-12-01T00:00:00+03:00');
+export const KASIM_KAMPANYASI_AKTIF = Date.now() < KASIM_KAMPANYASI_BITIS.getTime();
 export const KASIM_INDIRIM_ORANI = 10; // %10
 
 const yuvarla = (n: number) => Math.round(n * 100) / 100;

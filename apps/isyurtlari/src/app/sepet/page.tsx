@@ -8,6 +8,7 @@ import { LuArrowLeft, LuArrowRight, LuMinus, LuPlus, LuRotateCcw, LuShieldCheck,
 const tl = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 import { sepettenCikarildi } from '@/lib/analiz';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
+import KargoIlerlemeCubugu from '@/components/KargoIlerlemeCubugu';
 
 interface Campaign {
   id: string;
@@ -135,34 +136,8 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
             <div className="lg:col-span-2 space-y-4">
-              {/* Sepet Hedef İlerleme Çubuğu (AOV Artırıcı) */}
-              {(() => {
-                const HEDEF_TUTAR = 750;
-                const kalan = Math.max(0, HEDEF_TUTAR - subtotal);
-                const yuzde = Math.min(100, Math.round((subtotal / HEDEF_TUTAR) * 100));
-                return (
-                  <div className="rounded-2xl border border-orange-200/90 bg-gradient-to-r from-orange-50/80 via-[#FFF9F3] to-amber-50/80 p-4 shadow-sm">
-                    <div className="flex items-center justify-between text-xs font-bold mb-2">
-                      {kalan > 0 ? (
-                        <span className="text-[#BA4700] flex items-center gap-1.5">
-                          🎁 <strong>{tl(kalan)}</strong> daha ekleyin, paketinize özel sürpriz el emeği hediyesi kazanın!
-                        </span>
-                      ) : (
-                        <span className="text-emerald-700 flex items-center gap-1.5 font-bold">
-                          🎉 Tebrikler! ₺{HEDEF_TUTAR} hedefine ulaştınız; siparişinize özel sürpriz hediye paketinize tanımlandı!
-                        </span>
-                      )}
-                      <span className="text-gray-500 font-mono text-[11px]">%{yuzde}</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-gray-200/80 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-500 rounded-full ${kalan === 0 ? 'bg-emerald-500' : 'bg-gradient-to-r from-[#E8620C] to-[#CC4E00]'}`}
-                        style={{ width: `${yuzde}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })()}
+              {/* 1.500 TL Ücretsiz Kargo İlerleme Çubuğu */}
+              <KargoIlerlemeCubugu toplamTutar={subtotal} />
 
               {/* Ürünler */}
               <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 bg-white">

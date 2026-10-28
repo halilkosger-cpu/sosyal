@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useReducedMotion, useTransform } from 'framer-motion';
+import { m, useMotionValue, useSpring, useReducedMotion, useTransform } from 'framer-motion';
 
 export interface SensorySpotlightProps {
   /** Dış ambalaj ürün görseli yolu */
@@ -194,7 +194,7 @@ export default function SensorySpotlight({
       </div>
 
       {/* 2. Katman: Dinamik Radial-Gradient Maske ile Ortaya Çıkan Hasat & İç Doku Görseli */}
-      <motion.div
+      <m.div
         data-testid="sensory-mask-layer"
         data-spotlight-active={isHovered ? 'true' : 'false'}
         data-mask-x={lastCoords.x.toString()}
@@ -210,7 +210,7 @@ export default function SensorySpotlight({
           alt={storyAlt}
           className="w-full h-full object-cover pointer-events-none"
         />
-      </motion.div>
+      </m.div>
 
       {/* Awwwards Stilinde İpuçları ve Rozetler */}
       <div className="absolute top-4 left-4 z-20 pointer-events-none flex items-center gap-2">

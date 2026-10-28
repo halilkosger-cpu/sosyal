@@ -27,7 +27,10 @@ import { createHmac, timingSafeEqual } from 'crypto';
 const AMAC = 'ileti-ret';
 
 function gizli(): string {
-  return process.env.JWT_SECRET || 'dev-secret-key-change-in-production';
+  const anahtar = process.env.JWT_SECRET;
+  if (anahtar) return anahtar;
+  if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET tanımlı değil');
+  return 'dev-secret-key-change-in-production';
 }
 
 function imzala(customerId: string): string {

@@ -10,6 +10,7 @@ import { NextResponse } from 'next/server';
  */
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.delete('admin-token');
+  res.cookies.set('admin-token', '', { path: '/', maxAge: 0, httpOnly: true });
+  res.cookies.set('admin-token', '', { path: '/', maxAge: 0, httpOnly: true, domain: '.isyurtlari.com.tr' });
   return res;
 }

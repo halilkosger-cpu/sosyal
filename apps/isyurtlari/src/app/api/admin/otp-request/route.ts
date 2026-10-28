@@ -20,17 +20,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'E-posta adresi gereklidir' }, { status: 400 });
     }
 
-    // Yetkili yönetici e-posta kontrolü
-    if (!isAdminEmail(email)) {
-      await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta ile kod talebi', ip);
-      return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
-    }
-
     // Hız sınırı: dakikada en fazla 4 kod isteği
-    const sinir = await hizSiniriGuard(req, 'otp-request', 4, 60);
+    const sinir = await hizSiniriGuard(req, 'otp-request', 4, 60, true);
     if (sinir) {
       await logAudit('OTP_REQUEST', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
+    }
+
+    // Yetkisiz e-postaya da aynı yanıt: admin adresleri dışarıdan sınanamasın.
+    if (!isAdminEmail(email)) {
+      await logAudit('OTP_REQUEST', email, 'failed', 'Yetkisiz e-posta ile kod talebi', ip);
+      return NextResponse.json({ success: true, message: '6 haneli giriş kodu e-posta adresinize gönderildi.' });
     }
 
     // Kriptografik güvenli kod üret ve SHA-256 ile veritabanına kaydet

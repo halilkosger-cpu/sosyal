@@ -158,6 +158,9 @@ export default function ProductDetailPage({
    */
   const handleAddToCart = () => {
     if (!product) return;
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate(25); } catch {}
+    }
     const eklendi = sepeteEkle(
       {
         id: product.id,
@@ -255,7 +258,7 @@ export default function ProductDetailPage({
    * panelinden sonradan eklenen ek galeri gorsellerinin yerel karsiligi
    * yok, onlar eskisi gibi next/image ile ciziliyor.
    */
-  const anaSrcSet = seciliGorsel === 0 ? urunSrcSet(product.slug) : undefined;
+  const anaSrcSet = seciliGorsel === 0 ? urunSrcSet(product.slug, product.imageUrl) : undefined;
 
   const KATEGORI_HIKAYE_GORSELLERI: Record<string, string> = {
     gida: '/kategori/gida.webp',

@@ -80,6 +80,9 @@ export default function CheckoutPage() {
     email: '',
     phone: '',
     address: '',
+    ilce: '',
+    il: '',
+    postaKodu: '',
   });
 
   useEffect(() => {
@@ -255,8 +258,8 @@ export default function CheckoutPage() {
       setError('Lütfen tüm alanları doldurunuz');
       return;
     }
-    if (!kayitliAdresSecili && !formData.address.trim()) {
-      setError('Teslimat adresi girin ya da kayıtlı adreslerinizden birini seçin');
+    if (!kayitliAdresSecili && (!formData.address.trim() || !formData.ilce.trim() || !formData.il.trim())) {
+      setError('Adres, ilçe ve il alanlarını doldurun ya da kayıtlı adreslerinizden birini seçin');
       return;
     }
 
@@ -278,7 +281,15 @@ export default function CheckoutPage() {
            */
           ...(kayitliAdresSecili
             ? { addressId: seciliAdres }
-            : { shippingAddress: formData.address }),
+            : {
+                shippingAddress: [
+                  formData.address.trim(),
+                  `${formData.ilce.trim()} / ${formData.il.trim()}`,
+                  formData.postaKodu.trim(),
+                ]
+                  .filter(Boolean)
+                  .join(', '),
+              }),
           items: cart.map((item) => ({
             id: item.id,
             quantity: item.quantity,
@@ -438,7 +449,21 @@ export default function CheckoutPage() {
               {seciliAdres === 'yeni' && (
                 <div className="mt-5">
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1.5">Adres</label>
-                  <textarea id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleInputChange} rows={3} className="store-input" placeholder="Mahalle, sokak, bina no, daire no, ilçe / il" required />
+                  <textarea id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleInputChange} rows={2} className="store-input" placeholder="Mahalle, sokak, bina no, daire no" required />
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <label htmlFor="ilce" className="block text-sm font-medium text-gray-700 mb-1.5">İlçe</label>
+                      <input id="ilce" type="text" name="ilce" autoComplete="address-level2" value={formData.ilce} onChange={handleInputChange} className="store-input" required />
+                    </div>
+                    <div>
+                      <label htmlFor="il" className="block text-sm font-medium text-gray-700 mb-1.5">İl</label>
+                      <input id="il" type="text" name="il" autoComplete="address-level1" value={formData.il} onChange={handleInputChange} className="store-input" required />
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <label htmlFor="postaKodu" className="block text-sm font-medium text-gray-700 mb-1.5">Posta kodu <span className="text-gray-400 font-normal">(isteğe bağlı)</span></label>
+                    <input id="postaKodu" type="text" name="postaKodu" inputMode="numeric" autoComplete="postal-code" maxLength={5} value={formData.postaKodu} onChange={handleInputChange} className="store-input" />
+                  </div>
                   {musteri && adresler.length === 0 && (
                     <p className="text-xs text-gray-500 mt-2">
                       Bu adresi <Link href="/adreslerim" className="text-[#BA4700] hover:text-[#8F3700] font-medium underline">adres defterinize</Link> kaydederseniz sonraki siparişlerinizde baştan yazmanız gerekmez.

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { vitrinUrunu } from '@/lib/vitrin';
+import { kacir } from '@/lib/html-kacis';
 import { bankaBilgileri, bankaBilgisiTam } from '@/lib/bank';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
@@ -32,7 +34,7 @@ async function sendOrderEmail(
       .map(
         (item: any) =>
           `<tr>
-        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.product?.name || 'Ürün'}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${kacir(item.product?.name || 'Ürün')}</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">×${item.quantity}</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₺${(item.price * item.quantity).toFixed(2)}</td>
       </tr>`
@@ -44,11 +46,11 @@ async function sendOrderEmail(
       <hr style="border: none; border-top: 2px solid #FF6000; margin: 20px 0;">
 
       <h3>Müşteri Bilgileri:</h3>
-      <p><strong>Adı Soyadı:</strong> ${customerName}</p>
-      <p><strong>Email:</strong> ${customerEmail}</p>
-      <p><strong>Telefon:</strong> ${customerPhone}</p>
-      <p><strong>Teslimat Adresi:</strong> ${shippingAddress}</p>
-      <p><strong>Sipariş Numarası:</strong> ${orderNumber}</p>
+      <p><strong>Adı Soyadı:</strong> ${kacir(customerName)}</p>
+      <p><strong>Email:</strong> ${kacir(customerEmail)}</p>
+      <p><strong>Telefon:</strong> ${kacir(customerPhone)}</p>
+      <p><strong>Teslimat Adresi:</strong> ${kacir(shippingAddress)}</p>
+      <p><strong>Sipariş Numarası:</strong> ${kacir(orderNumber)}</p>
 
       <h3>Sipariş Detayları:</h3>
       <table style="width: 100%; border-collapse: collapse;">
@@ -705,6 +707,11 @@ export async function GET(req: NextRequest) {
      * Teslimat adresi kaliyor: onay sayfasi onu gosteriyor ve siparis
      * kimligi burada bir yetki anahtari islevi goruyor.
      */
+    const vitrinKalemleri = (order.items || []).map((kalem) => ({
+      ...vitrinUrunu(kalem),
+      product: kalem.product ? vitrinUrunu(kalem.product) : kalem.product,
+    }));
+
     return NextResponse.json({
       id: order.id,
       orderNumber: order.orderNumber,
@@ -719,8 +726,8 @@ export async function GET(req: NextRequest) {
       paymentMethod: order.paymentMethod,
       shippingAddress: order.shippingAddress,
       createdAt: order.createdAt,
-      items: order.items || [],
-      orderItems: order.items || [],
+      items: vitrinKalemleri,
+      orderItems: vitrinKalemleri,
       bankDetails: order.paymentMethod === 'TRANSFER'
         ? {
             ...bankaBilgileri(),

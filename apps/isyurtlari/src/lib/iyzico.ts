@@ -27,3 +27,29 @@ export function generateIyzicoV2Auth(
     jsonBody,
   };
 }
+
+export const IYZICO_YOLLARI = {
+  formBaslat: '/payment/iyzipos/checkoutform/initialize/auth/ecom',
+  formSonucu: '/payment/iyzipos/checkoutform/auth/ecom/detail',
+} as const;
+
+export async function iyzicoIstek(yol: string, govde: object, apiKey: string, secretKey: string): Promise<Response> {
+  const { authorization, randomKey, jsonBody } = generateIyzicoV2Auth(yol, govde, apiKey, secretKey);
+  return fetch(`${IYZICO_BASE_URL}${yol}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: authorization,
+      'x-iyzi-rnd': randomKey,
+    },
+    body: jsonBody,
+  });
+}
+
+/** Odeme gercekten tamamlandi mi ve tahsil edilen tutar siparisle ayni mi? */
+export function odemeGecerli(sonuc: any, siparisTutari: number): boolean {
+  if (sonuc?.status !== 'success' || sonuc?.paymentStatus !== 'SUCCESS') return false;
+  if (sonuc?.fraudStatus !== undefined && sonuc.fraudStatus !== 1) return false;
+  const tutar = Number(sonuc?.price);
+  return Number.isFinite(tutar) && Math.abs(tutar - siparisTutari) < 0.01;
+}

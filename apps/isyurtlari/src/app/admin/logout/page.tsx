@@ -12,9 +12,6 @@ export default function AdminLogoutPage() {
         await fetch('/api/admin/login', { method: 'DELETE' });
       } catch {}
 
-      // Çerezi sıfırla
-      document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; max-age=0; SameSite=Lax;';
-
       // 1.5 saniye sonra otomatik login sayfasına aktar
       const timer = setTimeout(() => {
         window.location.href = '/admin/login';

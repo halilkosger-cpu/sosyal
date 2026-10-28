@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { LuCheck, LuArrowRight, LuX, LuShoppingBag } from 'react-icons/lu';
 import { SEPETE_EKLENDI_OLAYI } from '@/lib/cart';
@@ -45,12 +45,12 @@ export default function SepetToastBildirimi() {
   return (
     <AnimatePresence>
       {bildirim && (
-        <motion.aside
+        <m.aside
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 25, scale: 0.95 }}
           transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="fixed bottom-20 md:bottom-8 left-4 right-4 md:left-auto md:right-8 z-50 max-w-sm md:max-w-md w-auto mx-auto md:mx-0 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-gray-200/90 text-gray-900 pointer-events-auto"
+          className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-8 left-4 right-4 md:left-auto md:right-8 z-50 max-w-sm md:max-w-md w-auto mx-auto md:mx-0 bg-white/95 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-gray-200/90 text-gray-900 pointer-events-auto"
           role="status"
           aria-live="polite"
         >
@@ -107,7 +107,7 @@ export default function SepetToastBildirimi() {
               <LuX size={14} />
             </button>
           </div>
-        </motion.aside>
+        </m.aside>
       )}
     </AnimatePresence>
   );

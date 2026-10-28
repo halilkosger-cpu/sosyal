@@ -117,9 +117,18 @@ export function urunGorseli(slug: string, imageUrl?: string | null): string | un
  * srcset dizgesi. Yerel surumu olmayan urun icin undefined doner; o zaman
  * <img> yalnizca src ile calisir, davranis degismez.
  */
-export function urunSrcSet(slug: string): string | undefined {
-  if (!YEREL.has(slug)) return undefined;
-  return GORSEL_BOYUTLARI.map((g) => `/urun/${slug}-${g}.webp ${g}w`).join(', ');
+export function urunSrcSet(slug: string, imageUrl?: string | null): string | undefined {
+  if (YEREL.has(slug)) return GORSEL_BOYUTLARI.map((g) => `/urun/${slug}-${g}.webp ${g}w`).join(', ');
+  return yuklenenSrcSet(imageUrl);
+}
+
+/** Admin yuklemesinde uretilen <ad>-400/800/1024.webp ailesi. */
+const YUKLENEN_DESEN = /-1024\.webp$/;
+
+export function yuklenenSrcSet(imageUrl?: string | null): string | undefined {
+  if (!imageUrl || !YUKLENEN_DESEN.test(imageUrl)) return undefined;
+  const taban = imageUrl.replace(YUKLENEN_DESEN, '');
+  return GORSEL_BOYUTLARI.map((g) => `${taban}-${g}.webp ${g}w`).join(', ');
 }
 
 /** Yerel surumu var mi? */

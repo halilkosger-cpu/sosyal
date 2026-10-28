@@ -127,7 +127,7 @@ export default function UrunKarti({
   const hedef = `/urun/${urun.slug}${tukendi ? '?on-talep=1' : ''}`;
 
   /** Yerel boyutlandirilmis surumu varsa srcset, yoksa undefined. */
-  const yerelSrcSet = urunSrcSet(urun.slug);
+  const yerelSrcSet = urunSrcSet(urun.slug, urun.imageUrl);
 
   const gorsel = (
     <div className={`relative ${gorselYuksekligi} bg-gradient-to-br ${gorselArkaPlani} flex items-center justify-center overflow-hidden`}>

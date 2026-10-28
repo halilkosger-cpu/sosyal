@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion, Variants } from 'framer-motion';
+import { m, useReducedMotion, Variants } from 'framer-motion';
 
 export type EffectType = 'pulse' | 'shake';
 
@@ -91,7 +91,7 @@ export default function ActiveStageIcon({
   const selectedVariants = effectType === 'shake' ? shakeVariants : pulseVariants;
 
   return (
-    <motion.div
+    <m.div
       data-testid={testId}
       data-is-active={isActive ? 'true' : 'false'}
       data-effect-type={effectType}
@@ -103,7 +103,7 @@ export default function ActiveStageIcon({
     >
       {/* 4. Durum: Yalnızca pulse ve isActive=true iken parlama/glow efekti */}
       {isActive && effectType === 'pulse' && (
-        <motion.div
+        <m.div
           data-testid="active-stage-glow"
           initial={{ scale: 0.9, opacity: 0.6 }}
           animate={
@@ -121,6 +121,6 @@ export default function ActiveStageIcon({
       )}
 
       {children}
-    </motion.div>
+    </m.div>
   );
 }

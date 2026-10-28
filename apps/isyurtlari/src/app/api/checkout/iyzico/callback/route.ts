@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { iyzicoIstek, IYZICO_YOLLARI, odemeGecerli } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
 import { siparisMuhasebeyeIsle, odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
 
 export const dynamic = 'force-dynamic';
 
-function imzaUret(istek: string, gizliAnahtar: string): string {
-  return crypto.createHmac('sha1', gizliAnahtar).update(istek).digest('base64');
-}
 
 export async function POST(req: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isyurtlari.com.tr';
@@ -38,34 +35,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.redirect(`${siteUrl}/checkout?hata=odeme_yapilandirilmamis`, 303);
     }
 
-    // 2. iyzico'dan ödeme sonucunu doğrula (retrieve)
-    const istekGovdesi = JSON.stringify({
-      locale: 'tr',
-      token,
-    });
-    const imza = imzaUret(istekGovdesi, gizliAnahtar);
-
-    const ucAdresi =
-      process.env.NODE_ENV === 'production'
-        ? 'https://api.iyzipay.com/v2/checkoutform/auth/retrieve'
-        : 'https://sandbox-api.iyzipay.com/v2/checkoutform/auth/retrieve';
-
-    const yanit = await fetch(ucAdresi, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(`${apiAnahtari}:${gizliAnahtar}`).toString('base64')}`,
-        'X-IYZIPAY-REQUEST-SIGNATURE': imza,
-      },
-      body: istekGovdesi,
-    });
-
+    // 2. iyzico'dan ödeme sonucunu doğrula
+    const yanit = await iyzicoIstek(IYZICO_YOLLARI.formSonucu, { locale: 'tr', token }, apiAnahtari, gizliAnahtar);
     const sonuc = await yanit.json().catch(() => ({}));
 
-    // 3. Ödeme Başarılı mı?
-    const basarili =
-      sonuc?.status === 'success' &&
-      (sonuc?.paymentStatus === 'SUCCESS' || sonuc?.fraudStatus === 1);
+    // 3. Ödeme Başarılı mı? (tutar, sipariş bulunduktan sonra ayrıca doğrulanıyor)
+    const basarili = sonuc?.status === 'success' && sonuc?.paymentStatus === 'SUCCESS';
 
     const orderNumber = sonuc?.basketId || '';
 
@@ -97,14 +72,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.redirect(`${siteUrl}/checkout?hata=siparis_bulunamadi`, 303);
     }
 
-    // Ödeme durumunu güncelle
-    await prisma.$transaction(async (tx) => {
-      await tx.order.update({
-        where: { id: siparis.id },
-        data: {
-          status: 'CONFIRMED',
-        },
+    if (!odemeGecerli(sonuc, siparis.totalAmount)) {
+      console.error('iyzico callback: tutar/fraud doğrulaması başarısız', {
+        orderNumber,
+        beklenen: siparis.totalAmount,
+        gelen: sonuc?.price,
+        fraudStatus: sonuc?.fraudStatus,
       });
+      return NextResponse.redirect(`${siteUrl}/checkout?hata=odeme_dogrulanamadi`, 303);
+    }
+
+    // Aynı token tekrar gelirse tahsilat/muhasebe ikinci kez yazılmasın.
+    const ilkKezOnaylandi = await prisma.$transaction(async (tx) => {
+      const guncellenen = await tx.order.updateMany({
+        where: { id: siparis.id, status: 'PENDING' },
+        data: { status: 'CONFIRMED' },
+      });
+      if (guncellenen.count === 0) return false;
 
       await tx.payment.updateMany({
         where: {
@@ -114,7 +98,12 @@ export async function POST(req: NextRequest) {
           status: 'COMPLETED',
         },
       });
+      return true;
     });
+
+    if (!ilkKezOnaylandi) {
+      return NextResponse.redirect(`${siteUrl}/order-confirmation/${siparis.id}?odeme=basarili`, 303);
+    }
 
     // 5. Logo GO3 Entegrasyonu:
     // a) Fatura ve Borç kaydı (henüz yapılmamışsa)
@@ -147,7 +136,7 @@ export async function POST(req: NextRequest) {
 
     // 6. Başarılı Onay Sayfasına Yönlendir
     return NextResponse.redirect(
-      `${siteUrl}/order-confirmation/${siparis.orderNumber}?odeme=basarili`,
+      `${siteUrl}/order-confirmation/${siparis.id}?odeme=basarili`,
       303
     );
   } catch (error) {

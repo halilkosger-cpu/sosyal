@@ -7,6 +7,7 @@ import { LuHouse, LuSearch, LuHeart, LuShoppingCart, LuUser } from 'react-icons/
 import { useMusteri } from '@/lib/musteri-istemci';
 import { SEPET_OLAYI, sepetiOku } from '@/lib/cart';
 import { FAVORI_OLAYI, favorileriGetir } from '@/lib/favoriler';
+import { SPOTLIGHT_ARAMA_OLAYI } from '@/components/SpotlightArama';
 
 /**
  * Mobil alt gezinme çubuğu.
@@ -80,15 +81,24 @@ export default function AltGezinme() {
 
           {/* Ara */}
           <li>
-            <Link
-              href="/ara"
-              className={`flex flex-col items-center justify-center gap-0.5 py-2 transition-colors ${
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  if ('vibrate' in navigator) {
+                    try { navigator.vibrate(20); } catch {}
+                  }
+                  window.dispatchEvent(new Event(SPOTLIGHT_ARAMA_OLAYI));
+                }
+              }}
+              aria-label="Ürün Ara"
+              className={`w-full flex flex-col items-center justify-center gap-0.5 py-2 transition-colors active:scale-95 ${
                 yol?.startsWith('/ara') ? 'text-[#BA4700]' : 'text-gray-500'
               }`}
             >
               <LuSearch size={20} strokeWidth={yol?.startsWith('/ara') ? 2.4 : 2} />
               <span className="text-[10px] font-medium">Ara</span>
-            </Link>
+            </button>
           </li>
 
           {/* Favoriler */}

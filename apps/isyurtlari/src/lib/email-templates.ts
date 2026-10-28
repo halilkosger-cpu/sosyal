@@ -1,3 +1,5 @@
+import { kacir } from '@/lib/html-kacis';
+
 // Responsive HTML email templates
 
 export const emailTemplates = {
@@ -51,16 +53,16 @@ export const emailTemplates = {
       <div class="container">
         <div class="header">
           <h1>✅ Siparişiniz Onaylandı</h1>
-          <p>Teşekkürler, ${data.customerName}!</p>
+          <p>Teşekkürler, ${kacir(data.customerName)}!</p>
         </div>
 
         <div class="content">
           <div class="section">
-            <p>Merhaba <strong>${data.customerName}</strong>,</p>
+            <p>Merhaba <strong>${kacir(data.customerName)}</strong>,</p>
             <p style="margin-top: 10px;">Siparişiniz başarıyla oluşturulmuştur. İşlem detaylarını aşağıda bulabilirsiniz.</p>
             <div style="background: white; padding: 15px; border-radius: 6px; margin: 20px 0; text-align: center; border: 2px solid #FF6000;">
               <p style="font-size: 12px; color: #999; margin-bottom: 5px;">Sipariş Numarası</p>
-              <p class="order-number">#${data.orderNumber}</p>
+              <p class="order-number">#${kacir(data.orderNumber)}</p>
             </div>
           </div>
 
@@ -79,7 +81,7 @@ export const emailTemplates = {
                   .map(
                     (item) => `
                   <tr>
-                    <td>${item.name}</td>
+                    <td>${kacir(item.name)}</td>
                     <td>${item.quantity}x</td>
                     <td style="text-align: right;">₺${(item.price * item.quantity).toFixed(2)}</td>
                   </tr>
@@ -101,12 +103,12 @@ export const emailTemplates = {
           <div class="section">
             <h2 style="font-size: 18px; margin-bottom: 15px; color: #333;">💳 Ödeme Bilgileri</h2>
             <div class="bank-info">
-              <p><span class="label">Banka:</span> <span class="value">${data.bankName}</span></p>
-              <p><span class="label">Hesap Sahibi:</span> <span class="value">${data.accountName}</span></p>
+              <p><span class="label">Banka:</span> <span class="value">${kacir(data.bankName)}</span></p>
+              <p><span class="label">Hesap Sahibi:</span> <span class="value">${kacir(data.accountName)}</span></p>
               <p><span class="label">IBAN:</span></p>
-              <div class="iban-code">${data.iban}</div>
+              <div class="iban-code">${kacir(data.iban)}</div>
               <p style="margin-top: 15px; font-size: 12px; color: #666;">
-                <strong>⚠️ Önemli:</strong> Lütfen havale yaparken açıklama kısmına sipariş numarasını yazınız: <strong>#${data.orderNumber}</strong>
+                <strong>⚠️ Önemli:</strong> Lütfen havale yaparken açıklama kısmına sipariş numarasını yazınız: <strong>#${kacir(data.orderNumber)}</strong>
               </p>
             </div>
           </div>
@@ -154,9 +156,9 @@ export const emailTemplates = {
 
         <div class="content">
           <div class="section">
-            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p>Merhaba <strong>${kacir(data.name)}</strong>,</p>
             <p style="margin-top: 15px;">İletişim formunuz başarıyla alınmıştır. En kısa sürede sizinle iletişime geçeceğiz.</p>
-            <p style="margin-top: 15px;">Gönderdiğiniz email adresine yanıt göndereceğiz: <strong>${data.email}</strong></p>
+            <p style="margin-top: 15px;">Gönderdiğiniz email adresine yanıt göndereceğiz: <strong>${kacir(data.email)}</strong></p>
           </div>
 
           <div class="section">
@@ -191,7 +193,7 @@ export const emailTemplates = {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${data.subject}</title>
+      <title>${kacir(data.subject)}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
@@ -205,15 +207,15 @@ export const emailTemplates = {
     <body>
       <div class="container">
         <div class="header">
-          <h2>🔔 ${data.subject}</h2>
+          <h2>🔔 ${kacir(data.subject)}</h2>
         </div>
 
         <div class="content">
           <div class="section">
-            ${data.message}
+            ${kacir(data.message)}
           </div>
           <div class="timestamp">
-            <strong>Tarih:</strong> ${data.timestamp}
+            <strong>Tarih:</strong> ${kacir(data.timestamp)}
           </div>
         </div>
       </div>
@@ -251,10 +253,10 @@ export const emailTemplates = {
 
         <div class="content">
           <div class="section">
-            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p>Merhaba <strong>${kacir(data.name)}</strong>,</p>
             <p style="margin-top: 15px;">
-              <strong>${data.productName}</strong> ürünü için
-              <strong>${data.quantity} adet</strong> ön talebiniz kaydedildi.
+              <strong>${kacir(data.productName)}</strong> ürünü için
+              <strong>${kacir(data.quantity)} adet</strong> ön talebiniz kaydedildi.
             </p>
             <p style="margin-top: 15px;">
               Ürün stoğa girdiği anda size bu e-posta adresinden haber vereceğiz.
@@ -264,8 +266,8 @@ export const emailTemplates = {
 
           <div class="section">
             <p style="margin-bottom: 15px;"><strong>Ürünü görüntüle:</strong></p>
-            <a href="${data.productUrl}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold;">
-              ${data.productName}
+            <a href="${kacir(data.productUrl)}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold;">
+              ${kacir(data.productName)}
             </a>
           </div>
 
@@ -316,10 +318,10 @@ export const emailTemplates = {
 
         <div class="content">
           <div class="section">
-            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p>Merhaba <strong>${kacir(data.name)}</strong>,</p>
             <p style="margin-top: 15px;">
-              <strong>${data.productName}</strong> ürünü için verdiğiniz
-              <strong>${data.quantity} adetlik</strong> ön talebi hatırlıyor musunuz?
+              <strong>${kacir(data.productName)}</strong> ürünü için verdiğiniz
+              <strong>${kacir(data.quantity)} adetlik</strong> ön talebi hatırlıyor musunuz?
               Ürün yeniden stoğumuza girdi.
             </p>
             <p style="margin-top: 15px;">
@@ -329,14 +331,14 @@ export const emailTemplates = {
           </div>
 
           <div class="section" style="text-align: center;">
-            <a href="${data.productUrl}" style="display: inline-block; background: #16a34a; color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px;">
+            <a href="${kacir(data.productUrl)}" style="display: inline-block; background: #16a34a; color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: bold; font-size: 16px;">
               Siparişimi Tamamla →
             </a>
           </div>
 
           <div class="section">
             <p style="font-size: 14px; color: #666;">
-              Bu bildirimi <strong>${data.productName}</strong> için ön talep verdiğiniz için aldınız.<br>
+              Bu bildirimi <strong>${kacir(data.productName)}</strong> için ön talep verdiğiniz için aldınız.<br>
               📧 info@isyurtlari.com.tr<br>
               🕒 Pazartesi - Cuma 09:00 - 18:00
             </p>
@@ -382,13 +384,13 @@ export const emailTemplates = {
 
         <div class="content">
           <div class="section">
-            <p>Merhaba <strong>${data.name}</strong>,</p>
+            <p>Merhaba <strong>${kacir(data.name)}</strong>,</p>
             <p style="margin-top: 15px;">
-              Ön talep oluşturduğunuz <strong>${data.productName}</strong> için atölye üretim sürecinde yeni bir aşamaya geçildi:
+              Ön talep oluşturduğunuz <strong>${kacir(data.productName)}</strong> için atölye üretim sürecinde yeni bir aşamaya geçildi:
             </p>
             <div style="background: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 15px; margin: 15px 0;">
-              <p style="font-size: 16px; font-weight: bold; color: #BA4700;">${data.stageTitle}</p>
-              <p style="font-size: 13px; color: #4B5563; margin-top: 5px;">${data.stageDescription}</p>
+              <p style="font-size: 16px; font-weight: bold; color: #BA4700;">${kacir(data.stageTitle)}</p>
+              <p style="font-size: 13px; color: #4B5563; margin-top: 5px;">${kacir(data.stageDescription)}</p>
             </div>
             <p style="font-size: 13px; color: #6B7280;">
               İşyurtları atölyelerinde meslek öğrenen ustalarımız ve zanaatkârlarımız ürününüzü özenle hazırlamaya devam ediyor.
@@ -396,7 +398,7 @@ export const emailTemplates = {
           </div>
 
           <div class="section" style="text-align: center;">
-            <a href="${data.productUrl}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+            <a href="${kacir(data.productUrl)}" style="display: inline-block; background: #FF6000; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px;">
               Ürünü Görüntüle →
             </a>
           </div>

@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { vitrinUrunu } from '@/lib/vitrin';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -68,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     // Format campaign info
     const productsWithCampaigns = products.map((p: any) => ({
-      ...p,
+      ...vitrinUrunu(p),
       campaign: p.campaigns[0]
         ? {
             id: p.campaigns[0].campaign.id,

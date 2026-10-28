@@ -1,11 +1,11 @@
 import { put } from '@vercel/blob';
+import { guvenliDosyaAdi, webpSurumleri } from '@/lib/gorsel-uret';
 import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-// SVG ve WebP kategori ikonlari icin eklendi: mevcut kategori ikonlarinin
-// tamami zaten SVG ve <img> ile gosteriliyor. Tarayici <img> icindeki SVG'de
-// script calistirmadigi icin bu yol guvenli olanidir.
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+const RASTER = ['image/jpeg', 'image/png', 'image/webp'];
+// SVG yalnizca kategori ikonlari icin; <img> icinde script calismaz.
+const SVG = 'image/svg+xml';
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: NextRequest) {
@@ -16,16 +16,16 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
-    console.log('Upload başladı:', { filename: file?.name, size: file?.size, type: file?.type });
-
     if (!file) {
       return NextResponse.json({ error: 'Dosya bulunamadı' }, { status: 400 });
     }
 
-    // Validate file type
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const istenenKlasor = formData.get('klasor');
+    const klasor = istenenKlasor === 'kategoriler' ? 'kategoriler' : 'products';
+    const svgIzinli = klasor === 'kategoriler' && file.type === SVG;
+    if (!RASTER.includes(file.type) && !svgIzinli) {
       return NextResponse.json(
-        { error: 'Sadece JPG ve PNG formatları destekleniyor' },
+        { error: 'Sadece JPG, PNG ve WebP destekleniyor (SVG yalnızca kategori ikonu)' },
         { status: 400 }
       );
     }
@@ -38,20 +38,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert file to buffer for Vercel Blob
-    const bytes = await file.arrayBuffer();
-    const timestamp = Date.now();
-    // Kategori ikonlari urun gorsellerinden ayri klasorde dursun; toplu
-    // gorsel optimizasyonu urunleri tararken ikonlara dokunmasin.
-    const istenenKlasor = formData.get('klasor');
-    const klasor = istenenKlasor === 'kategoriler' ? 'kategoriler' : 'products';
-    const filename = `${klasor}/${timestamp}-${file.name}`;
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const taban = `${klasor}/${Date.now()}-${guvenliDosyaAdi(file.name)}`;
 
-    console.log('Vercel Blob\'a yükleniyor:', filename);
-    const blob = await put(filename, bytes, { access: 'public' });
+    if (svgIzinli) {
+      const blob = await put(`${taban}.svg`, new Blob([bytes]), { access: 'public', contentType: SVG });
+      return NextResponse.json({ url: blob.url });
+    }
 
-    console.log('Upload başarılı:', blob.url);
-    return NextResponse.json({ url: blob.url });
+    const surumler = await webpSurumleri(bytes);
+    const yuklenenler = await Promise.all(
+      surumler.map((s) =>
+        put(`${taban}-${s.genislik}.webp`, new Blob([new Uint8Array(s.veri)]), {
+          access: 'public',
+          contentType: 'image/webp',
+          addRandomSuffix: false,
+          cacheControlMaxAge: 31536000,
+        })
+      )
+    );
+    return NextResponse.json({ url: yuklenenler[yuklenenler.length - 1].url });
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(

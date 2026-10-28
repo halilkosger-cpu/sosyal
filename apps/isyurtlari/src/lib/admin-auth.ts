@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-/**
- * Yönetici oturum imza anahtarı.
- * Ortamda JWT_SECRET veya NEXTAUTH_SECRET tanımlıysa onu kullanır,
- * tanımlı değilse güvenli sabit üretim anahtarına başvurur (erişim kilitlenmesini önler).
- */
-export const GUVENLI_ADMIN_JWT_SECRET =
-  process.env.JWT_SECRET ||
-  process.env.NEXTAUTH_SECRET ||
-  'isyurtlari-2026-prod-jwt-secret-9f8a7b6c5d4e3f2a1';
-
 export function jwtAnahtari(): string {
-  return GUVENLI_ADMIN_JWT_SECRET;
+  const anahtar = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET;
+  if (anahtar) return anahtar;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET tanımlı değil');
+  }
+  return 'yalnizca-yerel-gelistirme-anahtari';
 }
 
 /**
@@ -37,9 +32,8 @@ export function isAdminRequest(req: NextRequest): boolean {
   const token = req.cookies.get('admin-token')?.value;
   if (!token) return false;
 
-  const anahtar = jwtAnahtari();
   try {
-    const payload = jwt.verify(token, anahtar);
+    const payload = jwt.verify(token, jwtAnahtari());
     return typeof payload === 'object' && payload !== null && (payload as any).admin === true;
   } catch {
     return false;
@@ -65,9 +59,8 @@ export function adminEpostasi(req: NextRequest): string | null {
   const token = req.cookies.get('admin-token')?.value;
   if (!token) return null;
 
-  const anahtar = jwtAnahtari();
   try {
-    const payload = jwt.verify(token, anahtar);
+    const payload = jwt.verify(token, jwtAnahtari());
     if (typeof payload !== 'object' || payload === null) return null;
     const eposta = (payload as { email?: unknown }).email;
     return typeof eposta === 'string' && eposta ? eposta : null;

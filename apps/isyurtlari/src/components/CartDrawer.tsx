@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useCartDrawer } from '../context/CartDrawerContext';
 import { LuX, LuShoppingBag, LuArrowRight, LuTrash2, LuPlus, LuMinus } from 'react-icons/lu';
 import Link from 'next/link';
 import Image from 'next/image';
 import { sepetiOku, sepetiYaz, SEPET_OLAYI, type SepetUrunu } from '../lib/cart';
+import KargoIlerlemeCubugu from './KargoIlerlemeCubugu';
 
 export interface CartDrawerProps {
   /** Ek Tailwind sınıfları */
@@ -44,15 +45,46 @@ export default function CartDrawer({
     return () => window.removeEventListener(SEPET_OLAYI, yukle);
   }, []);
 
-  // ESC tuşuyla sepeti kapatma
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Açıkken: arka sayfa kaymasın, odak panelde kalsın, ESC kapatsın
   useEffect(() => {
+    if (!isCartOpen) return;
+    const oncekiOdak = document.activeElement as HTMLElement | null;
+    const oncekiTasma = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const odaklanabilirler = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])') ?? []
+      );
+    const zamanlayici = setTimeout(() => odaklanabilirler()[0]?.focus(), 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isCartOpen) {
+      if (e.key === 'Escape') {
         closeCart();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const liste = odaklanabilirler();
+      if (liste.length === 0) return;
+      const ilk = liste[0];
+      const son = liste[liste.length - 1];
+      if (e.shiftKey && document.activeElement === ilk) {
+        e.preventDefault();
+        son.focus();
+      } else if (!e.shiftKey && document.activeElement === son) {
+        e.preventDefault();
+        ilk.focus();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(zamanlayici);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = oncekiTasma;
+      oncekiOdak?.focus?.();
+    };
   }, [isCartOpen, closeCart]);
 
   // Adet güncelleme
@@ -104,7 +136,7 @@ export default function CartDrawer({
           className="fixed inset-0 z-50 flex justify-end"
         >
           {/* Arka plan karartması */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -114,7 +146,8 @@ export default function CartDrawer({
           />
 
           {/* Sağdan açılan çekmece paneli */}
-          <motion.div
+          <m.div
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Alışveriş Sepeti"
@@ -151,6 +184,13 @@ export default function CartDrawer({
                 <LuX size={20} />
               </button>
             </div>
+
+            {/* 1.500 TL Ücretsiz Kargo İlerleme Çubuğu */}
+            {items.length > 0 && (
+              <div className="px-6 pt-3 pb-1 bg-white">
+                <KargoIlerlemeCubugu toplamTutar={toplamTutar} kompakt />
+              </div>
+            )}
 
             {/* Sepet İçeriği */}
             {items.length === 0 ? (
@@ -280,7 +320,7 @@ export default function CartDrawer({
                 ← Alışverişe Devam Et
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>

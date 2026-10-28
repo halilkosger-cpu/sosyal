@@ -42,3 +42,7 @@ apps/isyurtlari/src/app/tasarim-onizleme/
 
 .idea/
 .vscode/
+
+# Yerel / gizli
+.env.production
+.claude/settings.local.json

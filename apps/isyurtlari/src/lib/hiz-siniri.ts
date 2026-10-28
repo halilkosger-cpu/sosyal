@@ -37,7 +37,8 @@ interface SinirSonucu {
 export async function hizSiniri(
   anahtar: string,
   azamiIstek: number,
-  pencereSaniye: number
+  pencereSaniye: number,
+  hatadaReddet = false
 ): Promise<SinirSonucu> {
   try {
     const satirlar = await prisma.$queryRawUnsafe<{ adet: number }[]>(
@@ -67,7 +68,8 @@ export async function hizSiniri(
     // Sayac tablosu yoksa ya da veritabani erisilemezse istegi engellemiyoruz:
     // hiz siniri bir koruma katmani, sitenin calismasinin sarti degil.
     console.error('Hiz siniri okunamadi:', error);
-    return { asildi: false, adet: 0 };
+    // Admin girisi gibi kaba kuvvete acik uclarda sayac yoksa istek reddedilir.
+    return { asildi: hatadaReddet, adet: 0 };
   }
 }
 
@@ -79,9 +81,10 @@ export async function hizSiniriGuard(
   req: NextRequest,
   uc: string,
   azamiIstek: number,
-  pencereSaniye: number
+  pencereSaniye: number,
+  hatadaReddet = false
 ): Promise<NextResponse | null> {
-  const { asildi } = await hizSiniri(`${uc}:${istemciAdresi(req)}`, azamiIstek, pencereSaniye);
+  const { asildi } = await hizSiniri(`${uc}:${istemciAdresi(req)}`, azamiIstek, pencereSaniye, hatadaReddet);
 
   if (!asildi) return null;
 

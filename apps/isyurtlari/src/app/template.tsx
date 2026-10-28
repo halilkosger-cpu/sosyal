@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 export interface TemplateProps {
   children: React.ReactNode;
@@ -25,7 +25,7 @@ export default function Template({ children }: TemplateProps) {
   };
 
   return (
-    <motion.div
+    <m.div
       data-testid="page-template-wrapper"
       initial={variants.initial}
       animate={variants.animate}
@@ -37,6 +37,6 @@ export default function Template({ children }: TemplateProps) {
       className="w-full flex-1"
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

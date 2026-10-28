@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { vitrinUrunu } from '@/lib/vitrin';
 import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
@@ -30,7 +31,12 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(activeCampaigns);
+    return NextResponse.json(
+      activeCampaigns.map((k) => ({
+        ...k,
+        products: k.products.map((kp) => ({ ...kp, product: vitrinUrunu(kp.product) })),
+      }))
+    );
   } catch {
     return NextResponse.json({ error: 'Failed to fetch campaigns' }, { status: 500 });
   }

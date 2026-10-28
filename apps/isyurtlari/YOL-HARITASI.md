@@ -312,3 +312,58 @@ kendi ekini aldı. hk isterse bunlar da gözden geçirilebilir.
 yenilendiğinde kullanımdan kalktı, ikincisi /hakkimizda sayfasında.
 Ayrıca oradaki "500+ ürün" ve "81 ilde faaliyet" sayıları katalogla
 tutmuyor (63 ürün var).
+
+---
+
+## 28 Ekim 2026 — Baştan denetim (güvenlik + mobil + Awwwards)
+
+Trafik: %75 mobil. Testler: 21 dosya / 67 test geçiyor.
+Sıra: yukarıdan aşağı. Biten maddeyi [x] yap.
+
+### A. Güvenlik — KRİTİK / YÜKSEK
+- [x] A1 `lib/admin-auth.ts:9-12` sabit JWT anahtarı fallback'i → sil, env yoksa fail; Vercel'de yeni 32 bayt `JWT_SECRET`. Admin e-postaları env'e. **NOT: Vercel'de JWT_SECRET tanımlı olmalı, yoksa admin girişi hata verir.**
+- [x] A2 Admin çerezi `httpOnly` değil (`totp-verify:79`, `otp-verify:91-97`) → `httpOnly, secure, sameSite:strict`; jetonu JSON'dan çıkar.
+- [x] A3 Alış fiyatı sızıyor (`api/products`, `products/[slug]`, `campaigns/active`, `orders` GET) → Prisma `select` ile vitrin alanları.
+- [x] A4 next 14.2.5 → son 14.2.x (CVE-2025-29927 vb.).
+
+### B. Güvenlik — ORTA / DÜŞÜK
+- [x] B1 `siparis-sorgula:73` `notes.includes(email)` → birebir e-posta eşleşmesi.
+- [x] B2 iyzico callback: `||`→`&&` (satır 74), `paidPrice` = sipariş tutarı, `status==='PENDING'` idempotency, IYZWSv2 imza. (Kart ödemesi açılmadan ŞART.)
+- [x] B3 E-posta HTML kaçışı: `contactConfirmation`, `orders` admin maili → `kacir()`; iletişim formuna Turnstile. (kaçış yapıldı; Turnstile ertelendi — form zaten saatte 5 istekle sınırlı)
+- [x] B4 `api/stats/sales` ciroyu herkese açıyor → aggregate, ciroyu çıkar, cache.
+- [x] B5 `HOSGELDIN10` e-posta değiştirerek sınırsız → sadece doğrulanmış hesap.
+- [x] B6 CSP (önce Report-Only) + HSTS; `X-XSS-Protection` kaldır.
+- [x] B7 `hiz-siniri.ts:66-70` DB hatasında admin OTP'yi reddet.
+- [x] B8 `totp-check`/`otp-request` admin e-posta ifşası → tek tip yanıt.
+- [x] B9 `admin/upload` SVG kabul + ham dosya adı → SVG kapat, slug.
+- [x] B10 `api/indexnow` GET herkese açık → cron/admin korumalı.
+- [x] B11 `.env.production`, `.claude/settings.local.json`, `public/downloads/*.apk` → gitignore/repo dışı. (.env.production ve settings.local.json takipten çıkarıldı; APK footer indirme bağlantısı olduğu için bırakıldı)
+
+### C. Mobil UX / Performans — YÜKSEK
+- [x] C1 `next.config.js:227` `images.unoptimized` → Blob için loader ya da upload'da 400/800 WebP.
+- [x] C2 Hero preload root layout'ta (her sayfada iniyor) → sadece ana sayfa.
+- [x] C3 İlk ziyarette 3 katman üst üste (app banner + çerez + kampanya modal) → tek sıra: çerez → (2. sayfa) kampanya → (3. ziyaret) app banner.
+- [x] C4 `UrunKarti` çift dokunuşla favori çalışmıyor, tek dokunuşa gecikme ekliyor → kaldır.
+- [x] C5 Footer'da Visa/Mastercard/iyzico logosu (kart ödemesi kapalı) → kaldır.
+- [x] C6 `CartDrawer` focus trap + body scroll kilidi yok.
+
+### D. Mobil UX — ORTA / DÜŞÜK
+- [x] D1 16px altı inputlar iOS'ta zoom (`SearchSuggest:169`, `SpotlightArama:139`, checkout kupon) → `text-base md:text-sm`.
+- [x] D2 Checkout adres: il/ilçe/posta kodu ayrı alan + `autoComplete`.
+- [x] D3 CookieConsent / SepetToast alt menü + safe-area üstüne biniyor.
+- [x] D4 Kategori afişi iki kez `priority` → tek Image. (gereksiz: iki afiş aynı dosya, tek indirme)
+- [x] D5 framer-motion → layout'ta `LazyMotion` + `m`.
+- [x] D6 Root layout'taki 12 istemci bileşeni → Spotlight/HediyeDanışmanı etkileşimde yüklensin. (zaten ssr:false ayrı parça; ek kazanç düşük, atlandı)
+- [x] D7 Ölü kod: ProductCard, ProductGrid, ProductDetail, ProductImageWrapper, ProductCardSkeleton, CustomCursor (+testleri).
+- [x] D8 "Efsane Kasım" bandı koda gömülü → kampanya verisinden. (1 Aralık 2026 00:00 itibarıyla kampanya ve bant otomatik kapanır)
+
+### E. Awwwards seviyesi mobil alışveriş (temeller bittikten sonra)
+Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik %10. Önce hız/temizlik, sonra "an".
+- [ ] E1 Hikâye: "Cezaevi atölyesinde üretim → eğitim → istihdam". Her ürünün atölye/üretim süreci kartı (gerçek foto/video, sahte sayı yok).
+- [ ] E2 Tek görsel dil: tutarlı ürün fotoğrafı (Aşama 3), 1 display + 1 metin fontu, sınırlı palet, büyük tipografi.
+- [ ] E3 İmza etkileşim: ürün kartı → detay paylaşımlı geçiş (View Transitions API), parmakla kaydırmalı galeri, "bottom sheet" sepet/filtre.
+- [ ] E4 Başparmak bölgesi: tüm birincil eylemler alt %40'ta; yapışkan "Sepete ekle" barı ürün sayfasında.
+- [ ] E5 Mikro etkileşimler: haptic (Capacitor Haptics), sepete uçan ürün, iskelet yüklemeler; `prefers-reduced-motion` desteği.
+- [ ] E6 Hız bir tasarım öğesidir: mobil LCP < 2s, INP < 200ms, CLS < 0.05; Lighthouse mobil 90+.
+- [ ] E7 Erişilebilirlik WCAG 2.2 AA (kontrast, odak, 44px dokunma hedefi).
+- [ ] E8 Başvuru öncesi: case study sayfası + 30 sn mobil ekran kaydı; önce CSSDA/FWA gibi küçük galerilerde dene.

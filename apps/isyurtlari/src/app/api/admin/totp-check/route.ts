@@ -10,17 +10,14 @@ export async function POST(req: NextRequest) {
     const cleanEmail = String(email || '').toLowerCase().trim();
 
     if (!cleanEmail || !isAdminEmail(cleanEmail)) {
-      return NextResponse.json({ hasTotp: false, validAdmin: false });
+      return NextResponse.json({ hasTotp: false });
     }
 
     const record = await getAdminTotpRecord(cleanEmail);
     const hasTotp = Boolean(record && record.aktif);
 
-    return NextResponse.json({
-      hasTotp,
-      validAdmin: true,
-    });
+    return NextResponse.json({ hasTotp });
   } catch (error) {
-    return NextResponse.json({ hasTotp: false, validAdmin: false });
+    return NextResponse.json({ hasTotp: false });
   }
 }

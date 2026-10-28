@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Hız sınırı: dakikada en fazla 6 deneme
-    const sinir = await hizSiniriGuard(req, 'totp-verify', 6, 60);
+    const sinir = await hizSiniriGuard(req, 'totp-verify', 6, 60, true);
     if (sinir) {
       await logAudit('TOTP_VERIFY', email, 'failed', 'Hız sınırı aşıldı', ip);
       return sinir;
@@ -69,16 +69,15 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       ok: true,
-      token,
       method: result.method,
       message: result.message || 'Yönetici oturumu açıldı.',
     });
 
     // Hem host-only hem domain genelinde güvenli çerez mühürle
     const cookieOptions = {
-      httpOnly: false,
+      httpOnly: true,
       secure: isHttps,
-      sameSite: 'lax' as const,
+      sameSite: 'strict' as const,
       maxAge: 4 * 60 * 60, // 4 saat
       path: '/',
     };
