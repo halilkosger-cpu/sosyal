@@ -13,6 +13,8 @@ import { adresiYazdir } from '@/lib/adres-dogrulama';
 import { siparisMuhasebeyeIsle } from '@/lib/muhasebe-entegrasyonu';
 
 // Email sending function
+const SIPARIS_BILDIRIM_EKIBI = ['halil.kosger@gmail.com', 'tahaberke0312@gmail.com', 'asenaerbil.com@gmail.com'];
+
 async function sendOrderEmail(
   orderNumber: string,
   customerName: string,
@@ -24,7 +26,14 @@ async function sendOrderEmail(
   kdvTutari: number
 ) {
   try {
-    const recipientEmail = process.env.EMAIL_RECIPIENT || ['halil.kosger@gmail.com', 'tahaberke0312@gmail.com'];
+    // Sabit ekip + EMAIL_RECIPIENT'ta virgulle yazilan ek adresler (env artik ekibi ezmiyor).
+    const recipientEmail = Array.from(
+      new Set(
+        [...SIPARIS_BILDIRIM_EKIBI, ...(process.env.EMAIL_RECIPIENT || '').split(',')]
+          .map((a) => a.trim().toLowerCase())
+          .filter(Boolean)
+      )
+    );
     const banka = bankaBilgileri();
     const bankName = banka.bankName;
     const accountName = banka.accountName;

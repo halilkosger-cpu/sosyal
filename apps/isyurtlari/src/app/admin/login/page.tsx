@@ -226,6 +226,13 @@ export default function AdminLoginPage() {
                   >
                     tahaberke0312@gmail.com
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setEmail('asenaerbil.com@gmail.com')}
+                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
+                  >
+                    asenaerbil.com@gmail.com
+                  </button>
                 </div>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
                   Google Authenticator (TOTP) veya tek kullanımlık e-posta kodu ile güvenli giriş.
