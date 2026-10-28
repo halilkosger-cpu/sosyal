@@ -17,7 +17,8 @@ export async function webpSurumleri(girdi: Buffer): Promise<{ genislik: number; 
   return Promise.all(
     GORSEL_BOYUTLARI.map(async (genislik) => ({
       genislik,
-      veri: await sharp(girdi)
+      // 40 MP ustu (dekompresyon bombasi) reddedilir.
+      veri: await sharp(girdi, { limitInputPixels: 40_000_000 })
         .rotate()
         .resize({ width: genislik, height: genislik, fit: 'inside', withoutEnlargement: true })
         .webp({ quality: 78 })

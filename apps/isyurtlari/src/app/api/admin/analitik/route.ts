@@ -394,7 +394,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error('Analytics aggregation error:', error);
     return NextResponse.json(
-      { error: 'Analitik verileri derlenirken hata oluştu: ' + error.message },
+      { error: 'Analitik verileri derlenirken hata oluştu' },
       { status: 500 }
     );
   }

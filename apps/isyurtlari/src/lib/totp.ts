@@ -1,6 +1,27 @@
-import { createHmac, randomBytes, createHash, timingSafeEqual } from 'crypto';
+import { createHmac, randomBytes, createHash, timingSafeEqual, createCipheriv, createDecipheriv } from 'crypto';
 import { prisma } from '@isyurtlari/database';
 import { generateQrSvg } from './qr-generator';
+import { jwtAnahtari } from './admin-auth';
+
+// Gizli anahtar veritabaninda AES-256-GCM ile sifreli durur ("enc:v1:iv:tag:veri").
+// Eski duz metin kayitlar okunur ve ilk basarili giriste sifreli bicime gecirilir.
+const SIFRE_ONEK = 'enc:v1:';
+const sifreAnahtari = () => createHash('sha256').update('admin-totp:' + jwtAnahtari()).digest();
+
+export function sirriSifrele(sir: string): string {
+  const iv = randomBytes(12);
+  const c = createCipheriv('aes-256-gcm', sifreAnahtari(), iv);
+  const veri = Buffer.concat([c.update(sir, 'utf8'), c.final()]);
+  return SIFRE_ONEK + [iv, c.getAuthTag(), veri].map((b) => b.toString('base64')).join(':');
+}
+
+export function sirriCoz(kayit: string): string {
+  if (!kayit.startsWith(SIFRE_ONEK)) return kayit;
+  const [iv, etiket, veri] = kayit.slice(SIFRE_ONEK.length).split(':').map((p) => Buffer.from(p, 'base64'));
+  const d = createDecipheriv('aes-256-gcm', sifreAnahtari(), iv);
+  d.setAuthTag(etiket);
+  return Buffer.concat([d.update(veri), d.final()]).toString('utf8');
+}
 
 /**
  * Google Authenticator (TOTP - RFC 6238) ve Yedek Kurtarma Kodları Motoru.
@@ -74,21 +95,20 @@ export function generateTotpCode(secret: string, step = 30, windowOffset = 0): s
   return code.toString().padStart(6, '0');
 }
 
-/**
- * Kullanıcının girdiği 6 haneli TOTP kodunu doğrular (±30 saniye tolerans).
- */
-export function verifyTotpCode(token: string, secret: string, step = 30, window = 1): boolean {
+/** Kod gecerliyse eslesen zaman adimini, degilse null dondurur (±30 sn tolerans). */
+export function eslesenTotpAdimi(token: string, secret: string, step = 30, window = 1): number | null {
   const cleanToken = token.replace(/\D/g, '').trim();
-  if (cleanToken.length !== 6) return false;
-
+  if (cleanToken.length !== 6) return null;
+  const simdikiAdim = Math.floor(Date.now() / 1000 / step);
   for (let offset = -window; offset <= window; offset++) {
     const expected = generateTotpCode(secret, step, offset);
-    if (expected.length === cleanToken.length) {
-      const match = timingSafeEqual(Buffer.from(expected), Buffer.from(cleanToken));
-      if (match) return true;
-    }
+    if (timingSafeEqual(Buffer.from(expected), Buffer.from(cleanToken))) return simdikiAdim + offset;
   }
-  return false;
+  return null;
+}
+
+export function verifyTotpCode(token: string, secret: string, step = 30, window = 1): boolean {
+  return eslesenTotpAdimi(token, secret, step, window) !== null;
 }
 
 /**
@@ -124,6 +144,7 @@ export async function ensureAdminTotpTable(): Promise<void> {
         CONSTRAINT "AdminTotp_pkey" PRIMARY KEY ("email")
       );
     `);
+    await prisma.$executeRawUnsafe(`ALTER TABLE "AdminTotp" ADD COLUMN IF NOT EXISTS "sonAdim" BIGINT`);
   } catch (err) {
     console.error('AdminTotp tablosu kontrol hatası:', err);
   }
@@ -134,6 +155,8 @@ export interface AdminTotpRecord {
   secret: string;
   backupCodes: string[]; // SHA-256 hash listesi
   aktif: boolean;
+  sifreli: boolean;
+  sonAdim: number | null;
   olusturma: Date;
   sonGiris?: Date | null;
 }
@@ -158,9 +181,18 @@ export async function getAdminTotpRecord(email: string): Promise<AdminTotpRecord
       backupCodes = [];
     }
 
+    let secret = '';
+    try {
+      secret = sirriCoz(r.secret);
+    } catch {
+      console.error('AdminTotp anahtari cozulemedi (JWT_SECRET degismis olabilir)');
+    }
+
     return {
       email: r.email,
-      secret: r.secret,
+      secret,
+      sifreli: String(r.secret).startsWith(SIFRE_ONEK),
+      sonAdim: r.sonAdim == null ? null : Number(r.sonAdim),
       backupCodes,
       aktif: Boolean(r.aktif),
       olusturma: r.olusturma,
@@ -191,9 +223,9 @@ export async function setupAdminTotp(email: string) {
     `INSERT INTO "AdminTotp" ("email", "secret", "backupCodes", "aktif", "olusturma")
      VALUES ($1, $2, $3, false, CURRENT_TIMESTAMP)
      ON CONFLICT ("email")
-     DO UPDATE SET "secret" = $2, "backupCodes" = $3, "aktif" = false, "olusturma" = CURRENT_TIMESTAMP`,
+     DO UPDATE SET "secret" = $2, "backupCodes" = $3, "aktif" = false, "sonAdim" = NULL, "olusturma" = CURRENT_TIMESTAMP`,
     cleanEmail,
-    secret,
+    sirriSifrele(secret),
     backupCodesJson
   );
 
@@ -243,14 +275,19 @@ export async function verifyAdminTotpOrBackup(
   const cleanInput = inputCode.trim();
 
   // 1. Önce 6 haneli standart TOTP kodu mu kontrol et
-  if (/^\d{6}$/.test(cleanInput)) {
-    const isTotpValid = verifyTotpCode(cleanInput, record.secret);
-    if (isTotpValid) {
-      await prisma.$executeRawUnsafe(
-        `UPDATE "AdminTotp" SET "sonGiris" = CURRENT_TIMESTAMP WHERE "email" = $1`,
-        cleanEmail
+  if (/^\d{6}$/.test(cleanInput) && record.secret) {
+    const adim = eslesenTotpAdimi(cleanInput, record.secret);
+    if (adim !== null) {
+      // Ayni kod (ya da daha eski adim) ikinci kez kullanilamaz; guncelleme atomik.
+      const guncellenen = await prisma.$executeRawUnsafe(
+        `UPDATE "AdminTotp" SET "sonGiris" = CURRENT_TIMESTAMP, "sonAdim" = $2${record.sifreli ? '' : ', "secret" = $3'}
+         WHERE "email" = $1 AND ("sonAdim" IS NULL OR "sonAdim" < $2)`,
+        cleanEmail,
+        adim,
+        ...(record.sifreli ? [] : [sirriSifrele(record.secret)])
       );
-      return { success: true, method: 'totp' };
+      if (guncellenen > 0) return { success: true, method: 'totp' };
+      return { success: false, message: 'Bu kod zaten kullanıldı. Yeni kodu bekleyin.' };
     }
   }
 

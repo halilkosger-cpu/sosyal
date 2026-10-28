@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { KullaniciHatasi, guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { adminGuard } from '@/lib/admin-auth';
 import { siparisMuhasebeyeIsle, odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
 import { NextRequest, NextResponse } from 'next/server';
@@ -178,7 +179,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!finalCariId) {
-        throw new Error('Faturanın bağlanacağı cari kart bulunamadı');
+        throw new KullaniciHatasi('Faturanın bağlanacağı cari kart bulunamadı');
       }
 
       // 2. Satırları ve Toplamları Hesapla
@@ -255,6 +256,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error('Fatura oluşturma hatası:', error);
-    return NextResponse.json({ error: error.message || 'Fatura oluşturulamadı' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'Fatura oluşturulamadı') }, { status: 500 });
   }
 }

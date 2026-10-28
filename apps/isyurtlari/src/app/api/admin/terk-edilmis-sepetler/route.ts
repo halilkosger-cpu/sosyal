@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
 import { sepetHatirlatmaEpostasiGonder, epostaTabanAdresi } from '@/lib/musteri-eposta';
@@ -156,7 +157,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Terk edilmiş sepetler listelenemedi:', error);
-    return NextResponse.json({ error: error?.message || 'Veriler alınamadı' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'Veriler alınamadı') }, { status: 500 });
   }
 }
 
@@ -223,6 +224,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Geçersiz işlem.' }, { status: 400 });
   } catch (error: any) {
     console.error('İşlem başarısız:', error);
-    return NextResponse.json({ error: error?.message || 'İşlem gerçekleştirilemedi.' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'İşlem gerçekleştirilemedi.') }, { status: 500 });
   }
 }

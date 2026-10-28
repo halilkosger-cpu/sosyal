@@ -382,12 +382,12 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 - [x] G3 YÜKSEK Next 14.2.35: RSC DoS + rewrite SSRF yalnızca 15.5.x'te yamalı; `@vercel/blob@0.21` undici → Next 15 geçişi planla. (Next 15.5.28 + React 19 + @vercel/blob 2.x; async params codemod, ssr:false katmanları IstemciKatmanlari.tsx)
 - [x] G4 YÜKSEK `/downloads/isyurtlari.apk` debuggable debug derleme → imzalı release APK ya da Play Store linki. (APK dosyası ve tüm bağlantılar kaldırıldı; Android banner yalnızca PWA kurulumu varsa)
 - [x] G5 ORTA JSON-LD `<` kaçışı yok (saklı XSS, admin onaylı yorumla) → `.replace(/</g,'\\u003c')`.
-- [ ] G6 ORTA CSV formül enjeksiyonu (`lib/csv.ts`) → `= + - @` başına `'`.
-- [ ] G7 ORTA `api/admin/export` User şifre özetleri + reset token'ları veriyor, audit yok → hassas sütunları çıkar, logAudit.
-- [ ] G8 ORTA `api/csp-rapor` DB tabanlı hız sınırı Neon'u uyandırıyor → bellek içi / örnekleme.
-- [ ] G9 ORTA `api/orders` (+ muhasebe uçları) hata mesajını istemciye sızdırıyor → sabit mesaj.
-- [ ] G10 DÜŞÜK TOTP sırrı düz metin + kod tekrar kullanımı → AES-GCM + son adım.
-- [ ] G11 DÜŞÜK Resend yoksa doğrulama/sıfırlama linki log'a yazılıyor → prod'da kapat.
-- [ ] G12 DÜŞÜK Admin ürün PUT/DELETE audit yok → logAudit.
-- [ ] G13 DÜŞÜK sharp `limitInputPixels` yok → 40 MP.
-- [ ] G14 DÜŞÜK Sipariş kalem sayısı sınırsız → en fazla 50.
+- [x] G6 ORTA CSV formül enjeksiyonu (`lib/csv.ts`) → `= + - @` başına `'`.
+- [x] G7 ORTA `api/admin/export` User şifre özetleri + reset token'ları veriyor, audit yok → hassas sütunları çıkar, logAudit.
+- [x] G8 ORTA `api/csp-rapor` DB tabanlı hız sınırı Neon'u uyandırıyor → bellek içi / örnekleme.
+- [x] G9 ORTA `api/orders` (+ muhasebe uçları) hata mesajını istemciye sızdırıyor → sabit mesaj.
+- [x] G10 DÜŞÜK TOTP sırrı düz metin + kod tekrar kullanımı → AES-GCM + son adım.
+- [x] G11 DÜŞÜK Resend yoksa doğrulama/sıfırlama linki log'a yazılıyor → prod'da kapat.
+- [x] G12 DÜŞÜK Admin ürün PUT/DELETE audit yok → logAudit.
+- [x] G13 DÜŞÜK sharp `limitInputPixels` yok → 40 MP.
+- [x] G14 DÜŞÜK Sipariş kalem sayısı sınırsız → en fazla 50.

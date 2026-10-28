@@ -93,7 +93,9 @@ export async function dogrulamaEpostasiGonder(
   const resend = resendIstemcisi();
 
   if (!resend) {
-    console.log(`[musteri] E-posta doğrulama bağlantısı (${eposta}): ${baglanti}`);
+    // Bağlantı hesap ele geçirmeye yeter; yalnızca yerel geliştirmede kayda yazılır.
+    if (process.env.NODE_ENV !== 'production') console.log(`[musteri] E-posta doğrulama bağlantısı (${eposta}): ${baglanti}`);
+    else console.error('[musteri] RESEND_API_KEY tanımlı değil; e-posta gönderilemedi');
     return;
   }
 
@@ -124,7 +126,9 @@ export async function sifirlamaEpostasiGonder(
   const resend = resendIstemcisi();
 
   if (!resend) {
-    console.log(`[musteri] Şifre sıfırlama bağlantısı (${eposta}): ${baglanti}`);
+    // Bağlantı hesap ele geçirmeye yeter; yalnızca yerel geliştirmede kayda yazılır.
+    if (process.env.NODE_ENV !== 'production') console.log(`[musteri] Şifre sıfırlama bağlantısı (${eposta}): ${baglanti}`);
+    else console.error('[musteri] RESEND_API_KEY tanımlı değil; e-posta gönderilemedi');
     return;
   }
 

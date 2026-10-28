@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { KullaniciHatasi, guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (!product) {
-        throw new Error('Ürün bulunamadı');
+        throw new KullaniciHatasi('Ürün bulunamadı');
       }
 
       const currentStock = Math.max(0, product.quantity);
@@ -99,6 +100,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error('Stok girişi hatası:', error);
-    return NextResponse.json({ error: error.message || 'Stok girişi yapılamadı' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'Stok girişi yapılamadı') }, { status: 500 });
   }
 }

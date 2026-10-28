@@ -1,5 +1,9 @@
 ﻿import { prisma } from '@isyurtlari/database';
-import { adminGuard } from '@/lib/admin-auth';
+import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
+import { logAudit } from '@/lib/audit-log';
+
+const denetle = (req: NextRequest, eylem: string, ayrinti: string) =>
+  logAudit(eylem, adminEpostasi(req) || 'bilinmiyor', 'success', ayrinti, req.headers.get('x-forwarded-for') || 'unknown');
 import { icerikTazele } from '@/lib/kategoriler';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -35,6 +39,8 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     },
   });
 
+  await denetle(req, 'PRODUCT_UPDATE', `${product.id} ${product.slug} fiyat=${product.price} stok=${product.quantity}`);
+
   // Slug ve kategori degisebiliyor: ikisi de sitemap ve kategori sayilarini
   // etkiliyor.
   icerikTazele();
@@ -64,6 +70,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
     data: { imageUrl },
     select: { id: true, name: true, imageUrl: true },
   });
+  await denetle(req, 'PRODUCT_IMAGE', `${product.id} ${imageUrl}`);
   return NextResponse.json(product);
 }
 
@@ -72,7 +79,8 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ id: st
   const red = adminGuard(req);
   if (red) return red;
 
-  await prisma.product.delete({ where: { id: params.id } });
+  const silinen = await prisma.product.delete({ where: { id: params.id }, select: { id: true, slug: true, name: true } });
+  await denetle(req, 'PRODUCT_DELETE', `${silinen.id} ${silinen.slug} ${silinen.name}`);
 
   // Kenar cubugundaki kategori urun sayilari guncellensin.
   icerikTazele();

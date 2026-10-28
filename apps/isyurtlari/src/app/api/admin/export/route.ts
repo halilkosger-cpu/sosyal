@@ -1,6 +1,7 @@
 import { prisma } from '@isyurtlari/database';
 import { NextRequest, NextResponse } from 'next/server';
-import { adminGuard } from '@/lib/admin-auth';
+import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
+import { logAudit } from '@/lib/audit-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,10 +29,15 @@ const TABLOLAR = [
   'ForumTopic', 'ForumReply',
   'LegalQuestion', 'LegalAnswer', 'LegalComment',
   'Message', 'Report', 'Notification', 'DsSchedule', 'News',
-  'PasswordResetToken', 'UserBadge', 'Announcement', 'SupportResource',
+  'UserBadge', 'Announcement', 'SupportResource',
 ] as const;
 
 /** Model adini Prisma istemcisindeki ozellik adina cevirir. */
+// Yedekte sifre ozetleri, jetonlar ve gizli anahtarlar disari verilmez.
+const HASSAS_ALAN = /pass|sifre|hash|token|secret|gizli/i;
+const hassasiAyikla = (satir: Record<string, unknown>) =>
+  Object.fromEntries(Object.entries(satir).filter(([k]) => !HASSAS_ALAN.test(k)));
+
 const prismaModeli = (ad: string) => (prisma as any)[ad.charAt(0).toLowerCase() + ad.slice(1)];
 
 export async function GET(req: NextRequest) {
@@ -63,14 +69,21 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const satirlar = await prismaModeli(tablo).findMany({ skip: atla, take: adet });
+    const satirlar = ((await prismaModeli(tablo).findMany({ skip: atla, take: adet })) as Record<string, unknown>[]).map(hassasiAyikla);
+    await logAudit(
+      'DB_EXPORT',
+      adminEpostasi(req) || 'bilinmiyor',
+      'success',
+      `${tablo} atla=${atla} adet=${satirlar.length}`,
+      req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
+    );
     return NextResponse.json(
       { tablo, atla, adet: satirlar.length, satirlar },
       { headers: NO_CACHE }
     );
-  } catch (e: any) {
+  } catch {
     return NextResponse.json(
-      { error: 'Tablo okunamadi: ' + (e?.message || '').slice(0, 120) },
+      { error: 'Tablo okunamadi' },
       { status: 500 }
     );
   }

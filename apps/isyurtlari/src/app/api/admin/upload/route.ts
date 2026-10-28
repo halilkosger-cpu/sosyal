@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Dosya yüklenirken hata oluştu: ' + (error instanceof Error ? error.message : String(error)) },
+      { error: 'Dosya yüklenirken hata oluştu' },
       { status: 500 }
     );
   }

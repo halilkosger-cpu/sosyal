@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { KullaniciHatasi, guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { prisma } from '@isyurtlari/database';
 import { musteriGuard } from '@/lib/musteri-auth';
 import { adresiDogrula } from '@/lib/adres-dogrulama';
@@ -88,7 +89,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
       }
 
       const { hata, adres } = adresiDogrula(govde ?? {});
-      if (hata || !adres) throw new Error(hata ?? 'Adres bilgileri eksik');
+      if (hata || !adres) throw new KullaniciHatasi(hata ?? 'Adres bilgileri eksik');
 
       return tx.address.update({
         where: { id: params.id },
@@ -109,7 +110,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
   } catch (error) {
     // Dogrulama hatalari islem icinden firlatiliyor; musteriye gosterilecek
     // metni tasiyorlar.
-    const mesaj = error instanceof Error ? error.message : 'Adres güncellenemedi';
+    const mesaj = guvenliHataMesaji(error, 'Adres güncellenemedi');
     const dogrulamaHatasi = mesaj !== 'Adres güncellenemedi' && mesaj.length < 120;
 
     if (!dogrulamaHatasi) console.error('Adres güncellenemedi:', error);

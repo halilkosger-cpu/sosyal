@@ -236,6 +236,9 @@ export async function POST(req: NextRequest) {
     if (!body.customerName || !body.email || !body.phone || !body.items || body.items.length === 0) {
       return NextResponse.json({ error: 'Gerekli alanlar eksik' }, { status: 400 });
     }
+    if (!Array.isArray(body.items) || body.items.length > 50) {
+      return NextResponse.json({ error: 'Bir siparişte en fazla 50 farklı ürün olabilir' }, { status: 400 });
+    }
     if (!body.addressId && !body.shippingAddress?.trim()) {
       return NextResponse.json({ error: 'Teslimat adresi gerekli' }, { status: 400 });
     }
@@ -655,7 +658,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Order creation error:', error);
     return NextResponse.json(
-      { error: 'Sipariş oluşturulurken hata oluştu: ' + (error instanceof Error ? error.message : String(error)) },
+      { error: 'Sipariş oluşturulurken hata oluştu' },
       { status: 500 }
     );
   }

@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { KullaniciHatasi, guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { adminGuard } from '@/lib/admin-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     const result = await prisma.$transaction(async (tx) => {
       const hesap = await tx.bankaHesabi.findUnique({ where: { id: bankaHesapId } });
-      if (!hesap) throw new Error('Banka hesabı bulunamadı');
+      if (!hesap) throw new KullaniciHatasi('Banka hesabı bulunamadı');
 
       const hareketTutari = parseFloat(tutar);
       const yeniHesapBakiye = tur === 'GIRIS'
@@ -120,6 +121,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
     console.error('Banka işlemi hatası:', error);
-    return NextResponse.json({ error: error.message || 'İşlem gerçekleştirilemedi' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'İşlem gerçekleştirilemedi') }, { status: 500 });
   }
 }

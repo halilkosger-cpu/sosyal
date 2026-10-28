@@ -52,7 +52,9 @@ export function csvAyristir(metin: string): string[][] {
 /** Satirlari CSV metnine cevirir (';' ayracli, BOM'lu). */
 export function csvOlustur(satirlar: (string | number)[][]): string {
   const kacir = (d: string | number) => {
-    const s = String(d ?? '');
+    let s = String(d ?? '');
+    // Excel formul enjeksiyonu: = + - @ (ve sekme/CR) ile baslayan metin hucresi formul olarak calismasin.
+    if (typeof d === 'string' && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
     return /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
   return UTF8_BOM + satirlar.map((r) => r.map(kacir).join(';')).join('\r\n') + '\r\n';

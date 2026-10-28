@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { adminGuard, adminEpostasi } from '@/lib/admin-auth';
 import {
   getAdminTotpRecord,
@@ -78,6 +79,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Geçersiz işlem.' }, { status: 400 });
   } catch (error: any) {
     console.error('TOTP setup hatası:', error);
-    return NextResponse.json({ error: error?.message || 'İşlem gerçekleştirilemedi.' }, { status: 500 });
+    return NextResponse.json({ error: guvenliHataMesaji(error, 'İşlem gerçekleştirilemedi.') }, { status: 500 });
   }
 }
