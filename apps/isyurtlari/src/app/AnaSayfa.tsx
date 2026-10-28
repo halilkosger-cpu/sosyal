@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import HarfHarf, { harfSayisi } from '@/components/HarfHarf';
+import GirisVideosu from '@/components/GirisVideosu';
 import { LuArrowRight, LuInfo, LuHammer, LuGraduationCap, LuRotateCcw } from 'react-icons/lu';
 import UrunKarti from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
@@ -148,10 +150,15 @@ export default function AnaSayfa({
 
                 {/* Slogan gorsel; basligin kendisi asagidaki H1. */}
                 <p className="font-serif text-[2.5rem] sm:text-[3rem] lg:text-[3.1rem] xl:text-[3.6rem] leading-[1.02] font-bold text-[#141B2D] tracking-tight" aria-hidden="true">
-                  {content.home.hero.title}.
+                  <HarfHarf metin={`${content.home.hero.title}.`} />
                   <br />
-                  {content.home.hero.titleHighlight}.{' '}
-                  <span className="text-[#CC4E00]">{content.home.hero.titleSuffix}.</span>
+                  <HarfHarf metin={`${content.home.hero.titleHighlight}.`} baslangic={harfSayisi(`${content.home.hero.title}.`)} />{' '}
+                  <span className="text-[#CC4E00] italic font-semibold">
+                    <HarfHarf
+                      metin={`${content.home.hero.titleSuffix}.`}
+                      baslangic={harfSayisi(`${content.home.hero.title}.${content.home.hero.titleHighlight}.`) + 3}
+                    />
+                  </span>
                 </p>
 
                 {/* lg'de daha erken sariyor: olculdu, max-w-lg ile son
@@ -183,6 +190,7 @@ export default function AnaSayfa({
            * Daha genis ekranlarda ustten ve alttan biraz kirpiliyor -
            * sol taraf duz krem oldugu icin kirpim gorunmuyor.
            */}
+          <div className="relative">
           <picture>
             <source
               media="(min-width: 1024px)"
@@ -202,6 +210,8 @@ export default function AnaSayfa({
               fetchPriority="high"
             />
           </picture>
+          <GirisVideosu />
+          </div>
         </div>
       </section>
 

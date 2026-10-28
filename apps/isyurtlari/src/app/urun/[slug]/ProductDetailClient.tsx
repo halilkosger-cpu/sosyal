@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
   LuHouse, LuCheck, LuShoppingCart, LuTruck, LuRotateCcw, LuShieldCheck,
-  LuHandHeart, LuStar, LuMinus, LuPlus, LuChevronRight, LuSparkles,
+  LuHandHeart, LuStar, LuMinus, LuPlus, LuChevronRight, LuSparkles, LuMaximize2, LuArrowRight,
 } from 'react-icons/lu';
 import FavoriteButton from '@/components/FavoriteButton';
 import PreOrderForm from '@/components/PreOrderForm';
@@ -22,6 +22,7 @@ import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
 import BirlikteAl from '@/components/BirlikteAl';
+import GorselBuyutec from '@/components/GorselBuyutec';
 
 /**
  * Urun sayfasi - 2026 Eylul tasarimi.
@@ -78,6 +79,16 @@ interface Review {
 
 type Sekme = 'aciklama' | 'ozellikler' | 'teslimat' | 'yorumlar';
 
+const HIKAYE_BOLUMU: Record<string, { kod: string; etiket: string; baslik: string }> = {
+  tekstil: { kod: 'emek', etiket: 'Emek', baslik: 'İlmek ilmek dokunan ürünler' },
+  'tekstil-urunleri': { kod: 'emek', etiket: 'Emek', baslik: 'İlmek ilmek dokunan ürünler' },
+  dokuma: { kod: 'emek', etiket: 'Emek', baslik: 'İlmek ilmek dokunan ürünler' },
+  ahsap: { kod: 'atolye', etiket: 'Atölye', baslik: 'Her şey bir tezgâhta başlar' },
+  'ahsap-urunler': { kod: 'atolye', etiket: 'Atölye', baslik: 'Her şey bir tezgâhta başlar' },
+  mobilya: { kod: 'atolye', etiket: 'Atölye', baslik: 'Her şey bir tezgâhta başlar' },
+  varsayilan: { kod: 'meslek', etiket: 'Meslek', baslik: 'Bir meslek, bir ücret' },
+};
+
 const fiyat = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 
 const Yildizlar = ({ puan, boyut = 16 }: { puan: number; boyut?: number }) => (
@@ -120,6 +131,7 @@ export default function ProductDetailPage({
   /** Galeride seçili görselin sırası. */
   const [seciliGorsel, setSeciliGorsel] = useState(0);
   const [sensoryAktif, setSensoryAktif] = useState(false);
+  const [buyutecAcik, setBuyutecAcik] = useState(false);
   const [sekme, setSekme] = useState<Sekme>('aciklama');
   /** Yorum formunun geri bildirimi. alert() yerine sayfada gösteriliyor. */
   const [reviewMesaji, setReviewMesaji] = useState<{ tur: 'ok' | 'hata'; metin: string } | null>(null);
@@ -170,6 +182,8 @@ export default function ProductDetailPage({
    * Sepete ekleme lib/cart.ts'teki sepeteEkle() uzerinden: kampanya fiyati,
    * stok ve fiyat kontrolu ve GA add_to_cart orada.
    */
+  const kapatBuyutec = useCallback(() => setBuyutecAcik(false), []);
+
   const handleAddToCart = () => {
     if (!product) return;
     const eklendi = sepeteEkle(
@@ -271,6 +285,10 @@ export default function ProductDetailPage({
    * yok, onlar eskisi gibi next/image ile ciziliyor.
    */
   const anaSrcSet = seciliGorsel === 0 ? urunSrcSet(product.slug, product.imageUrl) : undefined;
+  const buyukGorsel = anaSrcSet
+    ? urunGorseli(product.slug, secili?.url)?.replace(/-800\.webp$/, '-1024.webp') ?? secili?.url
+    : secili?.url;
+  const hikaye = HIKAYE_BOLUMU[product.category.slug] ?? HIKAYE_BOLUMU.varsayilan;
 
   const KATEGORI_HIKAYE_GORSELLERI: Record<string, string> = {
     gida: '/kategori/gida.webp',
@@ -309,7 +327,7 @@ export default function ProductDetailPage({
       <div className="max-w-screen-xl mx-auto px-4 pb-8 pt-2 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
 
         {/* ─── GALERİ ─── */}
-        <div>
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <div className="urun-gorsel-gecis relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-[#FBF6EF] to-[#F3EBE1] flex items-center justify-center">
             {sensoryAktif && (secili?.url || gorseller[0]?.url) ? (
               <SensorySpotlight
@@ -343,6 +361,18 @@ export default function ProductDetailPage({
               <Image src={secili.url} alt={secili.alt} fill priority quality={80} sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             ) : (
               <KategoriIkon slug={product.category.slug} className="w-40 h-40" />
+            )}
+            {!sensoryAktif && buyukGorsel && (
+              <button
+                type="button"
+                onClick={() => setBuyutecAcik(true)}
+                aria-label="Görseli büyüt"
+                className="absolute inset-0 z-[1] cursor-zoom-in"
+              >
+                <span className="absolute bottom-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/85 text-gray-800 shadow-md backdrop-blur-sm">
+                  <LuMaximize2 size={17} />
+                </span>
+              </button>
             )}
             {!inStock && (
               <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-4 py-1.5 rounded-full z-10">Tükendi</span>
@@ -499,6 +529,20 @@ export default function ProductDetailPage({
               </div>
             </div>
           </div>
+
+          {/* Atölye hikâyesindeki ilgili bölüm */}
+          <Link
+            href={`/#hikaye-${hikaye.kod}`}
+            className="group mt-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-[#E8DCCB] bg-[#FBF6EF] p-3 pr-4 transition-colors hover:border-[#CC4E00]/40"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/hikaye/${hikaye.kod}.jpg`} alt="" aria-hidden="true" loading="lazy" className="h-16 w-14 shrink-0 rounded-xl object-cover" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#BA4700]">Atölye hikâyesi · {hikaye.etiket}</span>
+              <span className="mt-0.5 block font-serif text-lg leading-snug text-[#141B2D]">{hikaye.baslik}</span>
+            </span>
+            <LuArrowRight size={18} className="shrink-0 text-[#BA4700] transition-transform group-hover:translate-x-1" />
+          </Link>
 
           {/* Güvence rozetleri - her biri doğrulanabilir bilgi */}
           <div className="grid grid-cols-2 gap-3 mt-5">
@@ -666,6 +710,10 @@ export default function ProductDetailPage({
             </div>
           </div>
         </div>
+      )}
+
+      {buyutecAcik && buyukGorsel && (
+        <GorselBuyutec src={buyukGorsel} alt={product.name} onKapat={kapatBuyutec} />
       )}
 
       {/* Mobilde sabit satın alma çubuğu (alt gezinmenin üstünde) */}

@@ -295,6 +295,19 @@ function KategoriIcerigi({
   const [loading, setLoading] = useState(!baslangicUrunler);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  // Alt panel acikken arka sayfa kaymasin, ESC kapatsin.
+  useEffect(() => {
+    if (!mobileFiltersOpen) return;
+    const onceki = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const tus = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileFiltersOpen(false); };
+    window.addEventListener('keydown', tus);
+    return () => {
+      document.body.style.overflow = onceki;
+      window.removeEventListener('keydown', tus);
+    };
+  }, [mobileFiltersOpen]);
+
   const products = veri?.urunler ?? [];
   const urlSeason = (aramaParametreleri.get('sezon') as HarvestSeasonType) || 'tumu';
 
@@ -396,23 +409,35 @@ function KategoriIcerigi({
         <div className="flex flex-col md:flex-row gap-6">
 
           {/* ─── FILTER PANEL (Desktop + Mobile) ─── */}
-          <div className={`
-            ${mobileFiltersOpen ? 'fixed inset-0 z-50 bg-black/50' : 'hidden md:block'}
-            md:relative md:bg-transparent md:z-auto
+          <div
+            onClick={(e) => { if (e.target === e.currentTarget) setMobileFiltersOpen(false); }}
+            className={`
+            ${mobileFiltersOpen ? 'fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] animate-[filtreKarartma_.25s_ease-out]' : 'hidden md:block'}
+            md:relative md:bg-transparent md:backdrop-blur-none md:z-auto md:animate-none
           `}>
-            <div className={`
-              ${mobileFiltersOpen ? 'fixed top-0 left-0 right-0 bottom-0 bg-white overflow-y-auto' : ''}
-              md:relative md:bg-white md:h-auto md:overflow-visible
-              md:w-64 flex-shrink-0 rounded-xl border border-gray-200 p-6
+            <div
+              role={mobileFiltersOpen ? 'dialog' : undefined}
+              aria-modal={mobileFiltersOpen ? true : undefined}
+              aria-label={mobileFiltersOpen ? 'Filtreler' : undefined}
+              className={`
+              ${mobileFiltersOpen ? 'fixed inset-x-0 bottom-0 max-h-[85svh] overflow-y-auto rounded-t-3xl bg-white px-6 pt-3 pb-0 shadow-2xl animate-[filtreYukari_.32s_cubic-bezier(.2,.8,.2,1)] motion-reduce:animate-none' : 'p-6'}
+              md:static md:max-h-none md:animate-none md:rounded-xl md:shadow-none md:p-6 md:bg-white md:h-auto md:overflow-visible
+              md:w-64 flex-shrink-0 md:border md:border-gray-200
             `}>
-              {/* Close button (mobile only) */}
               {mobileFiltersOpen && (
-                <button
-                  onClick={() => setMobileFiltersOpen(false)}
-                  className="absolute top-4 right-4 md:hidden p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <LuX size={20} />
-                </button>
+                <div className="md:hidden sticky top-0 z-10 -mx-6 mb-4 bg-white px-6 pb-3 pt-1">
+                  <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-gray-300" aria-hidden="true" />
+                  <div className="flex items-center justify-between">
+                    <p className="text-lg font-bold text-gray-900">Filtreler</p>
+                    <button
+                      onClick={() => setMobileFiltersOpen(false)}
+                      aria-label="Filtreleri kapat"
+                      className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-gray-100"
+                    >
+                      <LuX size={20} />
+                    </button>
+                  </div>
+                </div>
               )}
 
               {/* ─── KATEGORILER ─── */}
@@ -537,10 +562,27 @@ function KategoriIcerigi({
               {/* Reset filters button */}
               <button
                 onClick={suzgecleriTemizle}
-                className="w-full text-sm text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors"
+                className={`w-full text-sm text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors ${mobileFiltersOpen ? 'hidden md:block' : ''}`}
               >
                 Filtreleri Temizle
               </button>
+
+              {mobileFiltersOpen && (
+                <div className="md:hidden sticky bottom-0 -mx-6 mt-4 flex gap-3 border-t border-gray-100 bg-white px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+                  <button
+                    onClick={suzgecleriTemizle}
+                    className="min-h-[48px] flex-1 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700"
+                  >
+                    Temizle
+                  </button>
+                  <button
+                    onClick={() => setMobileFiltersOpen(false)}
+                    className="min-h-[48px] flex-[2] rounded-xl bg-[#CC4E00] text-sm font-semibold text-white"
+                  >
+                    {sorted.length} ürünü göster
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

@@ -72,11 +72,13 @@ function HikayeKarti({ bolum, sira, kartRef }: { bolum: Bolum; sira: number; kar
     >
       <div className="hikaye-sahne absolute inset-0 origin-top will-change-transform">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`/hikaye/${bolum.kod}.jpg`} alt="" aria-hidden="true" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        <picture>
+          <source media="(min-width: 1024px)" srcSet={`/hikaye/${bolum.kod}-genis.jpg`} />
+          <img src={`/hikaye/${bolum.kod}.jpg`} alt="" aria-hidden="true" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+        </picture>
         <video
           ref={videoRef}
           className="hikaye-video absolute inset-0 h-full w-full object-cover"
-          poster={`/hikaye/${bolum.kod}.jpg`}
           muted
           loop
           playsInline
@@ -84,6 +86,7 @@ function HikayeKarti({ bolum, sira, kartRef }: { bolum: Bolum; sira: number; kar
           preload="none"
           aria-hidden="true"
         >
+          <source src={`/hikaye/${bolum.kod}-genis.mp4`} type="video/mp4" media="(min-width: 1024px)" />
           <source src={`/hikaye/${bolum.kod}.mp4`} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,27,45,.15)_0%,rgba(20,27,45,0)_35%,rgba(20,27,45,.55)_70%,rgba(20,27,45,.88)_100%)]" />
