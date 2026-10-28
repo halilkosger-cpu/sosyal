@@ -55,5 +55,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.jpg|logo.webp|og-gorsel.jpg|llms.txt|robots.txt|sitemap.xml|google-merchant.xml|video/|hero/|kategori/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.jpg|logo.webp|og-gorsel.jpg|llms.txt|robots.txt|sitemap.xml|google-merchant.xml|video/|hero/|kategori/|hikaye/|urun/).*)'],
 };
