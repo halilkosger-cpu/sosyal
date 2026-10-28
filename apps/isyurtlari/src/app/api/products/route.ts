@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { vitrinUrunu } from '@/lib/vitrin';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,7 +11,7 @@ const hasDatabaseUrl = () => {
   return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
 };
 
-export async function GET(req: NextRequest) {
+async function urunleriGetir(req: NextRequest) {
   if (!hasDatabaseUrl()) {
     return NextResponse.json([]);
   }
@@ -89,4 +90,8 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET(req: NextRequest) {
+  return vitrinOnbellegi(await urunleriGetir(req));
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { prisma } from '@isyurtlari/database';
 import { urunAra } from '@/lib/arama';
 import { satilabilirlikKademesi } from '@/lib/urun-siralama';
@@ -52,7 +53,7 @@ const sayi = (deger: string | null): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-export async function GET(req: NextRequest) {
+async function urunleriListele(req: NextRequest) {
   const p = req.nextUrl.searchParams;
 
   try {
@@ -338,4 +339,8 @@ export async function GET(req: NextRequest) {
     console.error('Ürün listesi hatası:', error);
     return NextResponse.json({ error: 'Ürünler yüklenemedi' }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+  return vitrinOnbellegi(await urunleriListele(req));
 }

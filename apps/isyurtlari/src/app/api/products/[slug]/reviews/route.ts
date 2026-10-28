@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { prisma } from '@isyurtlari/database';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
@@ -34,7 +35,7 @@ export const dynamic = 'force-dynamic';
 const ASGARI_METIN = 10;
 const AZAMI_METIN = 2000;
 
-export async function GET(_req: NextRequest, { params }: { params: { slug: string } }) {
+async function yorumlariGetir(_req: NextRequest, { params }: { params: { slug: string } }) {
   try {
     const urun = await prisma.product.findUnique({
       where: { slug: params.slug },
@@ -200,4 +201,8 @@ export async function POST(req: NextRequest, { params }: { params: { slug: strin
     console.error('Yorum eklenemedi:', error);
     return NextResponse.json({ error: 'Yorum kaydedilemedi' }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest, baglam: { params: { slug: string } }) {
+  return vitrinOnbellegi(await yorumlariGetir(req, baglam));
 }

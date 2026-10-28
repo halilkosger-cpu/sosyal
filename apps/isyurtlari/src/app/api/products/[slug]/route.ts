@@ -1,10 +1,11 @@
 import { prisma } from '@isyurtlari/database';
+import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { vitrinUrunu } from '@/lib/vitrin';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_req: NextRequest, { params }: { params: { slug: string } }) {
+async function urunGetir(_req: NextRequest, { params }: { params: { slug: string } }) {
   try {
     const now = new Date();
     const product = await prisma.product.findUnique({
@@ -79,4 +80,8 @@ export async function GET(_req: NextRequest, { params }: { params: { slug: strin
     console.error('Ürün yüklenirken hata:', error);
     return NextResponse.json({ error: 'Ürün yüklenemedi' }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest, baglam: { params: { slug: string } }) {
+  return vitrinOnbellegi(await urunGetir(req, baglam));
 }

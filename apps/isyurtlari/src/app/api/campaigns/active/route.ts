@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { vitrinUrunu } from '@/lib/vitrin';
 import { NextResponse } from 'next/server';
 
@@ -11,7 +12,7 @@ const hasDatabaseUrl = () => {
   return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
 };
 
-export async function GET() {
+async function kampanyalariGetir() {
   if (!hasDatabaseUrl()) {
     return NextResponse.json([]);
   }
@@ -40,4 +41,8 @@ export async function GET() {
   } catch {
     return NextResponse.json({ error: 'Failed to fetch campaigns' }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return vitrinOnbellegi(await kampanyalariGetir());
 }

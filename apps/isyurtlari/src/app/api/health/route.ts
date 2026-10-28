@@ -64,9 +64,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(responseBody, {
     status: isHealthy ? 200 : 503,
     headers: {
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+      // Sik ping atan izleme servisi veritabanini uyutmasin diye sonuc CDN'de 10 dk tutulur.
+      'Cache-Control': isHealthy ? 'public, s-maxage=600' : 'no-store',
     },
   });
 }
