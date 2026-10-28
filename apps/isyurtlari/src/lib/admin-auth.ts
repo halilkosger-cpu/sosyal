@@ -17,6 +17,7 @@ export const YETKILI_ADMIN_EMAILLER: string[] = [
   (process.env.ADMIN_EMAIL || '').toLowerCase().trim(),
   'halil.kosger@gmail.com',
   'tahaberke0312@gmail.com',
+  'asenaerbil.com@gmail.com',
   'info@isyurtlari.com.tr',
 ].filter(Boolean);
 
