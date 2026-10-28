@@ -60,7 +60,8 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
 
   if (!firsatUrunu) return null;
 
-  const gorselAdresi = urunGorseli(firsatUrunu.slug, firsatUrunu.imageUrl);
+  // 144 px kutu icin 400'luk surum yeterli.
+  const gorselAdresi = urunGorseli(firsatUrunu.slug, firsatUrunu.imageUrl)?.replace(/-800\.webp$/, '-400.webp');
   // Fırsat için referans eski fiyat (temsili liste fiyatı / %15 piyasa indirimi etkisi)
   const eskiFiyat = Math.round(firsatUrunu.price * 1.2);
 

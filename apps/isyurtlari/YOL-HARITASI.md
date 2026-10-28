@@ -360,10 +360,10 @@ Sıra: yukarıdan aşağı. Biten maddeyi [x] yap.
 ### E. Awwwards seviyesi mobil alışveriş (temeller bittikten sonra)
 Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik %10. Önce hız/temizlik, sonra "an".
 - [ ] E1 Hikâye: "Cezaevi atölyesinde üretim → eğitim → istihdam". Her ürünün atölye/üretim süreci kartı (gerçek foto/video, sahte sayı yok).
-- [ ] E2 Tek görsel dil: tutarlı ürün fotoğrafı (Aşama 3), 1 display + 1 metin fontu, sınırlı palet, büyük tipografi.
+- [~] E2 Tek görsel dil: tutarlı ürün fotoğrafı (Aşama 3), 1 display + 1 metin fontu, sınırlı palet, büyük tipografi. (28 Eki: başlık fontu Fraunces yapıldı. 62 ürünün hepsi yerel sahnelenmiş, ölçek tutarlı (%62-95). Kalan: bez-canta-setleri ve taki-cantasi koyu zemin — Higgs ile yeniden sahnele)
 - [x] E3 İmza etkileşim: ürün kartı → detay paylaşımlı geçiş (View Transitions API), parmakla kaydırmalı galeri, "bottom sheet" sepet/filtre. (yapıldı: kart→detay görsel geçişi. Kalan: kaydırmalı galeri, bottom-sheet filtre)
 - [x] E4 Başparmak bölgesi: tüm birincil eylemler alt %40'ta; yapışkan "Sepete ekle" barı ürün sayfasında.
 - [x] E5 Mikro etkileşimler: haptic (Capacitor Haptics), sepete uçan ürün, iskelet yüklemeler; `prefers-reduced-motion` desteği. (yapıldı: titreşim + sepete uçan görsel + reduced-motion. Native Capacitor Haptics eklenmedi, iOS Safari titreşimi desteklemiyor)
-- [~] E6 Hız bir tasarım öğesidir: mobil LCP < 2s, INP < 200ms, CLS < 0.05; Lighthouse mobil 90+. (28 Eki ölçüm: mobil perf 66, LCP 8,9 sn. Sebep template.tsx opacity:0 animasyonu — kaldırıldı. Kategori görsel boyutları düzeltildi. Deploy sonrası yeniden ölç)
+- [~] E6 Hız bir tasarım öğesidir: mobil LCP < 2s, INP < 200ms, CLS < 0.05; Lighthouse mobil 90+. (28 Eki: önce ana 66 / gida 66, LCP 8,9-9,2 sn → sonra ana 71 / gida 88, LCP 6,4 / 3,4 sn; ana sayfa gözlenen LCP 2,4 sn. Ana sayfa sunucu bileşenine bölündü (AnaSayfa.tsx + istemci AnaSayfaVitrini.tsx); görseller yeniden sıkıştırıldı, logo-160. Deploy sonrası tekrar ölç)
 - [~] E7 Erişilebilirlik WCAG 2.2 AA (kontrast, odak, 44px dokunma hedefi). (Lighthouse a11y 92-97: kontrast, başlık sırası, select etiketi düzeltildi. Tam WCAG denetimi yapılmadı)
 - [ ] E8 Başvuru öncesi: case study sayfası + 30 sn mobil ekran kaydı; önce CSSDA/FWA gibi küçük galerilerde dene.

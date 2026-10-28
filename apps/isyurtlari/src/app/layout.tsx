@@ -6,7 +6,7 @@ import { SITE_URL } from '@/lib/seo';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Space_Grotesk, Plus_Jakarta_Sans } from 'next/font/google';
+import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 
 import Olcumler from '@/components/Olcumler';
 const CookieConsent = dynamic(() => import('@/components/CookieConsent'), { ssr: false });
@@ -33,13 +33,13 @@ import CartDrawer from '@/components/CartDrawer';
 import CartTrigger from '@/components/CartTrigger';
 import './globals.css';
 
-const spaceGrotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ['latin-ext'],
-  weight: ['700'],
+  axes: ['opsz', 'SOFT'],
   display: 'swap',
-  variable: '--font-space-grotesk',
+  variable: '--font-display',
   preload: true,
-  fallback: ['system-ui', 'arial'],
+  fallback: ['Georgia', 'serif'],
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -122,7 +122,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <ViewTransitions>
-    <html lang="tr" suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakartaSans.variable}`}>
+    <html lang="tr" suppressHydrationWarning className={`${fraunces.variable} ${plusJakartaSans.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -132,7 +132,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        <link rel="preconnect" href="https://bsvzh3olpntnziyt.public.blob.vercel-storage.com" crossOrigin="anonymous" />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
             (body'nin sonunda). Sebep: admin panelinde calismamalari gerekiyor,
             bunun icin de yolu okuyabilen bir istemci bileseni sart. */}
@@ -187,7 +186,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                       kucultulmus WebP kullaniliyor: 54 KB -> 12.5 KB.
                       logo.jpg og:image icin oldugu gibi duruyor. */}
                   <Image
-                    src="/logo.webp"
+                    src="/logo-160.webp"
                     alt="İsyurtları"
                     width={60}
                     height={60}
@@ -267,7 +266,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="max-w-screen-xl mx-auto px-4 pt-10 pb-24 md:pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="col-span-2 md:col-span-1">
-                <Image src="/logo.webp" alt="İsyurtları" width={60} height={60} className="h-[52px] w-auto mb-3" />
+                <Image src="/logo-160.webp" alt="İsyurtları" width={60} height={60} className="h-[52px] w-auto mb-3" />
                 <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
                   Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde hükümlülerin el emeğiyle
                   üretilen ürünlerin online satış mağazası.

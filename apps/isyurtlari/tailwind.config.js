@@ -13,7 +13,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-plus-jakarta-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-space-grotesk)', 'ui-serif', 'serif'],
+        serif: ['var(--font-display)', 'Georgia', 'ui-serif', 'serif'],
         mono: ['monospace'],
       },
       fontSize: {

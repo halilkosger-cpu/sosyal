@@ -1,5 +1,5 @@
 import { prisma } from '@isyurtlari/database';
-import HomeClient from './HomeClient';
+import AnaSayfa from './AnaSayfa';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 import { varsayilanSirala } from '@/lib/urun-siralama';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
@@ -95,7 +95,7 @@ const sssJsonLd = {
  *
  * Onceden bu uc istek istemcide, useEffect icinde yapiliyordu; sonuc olarak
  * arama motorlari ve ilk boyama sirasinda sayfada urun bulunmuyordu, sadece
- * iskelet animasyonu vardi. Ayni veri burada cekilip HomeClient'a baslangic
+ * iskelet animasyonu vardi. Ayni veri burada cekilip AnaSayfa'ya baslangic
  * degeri olarak gecirilince icerik sunucu HTML'ine giriyor.
  */
 async function anaSayfaVerisi() {
@@ -180,7 +180,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(sssJsonLd) }}
       />
-      <HomeClient
+      <AnaSayfa
         baslangicKategoriler={kategoriler}
         baslangicUrunler={urunler}
         baslangicKampanyalar={kampanyalar}

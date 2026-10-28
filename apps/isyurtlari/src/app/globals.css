@@ -31,8 +31,14 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  h1, h2 {
+    font-family: var(--font-display), Georgia, serif;
+    font-variation-settings: 'SOFT' 50;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  h3, h4, h5, h6 {
     font-weight: 700;
   }
 

@@ -1,16 +1,13 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LuArrowRight, LuInfo, LuHammer, LuGraduationCap, LuRotateCcw } from 'react-icons/lu';
 import UrunKarti from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
-import { IconFood, IconTextile, IconWood, IconWeaving, IconFurniture } from '@/components/Icons';
+import { urunYedegi } from './urun-yedegi';
 import { content } from '@/config/content';
 import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
 import KampanyaHeroBanner from '@/components/KampanyaHeroBanner';
-import HarvestFilter, { HarvestSeasonType } from '@/components/HarvestFilter';
+import AnaSayfaVitrini from '@/components/AnaSayfaVitrini';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -48,17 +45,6 @@ interface Product  { id: string; name: string; slug: string; price: number; quan
 interface CampaignProduct { productId: string; discount: number; product: Product; }
 interface Campaign { id: string; name: string; products: CampaignProduct[]; }
 
-/** Gorseli olmayan urunde kutu emojisi yerine kategorinin ikonu. */
-const urunYedekIkonu: Record<string, React.ElementType> = {
-  'gida': IconFood, 'gida-urunleri': IconFood,
-  'tekstil': IconTextile, 'tekstil-urunleri': IconTextile,
-  'ahsap': IconWood, 'ahsap-urunler': IconWood, 'peyzaj': IconWood,
-  'hediyelik': IconWeaving, 'sanat-zanaat': IconWeaving, 'temizlik': IconWeaving, 'dokuma': IconWeaving,
-};
-const urunYedegi = (slug?: string) => {
-  const Icon = (slug && urunYedekIkonu[slug]) || IconFurniture;
-  return <Icon className="w-20 h-20 object-contain opacity-90" />;
-};
 
 /**
  * Hero fotografi, iki kirpim.
@@ -98,30 +84,14 @@ interface BaslangicVeri {
   baslangicKampanyalar?: Campaign[] | null;
 }
 
-export default function HomeClient({
+export default function AnaSayfa({
   baslangicKategoriler = null,
   baslangicUrunler = null,
   baslangicKampanyalar = null,
 }: BaslangicVeri) {
-  const [categories, setCategories] = useState<Category[]>(baslangicKategoriler ?? []);
-  const [products,   setProducts]   = useState<Product[]>(baslangicUrunler ?? []);
-  const [campaigns,  setCampaigns]  = useState<Campaign[]>(baslangicKampanyalar ?? []);
-  const [loading,    setLoading]    = useState(!baslangicUrunler);
-
-  useEffect(() => {
-    // Veri sunucudan hazir geldiyse uc istegi tekrar yapmaya gerek yok
-    if (baslangicUrunler) return;
-    Promise.all([
-      fetch('/api/categories').then((r) => r.json()).catch(() => []),
-      fetch('/api/products').then((r) => r.json()).catch(() => []),
-      fetch('/api/campaigns/active').then((r) => r.json()).catch(() => []),
-    ]).then(([cats, prods, camps]) => {
-      setCategories(Array.isArray(cats) ? cats : []);
-      setProducts(Array.isArray(prods) ? prods.filter((p: Product) => p.imageUrl).slice(0, 8) : []);
-      setCampaigns(Array.isArray(camps) ? camps : []);
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  }, [baslangicUrunler]);
+  const categories = baslangicKategoriler ?? [];
+  const products = baslangicUrunler ?? [];
+  const campaigns = baslangicKampanyalar ?? [];
 
   const kampanyaKartlari = campaigns.flatMap((k) =>
     k.products.filter((cp) => cp.product.imageUrl).slice(0, 8).map((cp) => ({
@@ -129,27 +99,6 @@ export default function HomeClient({
       campaign: { discount: cp.discount, discountedPrice: indirimliFiyat(cp.product.price, cp.discount) },
     }))
   );
-
-  const [activeSeason, setActiveSeason] = useState<HarvestSeasonType>('tumu');
-
-  const filteredProducts = products.filter((p) => {
-    if (!p.category) return false;
-    if (activeSeason === 'tumu') return true;
-    if (activeSeason === 'taze-hasat') {
-      const isFood = p.category.slug === 'gida' || p.category.slug === 'gida-urunleri';
-      const nameL = p.name.toLowerCase();
-      const foodTerms = ['bal', 'reçel', 'zeytin', 'zeytinya', 'pekmez', 'sirke', 'salça', 'ceviz', 'fıstık', 'nohut', 'fasulye', 'tarhana', 'çay'];
-      return isFood || foodTerms.some((term) => nameL.includes(term));
-    }
-    if (activeSeason === 'on-siparis') {
-      return p.quantity <= 0;
-    }
-    if (activeSeason === 'dort-mevsim') {
-      const craftSlugs = ['ahsap', 'ahsap-urunler', 'tekstil', 'tekstil-urunleri', 'dokuma', 'sanat-zanaat', 'mobilya', 'hediyelik'];
-      return craftSlugs.includes(p.category.slug);
-    }
-    return true;
-  });
 
   const tumUrunler = `/${categories[0]?.slug ?? 'gida'}`;
 
@@ -274,11 +223,6 @@ export default function HomeClient({
       {/* ─── KATEGORİLER ───
           Mobilde yana kaydirilan satir; genis ekranda tek satir. */}
       <section className="max-w-screen-xl mx-auto px-4 pt-10" aria-label="Kategoriler">
-        {loading ? (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-20 rounded-xl bg-gray-100 animate-pulse" />)}
-          </div>
-        ) : (
           <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x -mx-4 px-4 pb-1 sm:mx-0 sm:px-0 sm:pb-0 sm:grid sm:grid-cols-[repeat(auto-fit,minmax(120px,1fr))] sm:overflow-visible">
             {categories.map((cat) => (
               <Link
@@ -294,7 +238,6 @@ export default function HomeClient({
               </Link>
             ))}
           </div>
-        )}
       </section>
 
       {/* ─── BÜYÜK AÇILIŞ & EFSANE KASIM VİTRİN BANNERI ─── */}
@@ -324,59 +267,7 @@ export default function HomeClient({
         </section>
       )}
 
-      {/* ─── EL EMEĞİ ÜRÜNLER ───
-          Kare kadraj ve genis satir araligi: kartlar birbirine
-          yapismiyor, fotograflar ayni oranda duruyor. */}
-      <section id="urunler" className="max-w-screen-xl mx-auto px-4 pt-12 scroll-mt-24">
-        <div className="flex items-end justify-between gap-4 flex-wrap mb-5">
-          <h2 className="font-serif text-2xl md:text-[1.9rem] font-semibold text-gray-900 tracking-tight">El emeği ürünler</h2>
-          <Link href={tumUrunler} className="inline-flex items-center gap-1.5 text-[#BA4700] hover:text-[#8F3700] text-sm font-semibold">
-            Tümünü gör <LuArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* ─── HASAT & MEVSİM FİLTRESİ ─── */}
-        <div className="mb-6">
-          <HarvestFilter
-            activeSeason={activeSeason}
-            onSeasonChange={setActiveSeason}
-          />
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-8">
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="bg-gray-100 rounded-xl aspect-square animate-pulse" />)}
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="bg-orange-50/50 rounded-2xl border border-orange-100 p-8 text-center my-4">
-            <span className="text-3xl block mb-2">🌿</span>
-            <p className="text-sm font-semibold text-gray-800 mb-1">Bu sezona/kategoriye ait ürün bulunamadı</p>
-            <p className="text-xs text-gray-500 mb-4">Diğer mevsim ve zanaat ürünlerini inceleyebilirsiniz.</p>
-            <button
-              onClick={() => setActiveSeason('tumu')}
-              className="px-4 py-2 bg-[#CC4E00] text-white text-xs font-semibold rounded-lg hover:bg-[#A63F00] transition"
-            >
-              Tüm Ürünleri Göster
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-8">
-            {filteredProducts.map((product, sira) => (
-              <UrunKarti
-                key={product.id}
-                urun={product}
-                kompakt
-                favoriButonu={false}
-                gorselYedek={urunYedegi(product.category.slug)}
-                gorselArkaPlani="from-white to-[#F7F2EA]"
-                gorselYuksekligi="aspect-square"
-                gorselBoyutlari="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 300px"
-                gorselOncelikli={sira < 4}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      <AnaSayfaVitrini products={products} tumUrunler={tumUrunler} />
 
       {/* ─── VIP ERKEN ERİŞİM & AÇILIŞ İNDİRİM BÜLTENİ ─── */}
       <VipBulten />
