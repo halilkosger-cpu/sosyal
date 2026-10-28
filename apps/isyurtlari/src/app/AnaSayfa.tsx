@@ -8,6 +8,7 @@ import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
 import KampanyaHeroBanner from '@/components/KampanyaHeroBanner';
 import AnaSayfaVitrini from '@/components/AnaSayfaVitrini';
+import AtolyeHikayesi from '@/components/AtolyeHikayesi';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -268,6 +269,8 @@ export default function AnaSayfa({
       )}
 
       <AnaSayfaVitrini products={products} tumUrunler={tumUrunler} />
+
+      <AtolyeHikayesi />
 
       {/* ─── VIP ERKEN ERİŞİM & AÇILIŞ İNDİRİM BÜLTENİ ─── */}
       <VipBulten />
