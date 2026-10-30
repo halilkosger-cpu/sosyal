@@ -316,6 +316,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <p className="font-semibold text-gray-700">İŞ YRT E-TİCARET GIDA LİMİTED ŞİRKETİ</p>
                 <p>© 2026 isyurtlari.com.tr - Tüm hakları saklıdır. 256-Bit SSL ile korunmaktadır.</p>
               </div>
+              <div className="flex items-center gap-3">
+                <Image src="/iyzico/footer-logo.svg" alt="iyzico ile Güvenli Ödeme" width={180} height={32} className="h-8 w-auto" />
+              </div>
             </div>
           </div>
         </footer>
