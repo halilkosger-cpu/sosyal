@@ -20,7 +20,9 @@ Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 
   Gün içinde yanlışlıkla boş `production` dalına bağlanmıştı; 97 yeni ürün oradan isyurtlari-prod'a
   kopyalandı (toplam 159). `production` dalı artık kullanılmıyor, silme.
 - **iyzico:** canlı anahtarlar Vercel'de (`IYZICO_API_KEY`, `IYZICO_SECRET_KEY`), ödeme sayfasında kart
-  seçeneği açıldı (varsayılan havale). Gerçek kartla uçtan uca test + iade henüz yapılmadı.
+  seçeneği açıldı (varsayılan havale). Müşteri iyzico'nun barındırdığı ödeme sayfasına yönlendiriliyor
+  (`paymentPageUrl`). Dönüşte tutar `paidPrice` ile doğrulanıyor (`price` indirimsiz sepet toplamı).
+  30 Ekim'de gerçek kartla uçtan uca test edildi.
 - **Google Merchant:** feed `https://isyurtlari.com.tr/google-merchant.xml` (130 ürün; fiyatı 0 olan 29 ürün
   dışarıda). `sale_price` kaldırıldı — %10 sepet indirimi Merchant Center → Promosyonlar'dan tanıtılmalı.
 
@@ -33,7 +35,7 @@ Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 
 | 3 — Fotoğrafların tek görsel dile oturtulması | ✅ 49 ürün Higgs ile, 12 ürün resmî galeriden |
 | 4 — Ana sayfa (A+C) | ✅ bitti |
 | 5 — İçerik derinliği | ✅ 61 açıklama + 3 kategori metni yazıldı |
-| 6 — İyzico tam entegrasyon | 🟡 canlı anahtar girildi, kart açık; uçtan uca test bekliyor |
+| 6 — İyzico tam entegrasyon | ✅ bitti — 30 Ekim 2026 gerçek kartla uçtan uca test edildi |
 | 7 — 99 ürün ekleme | ✅ bitti |
 
 Fotoğrafsız 14 ürünün 12'si resmî galeriden çözüldü; kalan ikisi
