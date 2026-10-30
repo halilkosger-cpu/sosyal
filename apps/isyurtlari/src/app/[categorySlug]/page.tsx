@@ -6,6 +6,7 @@ import { prisma } from '@isyurtlari/database';
 import CategoryPageClient from './CategoryPageClient';
 import { kategorileriGetir } from '@/lib/kategoriler';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { KATEGORI_METINLERI } from '@/config/kategori-metinleri';
 import {
@@ -113,21 +114,24 @@ const getCategoryProducts = async (slug: string) => {
 
   try {
     const now = new Date();
-    const urunler = await prisma.product.findMany({
-      where: { category: { slug }, ...GORSELLI_URUN },
-      include: {
-        category: { select: { name: true, slug: true } },
-        campaigns: {
-          where: { campaign: { active: true, startDate: { lte: now }, endDate: { gte: now } } },
-          include: { campaign: true },
+    const [urunler, talepler] = await Promise.all([
+      prisma.product.findMany({
+        where: { category: { slug }, ...GORSELLI_URUN },
+        include: {
+          category: { select: { name: true, slug: true } },
+          campaigns: {
+            where: { campaign: { active: true, startDate: { lte: now }, endDate: { gte: now } } },
+            include: { campaign: true },
+          },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      }),
+      onTalepSayilari(),
+    ]);
 
     // /api/urunler'in varsayılan sırasıyla aynı: ilk çizim ile istemcinin
     // sonradan çektiği liste farklı sırada olursa sayfa kendini yeniden dizer.
-    return varsayilanSirala(urunler).map((u) => {
+    return varsayilanSirala(urunler, talepler).map((u) => {
       // Not: indirim orani Campaign'de degil CampaignProduct uzerinde.
       const kp = u.campaigns[0];
       return {

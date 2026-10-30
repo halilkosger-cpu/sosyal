@@ -19,13 +19,25 @@ export function satilabilirlikKademesi(u: { price: number; quantity: number }): 
   return u.quantity > 0 ? 0 : 1;
 }
 
-/** Kademe, sonra en yeni. Diziyi yerinde değil, kopyasını sıralar. */
-export function varsayilanSirala<T extends { price: number; quantity: number; createdAt: Date }>(
-  urunler: T[]
-): T[] {
-  return [...urunler].sort(
-    (a, b) =>
-      satilabilirlikKademesi(a) - satilabilirlikKademesi(b) ||
-      b.createdAt.getTime() - a.createdAt.getTime()
+/** Ürün kimliği -> iptal edilmemiş ön talep sayısı (bkz. lib/on-talep-sayilari.ts). */
+export type OnTalepSayilari = ReadonlyMap<string, number>;
+
+type Siralanabilir = { id: string; price: number; quantity: number; createdAt: Date };
+
+/**
+ * Kademe, sonra ön talep sayısı (çok istenen üstte), sonra en yeni.
+ * Talep kademenin önüne geçmiyor: fiyatsız bir ürün ne kadar istenirse
+ * istensin sepete eklenemediği için listenin başına çıkmamalı.
+ */
+export function varsayilanKarsilastir(a: Siralanabilir, b: Siralanabilir, talepler: OnTalepSayilari): number {
+  return (
+    satilabilirlikKademesi(a) - satilabilirlikKademesi(b) ||
+    (talepler.get(b.id) ?? 0) - (talepler.get(a.id) ?? 0) ||
+    b.createdAt.getTime() - a.createdAt.getTime()
   );
+}
+
+/** Diziyi yerinde değil, kopyasını sıralar. */
+export function varsayilanSirala<T extends Siralanabilir>(urunler: T[], talepler: OnTalepSayilari): T[] {
+  return [...urunler].sort((a, b) => varsayilanKarsilastir(a, b, talepler));
 }

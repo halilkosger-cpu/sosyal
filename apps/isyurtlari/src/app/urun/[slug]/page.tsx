@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@isyurtlari/database';
 import ProductDetailClient from './ProductDetailClient';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
 import { yerelGorselVar } from '@/lib/urun-gorsel';
 import {
@@ -288,15 +289,18 @@ export default async function ProductPage(props: ProductPageProps) {
   }[] = [];
   if (product) {
     try {
-      const adaylar = await prisma.product.findMany({
-        where: { categoryId: product.categoryId, id: { not: product.id }, imageUrl: { not: null } },
-        select: {
-          id: true, name: true, slug: true, price: true, quantity: true, imageUrl: true, createdAt: true,
-          category: { select: { name: true, slug: true } },
-        },
-        take: 24,
-      });
-      benzerUrunler = varsayilanSirala(adaylar).slice(0, 4).map((u) => ({
+      const [adaylar, talepler] = await Promise.all([
+        prisma.product.findMany({
+          where: { categoryId: product.categoryId, id: { not: product.id }, imageUrl: { not: null } },
+          select: {
+            id: true, name: true, slug: true, price: true, quantity: true, imageUrl: true, createdAt: true,
+            category: { select: { name: true, slug: true } },
+          },
+          take: 24,
+        }),
+        onTalepSayilari(),
+      ]);
+      benzerUrunler = varsayilanSirala(adaylar, talepler).slice(0, 4).map((u) => ({
         id: u.id, name: u.name, slug: u.slug, price: u.price, quantity: u.quantity,
         imageUrl: u.imageUrl ?? undefined, category: u.category,
       }));

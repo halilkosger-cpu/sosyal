@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { prisma } from '@isyurtlari/database';
 import { urunAra } from '@/lib/arama';
-import { satilabilirlikKademesi } from '@/lib/urun-siralama';
+import { varsayilanKarsilastir, type OnTalepSayilari } from '@/lib/urun-siralama';
+import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 export const dynamic = 'force-dynamic';
@@ -209,6 +210,7 @@ async function urunleriListele(req: NextRequest) {
     let urunler = urunlerHam as any[];
 
     if (bellekteSirala) {
+      const talepler: OnTalepSayilari = sirala === 'varsayilan' ? await onTalepSayilari() : new Map();
       const hepsi = urunlerHam as { id: string; price: number; quantity: number; createdAt: Date }[];
 
       const sirali = [...hepsi].sort((a, b) => {
@@ -227,10 +229,7 @@ async function urunleriListele(req: NextRequest) {
           const fark = (aramaPuanlari.get(b.id) ?? 0) - (aramaPuanlari.get(a.id) ?? 0);
           if (fark !== 0) return fark;
         }
-        return (
-          satilabilirlikKademesi(a) - satilabilirlikKademesi(b) ||
-          b.createdAt.getTime() - a.createdAt.getTime()
-        );
+        return varsayilanKarsilastir(a, b, talepler);
       });
 
       const sayfaKimlikleri = sirali.slice((sayfa - 1) * adet, sayfa * adet).map((u) => u.id);

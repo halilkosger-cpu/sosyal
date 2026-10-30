@@ -3,6 +3,7 @@ import { jsonLdMetni } from '@/lib/json-ld';
 import AnaSayfa from './AnaSayfa';
 import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 import { varsayilanSirala } from '@/lib/urun-siralama';
+import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 
 /**
@@ -105,7 +106,7 @@ async function anaSayfaVerisi() {
   try {
     const now = new Date();
 
-    const [kategoriler, urunler, kampanyalar] = await Promise.all([
+    const [kategoriler, urunler, kampanyalar, talepler] = await Promise.all([
       // Gosterilecek urunu kalmayan kategori vitrine cikmiyor; bkz.
       // lib/urun-gorunurluk.ts.
       prisma.productCategory.findMany({
@@ -129,6 +130,7 @@ async function anaSayfaVerisi() {
           },
         },
       }),
+      onTalepSayilari(),
     ]);
 
     return {
@@ -136,7 +138,7 @@ async function anaSayfaVerisi() {
       // Vitrinde yalnizca fotografi olan urunler. Fotografsiz urun ana
       // sayfada bos kutu gibi duruyordu; kategori sayfalarinda ve aramada
       // gorunmeye devam ediyor.
-      urunler: varsayilanSirala(urunler.filter((u) => u.imageUrl)).slice(0, 8).map((u) => ({
+      urunler: varsayilanSirala(urunler.filter((u) => u.imageUrl), talepler).slice(0, 8).map((u) => ({
         id: u.id,
         name: u.name,
         slug: u.slug,
