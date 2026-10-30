@@ -42,5 +42,5 @@ async function kategorileriGetir() {
 }
 
 export async function GET() {
-  return vitrinOnbellegi(await kategorileriGetir(), 600);
+  return vitrinOnbellegi(await kategorileriGetir());
 }
