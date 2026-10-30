@@ -19,6 +19,7 @@ import {
   LuSparkles,
   LuCalendar,
 } from 'react-icons/lu';
+import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 
 interface SepetKalemi {
   id: string;
@@ -211,7 +212,8 @@ export default function AdminTerkEdilmisSepetlerPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <ExcelIndirDugmesi tur="terk-edilmis-sepetler" />
           <button
             onClick={veriYukle}
             disabled={loading}

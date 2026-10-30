@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
+import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
 
 interface OrderItem { quantity: number; price: number; product?: { name: string }; }
@@ -159,6 +160,7 @@ export default function AdminOrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Siparişler</h1>
           <p className="text-gray-500 text-sm mt-1">{orders.length} sipariş</p>
         </div>
+        <ExcelIndirDugmesi tur="siparisler" />
       </div>
 
       {/* Filter tabs */}

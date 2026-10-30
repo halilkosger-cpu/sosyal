@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { LuClock, LuBell, LuCheck, LuX, LuPackage } from 'react-icons/lu';
+import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 
 interface PreOrder {
   id: string;
@@ -131,11 +132,14 @@ export default function AdminPreOrdersPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Ön Talepler</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          {preOrders.length} ön talep · {summary.reduce((a, s) => a + s.waitingCount, 0)} tanesi stok bekliyor
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Ön Talepler</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {preOrders.length} ön talep · {summary.reduce((a, s) => a + s.waitingCount, 0)} tanesi stok bekliyor
+          </p>
+        </div>
+        <ExcelIndirDugmesi tur="on-talepler" />
       </div>
 
       {message && (
