@@ -37,7 +37,7 @@ const YEREL = new Set(); // Tüm ürünler imageUrl'le cevap verir, YEREL boş
  * Ayni kume, Prisma `where` icinde kullanilabilsin diye dizi olarak.
  * Vitrin gorunurluk kurali bunu okuyor; bkz. lib/urun-gorunurluk.ts.
  */
-export const YEREL_GORSELLI_SLUGLAR: string[] = Array.from(YEREL);
+export const YEREL_GORSELLI_SLUGLAR: string[] = Array.from(YEREL) as string[];
 
 /** Uretilen genislikler. Kaynak 1024 piksel; buyutme yapilmiyor. */
 export const GORSEL_BOYUTLARI = [400, 800, 1024] as const;
