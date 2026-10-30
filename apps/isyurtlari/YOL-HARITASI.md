@@ -16,6 +16,14 @@ Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 
 - Vercel GitHub push'unda otomatik deploy ediyor. Google Fonts kaynaklı
   `next/font ... reading '1'` build hatası geçici ağ hatasıydı; tekrar deploy yeterli.
 
+- **Veritabanı:** site yine Neon `isyurtlari-prod` dalına bağlı (siparişler, ön talepler, analitik, 2FA orada).
+  Gün içinde yanlışlıkla boş `production` dalına bağlanmıştı; 97 yeni ürün oradan isyurtlari-prod'a
+  kopyalandı (toplam 159). `production` dalı artık kullanılmıyor, silme.
+- **iyzico:** canlı anahtarlar Vercel'de (`IYZICO_API_KEY`, `IYZICO_SECRET_KEY`), ödeme sayfasında kart
+  seçeneği açıldı (varsayılan havale). Gerçek kartla uçtan uca test + iade henüz yapılmadı.
+- **Google Merchant:** feed `https://isyurtlari.com.tr/google-merchant.xml` (130 ürün; fiyatı 0 olan 29 ürün
+  dışarıda). `sale_price` kaldırıldı — %10 sepet indirimi Merchant Center → Promosyonlar'dan tanıtılmalı.
+
 ## Durum özeti
 
 | Aşama | Durum |
@@ -25,7 +33,7 @@ Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 
 | 3 — Fotoğrafların tek görsel dile oturtulması | ✅ 49 ürün Higgs ile, 12 ürün resmî galeriden |
 | 4 — Ana sayfa (A+C) | ✅ bitti |
 | 5 — İçerik derinliği | ✅ 61 açıklama + 3 kategori metni yazıldı |
-| 6 — İyzico tam entegrasyon | ⛔ hesap bekliyor |
+| 6 — İyzico tam entegrasyon | 🟡 canlı anahtar girildi, kart açık; uçtan uca test bekliyor |
 | 7 — 99 ürün ekleme | ✅ bitti |
 
 Fotoğrafsız 14 ürünün 12'si resmî galeriden çözüldü; kalan ikisi
