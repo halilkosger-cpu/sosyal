@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Kategorileri kontrol et/oluştur
     for (const [slug, name] of Object.entries(categoryNames)) {
-      const category = await db.productCategory.upsert({
+      await db.productCategory.upsert({
         where: { slug },
         update: {},
         create: {
