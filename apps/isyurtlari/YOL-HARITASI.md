@@ -391,3 +391,11 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 - [x] G12 DÜŞÜK Admin ürün PUT/DELETE audit yok → logAudit.
 - [x] G13 DÜŞÜK sharp `limitInputPixels` yok → 40 MP.
 - [x] G14 DÜŞÜK Sipariş kalem sayısı sınırsız → en fazla 50.
+
+### H. Yeni ürün fotoğrafları (20261030_resimleri_isyurt, 99 adet) — bekleyenler
+- [ ] H1 Yumurta (FOÇA M YUMURTA) — fiyat kartı kaldı, yeniden işlenecek.
+- [ ] H2 Yoğurt kovası — üzerinde "2,50 TL / 130" yazısı; raf etiketi mi ambalaj mı netleşecek.
+- [ ] H3 Sarı kapaklı zeytin/yaprak kavanozu — "900 ₺" etiketi kaldı.
+- [ ] H4 Son sıra (fc77f8a2) — ürün üzerinde "1250 ₺" etiketi kaldı.
+- [ ] H5 Fiyat okunamayanlar / eksik fiyatlar kullanıcı tarafından girilecek.
+- [ ] H6 Siteye yükleme: kategori + %35 kâr + dosya adı (SEO uyumlu slug) ile hazırlanacak; canlı DB'ye yazma kullanıcı onayıyla.
