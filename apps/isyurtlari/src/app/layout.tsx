@@ -37,12 +37,9 @@ import CartTrigger from '@/components/CartTrigger';
 import './globals.css';
 
 const fraunces = Fraunces({
-  subsets: ['latin-ext'],
-  axes: ['opsz', 'SOFT'],
+  subsets: ['latin'],
   display: 'swap',
   variable: '--font-display',
-  preload: true,
-  fallback: ['Georgia', 'serif'],
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
