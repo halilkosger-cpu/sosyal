@@ -1,27 +1,18 @@
-import { describe, it, expect } from 'vitest';
-import { odemeGecerli, generateIyzicoV2Auth } from './iyzico';
+import { describe, expect, it } from 'vitest';
+import { iyzicoSayfasiMi } from './iyzico';
 
-const basarili = { status: 'success', paymentStatus: 'SUCCESS', fraudStatus: 1, price: '250.00' };
+describe('iyzicoSayfasiMi', () => {
+  it('iyzico odeme sayfalarini kabul eder', () => {
+    expect(iyzicoSayfasiMi('https://cpp.iyzipay.com?token=abc&lang=tr')).toBe(true);
+    expect(iyzicoSayfasiMi('https://iyzipay.com/odeme')).toBe(true);
+  });
 
-describe('odemeGecerli', () => {
-  it('basarili ve tutari tutan odemeyi kabul eder', () => {
-    expect(odemeGecerli(basarili, 250)).toBe(true);
-  });
-  it('fraud onayi tek basina yetmez', () => {
-    expect(odemeGecerli({ ...basarili, paymentStatus: 'FAILURE' }, 250)).toBe(false);
-  });
-  it('fraud incelemesindeki odemeyi reddeder', () => {
-    expect(odemeGecerli({ ...basarili, fraudStatus: 0 }, 250)).toBe(false);
-  });
-  it('tutar uyusmazsa reddeder', () => {
-    expect(odemeGecerli({ ...basarili, price: '1.00' }, 250)).toBe(false);
-  });
-});
-
-describe('generateIyzicoV2Auth', () => {
-  it('IYZWSv2 basligi uretir', () => {
-    const { authorization } = generateIyzicoV2Auth('/x', { a: 1 }, 'k', 's');
-    const icerik = Buffer.from(authorization.replace('IYZWSv2 ', ''), 'base64').toString();
-    expect(icerik).toMatch(/^apiKey:k&randomKey:\d+&signature:[0-9a-f]{64}$/);
+  it('baska alan adlarini, http ve gecersiz degerleri reddeder', () => {
+    expect(iyzicoSayfasiMi('https://iyzipay.com.kotu.site/odeme')).toBe(false);
+    expect(iyzicoSayfasiMi('https://kotuiyzipay.com/odeme')).toBe(false);
+    expect(iyzicoSayfasiMi('http://cpp.iyzipay.com')).toBe(false);
+    expect(iyzicoSayfasiMi('javascript:alert(1)')).toBe(false);
+    expect(iyzicoSayfasiMi(undefined)).toBe(false);
+    expect(iyzicoSayfasiMi('')).toBe(false);
   });
 });

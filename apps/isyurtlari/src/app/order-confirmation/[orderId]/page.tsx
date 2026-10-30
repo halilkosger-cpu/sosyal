@@ -45,6 +45,13 @@ export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
   const orderId = params.orderId as string;
   const paymentType = searchParams.get('payment') || 'pending';
+  const kartOdemesiBasarili = searchParams.get('odeme') === 'basarili';
+
+  useEffect(() => {
+    if (!kartOdemesiBasarili) return;
+    localStorage.removeItem('cart');
+    window.dispatchEvent(new Event('cartUpdated'));
+  }, [kartOdemesiBasarili]);
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -392,7 +399,7 @@ export default function OrderConfirmationPage() {
             )}
 
             {/* Payment Details - Credit Card */}
-            {paymentType === 'pending' && order.paymentMethod === 'CREDIT_CARD' && (
+            {paymentType === 'pending' && order.paymentMethod === 'CREDIT_CARD' && !kartOdemesiBasarili && order.status === 'PENDING' && (
               <div className="bg-blue-50 rounded-2xl border border-blue-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">💳 Kredi Kartı Ödeme</h2>
                 <p className="text-gray-700 mb-4">

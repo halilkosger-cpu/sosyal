@@ -86,6 +86,13 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
+    const odemeHatasi = new URLSearchParams(window.location.search).get('hata');
+    if (odemeHatasi) {
+      setError(`Kartla ödeme tamamlanamadı: ${odemeHatasi.replace(/_/g, ' ')}. Lütfen tekrar deneyin veya havale/EFT seçin.`);
+    }
+  }, []);
+
+  useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
     if (savedCart.length === 0) {
       router.push('/sepet');
@@ -338,12 +345,12 @@ export default function CheckoutPage() {
 
         const paymentData = await paymentRes.json();
 
-        // Iyzico checkout form HTML'ini DOM'a ekle
-        if (paymentData.checkoutFormContent) {
-          const checkoutForm = document.createElement('div');
-          checkoutForm.innerHTML = paymentData.checkoutFormContent;
-          document.body.appendChild(checkoutForm);
+        if (!paymentData.paymentPageUrl) {
+          setError('Ödeme sayfası açılamadı, lütfen tekrar deneyin.');
+          setSubmitting(false);
+          return;
         }
+        window.location.assign(paymentData.paymentPageUrl);
       } else {
         // Bank transfer - show confirmation with bank details
         localStorage.removeItem('cart');

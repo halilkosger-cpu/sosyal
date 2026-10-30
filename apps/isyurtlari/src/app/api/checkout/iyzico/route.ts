@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { iyzicoIstek, IYZICO_YOLLARI } from '@/lib/iyzico';
+import { iyzicoIstek, iyzicoSayfasiMi, IYZICO_YOLLARI } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
@@ -254,7 +254,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Ödeme sağlayıcı yanıt vermedi' }, { status: 502 });
     }
 
-    if (!yanit.ok || !sonuc?.checkoutFormContent) {
+    if (!yanit.ok || sonuc?.status !== 'success' || !iyzicoSayfasiMi(sonuc?.paymentPageUrl)) {
       console.error('Iyzico hatası', {
         durum: yanit.status,
         kod: sonuc?.errorCode,
@@ -266,9 +266,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // innerHTML ile eklenen <script> calismadigi icin checkoutFormContent yerine
+    // iyzico'nun barindirdigi odeme sayfasina yonlendiriliyor.
     return NextResponse.json({
       success: true,
-      checkoutFormContent: sonuc.checkoutFormContent,
+      paymentPageUrl: sonuc.paymentPageUrl,
       orderId: siparis.id,
     });
   } catch (error) {

@@ -46,6 +46,17 @@ export async function iyzicoIstek(yol: string, govde: object, apiKey: string, se
   });
 }
 
+/** Musteri yalnizca iyzico'nun kendi HTTPS alan adina yonlendirilir. */
+export function iyzicoSayfasiMi(adres: unknown): adres is string {
+  if (typeof adres !== 'string') return false;
+  try {
+    const u = new URL(adres);
+    return u.protocol === 'https:' && (u.hostname === 'iyzipay.com' || u.hostname.endsWith('.iyzipay.com'));
+  } catch {
+    return false;
+  }
+}
+
 /** Odeme gercekten tamamlandi mi ve tahsil edilen tutar siparisle ayni mi? */
 export function odemeGecerli(sonuc: any, siparisTutari: number): boolean {
   if (sonuc?.status !== 'success' || sonuc?.paymentStatus !== 'SUCCESS') return false;
