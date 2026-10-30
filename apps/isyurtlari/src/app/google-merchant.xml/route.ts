@@ -43,15 +43,12 @@ export async function GET() {
         const normalFiyat = Number(p.price);
         const price = `${normalFiyat.toFixed(2)} TRY`;
 
-        // Büyük Açılış & Efsane Kasım: Sepette %10 indirim
-        // Google Merchant sale_price etiketi Google Alışveriş'te orijinal fiyatın üzerini çizer ve indirim rozeti ekler
-        let salePriceXml = '';
-        let customLabelXml = '';
-        if (KASIM_KAMPANYASI_AKTIF && KASIM_INDIRIM_ORANI > 0) {
-          const indirimliFiyat = Math.round(normalFiyat * (1 - KASIM_INDIRIM_ORANI / 100) * 100) / 100;
-          salePriceXml = `\n      <g:sale_price>${indirimliFiyat.toFixed(2)} TRY</g:sale_price>`;
-          customLabelXml = `\n      <g:custom_label_0>Efsane Kasim %10 Indirim</g:custom_label_0>`;
-        }
+        // sale_price bilerek yok: indirim sepette uygulaniyor, urun sayfasi tam fiyati gosteriyor.
+        // Google sayfa ile feed fiyati uyusmazsa urunu reddediyor; indirim Merchant Center Promosyonlar'dan tanitiliyor.
+        const customLabelXml =
+          KASIM_KAMPANYASI_AKTIF && KASIM_INDIRIM_ORANI > 0
+            ? `\n      <g:custom_label_0>Efsane Kasim %10 Indirim</g:custom_label_0>`
+            : '';
 
         const availability = p.quantity > 0 ? 'in_stock' : 'out_of_stock';
         
@@ -70,7 +67,7 @@ export async function GET() {
       <g:image_link>${imageUrl}</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>${availability}</g:availability>
-      <g:price>${price}</g:price>${salePriceXml}
+      <g:price>${price}</g:price>
       <g:brand>İşyurtları</g:brand>
       <g:product_type>${categoryName}</g:product_type>${customLabelXml}
       <g:identifier_exists>no</g:identifier_exists>
