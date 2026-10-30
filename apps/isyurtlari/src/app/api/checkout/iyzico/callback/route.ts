@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
       console.error('iyzico callback: tutar/fraud doğrulaması başarısız', {
         orderNumber,
         beklenen: siparis.totalAmount,
-        gelen: sonuc?.price,
+        gelen: sonuc?.paidPrice,
         fraudStatus: sonuc?.fraudStatus,
       });
       return NextResponse.redirect(`${siteUrl}/checkout?hata=odeme_dogrulanamadi`, 303);

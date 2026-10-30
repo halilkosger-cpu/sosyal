@@ -61,6 +61,7 @@ export function iyzicoSayfasiMi(adres: unknown): adres is string {
 export function odemeGecerli(sonuc: any, siparisTutari: number): boolean {
   if (sonuc?.status !== 'success' || sonuc?.paymentStatus !== 'SUCCESS') return false;
   if (sonuc?.fraudStatus !== undefined && sonuc.fraudStatus !== 1) return false;
-  const tutar = Number(sonuc?.price);
-  return Number.isFinite(tutar) && Math.abs(tutar - siparisTutari) < 0.01;
+  // price indirimsiz sepet toplami; tahsil edilen paidPrice. Taksit vade farki paidPrice'a eklendigi icin alt sinir kontrol ediliyor.
+  const tahsilEdilen = Number(sonuc?.paidPrice);
+  return Number.isFinite(tahsilEdilen) && tahsilEdilen >= siparisTutari - 0.01;
 }
