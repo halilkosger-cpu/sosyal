@@ -1,33 +1,22 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 30 Ekim 2026 (gün) — **99 yeni ürün ve 5 kategori eklendi, deployment sürecinde**
+Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 ürün, 5 kategori)
 Önceki: 25 Eylül 2026 (gece) · Sıradaki iş: **Aşama 6 (iyzico) ve fiyatsız 31 ürün**
 
-## 30 Ekim 2026 — 99 Ürün Ekleme Süreci (Devam Eden)
+## 30 Ekim 2026 — Katalog genişlemesi (99 ürün)
 
-**Başlangıç:** 99 yeni ürün (Neon) + iyzico logoları (footer, checkout)
-**Sorunlar çözmek için yapılan işlemler:**
+- Canlı katalog: 146 ürün, 5 kategori (Gemini veritabanını düzeltti).
+- Yeni ürün fotoğrafları kaynağı: `~/Desktop/20261030_resimleri_isyurt/web-hazir/{slug}.webp` (1024 px).
+  `public/urun/` altına 400/800/1024 WebP olarak üretildi (sharp, kalite 78) ve
+  `src/lib/urun-gorsel.ts` YEREL listesine 98 slug eklendi.
+- `el-dokumasi-namazlik` iki listede de vardı; eski (Higgs) fotoğrafı korundu.
+- Aynı gün denenip yanlış çıkan değişiklikler (YEREL'i boşaltmak, GORSELLI_URUN'ü kaldırmak,
+  CDN önbelleğini kapatmak, Fraunces fontundan `latin-ext`'i silmek) geri alındı.
+  Görünürlük kuralı yine `src/lib/urun-gorunurluk.ts`.
+- Vercel GitHub push'unda otomatik deploy ediyor. Google Fonts kaynaklı
+  `next/font ... reading '1'` build hatası geçici ağ hatasıydı; tekrar deploy yeterli.
 
-1. **Ürün stok sorunu:** Yeni 99 ürün quantity=0 olarak yüklenmişti → SQL ile quantity=10 set edildi
-2. **GORSELLI_URUN filtresi:** Kompleks filtre (yerel + imageUrl) 61 eski ürünü gösterirken yeni ürünleri gizliyordu
-   - `/src/lib/urun-gorsel.ts` YEREL Set'i boş yapıldı
-   - `/src/app/api/products/route.ts` GORSELLI_URUN yerine sadece `imageUrl: { not: null }` filtrelemesi
-3. **CDN Cache (5 dakika):** Ürün API'si 5 dakika cache'leniyor, güncellemeler gecikmeli gösteriliyordu
-   - `/src/lib/vitrin-onbellegi.ts` cache `s-maxage=300` kaldırıldı → `no-cache, no-store, must-revalidate`
-4. **Categories API filtresi:** 5 kategori olmasına rağmen 2 kategori (gıda, hediyelik) döndürülüyordu
-   - GORSELLI_URUN filtresi `where: { products: { some: { imageUrl: { not: null } } } }` olarak düzeltildi
-5. **Google Fonts loader hatası:** Fraunces font `axes` ve `preload` parametreleri API hatası yapıyordu
-   - Layout.tsx fontconfig basitleştirildi (axes kaldırıldı, latin-ext → latin)
-
-**Mevcut durum (30 Ekim):**
-- Neon: 99 ürün, 5 kategori, hepsi imageUrl dolu
-- Database: ✅ Tamam
-- Code commits: 6 commit (ürün ekleme, resimler, iyzico logoları, cache, fontlar)
-- Deployment: Google Fonts fix push yapıldı, Vercel build yapıyor (Gemini'ye geçince haber verilecek)
-
-**Beklenen sonuç (deploy bittiğinde):** 99 ürün + 5 kategori + yeni resimler + iyzico logoları görünür
-
-## Durum özeti (Eski)
+## Durum özeti
 
 | Aşama | Durum |
 |---|---|
@@ -37,7 +26,7 @@ Son güncelleme: 30 Ekim 2026 (gün) — **99 yeni ürün ve 5 kategori eklendi,
 | 4 — Ana sayfa (A+C) | ✅ bitti |
 | 5 — İçerik derinliği | ✅ 61 açıklama + 3 kategori metni yazıldı |
 | 6 — İyzico tam entegrasyon | ⛔ hesap bekliyor |
-| **7 — 99 Ürün Ekleme** | 🔄 **Deploy süreci** |
+| 7 — 99 ürün ekleme | ✅ bitti |
 
 Fotoğrafsız 14 ürünün 12'si resmî galeriden çözüldü; kalan ikisi
 (Bez Çanta Setleri, Takı Çantası) galeride yok, gizli duruyorlar.

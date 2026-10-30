@@ -1,6 +1,7 @@
 import { prisma } from '@isyurtlari/database';
 import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { vitrinUrunu } from '@/lib/vitrin';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -19,7 +20,7 @@ async function urunleriGetir(req: NextRequest) {
     const categorySlug = req.nextUrl.searchParams.get('category');
     const search = req.nextUrl.searchParams.get('search');
 
-    const where: any = { imageUrl: { not: null } };
+    const where: any = { ...GORSELLI_URUN };
 
     if (categorySlug) {
       where.category = {

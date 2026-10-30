@@ -1,5 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
+import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +25,7 @@ async function kategorileriGetir() {
      * sitemap'te de uygulaniyor; bkz. lib/urun-gorunurluk.ts.
      */
     const categories = await prisma.productCategory.findMany({
-      where: { products: { some: { imageUrl: { not: null } } } },
+      where: { products: { some: GORSELLI_URUN } },
       orderBy: {
         name: 'asc',
       },
@@ -41,5 +42,5 @@ async function kategorileriGetir() {
 }
 
 export async function GET() {
-  return vitrinOnbellegi(await kategorileriGetir());
+  return vitrinOnbellegi(await kategorileriGetir(), 600);
 }
