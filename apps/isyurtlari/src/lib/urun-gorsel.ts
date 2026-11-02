@@ -73,7 +73,6 @@ const YEREL = new Set([
   'el-yapimi-porselen-cini-cay-seti',
   'el-yapimi-porselen-cini-hediyelikler',
   'el-yapimi-sedef-kaplamali-satranc-seti',
-  'elma-agaci-fidani',
   'findik',
   'hasasezmesi',
   'incir-receli',
@@ -96,7 +95,6 @@ const YEREL = new Set([
   'zeytinyagi-500ml',
   'bez-canta-setleri',
   'taki-cantasi',
-  'takı-cantasi',
   // 30 Ekim 2026 katalog genislemesi: isyurtlari urun fotograflari.
   'ademoda-visko-yastik-kilifi-60x40-cm',
   'adiyaman-narli-cevizli-sucuk-250-gr',
