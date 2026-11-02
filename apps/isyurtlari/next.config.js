@@ -1,7 +1,9 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   reactStrictMode: true,
-  swcMinify: true,
   transpilePackages: ['@isyurtlari/database'],
   poweredByHeader: false,
   experimental: {
@@ -18,7 +20,6 @@ const nextConfig = {
 
   // Mobile optimization
   productionBrowserSourceMaps: false,
-  optimizeFonts: true,
 
   // Not: burada "optimizeImages: true" duruyordu. Next boyle bir secenek
   // tanimiyor ve her derlemede "Unrecognized key(s) in object:
