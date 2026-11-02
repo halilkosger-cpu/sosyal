@@ -138,7 +138,7 @@ export default function MobilUygulamaBanneri() {
                   <Image src="/logo.webp" alt="Logo" width={24} height={24} className="object-contain" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-gray-900">İsyurtları Uygulamasını Ekle</h3>
+                  <h3 className="font-bold text-sm text-gray-900">İşyurtları Uygulamasını Ekle</h3>
                   <p className="text-[10px] text-gray-500">iPhone Ana Ekranına Kolay Kurulum</p>
                 </div>
               </div>
