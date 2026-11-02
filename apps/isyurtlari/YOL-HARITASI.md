@@ -1,7 +1,7 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 2 Kasım 2026 — Google Merchant Center Feed Optimizasyonu (Marka, Taksonomi, Zengin Açıklamalar)
-Önceki: 30 Ekim 2026 · Sıradaki iş: **Merchant Center panel ayarları (Kargo, İade) ve Google Ads**
+Son güncelleme: 2 Kasım 2026 — Google Merchant Center Başlık & Marka Zenginleştirmesi, Piyasa Fiyat Analizi Planlaması
+Önceki: 30 Ekim 2026 · Sıradaki iş: **Merchant Center panel ayarları (Kargo, İade) ve Piyasa Fiyat Analizi**
 
 ## 2 Kasım 2026 — Google Merchant Center Feed Güçlendirmesi (Hesap: 5876808666)
 
@@ -424,10 +424,16 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 - [x] G13 DÜŞÜK sharp `limitInputPixels` yok → 40 MP.
 - [x] G14 DÜŞÜK Sipariş kalem sayısı sınırsız → en fazla 50.
 
-### H. Yeni ürün fotoğrafları (20261030_resimleri_isyurt, 99 adet) — bekleyenler
-- [ ] H1 Yumurta (FOÇA M YUMURTA) — fiyat kartı kaldı, yeniden işlenecek.
-- [ ] H2 Yoğurt kovası — üzerinde "2,50 TL / 130" yazısı; raf etiketi mi ambalaj mı netleşecek.
-- [ ] H3 Sarı kapaklı zeytin/yaprak kavanozu — "900 ₺" etiketi kaldı.
-- [ ] H4 Son sıra (fc77f8a2) — ürün üzerinde "1250 ₺" etiketi kaldı.
-- [ ] H5 Fiyat okunamayanlar / eksik fiyatlar kullanıcı tarafından girilecek.
-- [ ] H6 Siteye yükleme: kategori + %35 kâr + dosya adı (SEO uyumlu slug) ile hazırlanacak; canlı DB'ye yazma kullanıcı onayıyla.
+### H. Katalog & Ürün Temizliği — bekleyenler
+- [x] H1-H4 Etiketli/istenmeyen ürünler admin panelden temizlendi (Foça M Yumurta, Yoğurt Kovası, 900 TL zeytin, 1250 TL kutu).
+- [ ] H5 Fiyatı 0 olan veya eksik ürünler (/admin/fiyatlar üzerinden fiyat girilecek; fiyat girilince Merchant feed'ine otomatik dahil olur).
+- [ ] H6 Kalan yeni ürünlerin siteye aktarımı (SEO uyumlu slug ve kâr oranıyla).
+
+### I. Google Merchant Center & Otomatik Piyasa Fiyat Analizi
+- [x] I1 Dinamik XML Feed optimizasyonu (Elban, AK-CE, ADVEM, Zenbay marka eşleştirme, Google kategori taksonomisi 422/587/632/1604, zengin açıklamalar, `identifier_exists: no`).
+- [ ] I2 Merchant Center Panel Kargo Kuralları (Türkiye geneli kargo ücreti ve 2-4 iş günü teslimat süresi tanımı).
+- [ ] I3 Merchant Center Panel İade Politikası (14 gün yasal iade, iade adresi ve kargo şartları).
+- [ ] I4 Merchant Center "Otomatik Ürün Güncellemeleri" (Schema.org / JSON-LD mikro verileri ile Google'ın fiyat/stok değişimlerini anında senkronize etmesi).
+- [ ] I5 Otomatik Piyasa Fiyat Analizi (Piyasa Kıyaslama & Fiyat Takibi):
+  - **Aşama 1 (Google Dahili):** Merchant Center > Büyüme > *Fiyat Rekabet Gücü Raporu (Price Competitiveness)* aktivasyonu (Google Alışveriş kıyaslama fiyatı ve pazar ortalaması).
+  - **Aşama 2 (Admin Entegrasyonu):** Admin paneline piyasa takip modülü (Google Shopping API / Pazar yeri muadil ürün fiyat scraper veya Akakçe/Cimri eşleştirmesi ile 'Piyasa Ortalaması vs Sizin Fiyatınız' uyarısı ve kâr marjı önerisi).
