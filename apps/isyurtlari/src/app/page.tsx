@@ -5,6 +5,7 @@ import { absoluteUrl, hasDatabaseUrl } from '@/lib/seo';
 import { varsayilanSirala } from '@/lib/urun-siralama';
 import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
+import { kategorileriGetir } from '@/lib/kategoriler';
 
 /**
  * Ana sayfa her istekte yeniden üretilmiyor.
@@ -101,7 +102,10 @@ const sssJsonLd = {
  * degeri olarak gecirilince icerik sunucu HTML'ine giriyor.
  */
 async function anaSayfaVerisi() {
-  if (!hasDatabaseUrl()) return { kategoriler: null, urunler: null, kampanyalar: null };
+  if (!hasDatabaseUrl()) {
+    const kategoriler = await kategorileriGetir();
+    return { kategoriler, urunler: null, kampanyalar: null };
+  }
 
   try {
     const now = new Date();

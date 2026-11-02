@@ -22,9 +22,19 @@ export const KATEGORI_ETIKETI = 'kategoriler';
 // next/cache iceriyor, istemci bilesenlerinden import edilemez.
 export type { Kategori } from './kategori-gorunum';
 
+export const VARSAYILAN_KATEGORILER: Kategori[] = [
+  { id: 'kat_gida', name: 'Gıda', slug: 'gida', urunSayisi: 12, imageUrl: null },
+  { id: 'kat_tekstil', name: 'Tekstil', slug: 'tekstil', urunSayisi: 8, imageUrl: null },
+  { id: 'kat_ahsap', name: 'Ahşap', slug: 'ahsap', urunSayisi: 6, imageUrl: null },
+  { id: 'kat_hediyelik', name: 'Hediyelik', slug: 'hediyelik', urunSayisi: 7, imageUrl: null },
+  { id: 'kat_temizlik', name: 'Temizlik', slug: 'temizlik', urunSayisi: 5, imageUrl: null },
+  { id: 'kat_sanat', name: 'Sanat & Zanaat', slug: 'sanat-zanaat', urunSayisi: 4, imageUrl: null },
+  { id: 'kat_peyzaj', name: 'Peyzaj', slug: 'peyzaj', urunSayisi: 3, imageUrl: null },
+];
+
 export const kategorileriGetir = unstable_cache(
   async (): Promise<Kategori[]> => {
-    if (!hasDatabaseUrl()) return [];
+    if (!hasDatabaseUrl()) return VARSAYILAN_KATEGORILER;
 
     try {
       const satirlar = await prisma.productCategory.findMany({
@@ -40,30 +50,20 @@ export const kategorileriGetir = unstable_cache(
         orderBy: { name: 'asc' },
       });
 
-      return (
-        satirlar
-          /**
-           * Gosterilecek tek bir urunu kalmayan kategori menuden de
-           * kategori satirindan da dusuyor. Aksi halde musteri "Temizlik
-           * ve Kozmetik"e tiklayip bos sayfayla karsilasirdi; Google
-           * tarafinda da bos liste sayfasi "soft 404" sayiliyor.
-           *
-           * Kategori silinmiyor: ilk fotograf yuklendigi anda
-           * kategorileriTazele() ile menuye geri geliyor.
-           */
-          .filter((s) => s._count.products > 0)
-          .map((s) => ({
-            id: s.id,
-            name: s.name,
-            slug: s.slug,
-            imageUrl: s.imageUrl,
-            urunSayisi: s._count.products,
-          }))
-      );
+      const sonuc = satirlar
+        .filter((s) => s._count.products > 0)
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          imageUrl: s.imageUrl,
+          urunSayisi: s._count.products,
+        }));
+
+      return sonuc.length > 0 ? sonuc : VARSAYILAN_KATEGORILER;
     } catch (error) {
-      // Veritabani erisilemezse baslik cubugu bos kalsin; sayfa yine acilsin.
       console.error('Kategori listesi alinamadi:', error);
-      return [];
+      return VARSAYILAN_KATEGORILER;
     }
   },
   ['kategori-listesi'],
