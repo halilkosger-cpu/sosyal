@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { uygulamaBanneriGosterilebilir } from '@/lib/katman-sirasi';
 import Image from 'next/image';
-import { LuX, LuShare, LuSquarePlus, LuDownload } from 'react-icons/lu';
+import { LuX, LuShare, LuSquarePlus } from 'react-icons/lu';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -24,37 +23,42 @@ export default function MobilUygulamaBanneri() {
 
     if (isStandalone) return;
 
-    // Kullanici daha once kapattiysa 7 gun boyunca tekrar rahatsiz etme
+    // Kullanici daha once kapattiysa o gun tekrar rahatsiz etme
     const kapatilmaZamani = localStorage.getItem('app_banner_dismissed_at');
     if (kapatilmaZamani) {
       const gecenGun = (Date.now() - parseInt(kapatilmaZamani, 10)) / (1000 * 60 * 60 * 24);
-      if (gecenGun < 7) return;
+      if (gecenGun < 0.2) return; // ~5 saat sonra veya cache temizlenince tekrar
     }
 
     // Cihaz tespiti
     const ua = navigator.userAgent || navigator.vendor || '';
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+    const isIOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isAndroid = /android/i.test(ua);
 
     if (isIOS) setCihaz('ios');
     else if (isAndroid) setCihaz('android');
     else setCihaz('other');
 
-    // Sadece mobilde goster
-    // Android'de banner yalnizca tarayici PWA kurulumu sunarsa cikar (beforeinstallprompt).
-    if (isIOS && uygulamaBanneriGosterilebilir()) {
-      setGorunur(true);
-    }
+    // Mobilde (iOS, Android veya mobil tarayıcıda) banner'ı doğrudan göster
+    setGorunur(true);
 
     // Android Chrome PWA native prompt yakalama
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
-      if (uygulamaBanneriGosterilebilir()) setGorunur(true);
+      setGorunur(true);
     };
 
+    const handleAcModal = () => setIosRehberAcik(true);
+    window.addEventListener('open-app-install-modal', handleAcModal);
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('open-app-install-modal', handleAcModal);
+    };
   }, []);
 
   const kapat = () => {
@@ -102,7 +106,7 @@ export default function MobilUygulamaBanneri() {
             <Image src="/logo.webp" alt="İsyurtları" fill className="object-contain p-0.5" />
           </div>
           <div className="min-w-0 leading-tight">
-            <p className="text-xs font-bold text-white truncate">İsyurtları Mobil Mağaza</p>
+            <p className="text-xs font-bold text-white truncate">İşyurtları Mobil Uygulaması</p>
             <p className="text-[10px] text-gray-300 truncate">
               {cihaz === 'ios' ? 'Safari ile Ana Ekrana Ekle' : 'Daha Hızlı Alışveriş İçin Yükle'}
             </p>
@@ -114,17 +118,8 @@ export default function MobilUygulamaBanneri() {
           onClick={handleAksiyon}
           className="shrink-0 bg-[#CC4E00] hover:bg-[#BA4700] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1 active:scale-95 transition-all"
         >
-          {cihaz === 'ios' ? (
-            <>
-              <LuSquarePlus size={13} />
-              <span>Yükle</span>
-            </>
-          ) : (
-            <>
-              <LuDownload size={13} />
-              <span>APK İndir</span>
-            </>
-          )}
+          <LuSquarePlus size={13} />
+          <span>Yükle</span>
         </button>
       </div>
 
