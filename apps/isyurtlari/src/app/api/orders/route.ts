@@ -23,7 +23,8 @@ async function sendOrderEmail(
   shippingAddress: string,
   totalAmount: number,
   items: any[],
-  kdvTutari: number
+  kdvTutari: number,
+  faturaBilgisi?: string
 ) {
   try {
     // Sabit ekip + EMAIL_RECIPIENT'ta virgulle yazilan ek adresler (env artik ekibi ezmiyor).
@@ -58,6 +59,7 @@ async function sendOrderEmail(
       <p><strong>Adı Soyadı:</strong> ${kacir(customerName)}</p>
       <p><strong>Email:</strong> ${kacir(customerEmail)}</p>
       <p><strong>Telefon:</strong> ${kacir(customerPhone)}</p>
+      <p><strong>Fatura & Kimlik:</strong> <span style="color: #2b6cb0; font-weight: bold;">${kacir(faturaBilgisi || 'Belirtilmedi')}</span></p>
       <p><strong>Teslimat Adresi:</strong> ${kacir(shippingAddress)}</p>
       <p><strong>Sipariş Numarası:</strong> ${kacir(orderNumber)}</p>
 
@@ -202,6 +204,12 @@ interface OrderRequest {
   phone: string;
   /** Serbest metin adres. Kayitli adres secildiyse gonderilmiyor. */
   shippingAddress?: string;
+  billingAddress?: string;
+  faturaTuru?: 'bireysel' | 'kurumsal';
+  tcKimlikNo?: string;
+  sirketUnvani?: string;
+  vergiDairesi?: string;
+  vergiNo?: string;
   /** Musterinin adres defterindeki adresin kimligi. */
   addressId?: string;
   items: { id: string; quantity: number; price: number }[];
@@ -307,6 +315,52 @@ export async function POST(req: NextRequest) {
     if (!teslimatAdresi) {
       return NextResponse.json({ error: 'Teslimat adresi gerekli' }, { status: 400 });
     }
+
+    /**
+     * Fatura & Yasal Kimlik Doğrulaması.
+     * Bireysel ise 11 haneli TCKN zorunlu.
+     * Kurumsal ise Şirket Ünvanı, Vergi Dairesi ve VKN zorunlu.
+     */
+    const faturaTuru: 'bireysel' | 'kurumsal' =
+      body.faturaTuru === 'kurumsal' ? 'kurumsal' : 'bireysel';
+    const tcKimlikNo = String(body.tcKimlikNo ?? '').replace(/\D/g, '');
+    const sirketUnvani = String(body.sirketUnvani ?? '').trim();
+    const vergiDairesi = String(body.vergiDairesi ?? '').trim();
+    const vergiNo = String(body.vergiNo ?? '').replace(/\D/g, '');
+    const faturaAdresi = (body.billingAddress || '').trim() || teslimatAdresi;
+
+    if (faturaTuru === 'bireysel') {
+      if (!tcKimlikNo || tcKimlikNo.length !== 11 || tcKimlikNo.startsWith('0')) {
+        return NextResponse.json(
+          { error: 'Bireysel fatura ve kargo teslimatı için geçerli bir 11 haneli T.C. Kimlik Numarası zorunludur.' },
+          { status: 400 }
+        );
+      }
+    } else {
+      if (!sirketUnvani) {
+        return NextResponse.json(
+          { error: 'Kurumsal fatura için şirket / firma ünvanı zorunludur.' },
+          { status: 400 }
+        );
+      }
+      if (!vergiDairesi) {
+        return NextResponse.json(
+          { error: 'Kurumsal fatura için vergi dairesi zorunludur.' },
+          { status: 400 }
+        );
+      }
+      if (!vergiNo || (vergiNo.length !== 10 && vergiNo.length !== 11)) {
+        return NextResponse.json(
+          { error: 'Kurumsal fatura için geçerli bir Vergi Numarası (10 veya 11 hane) zorunludur.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const faturaBilgiMetni =
+      faturaTuru === 'kurumsal'
+        ? `Kurumsal | Ünvan: ${sirketUnvani} | VD: ${vergiDairesi} | VKN: ${vergiNo}`
+        : `Bireysel | TCKN: ${tcKimlikNo}`;
 
     const simdi = new Date();
     const kalemler: {
@@ -483,7 +537,8 @@ export async function POST(req: NextRequest) {
             kuponIndirimi,
             paymentMethod: body.paymentMethod,
             shippingAddress: teslimatAdresi,
-            notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone}`,
+            billingAddress: `${faturaBilgiMetni}\n${faturaAdresi}`,
+            notes: `Müşteri: ${body.customerName} | Email: ${body.email} | Telefon: ${body.phone} | Fatura: ${faturaBilgiMetni}`,
             items: {
               create: kalemler.map((k) => ({
                 productId: k.id,
@@ -603,7 +658,8 @@ export async function POST(req: NextRequest) {
       teslimatAdresi,
       gercekToplam,
       orderWithItems?.items || [],
-      tutar.kdv
+      tutar.kdv,
+      faturaBilgiMetni
     );
 
     // Logo GO3 Muhasebe Entegrasyonu: 120 Cari Kart, Satış Faturası ve Kargo Gideri İşleme
@@ -616,6 +672,12 @@ export async function POST(req: NextRequest) {
           email: body.email,
           phone: body.phone,
           shippingAddress: teslimatAdresi,
+          billingAddress: faturaAdresi,
+          faturaTuru,
+          tcKimlikNo,
+          sirketUnvani,
+          vergiDairesi,
+          vergiNo,
           totalAmount: orderWithItems.totalAmount,
           paymentMethod: orderWithItems.paymentMethod,
           items: (orderWithItems.items || []).map((it: any) => ({

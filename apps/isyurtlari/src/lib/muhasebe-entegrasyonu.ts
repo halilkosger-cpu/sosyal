@@ -7,6 +7,12 @@ interface SiparisMuhasebeGirdisi {
   email: string;
   phone?: string;
   shippingAddress: string;
+  billingAddress?: string;
+  faturaTuru?: 'bireysel' | 'kurumsal';
+  tcKimlikNo?: string;
+  vergiDairesi?: string;
+  vergiNo?: string;
+  sirketUnvani?: string;
   totalAmount: number;
   paymentMethod: string;
   items: Array<{
@@ -21,6 +27,7 @@ interface SiparisMuhasebeGirdisi {
 /**
  * 1. SİPARİŞ ANINDA OTOMATİK MUHASEBE KAYDI (Logo GO3 Mantığı)
  * - Müşteri 120 Cari Kartı oluşturulur / eşleştirilir.
+ * - Bireysel ise TCKN, Kurumsal ise Şirket Ünvanı, Vergi Dairesi ve VKN işlenir.
  * - Satış Faturası (FTR-2026-xxxxx) kesilir ve satırları yazılır.
  * - Cari hesaba fatura tutarı kadar BORÇ işlenir.
  * - Anlaşmalı kargo maliyeti (varsayılan 75 TL) otomatik İŞLETME GİDERİ (SHIPPING) yazılır.
@@ -31,10 +38,26 @@ export async function siparisMuhasebeyeIsle(girdi: SiparisMuhasebeGirdisi) {
     const telefon = (girdi.phone || '').trim();
     const adSoyad = (girdi.customerName || 'Bireysel Müşteri').trim();
 
+    const faturaUnvani =
+      girdi.faturaTuru === 'kurumsal' && girdi.sirketUnvani?.trim()
+        ? girdi.sirketUnvani.trim()
+        : adSoyad;
+
+    const vergiTcNo =
+      girdi.faturaTuru === 'kurumsal'
+        ? (girdi.vergiNo || '').replace(/\D/g, '')
+        : (girdi.tcKimlikNo || '').replace(/\D/g, '');
+
+    const vergiDairesi =
+      girdi.faturaTuru === 'kurumsal' && girdi.vergiDairesi
+        ? girdi.vergiDairesi.trim()
+        : null;
+
     // 1. Cari Kart Bul veya Aç (120 Alıcılar)
     let cari = await prisma.cariKart.findFirst({
       where: {
         OR: [
+          ...(vergiTcNo ? [{ vergiTcNo }] : []),
           ...(eposta ? [{ eposta }] : []),
           ...(telefon ? [{ telefon }] : []),
         ],
@@ -46,13 +69,26 @@ export async function siparisMuhasebeyeIsle(girdi: SiparisMuhasebeGirdisi) {
       cari = await prisma.cariKart.create({
         data: {
           kod: rastgeleKod,
-          unvan: adSoyad,
+          unvan: faturaUnvani,
           tur: 'ALICI',
           muhasebeKodu: '120.01.001',
+          vergiTcNo: vergiTcNo || null,
+          vergiDairesi: vergiDairesi || null,
           eposta: eposta || null,
           telefon: telefon || null,
-          adres: girdi.shippingAddress || null,
+          adres: girdi.billingAddress || girdi.shippingAddress || null,
           bakiye: 0,
+        },
+      });
+    } else {
+      // Cari zaten mevcutsa fatura/vergi bilgilerini zenginleştir
+      await prisma.cariKart.update({
+        where: { id: cari.id },
+        data: {
+          unvan: faturaUnvani || cari.unvan,
+          vergiTcNo: vergiTcNo || cari.vergiTcNo,
+          vergiDairesi: vergiDairesi || cari.vergiDairesi,
+          adres: girdi.billingAddress || cari.adres,
         },
       });
     }

@@ -50,6 +50,18 @@ function adresOzeti(a: Adres): string {
     .join(', ');
 }
 
+/** Türkiye telefon numarası maskesi: (5XX) XXX XX XX */
+function telefonFormatla(deger: string): string {
+  let temiz = deger.replace(/\D/g, '');
+  if (temiz.startsWith('0')) temiz = temiz.slice(1);
+  temiz = temiz.slice(0, 10);
+  if (!temiz) return '';
+  if (temiz.length <= 3) return `(${temiz}`;
+  if (temiz.length <= 6) return `(${temiz.slice(0, 3)}) ${temiz.slice(3)}`;
+  if (temiz.length <= 8) return `(${temiz.slice(0, 3)}) ${temiz.slice(3, 6)} ${temiz.slice(6)}`;
+  return `(${temiz.slice(0, 3)}) ${temiz.slice(3, 6)} ${temiz.slice(6, 8)} ${temiz.slice(8, 10)}`;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { musteri, yukleniyor: musteriYukleniyor } = useMusteri();
@@ -75,6 +87,8 @@ export default function CheckoutPage() {
     setIbanKopyalandi(true);
     setTimeout(() => setIbanKopyalandi(false), 2000);
   };
+  const [ulkeKodu, setUlkeKodu] = useState('+90');
+  const [telefonNo, setTelefonNo] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -83,6 +97,11 @@ export default function CheckoutPage() {
     ilce: '',
     il: '',
     postaKodu: '',
+    faturaTuru: 'bireysel' as 'bireysel' | 'kurumsal',
+    tcKimlikNo: '',
+    sirketUnvani: '',
+    vergiDairesi: '',
+    vergiNo: '',
   });
 
   useEffect(() => {
@@ -123,6 +142,20 @@ export default function CheckoutPage() {
    */
   useEffect(() => {
     if (musteriYukleniyor || !musteri) return;
+
+    if (musteri.phone) {
+      const p = musteri.phone.trim();
+      if (p.startsWith('+')) {
+        const parcalar = p.split(' ');
+        const kod = parcalar[0];
+        const num = parcalar.slice(1).join('') || p.slice(kod.length);
+        setUlkeKodu(kod);
+        setTelefonNo(kod === '+90' ? telefonFormatla(num) : num);
+      } else {
+        setUlkeKodu('+90');
+        setTelefonNo(telefonFormatla(p));
+      }
+    }
 
     setFormData((onceki) => ({
       ...onceki,
@@ -260,14 +293,46 @@ export default function CheckoutPage() {
     setError('');
 
     const kayitliAdresSecili = seciliAdres !== 'yeni' && adresler.some((a) => a.id === seciliAdres);
+    const tamTelefon = `${ulkeKodu.trim()} ${telefonNo.trim()}`.trim();
 
-    if (!formData.name || !formData.email || !formData.phone) {
-      setError('Lütfen tüm alanları doldurunuz');
+    if (!formData.name || !formData.email || !telefonNo.trim()) {
+      setError('Lütfen tüm iletişim alanlarını doldurunuz');
       return;
+    }
+    if (ulkeKodu === '+90') {
+      const rakamlar = telefonNo.replace(/\D/g, '');
+      const temizRakam = rakamlar.startsWith('0') ? rakamlar.slice(1) : rakamlar;
+      if (temizRakam.length !== 10 || !temizRakam.startsWith('5')) {
+        setError('Lütfen geçerli bir cep telefonu numarası giriniz: (5XX) XXX XX XX');
+        return;
+      }
     }
     if (!kayitliAdresSecili && (!formData.address.trim() || !formData.ilce.trim() || !formData.il.trim())) {
       setError('Adres, ilçe ve il alanlarını doldurun ya da kayıtlı adreslerinizden birini seçin');
       return;
+    }
+
+    // Fatura & Yasal Kimlik Doğrulaması (Kargo ve fatura için zorunlu)
+    if (formData.faturaTuru === 'bireysel') {
+      const tckn = formData.tcKimlikNo.replace(/\D/g, '');
+      if (!tckn || tckn.length !== 11 || tckn.startsWith('0')) {
+        setError('Bireysel fatura ve kargo teslimatı için lütfen geçerli bir 11 haneli T.C. Kimlik Numarası giriniz');
+        return;
+      }
+    } else {
+      if (!formData.sirketUnvani.trim()) {
+        setError('Kurumsal fatura için lütfen şirket / firma tam ünvanını giriniz');
+        return;
+      }
+      if (!formData.vergiDairesi.trim()) {
+        setError('Kurumsal fatura için lütfen vergi dairesini giriniz');
+        return;
+      }
+      const vkn = formData.vergiNo.replace(/\D/g, '');
+      if (!vkn || (vkn.length !== 10 && vkn.length !== 11)) {
+        setError('Kurumsal fatura için lütfen geçerli bir Vergi Numarası (10 veya 11 hane) giriniz');
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -279,7 +344,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           customerName: formData.name,
           email: formData.email,
-          phone: formData.phone,
+          phone: tamTelefon,
           /**
            * Kayitli adres secildiyse yalnizca kimligi gonderiliyor; adresin
            * metni sunucuda veritabanindaki kayittan uretiliyor. Istemciden
@@ -304,6 +369,11 @@ export default function CheckoutPage() {
           })),
           totalAmount: kuponluToplam,
           paymentMethod,
+          faturaTuru: formData.faturaTuru,
+          tcKimlikNo: formData.tcKimlikNo.replace(/\D/g, ''),
+          sirketUnvani: formData.sirketUnvani.trim(),
+          vergiDairesi: formData.vergiDairesi.trim(),
+          vergiNo: formData.vergiNo.replace(/\D/g, ''),
           ...(uygulananKupon ? { kuponKodu: uygulananKupon } : {}),
         }),
       });
@@ -416,8 +486,38 @@ export default function CheckoutPage() {
                   <input id="email" type="email" name="email" autoComplete="email" value={formData.email} onChange={handleInputChange} className="store-input" placeholder="ornek@email.com" required />
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">Telefon</label>
-                  <input id="phone" type="tel" name="phone" autoComplete="tel" value={formData.phone} onChange={handleInputChange} className="store-input" placeholder="05XX XXX XX XX" required />
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">Cep Telefonu</label>
+                  <div className="flex rounded-xl border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-[#CC4E00] focus-within:border-transparent transition overflow-hidden">
+                    <input
+                      type="text"
+                      value={ulkeKodu}
+                      onChange={(e) => {
+                        let val = e.target.value.trim();
+                        if (val && !val.startsWith('+')) val = '+' + val.replace(/\D/g, '');
+                        setUlkeKodu(val || '+');
+                      }}
+                      className="w-16 px-2 py-2.5 bg-gray-50 text-gray-800 font-bold text-xs sm:text-sm text-center border-r border-gray-200 focus:outline-none focus:bg-white select-all"
+                      title="Ülke kodu (+90 varsayılan; yabancı numara için değiştirebilirsiniz)"
+                      placeholder="+90"
+                      maxLength={5}
+                    />
+                    <input
+                      id="phone"
+                      type="tel"
+                      autoComplete="tel-national"
+                      value={telefonNo}
+                      onChange={(e) => {
+                        const val = ulkeKodu === '+90' ? telefonFormatla(e.target.value) : e.target.value;
+                        setTelefonNo(val);
+                      }}
+                      className="flex-1 px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none bg-transparent"
+                      placeholder={ulkeKodu === '+90' ? '(5__) ___ __ __' : 'Telefon numaranız'}
+                      required
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    {ulkeKodu === '+90' ? 'Varsayılan Türkiye (+90). Yabancı numara için kodu düzenleyebilirsiniz.' : 'Yurtdışı numarası olarak kaydedilecektir.'}
+                  </p>
                 </div>
               </div>
             </section>
@@ -480,9 +580,144 @@ export default function CheckoutPage() {
               )}
             </section>
 
-            {/* 3. Ödeme yöntemi */}
+            {/* 3. Fatura & Kimlik Bilgileri */}
             <section className={kutu}>
-              <h2 className={baslik}>{adim(3)} Ödeme & Sipariş Yöntemi</h2>
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <h2 className={baslik}>{adim(3)} Fatura & Kimlik Bilgileri</h2>
+                <span className="text-[11px] font-bold px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
+                  Mevzuat Gereği Zorunlu
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                Kargo taşıma mevzuatı ve resmi e-Arşiv / e-Fatura kesilebilmesi için Bireysel (T.C. Kimlik No) veya Şirket (Ünvan, Vergi No) bilgilerinden birinin girilmesi zorunludur.
+              </p>
+
+              {/* Fatura Türü Seçimi */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setFormData((p) => ({ ...p, faturaTuru: 'bireysel' }))}
+                  className={`p-3.5 rounded-xl border text-left font-medium text-sm transition flex items-center gap-2.5 cursor-pointer ${
+                    formData.faturaTuru === 'bireysel'
+                      ? 'border-[#CC4E00] bg-orange-50/70 text-[#CC4E00] font-bold ring-1 ring-[#CC4E00]'
+                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    formData.faturaTuru === 'bireysel' ? 'border-[#CC4E00]' : 'border-gray-300'
+                  }`}>
+                    {formData.faturaTuru === 'bireysel' && <span className="w-2 h-2 rounded-full bg-[#CC4E00]" />}
+                  </span>
+                  <span>👤 Bireysel Fatura (T.C. Kimlik)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData((p) => ({ ...p, faturaTuru: 'kurumsal' }))}
+                  className={`p-3.5 rounded-xl border text-left font-medium text-sm transition flex items-center gap-2.5 cursor-pointer ${
+                    formData.faturaTuru === 'kurumsal'
+                      ? 'border-[#CC4E00] bg-orange-50/70 text-[#CC4E00] font-bold ring-1 ring-[#CC4E00]'
+                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                    formData.faturaTuru === 'kurumsal' ? 'border-[#CC4E00]' : 'border-gray-300'
+                  }`}>
+                    {formData.faturaTuru === 'kurumsal' && <span className="w-2 h-2 rounded-full bg-[#CC4E00]" />}
+                  </span>
+                  <span>🏢 Kurumsal (Şirket / Firma)</span>
+                </button>
+              </div>
+
+              {/* Bireysel Alanlar */}
+              {formData.faturaTuru === 'bireysel' ? (
+                <div className="mt-4">
+                  <label htmlFor="tcKimlikNo" className="block text-sm font-medium text-gray-700 mb-1.5">
+                    T.C. Kimlik Numarası <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    id="tcKimlikNo"
+                    type="text"
+                    name="tcKimlikNo"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={11}
+                    value={formData.tcKimlikNo}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 11);
+                      setFormData((p) => ({ ...p, tcKimlikNo: val }));
+                    }}
+                    className="store-input"
+                    placeholder="11 haneli T.C. Kimlik Numaranız"
+                    required
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    Vergi Usul Kanunu uyarınca adınıza düzenlenecek e-Arşiv fatura ve kargo teslim fişi için zorunludur.
+                  </p>
+                </div>
+              ) : (
+                /* Kurumsal Alanlar */
+                <div className="mt-4 space-y-3.5">
+                  <div>
+                    <label htmlFor="sirketUnvani" className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Şirket / Firma Tam Ünvanı <span className="text-red-500 font-bold">*</span>
+                    </label>
+                    <input
+                      id="sirketUnvani"
+                      type="text"
+                      name="sirketUnvani"
+                      value={formData.sirketUnvani}
+                      onChange={handleInputChange}
+                      className="store-input"
+                      placeholder="Örn: ABC Gıda ve Tarım San. Tic. Ltd. Şti."
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="vergiDairesi" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Vergi Dairesi <span className="text-red-500 font-bold">*</span>
+                      </label>
+                      <input
+                        id="vergiDairesi"
+                        type="text"
+                        name="vergiDairesi"
+                        value={formData.vergiDairesi}
+                        onChange={handleInputChange}
+                        className="store-input"
+                        placeholder="Örn: Çankaya V.D."
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="vergiNo" className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Vergi Numarası (VKN) <span className="text-red-500 font-bold">*</span>
+                      </label>
+                      <input
+                        id="vergiNo"
+                        type="text"
+                        name="vergiNo"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        maxLength={11}
+                        value={formData.vergiNo}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 11);
+                          setFormData((p) => ({ ...p, vergiNo: val }));
+                        }}
+                        className="store-input"
+                        placeholder="10 Haneli VKN veya 11 Haneli TCKN"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* 4. Ödeme yöntemi */}
+            <section className={kutu}>
+              <h2 className={baslik}>{adim(4)} Ödeme & Sipariş Yöntemi</h2>
               <div className="space-y-3 mt-5">
                 <label className={secenek(paymentMethod === 'TRANSFER')}>
                   <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00] shrink-0" />

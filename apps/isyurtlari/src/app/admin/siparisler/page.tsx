@@ -9,6 +9,7 @@ interface OrderItem { quantity: number; price: number; product?: { name: string 
 interface Order {
   id: string; orderNumber: string; status: string; totalAmount: number;
   paymentMethod: string; shippingAddress: string; createdAt: string;
+  billingAddress?: string | null;
   notes?: string | null;
   user?: { name: string; email: string } | null;
   customer?: { name: string; email: string; phone?: string | null } | null;
@@ -272,6 +273,11 @@ export default function AdminOrdersPage() {
                         {musteri.telefon && <span className="text-xs font-semibold text-gray-700">📞 {musteri.telefon}</span>}
                         {musteri.eposta && <span className="text-xs font-normal text-gray-500">✉️ {musteri.eposta}</span>}
                       </p>
+                      {nottanCikar(order.notes, 'Fatura') && (
+                        <div className="mt-2 py-1.5 px-2.5 bg-blue-50/80 border border-blue-200/70 rounded-lg text-xs font-medium text-blue-900">
+                          🧾 <strong>Fatura Bilgisi:</strong> {nottanCikar(order.notes, 'Fatura')}
+                        </div>
+                      )}
                       <p className="text-sm text-gray-700 whitespace-pre-wrap mt-2 pt-2 border-t border-gray-200/60 leading-relaxed">
                         {order.shippingAddress}
                       </p>
@@ -345,6 +351,10 @@ export default function AdminOrdersPage() {
                                             📞 Tel: ${kacisHtml(musteri.telefon || 'Belirtilmedi')}
                                             ${musteri.eposta ? `<span style="font-weight: normal; color: #555; margin-left: 8px;">✉️ ${kacisHtml(musteri.eposta)}</span>` : ''}
                                           </div>
+                                          ${nottanCikar(order.notes, 'Fatura') ? `
+                                          <div style="font-size: 11px; font-weight: 600; color: #333; margin-bottom: 6px; padding: 4px 6px; background: #f0f4f8; border-radius: 4px; border: 1px solid #d0dbe5;">
+                                            🧾 <strong>Fatura:</strong> ${kacisHtml(nottanCikar(order.notes, 'Fatura'))}
+                                          </div>` : ''}
                                           <div style="font-size: 11px; font-weight: bold; color: #555; margin-top: 6px; text-transform: uppercase;">Teslimat Adresi:</div>
                                           <div style="font-size: 13px; line-height: 1.45; white-space: pre-wrap; margin-top: 2px;">${kacisHtml(musteri.temizAdres)}</div>
                                         </div>
