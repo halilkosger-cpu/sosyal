@@ -1,4 +1,5 @@
 import { prisma } from '@isyurtlari/database';
+import { hasDatabaseUrl } from './seo';
 
 let tabloOlusturuldu = false;
 
@@ -7,7 +8,7 @@ let tabloOlusturuldu = false;
  * Neon / PgBouncer uyumluluğu için her DDL ifadesini bağımsız çalıştırır.
  */
 export async function tabloyuHazirla(): Promise<void> {
-  if (tabloOlusturuldu) return;
+  if (tabloOlusturuldu || !hasDatabaseUrl()) return;
 
   try {
     // 1. Ana Tablo

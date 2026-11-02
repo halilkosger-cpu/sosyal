@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { tabloyuHazirla } from '@/lib/analitik-db';
 import { botMu, cihazCozumle, kaynakCozumle, konumCozumle } from '@/lib/analitik-parser';
+import { hasDatabaseUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!hasDatabaseUrl()) {
+      return NextResponse.json({ skipped: true, reason: 'no_database_url' });
+    }
     let body: any = {};
     const contentType = req.headers.get('content-type') || '';
 
