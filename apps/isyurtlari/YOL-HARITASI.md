@@ -1,7 +1,14 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 30 Ekim 2026 — 99 yeni ürün ve fotoğrafları eklendi (146 ürün, 5 kategori)
-Önceki: 25 Eylül 2026 (gece) · Sıradaki iş: **Aşama 6 (iyzico) ve fiyatsız 31 ürün**
+Son güncelleme: 2 Kasım 2026 — Google Merchant Center Feed Optimizasyonu (Marka, Taksonomi, Zengin Açıklamalar)
+Önceki: 30 Ekim 2026 · Sıradaki iş: **Merchant Center panel ayarları (Kargo, İade) ve Google Ads**
+
+## 2 Kasım 2026 — Google Merchant Center Feed Güçlendirmesi (Hesap: 5876808666)
+
+- **Marka alanı (`<g:brand>`):** Tüm ürünlere sabit basılan "İşyurtları" yerine ürün adından gerçek marka tespiti getirildi (Elban, ADVEM, Zenbay, Toprakkale, Odosun, ADEMODA, Espiye, Niğde, Kalkandere, Tokat, Adıyaman, Elazığ, Gaziantep). Eşleşmeyenler için İşyurtları korundu. "Elban zeytin" veya "ADVEM kolonya" aramalarında alaka düzeyi yükseltildi.
+- **Google Ürün Kategorisi (`<g:google_product_category>`):** Feed'e resmi Google kategori taksonomi kimlikleri eklendi (Gıda: 422, Temizlik: 587, Hediyelik/Dekor: 632, Tekstil: 1604, Ahşap: 632).
+- **Zengin Açıklamalar (`<g:description>`):** Başlıkla birebir aynı veya yetersiz olan açıklamalar için kategoriye özel, el emeği vurgulu zengin açıklamalar üretildi (Google'ın "ince/yinelenen içerik" cezası engellendi).
+- **Görsel Güvenliği (`<g:image_link>`):** 404 riski taşıyan bağlantılar elendi; HTTP linkleri ve yerel 800px WebP görselleri tam URL'ye bağlandı, yedek olarak mağaza logosu tanımlandı.
 
 ## 30 Ekim 2026 — Katalog genişlemesi (99 ürün)
 

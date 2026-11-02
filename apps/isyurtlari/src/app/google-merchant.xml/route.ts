@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
-import { urunGorseli } from '@/lib/urun-gorsel';
+import { urunGorseli, yerelGorselVar } from '@/lib/urun-gorsel';
 import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +16,69 @@ function xmlEscape(str: string | null | undefined): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
+}
+
+// Ürün başlığından bilinen markayı tespit et
+function markaBul(ad: string): string {
+  const markalar = [
+    'Elban',
+    'ADVEM',
+    'Zenbay',
+    'Toprakkale',
+    'Odosun',
+    'ADEMODA',
+    'Espiye',
+    'Niğde',
+    'Kalkandere',
+    'Tokat',
+    'Adıyaman',
+    'Elazığ',
+    'Gaziantep',
+  ];
+  for (const m of markalar) {
+    if (new RegExp(`\\b${m}\\b`, 'i').test(ad)) return m;
+  }
+  return 'İşyurtları';
+}
+
+// Kategori slug'ına göre Google Taksonomi ID eşleme
+function googleKategoriId(slug?: string | null): number {
+  switch (slug) {
+    case 'gida':
+      return 422; // Gıda, İçecek ve Tütün
+    case 'temizlik':
+      return 587; // Ev Temizlik Malzemeleri
+    case 'hediyelik':
+      return 632; // Ev ve Bahçe > Dekor
+    case 'tekstil':
+      return 1604; // Giyim ve Aksesuar
+    case 'ahsap':
+      return 632; // Ev ve Bahçe > Dekor
+    default:
+      return 422;
+  }
+}
+
+// Zengin açıklama oluşturucu (Google ince/kopya içerik uyarısını önler)
+function aciklamaOlustur(name: string, description?: string | null, catSlug?: string | null): string {
+  if (description && description.trim().length > 30 && description.trim() !== name.trim()) {
+    return description.trim();
+  }
+
+  switch (catSlug) {
+    case 'gida':
+      return `${name} - Adalet Bakanlığı İşyurtları atölye ve tarım işletmelerinde hükümlülerin el emeğiyle üretilmiş, katkısız ve taze gıda ürünü. Hijyenik koşullarda özenle paketlenmiştir.`;
+    case 'temizlik':
+      return `${name} - Adalet Bakanlığı İşyurtları bünyesinde üretilen, yüksek temizleme gücüne ve ferahlatıcı etkiye sahip kaliteli temizlik ve bakım ürünü.`;
+    case 'hediyelik':
+      return `${name} - İşyurtları bünyesindeki hükümlülerin usta ellerinde şekillenen, geleneksel motiflerle tek tek elde işlenmiş özel el sanatı hediyelik ürün.`;
+    case 'tekstil':
+      return `${name} - Adalet Bakanlığı İşyurtları tekstil atölyelerinde kaliteli malzeme ve özenli dikişle üretilen el emeği tekstil ürünü.`;
+    case 'ahsap':
+      return `${name} - İşyurtları ahşap ve marangozluk atölyelerinde usta işçilikle üretilmiş doğal ve dayanıklı el emeği ahşap ürün.`;
+    default:
+      return `${name} - Adalet Bakanlığı İşyurtları atölyelerinde hükümlülerin el emeğiyle özenle üretilen doğal ve kaliteli ürün.`;
+  }
 }
 
 export async function GET() {
@@ -35,10 +98,9 @@ export async function GET() {
       .map((p) => {
         const link = `${SITE_URL}/urun/${p.slug}`;
         const title = xmlEscape(p.name);
-        const description = xmlEscape(
-          p.description ||
-            `${p.name} - Adalet Bakanlığı İşyurtları atölyelerinde hükümlülerin el emeğiyle üretilen doğal ve kaliteli ürün.`
-        );
+        const brand = xmlEscape(markaBul(p.name));
+        const googleCat = googleKategoriId(p.category?.slug);
+        const description = xmlEscape(aciklamaOlustur(p.name, p.description, p.category?.slug));
         const categoryName = xmlEscape(p.category?.name || 'Genel');
         const normalFiyat = Number(p.price);
         const price = `${normalFiyat.toFixed(2)} TRY`;
@@ -51,11 +113,15 @@ export async function GET() {
             : '';
 
         const availability = p.quantity > 0 ? 'in_stock' : 'out_of_stock';
-        
-        const yerelGorsel = urunGorseli(p.slug, p.imageUrl);
+
+        // 404 hatasını önle: Gerçek görsel varsa onu ver, yoksa kategori/mağaza logosuna düş
         let tamGorselUrl = `${SITE_URL}/logo.jpg`;
-        if (yerelGorsel) {
-          tamGorselUrl = yerelGorsel.startsWith('http') ? yerelGorsel : `${SITE_URL}${yerelGorsel}`;
+        if (p.imageUrl?.startsWith('http')) {
+          tamGorselUrl = p.imageUrl;
+        } else if (yerelGorselVar(p.slug)) {
+          tamGorselUrl = `${SITE_URL}${urunGorseli(p.slug)}`;
+        } else if (p.imageUrl) {
+          tamGorselUrl = `${SITE_URL}${p.imageUrl}`;
         }
         const imageUrl = xmlEscape(tamGorselUrl);
 
@@ -68,7 +134,8 @@ export async function GET() {
       <g:condition>new</g:condition>
       <g:availability>${availability}</g:availability>
       <g:price>${price}</g:price>
-      <g:brand>İşyurtları</g:brand>
+      <g:brand>${brand}</g:brand>
+      <g:google_product_category>${googleCat}</g:google_product_category>
       <g:product_type>${categoryName}</g:product_type>${customLabelXml}
       <g:identifier_exists>no</g:identifier_exists>
     </item>`;
