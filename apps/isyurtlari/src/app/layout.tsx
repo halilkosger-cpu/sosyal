@@ -57,6 +57,18 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   ...defaultMetadata,
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'İşyurtları',
+  },
+  icons: {
+    icon: '/logo.png',
+    apple: [
+      { url: '/logo.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
   // 155 karakteri asmiyor: Google arama sonucunda yaklasik bu uzunlukta
   // kesiyor, oncesi 224 karakterdi ve sonu hic gorunmuyordu.
@@ -133,7 +145,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="theme-color" content="#FF6000" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="İşyurtları" />
+        <meta name="application-name" content="İşyurtları" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi

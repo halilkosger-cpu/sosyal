@@ -1,8 +1,8 @@
 // isyurtlari.com.tr PWA Service Worker (Store-Ready)
-const CACHE_NAME = 'isyurtlari-cache-v1';
+const CACHE_NAME = 'isyurtlari-pwa-v2';
 const STATIC_ASSETS = [
   '/',
-  '/manifest.webmanifest',
+  '/manifest.json',
   '/logo.png',
   '/favicon.ico',
 ];
@@ -35,7 +35,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 3. İstek yakalama stratejisi
+// 3. İstek yakalama ve önbellekleme stratejisi
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -49,11 +49,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Statik varlıklar (resimler, fontlar): Stale-While-Revalidate
+  // Statik varlıklar (resimler, fontlar, CSS, JS): Stale-While-Revalidate
   if (
     url.pathname.startsWith('/_next/static') ||
     url.pathname.startsWith('/urun/') ||
-    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|woff2|css|js)$/)
+    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|ico|woff2|css|js)$/)
   ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
@@ -75,7 +75,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Sayfalar (HTML): Network-first (Önce canlı güncel fiyat ve stok, çevrimdışıysa önbellek)
+  // Sayfalar (HTML): Network-First (Canlı güncel stok/fiyat, çevrimdışıysa önbellek)
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
@@ -91,10 +91,13 @@ self.addEventListener('fetch', (event) => {
         const cached = await caches.match(event.request);
         if (cached) return cached;
         const rootCached = await caches.match('/');
-        return rootCached || new Response('Çevrimdışı moddasınız', {
-          status: 503,
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-        });
+        return (
+          rootCached ||
+          new Response('İşyurtları - Şu an çevrimdışı moddasınız.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          })
+        );
       })
   );
 });
