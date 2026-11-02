@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import UrunKarti from '@/components/UrunKarti';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -294,6 +294,7 @@ function KategoriIcerigi({
   );
   const [loading, setLoading] = useState(!baslangicUrunler);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const urunlerAlaniRef = useRef<HTMLDivElement>(null);
 
   // Alt panel acikken arka sayfa kaymasin, ESC kapatsin.
   useEffect(() => {
@@ -358,6 +359,13 @@ function KategoriIcerigi({
     },
     [aramaParametreleri, pathname, router]
   );
+
+  const sayfaDegistir = (hedefSayfa: number) => {
+    parametreDegistir({ sayfa: String(hedefSayfa) }, true);
+    if (typeof window !== 'undefined') {
+      urunlerAlaniRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const fiyatiUygula = () => {
     parametreDegistir({
@@ -587,7 +595,7 @@ function KategoriIcerigi({
           </div>
 
           {/* ─── PRODUCTS SECTION ─── */}
-          <div className="flex-1 min-w-0 w-full">
+          <div ref={urunlerAlaniRef} className="flex-1 min-w-0 w-full scroll-mt-24">
             {/* ─── MOBILE FILTER BUTTON + SORT BAR ─── */}
             <div className="flex items-center justify-between gap-2 sm:gap-3 mb-5 bg-white rounded-xl border border-gray-200 px-3 sm:px-4 py-3">
               <button
@@ -691,19 +699,19 @@ function KategoriIcerigi({
             {!loading && (veri?.sayfaSayisi ?? 0) > 1 && (
               <div className="flex items-center justify-center gap-3 mt-10">
                 <button
-                  onClick={() => parametreDegistir({ sayfa: String(sayfa - 1) }, true)}
+                  onClick={() => sayfaDegistir(sayfa - 1)}
                   disabled={sayfa <= 1}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   Önceki
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 font-medium">
                   Sayfa {veri?.sayfa} / {veri?.sayfaSayisi}
                 </span>
                 <button
-                  onClick={() => parametreDegistir({ sayfa: String(sayfa + 1) }, true)}
+                  onClick={() => sayfaDegistir(sayfa + 1)}
                   disabled={sayfa >= (veri?.sayfaSayisi ?? 1)}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   Sonraki
                 </button>

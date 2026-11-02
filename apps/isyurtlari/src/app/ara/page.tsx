@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { LuArrowLeft, LuSearch } from 'react-icons/lu';
@@ -40,6 +40,7 @@ function AramaSonuclari() {
 
   const [veri, setVeri] = useState<Yanit | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
+  const sonuclarRef = useRef<HTMLDivElement>(null);
 
   /** Adres çubuğundaki tek bir parametreyi değiştirir, sayfayı başa alır. */
   const parametreDegistir = useCallback(
@@ -52,6 +53,13 @@ function AramaSonuclari() {
     },
     [params, pathname, router]
   );
+
+  const sayfaDegistir = (hedefSayfa: number) => {
+    parametreDegistir('sayfa', String(hedefSayfa), true);
+    if (typeof window !== 'undefined') {
+      sonuclarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   useEffect(() => {
     if (!sorgu) {
@@ -140,7 +148,7 @@ function AramaSonuclari() {
               </label>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div ref={sonuclarRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 scroll-mt-24">
               {veri.urunler.map((urun) => (
                 <UrunKarti key={urun.id} urun={urun} kategoriGoster favoriButonu sepetButonu />
               ))}
@@ -149,19 +157,19 @@ function AramaSonuclari() {
             {veri.sayfaSayisi > 1 && (
               <div className="flex items-center justify-center gap-3 mt-10">
                 <button
-                  onClick={() => parametreDegistir('sayfa', String(sayfa - 1), true)}
+                  onClick={() => sayfaDegistir(sayfa - 1)}
                   disabled={sayfa <= 1}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   Önceki
                 </button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-600 font-medium">
                   Sayfa {veri.sayfa} / {veri.sayfaSayisi}
                 </span>
                 <button
-                  onClick={() => parametreDegistir('sayfa', String(sayfa + 1), true)}
+                  onClick={() => sayfaDegistir(sayfa + 1)}
                   disabled={sayfa >= veri.sayfaSayisi}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50 transition cursor-pointer disabled:cursor-not-allowed"
                 >
                   Sonraki
                 </button>
