@@ -12,6 +12,7 @@ import {
   KargoTakipModal,
   SenkronKopru,
   MobilKopru,
+  PwaKayit,
   AltGezinme,
   KampanyaModal,
   SepetToastBildirimi,
@@ -335,6 +336,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SenkronKopru />
           {/* Mobil uygulama yerel koprusu ve cevrimdisi yonetimi */}
           <MobilKopru />
+          {/* PWA Service Worker ve cevrimdisi onbellek */}
+          <PwaKayit />
           {/* Mobil alt gezinme. Masaustunde ust baslik zaten hepsini tasiyor. */}
           <AltGezinme />
           {/* Bildirim ve Modüller */}

@@ -7,6 +7,7 @@ export const CookieConsent = dynamic(() => import('@/components/CookieConsent'),
 export const KargoTakipModal = dynamic(() => import('@/components/KargoTakipModal'), { ssr: false });
 export const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), { ssr: false });
 export const MobilKopru = dynamic(() => import('@/components/MobilKopru'), { ssr: false });
+export const PwaKayit = dynamic(() => import('@/components/PwaKayit'), { ssr: false });
 export const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
 export const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 export const SepetToastBildirimi = dynamic(() => import('@/components/SepetToastBildirimi'), { ssr: false });

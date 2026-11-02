@@ -7,6 +7,7 @@ import { varsayilanSirala } from '@/lib/urun-siralama';
 import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
 import { yerelGorselVar } from '@/lib/urun-gorsel';
+import { markaBul } from '@/lib/marka';
 import {
   SITE_URL,
   absoluteUrl,
@@ -236,14 +237,14 @@ export default async function ProductPage(props: ProductPageProps) {
         category: product.category.name,
         brand: {
           '@type': 'Brand',
-          name: 'İsyurtları',
-          description: 'Cezaevi ve hapishane hükümlülerinin el emeğiyle ürettiği doğal ürünler',
+          name: markaBul(product.name, product.slug),
+          description: 'Adalet Bakanlığı İşyurtları atölyelerinde üretilen el emeği ve doğal ürünler',
         },
         offers: {
           '@type': 'Offer',
           url: absoluteUrl(`/urun/${product.slug}`),
           priceCurrency: 'TRY',
-          price: (product.price > 0 ? product.price : 99).toFixed(2),
+          price: product.price > 0 ? product.price.toFixed(2) : '0.00',
           availability:
             product.quantity > 0 && product.price > 0
               ? 'https://schema.org/InStock'
@@ -257,6 +258,35 @@ export default async function ProductPage(props: ProductPageProps) {
             merchantReturnDays: 14,
             returnMethod: 'https://schema.org/ReturnByMail',
           },
+          shippingDetails: [
+            {
+              '@type': 'OfferShippingDetails',
+              shippingRate: {
+                '@type': 'MonetaryAmount',
+                value: product.price >= 2000 ? '0.00' : '110.00',
+                currency: 'TRY',
+              },
+              shippingDestination: {
+                '@type': 'DefinedRegion',
+                addressCountry: 'TR',
+              },
+              deliveryTime: {
+                '@type': 'ShippingDeliveryTime',
+                handlingTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 0,
+                  maxValue: 1,
+                  unitCode: 'DAY',
+                },
+                transitTime: {
+                  '@type': 'QuantitativeValue',
+                  minValue: 1,
+                  maxValue: 4,
+                  unitCode: 'DAY',
+                },
+              },
+            },
+          ],
         },
         ...puanBilgisi,
       }
