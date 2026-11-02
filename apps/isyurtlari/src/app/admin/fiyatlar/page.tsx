@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck } from 'react-icons/lu';
+import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck, LuSparkles } from 'react-icons/lu';
 import { fiyatiCoz } from '@/lib/csv';
+import { ONERILEN_PIYASA_FIYATLARI } from '@/lib/onerilen-fiyatlar';
 
 interface Urun {
   id: string;
@@ -149,6 +150,49 @@ export default function AdminFiyatlarPage() {
     }
   };
 
+  const onerilenleriDoldur = () => {
+    const yeniFiyatlar: Record<string, string> = { ...taslakFiyat };
+    const yeniMaliyetler: Record<string, string> = { ...taslakMaliyet };
+    const yeniKdvler: Record<string, number> = { ...taslakKdv };
+
+    let adet = 0;
+    for (const u of urunler) {
+      if (u.price <= 0 && ONERILEN_PIYASA_FIYATLARI[u.slug]) {
+        const oneri = ONERILEN_PIYASA_FIYATLARI[u.slug];
+        yeniFiyatlar[u.slug] = String(oneri.price).replace('.', ',');
+        yeniMaliyetler[u.slug] = String(oneri.purchasePrice).replace('.', ',');
+        yeniKdvler[u.slug] = oneri.vatRate;
+        adet++;
+      }
+    }
+
+    setTaslakFiyat(yeniFiyatlar);
+    setTaslakMaliyet(yeniMaliyetler);
+    setTaslakKdv(yeniKdvler);
+    setSadeceFiyatsiz(true);
+    setMesaj(`✨ ${adet} fiyatsız ürüne piyasa öneri fiyatları taslak olarak atandı. İnceleyip "Kaydet" butonuna tıklayabilirsiniz.`);
+  };
+
+  const onerilenleriOtomatikKaydet = async () => {
+    if (!confirm('Fiyatı 0 TL olan ürünlere önerilen piyasa fiyatları ve maliyetleri atanıp hemen kaydedilecek. Onaylıyor musunuz?')) return;
+    setKaydediliyor(true);
+    setMesaj(null);
+    try {
+      const r = await fetch('/api/admin/products/fiyat-tamamla', { method: 'POST' });
+      const d = await r.json();
+      if (r.ok) {
+        setMesaj(`✅ ${d.mesaj}`);
+        yukle();
+      } else {
+        setMesaj(`⚠️ ${d.error || 'İşlem başarısız oldu'}`);
+      }
+    } catch {
+      setMesaj('⚠️ Bağlantı hatası.');
+    } finally {
+      setKaydediliyor(false);
+    }
+  };
+
   const dosyaSecildi = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const dosya = e.target.files?.[0];
     if (!dosya) return;
@@ -217,17 +261,34 @@ export default function AdminFiyatlarPage() {
       </div>
 
       {(fiyatsizSayisi > 0 || maliyetsizSayisi > 0) && (
-        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-sm text-amber-900 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-sm text-amber-900 flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
           <div className="flex gap-2">
             <LuTriangleAlert size={20} className="flex-shrink-0 mt-0.5 text-amber-600" />
             <div>
-              <p className="font-semibold">Logo GO3 Ön Muhasebe & Kâr Uyumu İçin:</p>
+              <p className="font-semibold">Logo GO3 Ön Muhasebe & Google Shopping Uyumu İçin:</p>
               <p className="text-xs text-amber-800 mt-0.5">
-                Fiyatı olmayan ürünler sepete eklenemez. Alış maliyeti (girdi fiyatı) olmayan ürünlerde ise P&L Gelir Tablosunda SMM ve kârlılık 0 görünür.
+                Fiyatı 0 TL olan ürünler Google Merchant feed&apos;ine ve sepete eklenemez. Piyasa öneri fiyatlarını tek tıkla uygulayabilirsiniz.
               </p>
             </div>
           </div>
-          <div className="flex gap-2 text-xs font-semibold">
+          <div className="flex flex-wrap gap-2 text-xs font-semibold">
+            {fiyatsizSayisi > 0 && (
+              <>
+                <button
+                  onClick={onerilenleriOtomatikKaydet}
+                  disabled={kaydediliyor}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors"
+                >
+                  <LuSparkles size={14} /> Öneri Fiyatları Tek Tıkla Kaydet ({fiyatsizSayisi})
+                </button>
+                <button
+                  onClick={onerilenleriDoldur}
+                  className="bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-lg shadow-sm"
+                >
+                  Taslaklara Doldur
+                </button>
+              </>
+            )}
             <button
               onClick={() => {
                 setSadeceFiyatsiz(true);
