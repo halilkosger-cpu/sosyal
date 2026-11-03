@@ -7,7 +7,6 @@ import { LuX, LuShoppingBag, LuArrowRight, LuTrash2, LuPlus, LuMinus } from 'rea
 import Link from 'next/link';
 import Image from 'next/image';
 import { sepetiOku, sepetiYaz, SEPET_OLAYI, type SepetUrunu } from '../lib/cart';
-import KargoIlerlemeCubugu from './KargoIlerlemeCubugu';
 
 export interface CartDrawerProps {
   /** Ek Tailwind sınıfları */
@@ -185,12 +184,6 @@ export default function CartDrawer({
               </button>
             </div>
 
-            {/* 1.500 TL Ücretsiz Kargo İlerleme Çubuğu */}
-            {items.length > 0 && (
-              <div className="px-6 pt-3 pb-1 bg-white">
-                <KargoIlerlemeCubugu toplamTutar={toplamTutar} kompakt />
-              </div>
-            )}
 
             {/* Sepet İçeriği */}
             {items.length === 0 ? (
