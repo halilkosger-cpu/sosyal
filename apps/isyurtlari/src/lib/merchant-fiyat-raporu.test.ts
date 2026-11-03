@@ -69,6 +69,11 @@ describe('fiyatOzetiOlustur', () => {
     expect(ozet.feedSorunu).toContain('1');
   });
 
+  it('hiç satır dönmezse veriYok işaretlenir', () => {
+    expect(fiyatOzetiOlustur([]).veriYok).toBe(true);
+    expect(fiyatOzetiOlustur([satir('a', 100, 100)]).veriYok).toBe(false);
+  });
+
   it('eksik benchmark yoksa feedSorunu null olur', () => {
     const ozet = fiyatOzetiOlustur([satir('a', 100, 100)]);
     expect(ozet.feedSorunu).toBeNull();
