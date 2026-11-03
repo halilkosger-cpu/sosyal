@@ -117,3 +117,40 @@ export async function merchantSatirlariGetir(): Promise<MerchantSatir[]> {
   }
   return merchantSatirlariniAyristir((await yanit.json()) as MerchantYanit);
 }
+
+/**
+ * Geçici tanı: benchmark içermeyen basit bir Merchant raporu dener.
+ * Bu basit sorgu başarılıysa kimlik doğrulama çalışıyor demektir; sorun
+ * price_competitiveness_product_view raporunun hesapta kullanılamamasıdır.
+ */
+export async function merchantTaniGetir(): Promise<{ durum: number; yanit: string }> {
+  const jeton = await googleErisimJetonu(['https://www.googleapis.com/auth/content']);
+  const yanit = await fetch(
+    `https://merchantapi.googleapis.com/reports/v1/accounts/${MERCHANT_HESAP_ID}/reports:search`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` },
+      body: JSON.stringify({ query: 'SELECT product_view.id, product_view.title FROM product_view LIMIT 1' }),
+      cache: 'no-store',
+    }
+  );
+  return { durum: yanit.status, yanit: (await yanit.text()).slice(0, 1500) };
+}
+
+/**
+ * Geçici kurulum: GCP projesini Merchant hesabına API geliştiricisi olarak
+ * kaydeder (developerRegistration:registerGcp). Bir kez çalıştırılır.
+ */
+export async function merchantProjeKaydet(): Promise<{ durum: number; yanit: string }> {
+  const jeton = await googleErisimJetonu(['https://www.googleapis.com/auth/content']);
+  const yanit = await fetch(
+    `https://merchantapi.googleapis.com/accounts/v1/accounts/${MERCHANT_HESAP_ID}/developerRegistration:registerGcp`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` },
+      body: JSON.stringify({ developerEmail: process.env.GUNLUK_RAPOR_ALICI || 'halil.kosger@gmail.com' }),
+      cache: 'no-store',
+    }
+  );
+  return { durum: yanit.status, yanit: (await yanit.text()).slice(0, 1500) };
+}

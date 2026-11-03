@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { isAdminRequest } from '@/lib/admin-auth';
 import { gunlukRaporMetniOlustur } from '@/lib/gunluk-rapor';
 import { gunlukVeriTopla } from '@/lib/gunluk-rapor-veri';
+import { merchantProjeKaydet, merchantTaniGetir } from '@/lib/merchant-fiyat-raporu';
 
 export const dynamic = 'force-dynamic';
 /** Üç dış kaynak sırayla çağrılıyor; varsayılan süre yetmeyebilir. */
@@ -28,6 +29,16 @@ export async function GET(req: NextRequest) {
 
   if (!cronYetkili && !isAdminRequest(req)) {
     return NextResponse.json({ error: 'Yetkisiz erişim' }, { status: 401 });
+  }
+
+  if (req.nextUrl.searchParams.get('kayit') === '1') {
+    // Geçici kurulum: GCP projesini Merchant hesabına kaydeder.
+    return NextResponse.json(await merchantProjeKaydet());
+  }
+
+  if (req.nextUrl.searchParams.get('tani') === '1') {
+    // Geçici tanı: Merchant kimlik doğrulamasını basit bir raporla dener.
+    return NextResponse.json(await merchantTaniGetir());
   }
 
   try {
