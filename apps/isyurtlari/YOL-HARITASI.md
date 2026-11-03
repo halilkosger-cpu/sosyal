@@ -437,3 +437,13 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 - [ ] I5 Otomatik Piyasa Fiyat Analizi (Piyasa Kıyaslama & Fiyat Takibi):
   - **Aşama 1 (Google Dahili):** Merchant Center > Büyüme > *Fiyat Rekabet Gücü Raporu (Price Competitiveness)* aktivasyonu (Google Alışveriş kıyaslama fiyatı ve pazar ortalaması).
   - **Aşama 2 (Admin Entegrasyonu):** Admin paneline piyasa takip modülü (Google Shopping API / Pazar yeri muadil ürün fiyat scraper veya Akakçe/Cimri eşleştirmesi ile 'Piyasa Ortalaması vs Sizin Fiyatınız' uyarısı ve kâr marjı önerisi).
+
+### J. Klon Proje & Marka Yayılımı: cezaevinden.com (İleride Yapılacak)
+- [ ] J1 Bağımsız Klonlama: `sosyal/` projesini `.git`, `.next`, `node_modules` hariç tutarak yeni `cezaevinden/` dizinine kopyalama (`isyurtlari.com.tr` deposuna sıfır etki ve tam izolasyon).
+- [ ] J2 Yeni Git Deposu: Bağımsız GitHub deposu (`git init`, `git remote add origin https://github.com/.../cezaevinden.git`).
+- [ ] J3 Ortak Veritabanı: Neon PostgreSQL `DATABASE_URL` bağlantı dizesini kullanarak aynı ürün/sipariş/katalog veritabanını paylaşma.
+- [ ] J4 Marka & Alan Adı Uyarlaması:
+  - `apps/isyurtlari/src/lib/seo.ts` (`SITE_URL = 'https://cezaevinden.com'`, `SITE_NAME = 'cezaevinden.com'`).
+  - `apps/isyurtlari/public/manifest.json` ("Cezaevinden" PWA başlığı ve kısa adı).
+  - Logo, favicon ve og-gorsel marka görselleri.
+  - Vercel dağıtımı (`NEXT_PUBLIC_DOMAIN=cezaevinden.com`, `NEXTAUTH_URL=https://cezaevinden.com`).
