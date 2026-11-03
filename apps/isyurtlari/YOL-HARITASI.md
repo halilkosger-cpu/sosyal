@@ -1,7 +1,7 @@
 # isyurtlari.com.tr — Yol Haritası
 
 Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi, site güven/dönüşüm incelemesi
-Önceki: 2 Kasım 2026 · Sıradaki iş: **Mobil üst alan PR'ını canlıda doğrulama, stoksuz ürünlerin vitrinden çıkarılması**
+Önceki: 2 Kasım 2026 · Sıradaki iş: **Stoksuz ürünlerin vitrinden çıkarılması**
 
 ## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
 
@@ -22,16 +22,17 @@ Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi,
 - **Güven düzeltmeleri (PR #11, birleştirildi):** ürün sayfasındaki sabit "Bugün 18 kişi inceledi" ve "%98 Memnuniyet" rozetleri, her gün sıfırlanan "Günün Fırsatı" sayacı ve `price * 1.2` ile uydurulmuş üstü çizili fiyat kaldırıldı. Blok "Öne Çıkan Ürün" oldu.
 - **Kargo vaadi (PR #12, birleştirildi):** karşı ödemeli modelle çelişen "1.500 TL üzeri kargonuz BEDAVA" çubuğu (sepet sayfası ve çekmece) kaldırıldı. `fiyat.ts` içindeki kullanılmayan `UCRETSIZ_KARGO_ESIGI` sabiti model değişirse diye bırakıldı.
 - **Yol haritası güncellemesi (PR #13, birleştirildi).**
-- **Mobil üst alan kısaltıldı (PR #14, açık, birleştirme onayı bekliyor):**
+- **Mobil üst alan kısaltıldı (PR #14, birleştirildi ve canlıda doğrulandı):**
   - Kategori şeridi (`MobilKategoriSeridi`) sabit (`sticky`) başlığın içindeydi; mobilde kaydırırken bile ekranın yaklaşık dörtte birini kaplıyordu. Başlığın dışına alındı, artık sayfayla birlikte kayıyor. `/urun/`, `/sepet`, `/checkout`, `/order-confirmation` yollarında hiç gösterilmiyor.
   - Kampanya bandı mobilde tek satır ("Efsane Kasım: sepette net %10 indirim"); geniş ekranda tam metin.
   - Uygulama yükle bandı sayfa açıldıktan 20 sn sonra çıkıyor (önceden anında) ve kapatılınca 7 gün susuyor (önceden ~5 saat).
   - Çerez bandı mobilde kompakt: tek satır metin, küçük düğmeler, başlık yalnızca masaüstünde.
-  - Yerel önizleme yapılamadı (çalışma kopyasında `.env`/veritabanı yok); görsel doğrulama deploy sonrası canlıda 375px'te yapılacak.
+  - Canlı doğrulama (375px, 3 Kasım): sabit başlık yüksekliği 256 px → 109 px; ürün sayfasında kategori şeridi, uygulama yükle bandı ve sahte rozetler yok, ilk ekranda ürün görseli görünüyor; ana sayfada şerit sayfayla kayıyor ve çerez bandı 149 px → 61 px.
+  - Not: Eski sürüm tarayıcı önbelleğinden (`s-maxage=3600`, `stale-while-revalidate=86400`) görünebilir; deploy sonrası kontrolde `?v=...` ile önbellek atlanmalı.
 
 ### Yapılmayanlar (öncelik sırasıyla)
 
-1. **Mobil üst alan canlı doğrulaması (PR #14 birleştikten sonra).** 375px'te ana sayfa ve ürün sayfasında ilk ekran, kampanya bandı, çerez bandı ve gecikmeli yükle bandı gözle kontrol edilecek. Trafiğin %70'i mobil.
+1. **Gerçek telefonda mobil kontrol.** Yükle bandının 20 sn sonra çıktığı ve kapatılınca 7 gün sustuğu, iOS Safari ve Android Chrome'da denenmedi (yalnızca masaüstü tarayıcıda 375px emülasyonuyla bakıldı).
 2. **Stoksuz ürünler vitrinde.** Polen, Bal & Arı Ürünleri ve El Yapımı Gümüş Kehribar Tesbih stokta yok; ana sayfa görselinde Polen öne çıkıyor. Vitrinden ve Merchant beslemesinden çıkarılmalı, "Ön Talep" öne alınmalı.
 3. **Gerçek yorum sistemi.** Yorumlar sekmesi 0; teslimat sonrası yorum isteyen e-posta eklenmeli (Merchant ürün puanını da besler).
 4. **Admin "Günlük Rapor" sayfası.** Raporu e-posta dışında web'de görmek için; aynı `gunlukVeriTopla` fonksiyonuyla yalnızca dünün raporu. Kullanıcı onayı bekleniyor. Geçmiş günler için veritabanına kayıt gerekir (ayrı iş).
