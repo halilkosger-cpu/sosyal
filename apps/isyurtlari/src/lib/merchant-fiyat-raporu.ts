@@ -87,6 +87,7 @@ export function fiyatOzetiOlustur(satirlar: MerchantSatir[]): FiyatOzeti {
     ucuzSayi: ucuz.length,
     eksikSayi: eksik,
     feedSorunu: eksik > 0 ? `${eksik} ürün için benchmark fiyatı yok` : null,
+    veriYok: satirlar.length === 0,
   };
 }
 

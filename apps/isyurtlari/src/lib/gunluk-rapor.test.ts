@@ -63,6 +63,16 @@ describe('gunlukRaporMetniOlustur', () => {
     expect(metin).toContain('Fiyat verisi alınamadı');
   });
 
+  it('Merchant hiç satır döndürmezse bunu açıkça yazar', () => {
+    const veri: GunlukVeri = {
+      ...tamVeri(),
+      fiyat: { pahali: [], ucuz: [], pahaliSayi: 0, ucuzSayi: 0, eksikSayi: 0, feedSorunu: null, veriYok: true },
+    };
+    const metin = gunlukRaporMetniOlustur(veri);
+    expect(metin).toContain('Rekabet verisi bu hesapta dönmedi');
+    expect(metin).not.toContain('Piyasadan %10+ pahalı');
+  });
+
   it('ürün listelerini 10 ile sınırlar ve 400 kelimeyi aşmaz', () => {
     const uzunBaslik = 'Çok uzun bir ürün adı '.repeat(10);
     const cokUrun = Array.from({ length: 40 }, (_, i) => ({ baslik: `${uzunBaslik}${i}`, fark: 20 + i }));

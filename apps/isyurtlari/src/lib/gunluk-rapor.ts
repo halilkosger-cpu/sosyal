@@ -50,6 +50,8 @@ export interface FiyatOzeti {
   ucuzSayi: number;
   eksikSayi: number;
   feedSorunu: string | null;
+  /** Merchant boş sonuç döndü: hesapta rekabet verisi yok. */
+  veriYok?: boolean;
 }
 
 export interface GunlukVeri {
@@ -93,6 +95,7 @@ function bolum1(veri: GunlukVeri): string[] {
   if (!veri.fiyat) return [...satirlar, '- Fiyat verisi alınamadı.'];
 
   const f = veri.fiyat;
+  if (f.veriYok) return [...satirlar, '- Rekabet verisi bu hesapta dönmedi.'];
   satirlar.push(`- Piyasadan %10+ pahalı: ${f.pahaliSayi} ürün`);
   f.pahali.slice(0, MAKS_LISTE).forEach((k) => satirlar.push(`- ${kisalt(k.baslik)} (${yuzde(k.fark)} pahalı)`));
   satirlar.push(`- Piyasadan %10+ ucuz (marj fırsatı): ${f.ucuzSayi} ürün`);
