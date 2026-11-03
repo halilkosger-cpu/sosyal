@@ -185,9 +185,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* Kampanya Duyuru Bandı */}
           {KASIM_KAMPANYASI_AKTIF && (
           <div className="bg-gradient-to-r from-[#BA4700] via-[#CC4E00] to-[#BA4700] text-white text-[11px] sm:text-xs py-1.5 px-3 text-center font-medium tracking-wide">
-            <span className="inline-flex items-center gap-1.5 justify-center flex-wrap">
+            <span className="inline-flex items-center gap-1.5 justify-center sm:flex-wrap whitespace-nowrap">
               <span>🔥</span>
-              <span><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong> anında uygulanır!</span>
+              {/* Mobilde tek satır; geniş ekranda tam metin */}
+              <span className="sm:hidden"><strong>Efsane Kasım:</strong> sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong></span>
+              <span className="hidden sm:inline"><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong> anında uygulanır!</span>
             </span>
           </div>
           )}
@@ -264,10 +266,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </div>
 
-          {/* Category bar - Mobil Thumb-Zone Hikaye Stili */}
-          <MobilKategoriSeridi categories={categories} />
-
         </header>
+
+          {/* Kategori şeridi sabit başlığın dışında: mobilde kaydırınca ekranı kaplamasın */}
+          <MobilKategoriSeridi categories={categories} />
 
         {/* Main Content */}
         <main className="min-h-screen bg-gray-100">
