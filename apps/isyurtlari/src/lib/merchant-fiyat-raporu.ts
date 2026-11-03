@@ -25,15 +25,18 @@ export interface MerchantSatir {
   paraBirimi: string;
 }
 
+interface MerchantFiyat {
+  amountMicros?: string;
+  currencyCode?: string;
+}
+
 interface MerchantYanit {
   results?: {
-    productView?: {
+    priceCompetitivenessProductView?: {
       id?: string;
       title?: string;
-      price?: { amountMicros?: string; currencyCode?: string };
-    };
-    priceCompetitivenessProductView?: {
-      benchmarkPrice?: { amountMicros?: string; currencyCode?: string };
+      price?: MerchantFiyat;
+      benchmarkPrice?: MerchantFiyat;
     };
   }[];
 }
@@ -42,13 +45,14 @@ const mikroTl = (m: string | undefined) => (m ? Number(m) / 1_000_000 : 0);
 
 export function merchantSatirlariniAyristir(yanit: MerchantYanit): MerchantSatir[] {
   return (yanit.results ?? []).map((r) => {
-    const benchmarkMikro = r.priceCompetitivenessProductView?.benchmarkPrice?.amountMicros;
+    const v = r.priceCompetitivenessProductView;
+    const benchmarkMikro = v?.benchmarkPrice?.amountMicros;
     return {
-      id: r.productView?.id ?? '',
-      baslik: r.productView?.title ?? '',
-      fiyat: mikroTl(r.productView?.price?.amountMicros),
+      id: v?.id ?? '',
+      baslik: v?.title ?? '',
+      fiyat: mikroTl(v?.price?.amountMicros),
       benchmark: benchmarkMikro ? mikroTl(benchmarkMikro) : null,
-      paraBirimi: r.productView?.price?.currencyCode ?? 'TRY',
+      paraBirimi: v?.price?.currencyCode ?? 'TRY',
     };
   });
 }
@@ -90,14 +94,17 @@ export function fiyatOzetiOlustur(satirlar: MerchantSatir[]): FiyatOzeti {
 export async function merchantSatirlariGetir(): Promise<MerchantSatir[]> {
   const jeton = await googleErisimJetonu(['https://www.googleapis.com/auth/content']);
 
+  // Bu görünümde yalnızca tek tablo sorgulanabilir; ürün alanları da aynı tablodan gelir.
+  // id ve report_country_code SELECT içinde zorunlu.
   const sorgu = `
     SELECT
-      product_view.id,
-      product_view.title,
-      product_view.price.amount_micros,
-      product_view.price.currency_code,
-      price_competitiveness_product_view.benchmark_price.amount_micros,
-      price_competitiveness_product_view.benchmark_price.currency_code
+      id,
+      title,
+      price.amount_micros,
+      price.currency_code,
+      benchmark_price.amount_micros,
+      benchmark_price.currency_code,
+      report_country_code
     FROM price_competitiveness_product_view
     LIMIT 200
   `;
