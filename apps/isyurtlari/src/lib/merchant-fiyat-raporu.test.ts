@@ -6,12 +6,10 @@ describe('merchantSatirlariniAyristir', () => {
     const satirlar = merchantSatirlariniAyristir({
       results: [
         {
-          productView: {
-            id: 'sku-1',
+          priceCompetitivenessProductView: {
+            id: 'tr~TR~feed~sku-1',
             title: 'Elban Peynir 1000 gr',
             price: { amountMicros: '300000000', currencyCode: 'TRY' },
-          },
-          priceCompetitivenessProductView: {
             benchmarkPrice: { amountMicros: '250000000', currencyCode: 'TRY' },
           },
         },
@@ -19,13 +17,21 @@ describe('merchantSatirlariniAyristir', () => {
     });
 
     expect(satirlar).toEqual([
-      { id: 'sku-1', baslik: 'Elban Peynir 1000 gr', fiyat: 300, benchmark: 250, paraBirimi: 'TRY' },
+      { id: 'tr~TR~feed~sku-1', baslik: 'Elban Peynir 1000 gr', fiyat: 300, benchmark: 250, paraBirimi: 'TRY' },
     ]);
   });
 
   it('benchmark yoksa null bırakır', () => {
     const satirlar = merchantSatirlariniAyristir({
-      results: [{ productView: { id: 'x', title: 'X', price: { amountMicros: '100000000', currencyCode: 'TRY' } } }],
+      results: [
+        {
+          priceCompetitivenessProductView: {
+            id: 'x',
+            title: 'X',
+            price: { amountMicros: '100000000', currencyCode: 'TRY' },
+          },
+        },
+      ],
     });
     expect(satirlar[0].benchmark).toBeNull();
   });
