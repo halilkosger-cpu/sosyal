@@ -25,15 +25,18 @@ export interface MerchantSatir {
   paraBirimi: string;
 }
 
+interface MerchantFiyat {
+  amountMicros?: string;
+  currencyCode?: string;
+}
+
 interface MerchantYanit {
   results?: {
     priceCompetitivenessProductView?: {
       id?: string;
       title?: string;
-      priceMicros?: string;
-      currencyCode?: string;
-      benchmarkPriceMicros?: string;
-      benchmarkPriceCurrencyCode?: string;
+      price?: MerchantFiyat;
+      benchmarkPrice?: MerchantFiyat;
     };
   }[];
 }
@@ -43,13 +46,13 @@ const mikroTl = (m: string | undefined) => (m ? Number(m) / 1_000_000 : 0);
 export function merchantSatirlariniAyristir(yanit: MerchantYanit): MerchantSatir[] {
   return (yanit.results ?? []).map((r) => {
     const v = r.priceCompetitivenessProductView;
-    const benchmarkMikro = v?.benchmarkPriceMicros;
+    const benchmarkMikro = v?.benchmarkPrice?.amountMicros;
     return {
       id: v?.id ?? '',
       baslik: v?.title ?? '',
-      fiyat: mikroTl(v?.priceMicros),
+      fiyat: mikroTl(v?.price?.amountMicros),
       benchmark: benchmarkMikro ? mikroTl(benchmarkMikro) : null,
-      paraBirimi: v?.currencyCode ?? 'TRY',
+      paraBirimi: v?.price?.currencyCode ?? 'TRY',
     };
   });
 }
@@ -97,10 +100,8 @@ export async function merchantSatirlariGetir(): Promise<MerchantSatir[]> {
     SELECT
       id,
       title,
-      price_micros,
-      currency_code,
-      benchmark_price_micros,
-      benchmark_price_currency_code,
+      price,
+      benchmark_price,
       report_country_code
     FROM price_competitiveness_product_view
     LIMIT 200

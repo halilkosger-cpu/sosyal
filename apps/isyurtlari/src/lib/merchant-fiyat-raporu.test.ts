@@ -9,10 +9,8 @@ describe('merchantSatirlariniAyristir', () => {
           priceCompetitivenessProductView: {
             id: 'tr~TR~feed~sku-1',
             title: 'Elban Peynir 1000 gr',
-            priceMicros: '300000000',
-            currencyCode: 'TRY',
-            benchmarkPriceMicros: '250000000',
-            benchmarkPriceCurrencyCode: 'TRY',
+            price: { amountMicros: '300000000', currencyCode: 'TRY' },
+            benchmarkPrice: { amountMicros: '250000000', currencyCode: 'TRY' },
           },
         },
       ],
@@ -30,8 +28,7 @@ describe('merchantSatirlariniAyristir', () => {
           priceCompetitivenessProductView: {
             id: 'x',
             title: 'X',
-            priceMicros: '100000000',
-            currencyCode: 'TRY',
+            price: { amountMicros: '100000000', currencyCode: 'TRY' },
           },
         },
       ],
