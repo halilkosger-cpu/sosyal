@@ -136,3 +136,21 @@ export async function merchantTaniGetir(): Promise<{ durum: number; yanit: strin
   );
   return { durum: yanit.status, yanit: (await yanit.text()).slice(0, 1500) };
 }
+
+/**
+ * Geçici kurulum: GCP projesini Merchant hesabına API geliştiricisi olarak
+ * kaydeder (developerRegistration:registerGcp). Bir kez çalıştırılır.
+ */
+export async function merchantProjeKaydet(): Promise<{ durum: number; yanit: string }> {
+  const jeton = await googleErisimJetonu(['https://www.googleapis.com/auth/content']);
+  const yanit = await fetch(
+    `https://merchantapi.googleapis.com/accounts/v1/accounts/${MERCHANT_HESAP_ID}/developerRegistration:registerGcp`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` },
+      body: JSON.stringify({ developerEmail: process.env.GUNLUK_RAPOR_ALICI || 'halil.kosger@gmail.com' }),
+      cache: 'no-store',
+    }
+  );
+  return { durum: yanit.status, yanit: (await yanit.text()).slice(0, 1500) };
+}
