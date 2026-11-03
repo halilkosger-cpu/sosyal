@@ -1,7 +1,53 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 2 Kasım 2026 — Google Merchant Center Başlık & Marka Zenginleştirmesi, Piyasa Fiyat Analizi Planlaması
-Önceki: 30 Ekim 2026 · Sıradaki iş: **Merchant Center panel ayarları (Kargo, İade) ve Piyasa Fiyat Analizi**
+Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi, site güven/dönüşüm incelemesi
+Önceki: 2 Kasım 2026 · Sıradaki iş: **Bekleyen PR'ları (#11, #12) birleştirme, mobil üst alan, stoksuz ürünlerin vitrinden çıkarılması**
+
+## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
+
+### Yapılanlar
+
+- **Günlük yönetim raporu e-postası (PR #4–#10, canlıda):**
+  - Uç: `/api/gorevler/gunluk-rapor`. Vercel Cron her gün 06:00 UTC'de (Türkiye 09:00) çalışır, `halil.kosger@gmail.com` adresine gönderir (`GUNLUK_RAPOR_ALICI` ile değişir).
+  - Üç bölüm: fiyat rekabeti, günlük performans ve trafik (satış, GA4), eylem planı. En fazla 400 kelime.
+  - Veri kaynakları: Prisma (dünün ciro, sipariş, AOV, en çok satan 5 ürün, düşük stok), GA4 Data API (mülk 534677974), Merchant API v1 Reports.
+  - Vercel ortam değişkenleri: `GA4_PROPERTY_ID`, `GOOGLE_SERVICE_ACCOUNT_KEY`, `CRON_SECRET`, isteğe bağlı `GOOGLE_MERCHANT_ID`. `CRON_SECRET` sohbette göründüğü için yenilendi; eski değer 401 veriyor.
+  - Merchant hesabına servis hesabı eklendi (Yönetici) ve GCP projesi `developerRegistration:registerGcp` ile kaydedildi. Geçici `?tani=1` ve `?kayit=1` uçları kaldırıldı.
+  - `?kuru=1` e-posta göndermeden raporu JSON döndürür (Bearer `CRON_SECRET` veya admin oturumu gerekir).
+- **Merchant fiyat rekabeti verisi bu hesapta dönmüyor.** Sorgu (`price`, `benchmark_price` mesajları) hata vermiyor ama boş sonuç dönüyor; Merchant Center'da Analytics → Fiyatlandırma sayfası yalnızca indirimli fiyat önerilerini gösteriyor, fiyat rekabeti raporu yok. Rapor bunu "Rekabet verisi bu hesapta dönmedi." diye yazıyor. Veri ileride açılırsa otomatik dolar.
+- **Güvenlik denetimi yapıldı (yalnızca rapor, düzeltme yok)**; bulgular aşağıda "Yapılmayanlar"da.
+- **Site incelemesi yapıldı** (masaüstü, 375px mobil, ürün sayfası kodu, SEO sinyalleri). Hız iyi (ilk bayt ≈0,2 sn), `robots.txt`/`sitemap.xml`/JSON-LD var.
+- **Kargo kararı:** Karşı ödemeli model aynen kalıyor (`KARGO_KARSI_ODEMELI = true`).
+
+### Açık PR'lar (birleştirme onayı bekliyor)
+
+- **#11 — Güven düzeltmeleri:** ürün sayfasındaki sabit "Bugün 18 kişi inceledi" ve "%98 Memnuniyet" rozetleri, her gün sıfırlanan "Günün Fırsatı" sayacı ve `price * 1.2` ile uydurulmuş üstü çizili fiyat kaldırıldı. Kullanıcı "önce bekle" dedi.
+- **#12 — Kargo vaadi:** karşı ödemeli modelle çelişen "1.500 TL üzeri kargonuz BEDAVA" çubuğu (sepet sayfası ve çekmece) kaldırıldı.
+
+### Yapılmayanlar (öncelik sırasıyla)
+
+1. **Mobil üst alan (trafiğin %70'i mobil).** İlk 812 px'in yaklaşık 300 px'ini uygulama yükle bandı, kampanya bandı ve kategori daireleri; altta çerez bandı ve alt menü kaplıyor. İncelendi (`MobilUygulamaBanneri.tsx`, `CookieConsent.tsx`, `KampanyaHeroBanner.tsx`), kod değişmedi.
+2. **Stoksuz ürünler vitrinde.** Polen, Bal & Arı Ürünleri ve El Yapımı Gümüş Kehribar Tesbih stokta yok; ana sayfa görselinde Polen öne çıkıyor. Vitrinden ve Merchant beslemesinden çıkarılmalı, "Ön Talep" öne alınmalı.
+3. **Gerçek yorum sistemi.** Yorumlar sekmesi 0; teslimat sonrası yorum isteyen e-posta eklenmeli (Merchant ürün puanını da besler).
+4. **Admin "Günlük Rapor" sayfası.** Raporu e-posta dışında web'de görmek için; aynı `gunlukVeriTopla` fonksiyonuyla yalnızca dünün raporu. Kullanıcı onayı bekleniyor. Geçmiş günler için veritabanına kayıt gerekir (ayrı iş).
+5. **Ödeme adımı doğrulanmadı:** misafir olarak alışveriş, taksit seçeneği (1.755 ₺ ve 5.500 ₺'lik ürünler için önemli), mobil ödeme akışı.
+6. **Ana sayfada alt metni olmayan görseller:** 35 görselin 20'sinde `alt` yok.
+7. **Trafik çeşitliliği:** oturumlar neredeyse tamamen organik (62) ve direkt (33); sosyal, e-posta ve ücretli kanal yok. Hediye Kutusu Yap ve kurumsal hediye öne çıkarılabilir.
+8. **Eski Merchant kodu temizliği:** `google-merchant-api.ts` hâlâ kapanan Content API v2.1'i kullanıyor ve canlı veri yoksa uydurma `YEREL_SIMULASYON` fiyatlarına düşüyor (admin fiyat analizi sayfasını yanıltabilir). `google-merchant-api.test.ts` içinde önceden var olan başarısız test ve `tsc` hataları da var.
+9. **"Fiyat Rekabet Gücü Raporu panelden açılabilir" notu geçersiz** (bölüm I5). Hesapta rapor yok; Merchant Center'da uygunluk ve ürün kataloğu eşleşmesi (GTIN/marka) kontrol edilmeli.
+10. **Merchant kargo ayarları** panelde sitedeki karşı ödemeli modelle tutarlı olmalı (yalnızca panelden yapılabilir).
+
+### Güvenlik denetimi bulguları (düzeltilmedi)
+
+- `hiz-siniri.ts` `istemciAdresi` en soldaki `X-Forwarded-For` değerini kullanıyor (sahtelenebilir): admin `totp-verify`/`otp-verify`/`otp-request`, müşteri girişi ve `siparis-sorgula` hız sınırları atlatılabilir.
+- Admin TOTP için hesap bazlı kilitleme yok.
+- CSP `script-src 'unsafe-inline'` içeriyor.
+- iyzico callback `payment.updateMany` açıklamada `contains` kullanıyor (SG-2026-001, SG-2026-0010 ile eşleşir).
+- Kategoriler için SVG yükleme açık.
+- JWT için geliştirme ortamı yedek anahtarı var.
+- `admin-auth.ts` içinde sabit yönetici e-postaları.
+- Yedek kodlar tuzsuz SHA-256 (32 bit kod).
+- Olumlu: scrypt parolalar, özetlenmiş oturumlar, IDOR kontrolleri, fiyatın sunucuda yeniden hesaplanması, e-posta ve JSON-LD kaçışları.
 
 ## 2 Kasım 2026 — Google Merchant Center Feed Güçlendirmesi (Hesap: 5876808666)
 
