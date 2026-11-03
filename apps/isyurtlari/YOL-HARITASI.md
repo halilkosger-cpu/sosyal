@@ -433,10 +433,12 @@ Jüri bakar: Tasarım %40, Kullanılabilirlik %30, Yaratıcılık %20, İçerik 
 - [x] I1 Dinamik XML Feed optimizasyonu (Elban, AK-CE, ADVEM, Zenbay marka eşleştirme, Google kategori taksonomisi 422/587/632/1604, zengin açıklamalar, `identifier_exists: no`).
 - [ ] I2 Merchant Center Panel Kargo Kuralları (Türkiye geneli kargo ücreti ve 2-4 iş günü teslimat süresi tanımı).
 - [ ] I3 Merchant Center Panel İade Politikası (14 gün yasal iade, iade adresi ve kargo şartları).
-- [ ] I4 Merchant Center "Otomatik Ürün Güncellemeleri" (Schema.org / JSON-LD mikro verileri ile Google'ın fiyat/stok değişimlerini anında senkronize etmesi).
-- [ ] I5 Otomatik Piyasa Fiyat Analizi (Piyasa Kıyaslama & Fiyat Takibi):
-  - **Aşama 1 (Google Dahili):** Merchant Center > Büyüme > *Fiyat Rekabet Gücü Raporu (Price Competitiveness)* aktivasyonu (Google Alışveriş kıyaslama fiyatı ve pazar ortalaması).
-  - **Aşama 2 (Admin Entegrasyonu):** Admin paneline piyasa takip modülü (Google Shopping API / Pazar yeri muadil ürün fiyat scraper veya Akakçe/Cimri eşleştirmesi ile 'Piyasa Ortalaması vs Sizin Fiyatınız' uyarısı ve kâr marjı önerisi).
+- [x] I4 Merchant Center "Otomatik Ürün Güncellemeleri" Altyapısı:
+  - Kod Tarafı (TAMAMLANDI): `src/app/urun/[slug]/page.tsx` içinde Google standartlarında `Schema.org/Product` ve `Offer` (fiyat, stok, para birimi, kargo ve iade detayları) JSON-LD mikro verileri canlıya alındı.
+  - Panel Onayı: Merchant Center panelinden `Araçlar > Otomatik İyileştirmeler > Otomatik Ürün Güncellemeleri` onay kutusunun aktifleştirilmesi bekleniyor.
+- [x] I5 Otomatik Piyasa Fiyat Analizi & Öneri Modülü:
+  - Admin Entegrasyonu (TAMAMLANDI): `/admin/fiyatlar` sayfasına piyasa muadil fiyatlandırma ve kâr marjı analiz motoru eklendi (`ONERILEN_PIYASA_FIYATLARI` + `/api/admin/products/fiyat-tamamla` ile tek tıkla toplu fiyat/maliyet tamamlama).
+  - Google Dahili Rapor: Merchant Center > Büyüme > *Fiyat Rekabet Gücü Raporu (Price Competitiveness)* panelden açılabilir.
 
 ### J. Klon Proje & Marka Yayılımı: cezaevinden.com (İleride Yapılacak)
 - [ ] J1 Bağımsız Klonlama: `sosyal/` projesini `.git`, `.next`, `node_modules` hariç tutarak yeni `cezaevinden/` dizinine kopyalama (`isyurtlari.com.tr` deposuna sıfır etki ve tam izolasyon).
