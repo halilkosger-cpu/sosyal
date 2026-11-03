@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck, LuSparkles } from 'react-icons/lu';
+import Link from 'next/link';
+import { LuDownload, LuUpload, LuSave, LuTriangleAlert, LuCheck, LuSparkles, LuTrendingUp } from 'react-icons/lu';
 import { fiyatiCoz } from '@/lib/csv';
 import { ONERILEN_PIYASA_FIYATLARI } from '@/lib/onerilen-fiyatlar';
 
@@ -236,7 +237,13 @@ export default function AdminFiyatlarPage() {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/admin/fiyat-analizi"
+            className="inline-flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition-colors shadow-sm"
+          >
+            <LuTrendingUp size={15} /> Piyasa Fiyat Analizi & Rapor
+          </Link>
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- dosya indirme ucu */}
           <a
             href="/api/admin/products/prices"
