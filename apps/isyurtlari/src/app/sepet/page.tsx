@@ -8,7 +8,6 @@ import { LuArrowLeft, LuArrowRight, LuMinus, LuPlus, LuRotateCcw, LuShieldCheck,
 const tl = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 import { sepettenCikarildi } from '@/lib/analiz';
 import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
-import KargoIlerlemeCubugu from '@/components/KargoIlerlemeCubugu';
 
 interface Campaign {
   id: string;
@@ -136,9 +135,6 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
             <div className="lg:col-span-2 space-y-4">
-              {/* 1.500 TL Ücretsiz Kargo İlerleme Çubuğu */}
-              <KargoIlerlemeCubugu toplamTutar={subtotal} />
-
               {/* Ürünler */}
               <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 bg-white">
               {cart.map((item) => (
