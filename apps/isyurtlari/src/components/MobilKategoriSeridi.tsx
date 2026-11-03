@@ -1,7 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import KategoriIkon from './KategoriIkon';
+
+/** Bu yollarda şerit gizlenir: ürün, sepet ve ödeme akışında ilk ekran ürüne/sipariş adımına kalsın. */
+const SERIDIN_GIZLENDIGI_YOLLAR = ['/urun/', '/sepet', '/checkout', '/order-confirmation'];
 
 interface CategoryItem {
   id: string;
@@ -15,7 +19,9 @@ interface CategoryItem {
  * Mobilde ilk ekranda parmakla yatay kaydırılabilir, tek dokunuşla kategoriye yönlendirir.
  */
 export default function MobilKategoriSeridi({ categories }: { categories: CategoryItem[] }) {
+  const yol = usePathname() ?? '';
   if (!categories || categories.length === 0) return null;
+  if (SERIDIN_GIZLENDIGI_YOLLAR.some((onEk) => yol.startsWith(onEk))) return null;
 
   return (
     <nav

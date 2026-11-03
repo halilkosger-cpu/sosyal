@@ -49,10 +49,10 @@ export default function CookieConsent() {
 
   return (
     <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] md:bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
-      <div className="max-w-screen-xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="max-w-screen-xl mx-auto px-3 md:px-4 py-2 md:py-4 flex flex-row items-center justify-between gap-3 md:gap-4">
         <div className="flex-1">
-          <h3 className="font-bold text-sm mb-1 text-gray-900">Çerez Politikası</h3>
-          <p className="text-xs text-gray-600">
+          <h3 className="hidden md:block font-bold text-sm mb-1 text-gray-900">Çerez Politikası</h3>
+          <p className="text-[11px] leading-snug md:text-xs text-gray-600">
             Site deneyiminizi iyileştirmek için çerezler kullanıyoruz.
             <Link href="/gizlilik-sozlesmesi" className="text-[#BA4700] underline hover:no-underline ml-1 font-semibold">Detaylı bilgi</Link>
           </p>
@@ -60,14 +60,14 @@ export default function CookieConsent() {
         <div className="flex gap-2 flex-shrink-0">
           <button
             onClick={handleReject}
-            className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             aria-label="Çerezleri reddet"
           >
             Reddet
           </button>
           <button
             onClick={handleAccept}
-            className="px-4 py-2 text-sm font-semibold text-white bg-[#CC4E00] hover:bg-[#CC4E00] rounded-lg transition-colors"
+            className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-semibold text-white bg-[#CC4E00] hover:bg-[#CC4E00] rounded-lg transition-colors"
             aria-label="Tüm çerezleri kabul et"
           >
             Kabul Et

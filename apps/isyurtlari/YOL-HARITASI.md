@@ -1,7 +1,7 @@
 # isyurtlari.com.tr — Yol Haritası
 
 Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi, site güven/dönüşüm incelemesi
-Önceki: 2 Kasım 2026 · Sıradaki iş: **Bekleyen PR'ları (#11, #12) birleştirme, mobil üst alan, stoksuz ürünlerin vitrinden çıkarılması**
+Önceki: 2 Kasım 2026 · Sıradaki iş: **Mobil üst alan PR'ını canlıda doğrulama, stoksuz ürünlerin vitrinden çıkarılması**
 
 ## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
 
@@ -19,14 +19,19 @@ Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi,
 - **Site incelemesi yapıldı** (masaüstü, 375px mobil, ürün sayfası kodu, SEO sinyalleri). Hız iyi (ilk bayt ≈0,2 sn), `robots.txt`/`sitemap.xml`/JSON-LD var.
 - **Kargo kararı:** Karşı ödemeli model aynen kalıyor (`KARGO_KARSI_ODEMELI = true`).
 
-### Açık PR'lar (birleştirme onayı bekliyor)
-
-- **#11 — Güven düzeltmeleri:** ürün sayfasındaki sabit "Bugün 18 kişi inceledi" ve "%98 Memnuniyet" rozetleri, her gün sıfırlanan "Günün Fırsatı" sayacı ve `price * 1.2` ile uydurulmuş üstü çizili fiyat kaldırıldı. Kullanıcı "önce bekle" dedi.
-- **#12 — Kargo vaadi:** karşı ödemeli modelle çelişen "1.500 TL üzeri kargonuz BEDAVA" çubuğu (sepet sayfası ve çekmece) kaldırıldı.
+- **Güven düzeltmeleri (PR #11, birleştirildi):** ürün sayfasındaki sabit "Bugün 18 kişi inceledi" ve "%98 Memnuniyet" rozetleri, her gün sıfırlanan "Günün Fırsatı" sayacı ve `price * 1.2` ile uydurulmuş üstü çizili fiyat kaldırıldı. Blok "Öne Çıkan Ürün" oldu.
+- **Kargo vaadi (PR #12, birleştirildi):** karşı ödemeli modelle çelişen "1.500 TL üzeri kargonuz BEDAVA" çubuğu (sepet sayfası ve çekmece) kaldırıldı. `fiyat.ts` içindeki kullanılmayan `UCRETSIZ_KARGO_ESIGI` sabiti model değişirse diye bırakıldı.
+- **Yol haritası güncellemesi (PR #13, birleştirildi).**
+- **Mobil üst alan kısaltıldı (PR #14, açık, birleştirme onayı bekliyor):**
+  - Kategori şeridi (`MobilKategoriSeridi`) sabit (`sticky`) başlığın içindeydi; mobilde kaydırırken bile ekranın yaklaşık dörtte birini kaplıyordu. Başlığın dışına alındı, artık sayfayla birlikte kayıyor. `/urun/`, `/sepet`, `/checkout`, `/order-confirmation` yollarında hiç gösterilmiyor.
+  - Kampanya bandı mobilde tek satır ("Efsane Kasım: sepette net %10 indirim"); geniş ekranda tam metin.
+  - Uygulama yükle bandı sayfa açıldıktan 20 sn sonra çıkıyor (önceden anında) ve kapatılınca 7 gün susuyor (önceden ~5 saat).
+  - Çerez bandı mobilde kompakt: tek satır metin, küçük düğmeler, başlık yalnızca masaüstünde.
+  - Yerel önizleme yapılamadı (çalışma kopyasında `.env`/veritabanı yok); görsel doğrulama deploy sonrası canlıda 375px'te yapılacak.
 
 ### Yapılmayanlar (öncelik sırasıyla)
 
-1. **Mobil üst alan (trafiğin %70'i mobil).** İlk 812 px'in yaklaşık 300 px'ini uygulama yükle bandı, kampanya bandı ve kategori daireleri; altta çerez bandı ve alt menü kaplıyor. İncelendi (`MobilUygulamaBanneri.tsx`, `CookieConsent.tsx`, `KampanyaHeroBanner.tsx`), kod değişmedi.
+1. **Mobil üst alan canlı doğrulaması (PR #14 birleştikten sonra).** 375px'te ana sayfa ve ürün sayfasında ilk ekran, kampanya bandı, çerez bandı ve gecikmeli yükle bandı gözle kontrol edilecek. Trafiğin %70'i mobil.
 2. **Stoksuz ürünler vitrinde.** Polen, Bal & Arı Ürünleri ve El Yapımı Gümüş Kehribar Tesbih stokta yok; ana sayfa görselinde Polen öne çıkıyor. Vitrinden ve Merchant beslemesinden çıkarılmalı, "Ön Talep" öne alınmalı.
 3. **Gerçek yorum sistemi.** Yorumlar sekmesi 0; teslimat sonrası yorum isteyen e-posta eklenmeli (Merchant ürün puanını da besler).
 4. **Admin "Günlük Rapor" sayfası.** Raporu e-posta dışında web'de görmek için; aynı `gunlukVeriTopla` fonksiyonuyla yalnızca dünün raporu. Kullanıcı onayı bekleniyor. Geçmiş günler için veritabanına kayıt gerekir (ayrı iş).

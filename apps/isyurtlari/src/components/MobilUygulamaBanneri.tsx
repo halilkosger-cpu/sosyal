@@ -9,6 +9,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+/** Banner sayfa açıldıktan bu kadar sonra çıkar (ilk ekran boş kalsın). */
+const BANNER_GECIKME_MS = 20_000;
+/** Kapatılan banner bu kadar gün tekrar gösterilmez. */
+const BANNER_SUSTURMA_GUN = 7;
+
 export default function MobilUygulamaBanneri() {
   const [gorunur, setGorunur] = useState(false);
   const [cihaz, setCihaz] = useState<'ios' | 'android' | 'other'>('other');
@@ -23,11 +28,11 @@ export default function MobilUygulamaBanneri() {
 
     if (isStandalone) return;
 
-    // Kullanici daha once kapattiysa o gun tekrar rahatsiz etme
+    // Kullanici daha once kapattiysa bir hafta tekrar rahatsiz etme
     const kapatilmaZamani = localStorage.getItem('app_banner_dismissed_at');
     if (kapatilmaZamani) {
       const gecenGun = (Date.now() - parseInt(kapatilmaZamani, 10)) / (1000 * 60 * 60 * 24);
-      if (gecenGun < 0.2) return; // ~5 saat sonra veya cache temizlenince tekrar
+      if (gecenGun < BANNER_SUSTURMA_GUN) return;
     }
 
     // Cihaz tespiti
@@ -41,14 +46,13 @@ export default function MobilUygulamaBanneri() {
     else if (isAndroid) setCihaz('android');
     else setCihaz('other');
 
-    // Mobilde (iOS, Android veya mobil tarayıcıda) banner'ı doğrudan göster
-    setGorunur(true);
+    // İlk ekranı kaplamasın: ürün/vitrin görülsün, banner biraz sonra çıksın
+    const gosterZamanlayici = window.setTimeout(() => setGorunur(true), BANNER_GECIKME_MS);
 
-    // Android Chrome PWA native prompt yakalama
+    // Android Chrome PWA native prompt yakalama (banner gecikmeyle zaten çıkacak)
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
-      setGorunur(true);
     };
 
     const handleAcModal = () => setIosRehberAcik(true);
@@ -56,6 +60,7 @@ export default function MobilUygulamaBanneri() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     return () => {
+      window.clearTimeout(gosterZamanlayici);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
       window.removeEventListener('open-app-install-modal', handleAcModal);
     };
