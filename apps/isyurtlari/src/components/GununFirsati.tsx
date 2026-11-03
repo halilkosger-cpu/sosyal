@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LuFlame, LuTimer, LuShoppingBag, LuCheck, LuSparkles } from 'react-icons/lu';
+import { LuFlame, LuShoppingBag, LuCheck, LuSparkles } from 'react-icons/lu';
 import { sepeteEkle } from '@/lib/cart';
 import { urunGorseli } from '@/lib/urun-gorsel';
 
@@ -22,37 +22,9 @@ interface GununFirsatiProps {
 }
 
 export default function GununFirsati({ products }: GununFirsatiProps) {
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [added, setAdded] = useState(false);
 
-  // Gün sonuna (gece 23:59:59) kalan süreyi hesaplar
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const diff = endOfDay.getTime() - now.getTime();
-      if (diff <= 0) {
-        return { hours: 0, minutes: 0, seconds: 0 };
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      return { hours, minutes, seconds };
-    };
-
-    setTimeLeft(calculateTimeLeft());
-    const interval = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Fırsat ürünü olarak stoğu ve fiyatı olan vitrin ürününü seç (Örn: zeytin, peynir, recel veya ilk uygun urun)
+  // Öne çıkan ürün olarak stoğu ve fiyatı olan vitrin ürününü seç (Örn: zeytin, peynir, recel veya ilk uygun urun)
   const firsatUrunu =
     products.find((p) => p.price > 0 && p.quantity > 0 && p.imageUrl) ||
     products.find((p) => p.price > 0 && p.imageUrl) ||
@@ -62,8 +34,6 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
 
   // 144 px kutu icin 400'luk surum yeterli.
   const gorselAdresi = urunGorseli(firsatUrunu.slug, firsatUrunu.imageUrl)?.replace(/-800\.webp$/, '-400.webp');
-  // Fırsat için referans eski fiyat (temsili liste fiyatı / %15 piyasa indirimi etkisi)
-  const eskiFiyat = Math.round(firsatUrunu.price * 1.2);
 
   const handleAddToCart = () => {
     const basarili = sepeteEkle({
@@ -80,67 +50,29 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
     }
   };
 
-  const pad = (n: number) => String(n).padStart(2, '0');
-
   return (
-    <section className="max-w-screen-xl mx-auto px-4 pt-10" aria-label="Günün Fırsatı">
+    <section className="max-w-screen-xl mx-auto px-4 pt-10" aria-label="Öne Çıkan Ürün">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F2040] via-[#162B54] to-[#0A162C] text-white shadow-xl border border-blue-900/40 p-6 md:p-8">
         {/* Arka plan süsleme ışıkları */}
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-          {/* Sol Kolon: Başlık, Geri Sayım Sayacı ve Avantajlar */}
+          {/* Sol Kolon: Başlık ve kısa açıklama */}
           <div className="flex-1 space-y-4 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-300 text-xs font-bold uppercase tracking-wider">
               <LuFlame className="w-4 h-4 text-orange-400 animate-pulse" />
-              Günün Kaçırılmayacak Fırsatı
+              Öne Çıkan Ürün
             </div>
 
             <h2 className="text-2xl md:text-3xl font-serif font-bold text-white tracking-tight">
-              Günün Öne Çıkan El Emeği Lezzeti
+              Öne Çıkan El Emeği Lezzeti
             </h2>
 
             <p className="text-sm text-blue-200/90 max-w-xl">
-              İşyurtları atölyelerinde katkısız ve geleneksel yöntemlerle üretilen en çok tercih edilen
-              ürünümüz, bugüne özel avantajlı sevk koşuluyla sunuluyor.
+              İşyurtları atölyelerinde geleneksel yöntemlerle üretilen ürünlerimizden birini sizin için
+              öne çıkardık.
             </p>
-
-            {/* Canlı Geri Sayım Sayacı */}
-            <div className="pt-2">
-              <div className="flex items-center justify-center lg:justify-start gap-2 text-xs font-semibold text-gray-300 mb-2">
-                <LuTimer className="w-4 h-4 text-orange-400" />
-                <span>Günün Fırsatının Bitmesine Kalan Süre:</span>
-              </div>
-
-              <div className="inline-flex items-center gap-2">
-                {/* Saat */}
-                <div className="flex flex-col items-center justify-center bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 min-w-[54px]">
-                  <span className="text-xl md:text-2xl font-mono font-bold text-orange-400">
-                    {pad(timeLeft.hours)}
-                  </span>
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Saat</span>
-                </div>
-                <span className="text-xl font-bold text-gray-400">:</span>
-
-                {/* Dakika */}
-                <div className="flex flex-col items-center justify-center bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 min-w-[54px]">
-                  <span className="text-xl md:text-2xl font-mono font-bold text-orange-400">
-                    {pad(timeLeft.minutes)}
-                  </span>
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Dakika</span>
-                </div>
-                <span className="text-xl font-bold text-gray-400">:</span>
-
-                {/* Saniye */}
-                <div className="flex flex-col items-center justify-center bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 min-w-[54px]">
-                  <span className="text-xl md:text-2xl font-mono font-bold text-orange-400 animate-pulse">
-                    {pad(timeLeft.seconds)}
-                  </span>
-                  <span className="text-[10px] text-gray-400 uppercase tracking-wider">Saniye</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Sağ Kolon: Fırsat Ürün Kartı */}
@@ -163,7 +95,7 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
                 </div>
               )}
               <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                Özel Seçim
+                Öne Çıkan
               </span>
             </Link>
 
@@ -181,9 +113,6 @@ export default function GununFirsati({ products }: GununFirsatiProps) {
               <div className="flex items-baseline justify-center sm:justify-start gap-2 pt-0.5">
                 <span className="text-xl font-extrabold text-[#BA4700]">
                   ₺{Number(firsatUrunu.price).toLocaleString('tr-TR')}
-                </span>
-                <span className="text-xs text-gray-500 line-through">
-                  ₺{eskiFiyat.toLocaleString('tr-TR')}
                 </span>
               </div>
 

@@ -441,13 +441,6 @@ export default function ProductDetailPage({
               <span className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-green-600' : 'bg-red-600'}`} />
               {inStock ? 'Stokta' : 'Tükendi'}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Bugün 18 kişi inceledi
-            </span>
-            <span className="text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/60 px-2.5 py-0.5 rounded-full">
-              ⭐ %98 Memnuniyet
-            </span>
           </div>
 
           <div className="flex items-start justify-between gap-4">
