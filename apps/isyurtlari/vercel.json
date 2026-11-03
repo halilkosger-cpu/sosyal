@@ -9,6 +9,10 @@
     {
       "path": "/api/gorevler/terk-edilmis-sepet",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/gorevler/gunluk-rapor",
+      "schedule": "0 6 * * *"
     }
   ]
 }
