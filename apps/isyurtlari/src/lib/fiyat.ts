@@ -43,8 +43,8 @@ export const KARGO_KARSI_ODEMELI = true;
 /** Karsi odemeli degilken uygulanacak sabit kargo bedeli (TL). */
 export const KARGO_UCRETI = 0;
 
-/** Bu tutar ve uzeri siparislerde kargo ucretsiz (1500 TL). */
-export const UCRETSIZ_KARGO_ESIGI = 1500;
+/** Bu tutar ve uzeri siparislerde kargo ucretsiz (2000 TL). Merchant Center'daki kargo ayariyla ayni olmali. */
+export const UCRETSIZ_KARGO_ESIGI = 2000;
 
 /**
  * Büyük Açılış & Efsane Kasım Kampanyası:

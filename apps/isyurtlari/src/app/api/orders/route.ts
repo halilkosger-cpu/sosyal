@@ -227,10 +227,6 @@ interface OrderRequest {
   hediyeKodu?: string;
 }
 
-// Constants for impact calculations
-const TRAINING_HOURS_PER_ITEM = 5;
-const PRISONERS_PER_ITEM = 0.5; // 1 prisoner supported per 2 items
-
 /** Islem icinde kuponun hakki dolduysa firlatilir. */
 class KuponTukendi extends Error {
   constructor() {
@@ -523,11 +519,6 @@ export async function POST(req: NextRequest) {
         kalemler.reduce((t, k) => t + (k.listeFiyati - k.birimFiyat) * k.adet, 0) * 100
       ) / 100;
 
-    // Calculate impact metrics
-    const totalItemsCount = kalemler.reduce((sum, k) => sum + k.adet, 0);
-    const trainingHoursFunded = totalItemsCount * TRAINING_HOURS_PER_ITEM;
-    const prisonersSupportedCount = Math.ceil(totalItemsCount * PRISONERS_PER_ITEM);
-
     /**
      * Siparis, kalemleri, stok dususu ve odeme kaydi tek islemde yaziliyor.
      *
@@ -770,12 +761,6 @@ export async function POST(req: NextRequest) {
       shippingAddress: orderWithItems?.shippingAddress,
       items: orderWithItems?.items || [],
       orderItems: orderWithItems?.items || [],
-      impact: {
-        trainingHoursFunded,
-        prisonersSupportedCount,
-        totalItemsCount,
-        missionMessage: 'Siparişiniz alındı. Hükümlü el emeği ürünlerini tercih ettiğiniz için teşekkür ederiz.',
-      },
       paymentRequired: body.paymentMethod === 'CREDIT_CARD',
       bankDetails:
         body.paymentMethod === 'TRANSFER'
