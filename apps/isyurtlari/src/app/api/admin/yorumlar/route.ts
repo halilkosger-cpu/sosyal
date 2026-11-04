@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
         orderItemId: true,
         product: { select: { name: true, slug: true } },
         customer: { select: { name: true, email: true } },
+        misafirAd: true,
       },
     });
 

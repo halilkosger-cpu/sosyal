@@ -66,9 +66,41 @@ const durumStili: Record<string, { renk: string; arka: string; Ikon: React.Eleme
  */
 const durumMetni = SIPARIS_DURUM_METNI as Record<string, string>;
 
-function SiparisKarti({ siparis }: { siparis: Siparis }) {
+function SiparisKarti({
+  siparis,
+  misafir,
+}: {
+  siparis: Siparis;
+  /** Hesapsız sorguda sahiplik kanıtı (sipariş no + e-posta): yorum bağlantısı üretmek için. */
+  misafir?: { siparisNo: string; email: string };
+}) {
   const stil = durumStili[siparis.status];
   const DurumIkonu = stil?.Ikon ?? LuPackage;
+  const [yorumIsleniyor, setYorumIsleniyor] = useState<string | null>(null);
+  const [yorumHatasi, setYorumHatasi] = useState('');
+
+  /** Misafir: siparişe özel, imzalı yorum bağlantısı alıp yorum sayfasına gider. */
+  const misafirDegerlendir = async (orderItemId: string) => {
+    if (!misafir) return;
+    setYorumHatasi('');
+    setYorumIsleniyor(orderItemId);
+    try {
+      const res = await fetch('/api/yorum-baglantisi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...misafir, orderItemId }),
+      });
+      const veri = await res.json();
+      if (res.ok && veri.url) {
+        window.location.assign(veri.url);
+        return;
+      }
+      setYorumHatasi(veri.error || 'Yorum bağlantısı oluşturulamadı');
+    } catch {
+      setYorumHatasi('Bağlantı kurulamadı, lütfen tekrar deneyin');
+    }
+    setYorumIsleniyor(null);
+  };
 
   return (
     <div className={`rounded-2xl border-2 bg-white p-6 ${stil?.arka ?? 'border-gray-200'}`}>
@@ -107,6 +139,9 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
 
       <div className="mb-4 space-y-3 border-b border-gray-200 pb-4">
         <p className="text-sm font-semibold text-gray-700">{siparis.urunAdedi} ürün</p>
+        {yorumHatasi && (
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">{yorumHatasi}</p>
+        )}
         {siparis.items.map((k) => (
           <div key={k.id} className="flex items-center gap-3">
             {k.product.imageUrl && (
@@ -117,12 +152,18 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
               className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#BA4700]">
               {k.product.name}
             </Link>
-            {siparis.status === 'DELIVERED' && (
-              <Link href={`/urun/${k.product.slug}#yorumlar`}
-                className="flex-shrink-0 text-xs font-semibold text-[#BA4700] hover:underline">
-                Değerlendir
-              </Link>
-            )}
+            {siparis.status === 'DELIVERED' &&
+              (misafir ? (
+                <button type="button" onClick={() => misafirDegerlendir(k.id)} disabled={yorumIsleniyor === k.id}
+                  className="flex-shrink-0 text-xs font-semibold text-[#BA4700] hover:underline disabled:opacity-50">
+                  {yorumIsleniyor === k.id ? '...' : 'Değerlendir'}
+                </button>
+              ) : (
+                <Link href={`/urun/${k.product.slug}#yorumlar`}
+                  className="flex-shrink-0 text-xs font-semibold text-[#BA4700] hover:underline">
+                  Değerlendir
+                </Link>
+              ))}
             <span className="flex-shrink-0 text-sm text-gray-500">×{k.quantity}</span>
             <span className="flex-shrink-0 text-sm font-semibold text-gray-900">
               ₺{(k.price * k.quantity).toFixed(2)}
@@ -248,6 +289,7 @@ function SiparisSorgu() {
   const [siparisNo, setSiparisNo] = useState('');
   const [email, setEmail] = useState('');
   const [siparis, setSiparis] = useState<Siparis | null>(null);
+  const [sorgulanan, setSorgulanan] = useState<{ siparisNo: string; email: string } | null>(null);
   const [hata, setHata] = useState('');
   const [yukleniyor, setYukleniyor] = useState(false);
 
@@ -264,8 +306,11 @@ function SiparisSorgu() {
         body: JSON.stringify({ siparisNo, email }),
       });
       const veri = await res.json();
-      if (res.ok) setSiparis(veri);
-      else setHata(veri.error || 'Sorgu yapılamadı');
+      if (res.ok) {
+        setSiparis(veri);
+        // Sahiplik kanıtı sorgu anındaki değerler: form alanları sonra değişse de bağlantı bunlarla üretilir.
+        setSorgulanan({ siparisNo: String(veri.orderNumber ?? siparisNo), email });
+      } else setHata(veri.error || 'Sorgu yapılamadı');
     } catch {
       setHata('Bağlantı kurulamadı, lütfen tekrar deneyin');
     }
@@ -306,7 +351,7 @@ function SiparisSorgu() {
 
       {siparis && (
         <div className="mt-6">
-          <SiparisKarti siparis={siparis} />
+          <SiparisKarti siparis={siparis} misafir={sorgulanan ?? undefined} />
         </div>
       )}
     </>

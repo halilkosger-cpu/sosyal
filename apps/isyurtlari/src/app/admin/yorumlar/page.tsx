@@ -20,6 +20,7 @@ interface Yorum {
   dogrulanmis: boolean;
   product: { name: string; slug: string };
   customer: { name: string; email: string } | null;
+  misafirAd?: string | null;
 }
 
 type Durum = 'bekleyen' | 'yayinda' | 'hepsi';
@@ -145,7 +146,7 @@ export default function YorumlarSayfasi() {
                   {y.product.name}
                 </a>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {y.customer?.name ?? 'Müşteri'}
+                  {y.customer?.name ?? (y.misafirAd ? `${y.misafirAd} (misafir)` : 'Müşteri')}
                   {y.customer?.email ? ` · ${y.customer.email}` : ''} · {new Date(y.createdAt).toLocaleString('tr-TR')}
                 </p>
               </div>
