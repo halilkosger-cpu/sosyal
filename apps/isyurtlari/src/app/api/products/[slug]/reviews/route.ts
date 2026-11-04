@@ -196,5 +196,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ slug: st
 }
 
 export async function GET(req: NextRequest, baglam: { params: Promise<{ slug: string }> }) {
-  return vitrinOnbellegi(await yorumlariGetir(req, { params: await baglam.params }));
+  // Yorum listesi kısa süre önbelleğe alınır (30 sn + en fazla 60 sn eski kopya): yönetici bir
+  // yorumu onaylayınca müşteri 5-15 dakika boyunca "Yorumlar (0)" görmesin. Yorum sayısı az,
+  // veritabanına ek yük önemsiz.
+  return vitrinOnbellegi(await yorumlariGetir(req, { params: await baglam.params }), 30);
 }
