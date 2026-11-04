@@ -7,7 +7,8 @@ import { LuArrowLeft, LuArrowRight, LuMinus, LuPlus, LuRotateCcw, LuShieldCheck,
 
 const tl = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 import { sepettenCikarildi } from '@/lib/analiz';
-import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
+import { siparisToplami, KARGO_KARSI_ODEMELI, kargoDurumuMetni } from '@/lib/fiyat';
+import KargoIlerlemeCubugu from '@/components/KargoIlerlemeCubugu';
 
 interface Campaign {
   id: string;
@@ -92,6 +93,7 @@ export default function CartPage() {
     urunToplami: subtotal,
     kdv: tax,
     kargo: shipping,
+    kargoUcretsiz,
     toplam: total,
   } = siparisToplami(
     cart.map((item) => ({
@@ -135,6 +137,9 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
             <div className="lg:col-span-2 space-y-4">
+              {/* Ücretsiz kargo ilerleme çubuğu (eşik: ödenecek ürün toplamı) */}
+              <KargoIlerlemeCubugu urunToplami={subtotal} />
+
               {/* Ürünler */}
               <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 bg-white">
               {cart.map((item) => (
@@ -210,7 +215,7 @@ export default function CartPage() {
                 )}
                 <div className="flex justify-between text-gray-600">
                   <dt>Kargo</dt>
-                  <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? tl(shipping) : 'Ücretsiz'}</dd>
+                  <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? kargoDurumuMetni(kargoUcretsiz) : shipping > 0 ? tl(shipping) : 'Ücretsiz'}</dd>
                 </div>
               </dl>
               <div className="flex justify-between items-baseline border-t border-gray-200 mt-4 pt-4">
@@ -220,7 +225,8 @@ export default function CartPage() {
               {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden cikiyor. */}
               <p className="text-xs leading-relaxed text-gray-500 mt-2">
                 Fiyatlara KDV dahildir ({tl(tax)}).
-                {KARGO_KARSI_ODEMELI ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+                {KARGO_KARSI_ODEMELI && !kargoUcretsiz ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+                {KARGO_KARSI_ODEMELI && kargoUcretsiz ? ' Kargo bu siparişte ücretsizdir; teslimatta kargo ücreti ödemezsiniz.' : ''}
               </p>
               <button onClick={() => router.push('/checkout')} className="w-full mt-5 h-12 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-xl font-bold flex items-center justify-center gap-2">
                 Ödemeye Geç <LuArrowRight size={18} />

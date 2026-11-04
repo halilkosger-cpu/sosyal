@@ -8,6 +8,7 @@ import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
 import { yerelGorselVar } from '@/lib/urun-gorsel';
 import { markaBul } from '@/lib/marka';
+import { siparisToplami } from '@/lib/fiyat';
 import {
   SITE_URL,
   absoluteUrl,
@@ -263,7 +264,10 @@ export default async function ProductPage(props: ProductPageProps) {
               '@type': 'OfferShippingDetails',
               shippingRate: {
                 '@type': 'MonetaryAmount',
-                value: product.price >= 2000 ? '0.00' : '110.00',
+                // Tek ürünlük sipariş ücretsiz kargo eşiğine ulaşıyorsa 0. Eşiğin altındaki
+                // tutar işletme tahminidir (gerçek ücret kargo firmasının tarifesine göre
+                // teslimatta ödenir); doğrulanmalı.
+                value: siparisToplami([{ tutar: product.price }]).kargoUcretsiz ? '0.00' : '110.00',
                 currency: 'TRY',
               },
               shippingDestination: {

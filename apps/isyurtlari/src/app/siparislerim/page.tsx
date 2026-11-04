@@ -21,6 +21,7 @@ import { useMusteri } from '@/lib/musteri-istemci';
 
 import SiparisDurumu from '@/components/SiparisDurumu';
 import { SIPARIS_DURUM_METNI } from '@/lib/kargo';
+import { kargoUcretsizMi } from '@/lib/fiyat';
 
 interface Kalem {
   id: string;
@@ -119,7 +120,7 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <span className="text-sm text-gray-600">
           {siparis.paymentMethod === 'TRANSFER' ? 'Havale / EFT' : 'Kredi Kartı'}
-          {' · Kargo karşı ödemeli'}
+          {kargoUcretsizMi(siparis.totalAmount) ? ' · Kargo ücretsiz' : ' · Kargo karşı ödemeli'}
         </span>
         <div className="text-right">
           <span className="text-xl font-bold text-[#BA4700]">₺{siparis.totalAmount.toFixed(2)}</span>
