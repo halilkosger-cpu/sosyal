@@ -15,9 +15,13 @@ describe('yetkiliAdminEpostalari', () => {
     expect(liste).toEqual(['a@x.com']);
   });
 
-  it('ADMIN_EMAILS yoksa geriye uyumlu varsayılan listeyi kullanır (kilitlenmeyi önler)', () => {
-    const liste = yetkiliAdminEpostalari({});
-    expect(liste.length).toBeGreaterThan(0);
+  it('ortam değişkeni yoksa kimseyi yetkili saymaz (koda gömülü yedek liste yok)', () => {
+    expect(yetkiliAdminEpostalari({})).toEqual([]);
+    expect(yetkiliAdminEpostalari({ ADMIN_EMAILS: '  ,  ' })).toEqual([]);
+  });
+
+  it('yalnızca ADMIN_EMAIL tanımlıysa onu kabul eder', () => {
+    expect(yetkiliAdminEpostalari({ ADMIN_EMAIL: 'Tek@Ornek.com' })).toEqual(['tek@ornek.com']);
   });
 });
 
