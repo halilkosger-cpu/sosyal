@@ -8,7 +8,7 @@ import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator'
 import { siparisTamamlandi } from '@/lib/analiz';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
 import { SIPARIS_TESEKKUR_METNI } from '@/lib/yorum-mesajlari';
-import { HEDIYE_EN_AZ_SIPARIS_TUTARI } from '@/lib/hediye';
+import { HEDIYE_EN_AZ_SIPARIS_TUTARI, whatsappPaylasimBaglantisi } from '@/lib/hediye';
 
 interface OrderData {
   id: string;
@@ -193,11 +193,7 @@ export default function OrderConfirmationPage() {
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <span className="font-mono text-lg font-bold tracking-wider bg-gray-100 rounded-lg px-3 py-2">{order.hediyeKodu}</span>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(
-                      `Merhaba! İşyurtları'ndan sipariş verdim; ürünler hükümlülerin el emeğiyle üretiliyor. ` +
-                        `Bu kodla ilk siparişinde küçük bir hediye kazanırsın: ${order.hediyeKodu} ` +
-                        `${typeof window !== 'undefined' ? window.location.origin : ''}/?hediye=${order.hediyeKodu}`
-                    )}`}
+                    href={whatsappPaylasimBaglantisi(typeof window !== 'undefined' ? window.location.origin : '', order.hediyeKodu)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5A] text-white font-semibold px-4 py-2 rounded-lg text-sm"

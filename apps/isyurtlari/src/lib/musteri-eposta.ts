@@ -223,3 +223,29 @@ export async function sepetHatirlatmaEpostasiGonder(
     return false;
   }
 }
+
+/**
+ * Teslimden sonraki yorum isteği e-postasını gönderir (içerik
+ * lib/yorum-istegi-eposta.ts'te üretilir). Ticari ileti: izin ve ret
+ * bağlantısı kontrolleri çağıran görevde, bkz. lib/yorum-istegi.ts.
+ *
+ * Gönderildiyse true; sağlayıcı hata verirse false (çağıran görev
+ * "gönderildi" kaydını geri alır ki sonraki çalışmada yeniden denensin).
+ */
+export async function yorumIstegiEpostasiGonder(eposta: string, konu: string, html: string): Promise<boolean> {
+  const resend = resendIstemcisi();
+
+  if (!resend) {
+    // API anahtarı yok (yerel geliştirme): akış denenebilsin diye gönderilmiş sayılır.
+    console.log(`[yorum-istegi] ${eposta}: ${konu}`);
+    return true;
+  }
+
+  try {
+    await resend.emails.send({ from: GONDERICI, to: eposta, subject: konu, html });
+    return true;
+  } catch (error) {
+    console.error('Yorum isteği e-postası gönderilemedi:', error);
+    return false;
+  }
+}
