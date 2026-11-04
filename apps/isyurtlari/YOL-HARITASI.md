@@ -1,7 +1,7 @@
 # isyurtlari.com.tr — Yol Haritası
 
 Son güncelleme: 4 Kasım 2026 — Güvenlik düzeltmeleri (TOTP hesap kilidi, iyzico eşleşmesi, yedek kodlar, yönetici e-postaları)
-Önceki: 2 Kasım 2026 · Sıradaki iş: **Stoksuz ürünlerin vitrinden çıkarılması**
+Önceki: 2 Kasım 2026 · Sıradaki iş: **Gerçek yorum sistemi, admin "Günlük Rapor" sayfası, ödeme adımı doğrulaması**
 
 ## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
 
@@ -39,7 +39,7 @@ Son güncelleme: 4 Kasım 2026 — Güvenlik düzeltmeleri (TOTP hesap kilidi, i
 ### Yapılmayanlar (öncelik sırasıyla)
 
 1. **Gerçek telefonda mobil kontrol.** Yükle bandının 20 sn sonra çıktığı ve kapatılınca 7 gün sustuğu, iOS Safari ve Android Chrome'da denenmedi (yalnızca masaüstü tarayıcıda 375px emülasyonuyla bakıldı).
-2. **Stoksuz ürünler vitrinde.** Polen, Bal & Arı Ürünleri ve El Yapımı Gümüş Kehribar Tesbih stokta yok; ana sayfa görselinde Polen öne çıkıyor. Vitrinden ve Merchant beslemesinden çıkarılmalı, "Ön Talep" öne alınmalı.
+2. **Stoksuz ürünler — karar: vitrinde kalıyor (4 Kasım).** İş sahibi stoksuz ürünleri bilerek tutuyor: stokta yoksa müşteri "Ön Talep" veriyor. Canlı Merchant beslemesi doğru işaretliyor (156 üründen 8'i `out_of_stock`), yani Google stoksuz ürünler için reklam göstermez. Yapılacak bir şey yok; yalnızca ana sayfa hero görselinde stoksuz bir ürünün (Polen) öne çıkması istenirse ayrıca değerlendirilir.
 3. **Gerçek yorum sistemi — 1. aşama yapıldı (4 Kasım, PR açık, birleştirme onayı bekliyor), 2. aşama açık.**
    - **Bulunan kök neden:** Yorum yazma altyapısı vardı (giriş yapmış ve ürünü satın almış müşteri, "doğrulanmış alışveriş" rozeti, `approved: false` ile kayıt), ama **yöneticinin onaylayabileceği hiçbir ekran/uç yoktu**; yani hiçbir yorum yayınlanamıyordu. "Yorumlar (0)" bu yüzden sıfırdı.
    - **1. aşama (yapıldı):** `/admin/yorumlar` moderasyon sayfası (Onay bekleyen / Yayında / Tümü; yayına al, yayından kaldır, sil; menüde "Yorumlar") ve `/api/admin/yorumlar` (GET/PATCH/DELETE, yönetici girişi şart, denetim günlüğüne yazar, ürün sayfasını `revalidatePath` ile yeniler). Testler: `src/app/api/admin/yorumlar/route.test.ts`. "Siparişlerim"de teslim edilmiş siparişlerin ürünlerinde "Değerlendir" bağlantısı; `#yorumlar` bağlantısı ürün sayfasında Yorumlar sekmesini açar.
