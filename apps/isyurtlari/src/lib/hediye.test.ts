@@ -8,6 +8,8 @@ import {
   hediyeUygunlugu,
   hediyeNotu,
   notHediyeIceriyor,
+  hediyePaylasimMetni,
+  whatsappPaylasimBaglantisi,
 } from './hediye';
 
 describe('hediyeKoduUret', () => {
@@ -94,5 +96,22 @@ describe('hediye notu', () => {
     expect(notHediyeIceriyor(`Müşteri: Ayşe | Email: a@b.com | ${not}`)).toBe(true);
     expect(notHediyeIceriyor('Müşteri: Ayşe | Email: a@b.com')).toBe(false);
     expect(notHediyeIceriyor(null)).toBe(false);
+  });
+});
+
+describe('hediye paylaşım metni', () => {
+  it('kodu, bağlantıyı ve 2.000 ₺ koşulunu içerir (arkadaş şartı baştan bilsin)', () => {
+    const metin = hediyePaylasimMetni('https://isyurtlari.com.tr', 'HD-7K2M9');
+    expect(metin).toContain('HD-7K2M9');
+    expect(metin).toContain('https://isyurtlari.com.tr/?hediye=HD-7K2M9');
+    expect(metin).toContain('2.000');
+  });
+
+  it('WhatsApp bağlantısı metni kodlayarak taşır', () => {
+    const url = whatsappPaylasimBaglantisi('https://isyurtlari.com.tr', 'HD-7K2M9');
+    expect(url.startsWith('https://wa.me/?text=')).toBe(true);
+    expect(decodeURIComponent(url.slice('https://wa.me/?text='.length))).toBe(
+      hediyePaylasimMetni('https://isyurtlari.com.tr', 'HD-7K2M9')
+    );
   });
 });

@@ -109,3 +109,20 @@ export function hediyeNotu(kod: string): string {
 export function notHediyeIceriyor(notes: string | null | undefined): boolean {
   return Boolean(notes && notes.includes(NOT_ONEKI));
 }
+
+/**
+ * Arkadaşa gönderilecek WhatsApp metni. Koşulu (2.000 ₺) baştan söyler: hediye
+ * eşiğe bağlı olduğu için, söylenmezse arkadaş küçük bir siparişle gelip hayal
+ * kırıklığına uğrar. Onay sayfası ve yorum isteği e-postası aynı metni kullanır.
+ */
+export function hediyePaylasimMetni(taban: string, kod: string): string {
+  return (
+    `Merhaba! İşyurtları'ndan sipariş verdim; ürünler hükümlülerin el emeğiyle üretiliyor. ` +
+    `Bu kodla ilk siparişinde (${tl(HEDIYE_EN_AZ_SIPARIS_TUTARI)} ₺ ve üzeri) küçük bir hediye kazanırsın: ${kod} ` +
+    `${taban}/?hediye=${kod}`
+  );
+}
+
+export function whatsappPaylasimBaglantisi(taban: string, kod: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(hediyePaylasimMetni(taban, kod))}`;
+}
