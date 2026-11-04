@@ -29,12 +29,6 @@ interface OrderData {
   hediyeUygulandi?: boolean;
   notes?: string;
   orderItems: Array<{ id: string; quantity: number; price: number; product: { name: string; slug: string } }>;
-  impact?: {
-    trainingHoursFunded: number;
-    prisonersSupportedCount: number;
-    totalItemsCount: number;
-    missionMessage: string;
-  };
   bankDetails?: {
     bankName: string;
     eksik?: boolean;
@@ -267,36 +261,6 @@ export default function OrderConfirmationPage() {
               <PreOrderTimeline currentStepIndex={order.status === 'CONFIRMED' ? 1 : 0} />
             </div>
 
-            {/* Impact Celebration */}
-            {order.impact && (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">📊 Yardımının Etkisi</h2>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-white rounded-xl p-4 text-center border border-blue-100">
-                    <p className="text-3xl font-bold text-blue-600">{order.impact.trainingHoursFunded}</p>
-                    <p className="text-sm text-gray-600 mt-2">Saat Meslek Eğitimi</p>
-                    <p className="text-xs text-gray-500 mt-1">Fonlanan</p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-4 text-center border border-green-100">
-                    <p className="text-3xl font-bold text-green-600">~{order.impact.prisonersSupportedCount}</p>
-                    <p className="text-sm text-gray-600 mt-2">Hükümlü Desteklenmiş</p>
-                    <p className="text-xs text-gray-500 mt-1">Yeniden Başlama</p>
-                  </div>
-
-                  <div className="bg-white rounded-xl p-4 text-center border border-purple-100">
-                    <p className="text-3xl font-bold text-purple-600">{order.impact.totalItemsCount}</p>
-                    <p className="text-sm text-gray-600 mt-2">Ürün Satın Alındı</p>
-                    <p className="text-xs text-gray-500 mt-1">Toplam</p>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-700 mt-6 p-4 bg-white rounded-lg border border-blue-100 italic">
-                  💡 Bu satın alma, hükümlülerin meslek eğitimi, istihdam desteği ve topluma başarılı reentegrasyon için gerekli tüm destek programlarını destekler.
-                </p>
-              </div>
-            )}
 
             {/* Payment Details - Bank Transfer */}
             {paymentType === 'transfer' && (
