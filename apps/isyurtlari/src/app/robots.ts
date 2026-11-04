@@ -42,6 +42,7 @@ export default function robots(): MetadataRoute.Robots {
           '/sepet',
           '/favoriler',
           '/order-confirmation',
+          '/yorum',
         ],
       },
       // Genel Arama Motoru Botları (Google, Bing, Yandex, Yahoo, DuckDuckGo vb.)
@@ -65,6 +66,7 @@ export default function robots(): MetadataRoute.Robots {
           '/sepet',
           '/favoriler',
           '/order-confirmation',
+          '/yorum',
           // Filtre/siralama varyantlari ayni icerigi tekrar uretiyor
           '/*?*sort=',
           '/*?*filter=',

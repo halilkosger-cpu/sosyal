@@ -4,6 +4,7 @@ import { prisma } from '@isyurtlari/database';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { YORUM_SONRASI_TESEKKUR } from '@/lib/yorum-mesajlari';
+import { ASGARI_METIN, AZAMI_METIN, kisaltilmisAd } from '@/lib/yorum-yardimcilari';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,9 +33,6 @@ export const dynamic = 'force-dynamic';
  * kullanılıyor artık - kod tabanının geri kalanı da öyle yapıyor.
  */
 
-/** Yorum metni sınırları. */
-const ASGARI_METIN = 10;
-const AZAMI_METIN = 2000;
 
 async function yorumlariGetir(_req: NextRequest, { params }: { params: { slug: string } }) {
   try {
@@ -59,6 +57,7 @@ async function yorumlariGetir(_req: NextRequest, { params }: { params: { slug: s
         createdAt: true,
         orderItemId: true,
         customer: { select: { name: true } },
+        misafirAd: true,
         user: { select: { name: true, avatar: true } },
       },
     });
@@ -72,7 +71,7 @@ async function yorumlariGetir(_req: NextRequest, { params }: { params: { slug: s
      */
     return NextResponse.json(
       yorumlar.map((y) => {
-        const tamAd = (y.customer?.name || y.user?.name || '').trim();
+        const tamAd = (y.customer?.name || y.user?.name || y.misafirAd || '').trim();
         return {
           id: y.id,
           rating: y.rating,
@@ -91,15 +90,6 @@ async function yorumlariGetir(_req: NextRequest, { params }: { params: { slug: s
     console.error('Yorumlar okunamadı:', error);
     return NextResponse.json({ error: 'Yorumlar getirilemedi' }, { status: 500 });
   }
-}
-
-/** "Özlem Gürbüz" -> "Özlem G." */
-function kisaltilmisAd(tamAd: string): string {
-  const parcalar = tamAd.split(/\s+/).filter(Boolean);
-  if (parcalar.length === 0) return 'Müşteri';
-  if (parcalar.length === 1) return parcalar[0];
-  const son = parcalar[parcalar.length - 1];
-  return `${parcalar.slice(0, -1).join(' ')} ${son.charAt(0).toLocaleUpperCase('tr-TR')}.`;
 }
 
 export async function POST(req: NextRequest, props: { params: Promise<{ slug: string }> }) {
