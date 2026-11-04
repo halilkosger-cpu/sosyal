@@ -3,6 +3,7 @@ import { vitrinOnbellegi } from '@/lib/vitrin-onbellegi';
 import { prisma } from '@isyurtlari/database';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
+import { YORUM_SONRASI_TESEKKUR } from '@/lib/yorum-mesajlari';
 
 export const dynamic = 'force-dynamic';
 
@@ -194,7 +195,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ slug: st
     return NextResponse.json(
       {
         ok: true,
-        mesaj: 'Yorumunuz alındı. İncelendikten sonra yayınlanacak.',
+        mesaj: YORUM_SONRASI_TESEKKUR,
       },
       { status: 201 }
     );

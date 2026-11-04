@@ -19,6 +19,7 @@ import { sepeteEkle } from '@/lib/cart';
 import { sepeteUcur } from '@/lib/sepete-ucus';
 import { urunGoruntulendi } from '@/lib/analiz';
 import { UCRETSIZ_KARGO_ESIGI } from '@/lib/fiyat';
+import { YORUM_ONCESI_METNI, YORUM_SONRASI_TESEKKUR } from '@/lib/yorum-mesajlari';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
@@ -233,7 +234,7 @@ export default function ProductDetailPage({
       });
       const veri = await res.json().catch(() => ({}));
       if (res.ok) {
-        setReviewMesaji({ tur: 'ok', metin: veri.mesaj || 'Yorumunuz alındı. İncelendikten sonra yayınlanacak.' });
+        setReviewMesaji({ tur: 'ok', metin: veri.mesaj || YORUM_SONRASI_TESEKKUR });
         setReviewFormOpen(false);
         setReviewForm({ rating: 5, title: '', text: '' });
       } else {
@@ -657,7 +658,7 @@ export default function ProductDetailPage({
 
             <div className="mt-6 rounded-xl bg-[#FDF1E7] border border-orange-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <p className="text-sm text-gray-700">
-                {musteri ? 'Bu ürünü satın aldıysanız deneyiminizi paylaşın.' : 'Yorum yazmak için giriş yapın. Yalnızca satın aldığınız ürünlere yorum yazabilirsiniz.'}
+                {musteri ? YORUM_ONCESI_METNI : 'Yorum yazmak için giriş yapın. Yalnızca satın aldığınız ürünlere yorum yazabilirsiniz.'}
               </p>
               {musteri ? (
                 <button onClick={() => { setReviewMesaji(null); setReviewFormOpen(true); }} className="shrink-0 bg-[#CC4E00] hover:bg-[#A63F00] text-white px-5 py-2.5 rounded-lg text-sm font-semibold">Yorum Yaz</button>
@@ -688,7 +689,8 @@ export default function ProductDetailPage({
       {reviewFormOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-2xl p-6 max-w-lg w-full">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Ürün Yorumu Yaz</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-1">Ürün Yorumu Yaz</h3>
+            <p className="text-sm text-gray-600 mb-4">{YORUM_ONCESI_METNI}</p>
             <div className="space-y-4">
               <div className="flex gap-1" role="radiogroup" aria-label="Puan">
                 {[1, 2, 3, 4, 5].map((y) => (

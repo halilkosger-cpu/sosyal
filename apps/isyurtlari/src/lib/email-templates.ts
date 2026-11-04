@@ -1,4 +1,5 @@
 import { kacir } from '@/lib/html-kacis';
+import { SIPARIS_TESEKKUR_METNI } from '@/lib/yorum-mesajlari';
 
 // Responsive HTML email templates
 
@@ -60,6 +61,7 @@ export const emailTemplates = {
           <div class="section">
             <p>Merhaba <strong>${kacir(data.customerName)}</strong>,</p>
             <p style="margin-top: 10px;">Siparişiniz başarıyla oluşturulmuştur. İşlem detaylarını aşağıda bulabilirsiniz.</p>
+            <p style="margin-top: 10px;">${SIPARIS_TESEKKUR_METNI}</p>
             <div style="background: white; padding: 15px; border-radius: 6px; margin: 20px 0; text-align: center; border: 2px solid #FF6000;">
               <p style="font-size: 12px; color: #999; margin-bottom: 5px;">Sipariş Numarası</p>
               <p class="order-number">#${kacir(data.orderNumber)}</p>

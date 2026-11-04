@@ -7,6 +7,7 @@ import { LuCheck, LuCopy, LuShare2, LuHouse, LuArrowRight, LuQrCode } from 'reac
 import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator';
 import { siparisTamamlandi } from '@/lib/analiz';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
+import { SIPARIS_TESEKKUR_METNI } from '@/lib/yorum-mesajlari';
 
 interface OrderData {
   id: string;
@@ -143,7 +144,7 @@ export default function OrderConfirmationPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">🎉 BAŞARILI!</h1>
           <p className="text-xl text-green-700 font-semibold mb-2">Değiştirdin. Destekledin. Fark Yarattın.</p>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            {order.impact?.missionMessage || "Siparişiniz için teşekkürler."}
+            {SIPARIS_TESEKKUR_METNI}
           </p>
         </div>
       </div>
