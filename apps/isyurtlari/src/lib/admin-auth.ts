@@ -10,29 +10,17 @@ export function jwtAnahtari(): string {
   return 'yalnizca-yerel-gelistirme-anahtari';
 }
 
-/**
- * Geriye uyumluluk için varsayılan yönetici listesi: yalnızca `ADMIN_EMAILS`
- * ortam değişkeni tanımlı değilse kullanılır. Vercel'de `ADMIN_EMAILS`
- * (virgülle ayrılmış) tanımlandıktan sonra bu liste koddan silinmeli.
- */
-const VARSAYILAN_ADMIN_EMAILLER = [
-  'halil.kosger@gmail.com',
-  'tahaberke0312@gmail.com',
-  'asenaerbil.com@gmail.com',
-  'info@isyurtlari.com.tr',
-];
-
 const eposta = (s: string) => s.toLowerCase().trim();
 
 /**
- * Yetkili yönetici e-posta listesi.
- * `ADMIN_EMAILS` tanımlıysa yalnızca ortamdaki adresler (+ `ADMIN_EMAIL`) geçerlidir.
+ * Yetkili yönetici e-posta listesi: yalnızca ortam değişkenlerinden okunur
+ * (`ADMIN_EMAIL` ve virgülle ayrılmış `ADMIN_EMAILS`). İkisi de boşsa kimse
+ * yetkili değildir; koda gömülü yedek liste yoktur.
  */
 export function yetkiliAdminEpostalari(env: Record<string, string | undefined> = process.env): string[] {
   const tekil = eposta(env.ADMIN_EMAIL || '');
-  const ortamListesi = (env.ADMIN_EMAILS || '').split(',').map(eposta).filter(Boolean);
-  const kaynak = ortamListesi.length > 0 ? ortamListesi : VARSAYILAN_ADMIN_EMAILLER;
-  return [...new Set([tekil, ...kaynak].filter(Boolean))];
+  const ortamListesi = (env.ADMIN_EMAILS || '').split(',').map(eposta);
+  return [...new Set([tekil, ...ortamListesi].filter(Boolean))];
 }
 
 export function isAdminEmail(email: string): boolean {

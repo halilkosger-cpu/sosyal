@@ -204,35 +204,12 @@ export default function AdminLoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Örn: halil.kosger@gmail.com"
+                    placeholder="E-posta adresiniz"
+                    autoComplete="username"
                     required
                     autoFocus
                     className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl text-sm font-medium focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition-all"
                   />
-                </div>
-                <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                  <span className="text-[11px] text-gray-400 mr-1">Hızlı Seçim:</span>
-                  <button
-                    type="button"
-                    onClick={() => setEmail('halil.kosger@gmail.com')}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
-                  >
-                    halil.kosger@gmail.com
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEmail('tahaberke0312@gmail.com')}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
-                  >
-                    tahaberke0312@gmail.com
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEmail('asenaerbil.com@gmail.com')}
-                    className="text-[11px] px-2 py-0.5 rounded-md bg-gray-100 hover:bg-orange-50 hover:text-orange-600 text-gray-700 font-medium transition-colors border border-gray-200"
-                  >
-                    asenaerbil.com@gmail.com
-                  </button>
                 </div>
                 <p className="text-[11px] text-gray-500 mt-2 leading-relaxed">
                   Google Authenticator (TOTP) veya tek kullanımlık e-posta kodu ile güvenli giriş.
