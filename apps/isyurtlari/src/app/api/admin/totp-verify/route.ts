@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { verifyAdminTotpOrBackup } from '@/lib/totp';
 import { logAudit } from '@/lib/audit-log';
-import { hizSiniriGuard } from '@/lib/hiz-siniri';
+import { hizSiniri, hizSiniriGuard } from '@/lib/hiz-siniri';
 import { jwtAnahtari, isAdminEmail } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
+
+const TOTP_HESAP_AZAMI_DENEME = 20;
+const TOTP_HESAP_PENCERE_SN = 900;
 
 export async function POST(req: NextRequest) {
   let email = 'unknown';
@@ -33,6 +36,17 @@ export async function POST(req: NextRequest) {
     if (!isAdminEmail(email)) {
       await logAudit('TOTP_VERIFY', email, 'failed', 'Yetkisiz e-posta ile TOTP denemesi', ip);
       return NextResponse.json({ error: 'Yetkisiz e-posta adresi.' }, { status: 403 });
+    }
+
+    // Hesap bazlı sınır: IP sınırı dağıtık (çok IP'li) denemeleri durdurmaz.
+    // 15 dakikada 20 deneme meşru girişe yeter; 6 haneli kodu tahmin etmeye yetmez.
+    const hesapSiniri = await hizSiniri(`totp-verify-hesap:${email}`, TOTP_HESAP_AZAMI_DENEME, TOTP_HESAP_PENCERE_SN, true);
+    if (hesapSiniri.asildi) {
+      await logAudit('TOTP_VERIFY', email, 'failed', 'Hesap bazlı deneme sınırı aşıldı', ip);
+      return NextResponse.json(
+        { error: 'Bu hesap için çok fazla deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.' },
+        { status: 429, headers: { 'Retry-After': String(TOTP_HESAP_PENCERE_SN) } }
+      );
     }
 
     // TOTP veya Kurtarma Kodunu Doğrula
