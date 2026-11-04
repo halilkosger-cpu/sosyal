@@ -876,6 +876,9 @@ model Review {
   rating        Int      // 1-5
   title         String?  // Yorum başlığı
   text          String   // Yorum metni
+  /// Hesapsiz (misafir) yorumcunun gorunen adi. customerId bos ise kullanilir;
+  /// yorum, siparis kalemine bagli imzali baglantiyla birakilir.
+  misafirAd     String?
   approved      Boolean  @default(false)  // Admin onayı
   helpfulCount  Int      @default(0)     // Kaç kişi faydalı buldu
   createdAt     DateTime @default(now())

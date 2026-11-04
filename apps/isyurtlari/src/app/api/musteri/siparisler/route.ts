@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { musteriGuard } from '@/lib/musteri-auth';
+import { notHediyeIceriyor } from '@/lib/hediye';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,8 @@ export async function GET(req: NextRequest) {
           paymentMethod: true,
           shippingAddress: true,
           createdAt: true,
+          // Yalnızca "hediye eklenecek mi" bilgisi için okunur; yanıta verilmez.
+          notes: true,
           // Kargo takibi
           kargoFirmasi: true,
           kargoTakipNo: true,
@@ -61,8 +64,9 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({
-      siparisler: siparisler.map((s) => ({
+      siparisler: siparisler.map(({ notes, ...s }) => ({
         ...s,
+        hediyeUygulandi: notHediyeIceriyor(notes),
         urunAdedi: s.items.reduce((t, k) => t + k.quantity, 0),
       })),
       sayfa,

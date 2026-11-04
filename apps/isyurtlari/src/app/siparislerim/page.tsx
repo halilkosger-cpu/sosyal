@@ -40,6 +40,8 @@ interface Siparis {
   createdAt: string;
   items: Kalem[];
   urunAdedi: number;
+  /** Siparişe arkadaş hediyesi eklenecek mi? ("ÜCRETSİZ HEDİYE" ibaresi) */
+  hediyeUygulandi?: boolean;
   // Kargo takibi
   kargoFirmasi?: string | null;
   kargoTakipNo?: string | null;
@@ -96,6 +98,12 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
         kargoyaVerilme={siparis.shippedAt}
         teslimEdilme={siparis.deliveredAt}
       />
+
+      {siparis.hediyeUygulandi && (
+        <p className="mb-4 inline-block rounded-lg border border-[#CC4E00]/40 bg-[#FDF1E7] px-3 py-1.5 text-sm font-bold text-[#BA4700]">
+          🎁 ÜCRETSİZ HEDİYE
+        </p>
+      )}
 
       <div className="mb-4 space-y-3 border-b border-gray-200 pb-4">
         <p className="text-sm font-semibold text-gray-700">{siparis.urunAdedi} ürün</p>

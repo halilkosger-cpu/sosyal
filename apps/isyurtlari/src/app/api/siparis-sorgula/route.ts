@@ -1,5 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { siparisEpostasiUyuyor } from '@/lib/siparis-eposta';
+import { notHediyeIceriyor } from '@/lib/hediye';
 import { NextRequest, NextResponse } from 'next/server';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 
@@ -86,6 +87,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ...disariVerilebilir,
+      // Not alanı verilmiyor; yalnızca "siparişe hediye eklenecek mi" bilgisi.
+      hediyeUygulandi: notHediyeIceriyor(siparis.notes),
       urunAdedi: siparis.items.reduce((t, k) => t + k.quantity, 0),
     });
   } catch (error) {

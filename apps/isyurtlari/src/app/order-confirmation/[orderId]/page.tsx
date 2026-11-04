@@ -8,6 +8,7 @@ import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator'
 import { siparisTamamlandi } from '@/lib/analiz';
 import PreOrderTimeline from '@/components/PreOrderTimeline';
 import { SIPARIS_TESEKKUR_METNI } from '@/lib/yorum-mesajlari';
+import { HEDIYE_EN_AZ_SIPARIS_TUTARI } from '@/lib/hediye';
 
 interface OrderData {
   id: string;
@@ -22,6 +23,10 @@ interface OrderData {
   discountTotal?: number | null;
   paymentMethod: string;
   shippingAddress: string;
+  /** Müşterinin sevdiklerine göndereceği kendi hediye kodu (yoksa null). */
+  hediyeKodu?: string | null;
+  /** Bu siparişe arkadaş hediyesi eklenecek mi? ("ÜCRETSİZ HEDİYE" ibaresi) */
+  hediyeUygulandi?: boolean;
   notes?: string;
   orderItems: Array<{ id: string; quantity: number; price: number; product: { name: string; slug: string } }>;
   impact?: {
@@ -58,6 +63,15 @@ export default function OrderConfirmationPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  /** Kod girildiği hâlde uygulanamadıysa ödeme sayfasının sakladığı neden. */
+  const [hediyeMesaji, setHediyeMesaji] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setHediyeMesaji(sessionStorage.getItem(`hediye_mesaji_${orderId}`));
+    } catch {
+      // Depolama kapalıysa mesaj gösterilmez.
+    }
+  }, [orderId]);
   const [qrModu, setQrModu] = useState<'fast' | 'iban'>('iban');
 
   useEffect(() => {
@@ -154,6 +168,46 @@ export default function OrderConfirmationPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Arkadaş hediyesi: bu siparişe hediye eklenecekse ya da kod uygulanamadıysa nedeni */}
+            {order.hediyeUygulandi && (
+              <div className="rounded-2xl border-2 border-[#CC4E00] bg-[#FDF1E7] p-6 text-center">
+                <p className="text-xl font-extrabold text-[#BA4700]">🎁 ÜCRETSİZ HEDİYE</p>
+                <p className="text-sm text-gray-700 mt-1">Siparişinize küçük bir hediye ürün eklenecek. Bizi tercih ettiğiniz için teşekkür ederiz.</p>
+              </div>
+            )}
+            {!order.hediyeUygulandi && hediyeMesaji && (
+              <div className="rounded-2xl border border-gray-200 bg-white p-5 text-sm text-gray-700">
+                Hediye kodunuz uygulanamadı: {hediyeMesaji} Siparişiniz bundan etkilenmedi.
+              </div>
+            )}
+
+            {/* Sevdiklerinizle paylaşın: kodu WhatsApp ile gönderin */}
+            {order.hediyeKodu && (
+              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <h2 className="text-lg font-bold text-gray-900">Deneyiminizi sevdiklerinizle paylaşın</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Onlara sizin adınıza küçük bir hediye gönderelim. Kodunuzla verdikleri ilk
+                  {' '}{HEDIYE_EN_AZ_SIPARIS_TUTARI.toLocaleString('tr-TR')} ₺ ve üzeri siparişe hediye eklenir
+                  (kişi başı bir kez, stokla sınırlı).
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-lg font-bold tracking-wider bg-gray-100 rounded-lg px-3 py-2">{order.hediyeKodu}</span>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      `Merhaba! İşyurtları'ndan sipariş verdim; ürünler hükümlülerin el emeğiyle üretiliyor. ` +
+                        `Bu kodla ilk siparişinde küçük bir hediye kazanırsın: ${order.hediyeKodu} ` +
+                        `${typeof window !== 'undefined' ? window.location.origin : ''}/?hediye=${order.hediyeKodu}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1EBE5A] text-white font-semibold px-4 py-2 rounded-lg text-sm"
+                  >
+                    <LuShare2 size={16} /> WhatsApp ile paylaş
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Order Details */}
             <div className="bg-white rounded-2xl border border-gray-200 p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Sipariş Detayları</h2>

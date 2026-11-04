@@ -5,6 +5,7 @@ import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
 import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
 import { kargoUcretsizMi } from '@/lib/fiyat';
+import { notHediyeIceriyor } from '@/lib/hediye';
 
 interface OrderItem { quantity: number; price: number; product?: { name: string }; }
 interface Order {
@@ -223,6 +224,11 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</p>
+                    {notHediyeIceriyor(order.notes) && (
+                      <p className="mt-0.5 mr-1 inline-block rounded border border-[#CC4E00] bg-[#FDF1E7] px-1.5 py-0.5 text-[10px] font-extrabold text-[#BA4700]">
+                        🎁 HEDİYE EKLENECEKTİR
+                      </p>
+                    )}
                     {kargoUcretsizMi(order.totalAmount) && (
                       <p
                         className="inline-block mt-0.5 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded"
