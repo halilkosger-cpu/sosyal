@@ -6,7 +6,7 @@ import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag, LuShoppingCart,
   LuLogOut, LuMenu, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
-  LuRotateCcw, LuTicket, LuFileText, LuShieldCheck, LuTrendingUp,
+  LuRotateCcw, LuTicket, LuFileText, LuShieldCheck, LuTrendingUp, LuMessageSquare,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -26,6 +26,7 @@ const navItems = [
   { href: '/admin/terk-edilmis-sepetler', label: 'Terk Edilmiş Sepetler', Icon: LuShoppingCart },
   { href: '/admin/on-talepler', label: 'Ön Talepler', Icon: LuBell          },
   { href: '/admin/iadeler',    label: 'İadeler',      Icon: LuRotateCcw      },
+  { href: '/admin/yorumlar',   label: 'Yorumlar',     Icon: LuMessageSquare  },
   { href: '/admin/email',      label: 'Email Gönder', Icon: LuMail          },
   { href: '/admin/kuponlar',   label: 'Kuponlar',    Icon: LuTicket         },
   { href: '/admin/audit-logs', label: 'Denetim Günlüğü', Icon: LuActivity    },

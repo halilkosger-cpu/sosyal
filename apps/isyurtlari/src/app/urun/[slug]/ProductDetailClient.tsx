@@ -140,6 +140,11 @@ export default function ProductDetailPage({
   const satinAlmaRef = useRef<HTMLDivElement>(null);
   const [cubukGorunur, setCubukGorunur] = useState(false);
 
+  // "Siparişlerim"deki "Değerlendir" bağlantısı (#yorumlar) Yorumlar sekmesini açar.
+  useEffect(() => {
+    if (window.location.hash === '#yorumlar') setSekme('yorumlar');
+  }, []);
+
   // Mobil cubuk yalnizca ana "Sepete Ekle" ekrandan ciktiginda (asagi kaydirilinca) gorunur.
   useEffect(() => {
     const hedef = satinAlmaRef.current;

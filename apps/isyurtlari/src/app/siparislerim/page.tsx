@@ -109,6 +109,12 @@ function SiparisKarti({ siparis }: { siparis: Siparis }) {
               className="min-w-0 flex-1 truncate text-sm font-medium text-gray-900 hover:text-[#BA4700]">
               {k.product.name}
             </Link>
+            {siparis.status === 'DELIVERED' && (
+              <Link href={`/urun/${k.product.slug}#yorumlar`}
+                className="flex-shrink-0 text-xs font-semibold text-[#BA4700] hover:underline">
+                Değerlendir
+              </Link>
+            )}
             <span className="flex-shrink-0 text-sm text-gray-500">×{k.quantity}</span>
             <span className="flex-shrink-0 text-sm font-semibold text-gray-900">
               ₺{(k.price * k.quantity).toFixed(2)}
