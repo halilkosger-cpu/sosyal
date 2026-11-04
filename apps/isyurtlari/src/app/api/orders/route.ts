@@ -12,6 +12,8 @@ import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { adresiYazdir } from '@/lib/adres-dogrulama';
 import { siparisMuhasebeyeIsle } from '@/lib/muhasebe-entegrasyonu';
 import { odemeAciklamasi } from '@/lib/odeme-aciklamasi';
+import { hediyeKodunuNormallestir, hediyeNotu, notHediyeIceriyor } from '@/lib/hediye';
+import { hediyeKodunuDegerlendir, hediyeyiSipariseUygula, siparisIcinKodOlustur, siparisinKodu } from '@/lib/hediye-db';
 
 // Email sending function
 const SIPARIS_BILDIRIM_EKIBI = ['halil.kosger@gmail.com', 'tahaberke0312@gmail.com', 'asenaerbil.com@gmail.com'];
@@ -25,7 +27,9 @@ async function sendOrderEmail(
   totalAmount: number,
   items: any[],
   kdvTutari: number,
-  faturaBilgisi?: string
+  faturaBilgisi?: string,
+  /** Hediye kodlu sipariş: paketleme ekibi e-postada da görsün. */
+  hediyeKodu?: string | null
 ) {
   try {
     // Sabit ekip + EMAIL_RECIPIENT'ta virgulle yazilan ek adresler (env artik ekibi ezmiyor).
@@ -63,6 +67,7 @@ async function sendOrderEmail(
       <p><strong>Fatura & Kimlik:</strong> <span style="color: #2b6cb0; font-weight: bold;">${kacir(faturaBilgisi || 'Belirtilmedi')}</span></p>
       <p><strong>Teslimat Adresi:</strong> ${kacir(shippingAddress)}</p>
       <p><strong>Sipariş Numarası:</strong> ${kacir(orderNumber)}</p>
+      ${hediyeKodu ? `<p style="background: #fff3e0; border: 2px solid #FF6000; padding: 10px; font-weight: bold; color: #BA4700;">🎁 ${kacir(hediyeNotu(hediyeKodu))}</p>` : ''}
 
       <h3>Sipariş Detayları:</h3>
       <table style="width: 100%; border-collapse: collapse;">
@@ -218,6 +223,8 @@ interface OrderRequest {
   paymentMethod: 'CREDIT_CARD' | 'TRANSFER';
   /** Kupon kodu. İndirim istemciden ALINMIYOR; sunucuda hesaplanıyor. */
   kuponKodu?: string;
+  /** Arkadaşın hediye kodu (HD-XXXXX). Geçersizse sipariş yine oluşur, hediye uygulanmaz. */
+  hediyeKodu?: string;
 }
 
 // Constants for impact calculations
@@ -487,6 +494,30 @@ export async function POST(req: NextRequest) {
       }))
     );
     const gercekToplam = tutar.toplam;
+
+    /**
+     * ─── HEDİYE KODU ────────────────────────────────────────────────
+     *
+     * Hediye siparişi ASLA engellemez: kod geçersizse ya da hediye tabloları
+     * erişilemezse sipariş yine oluşur, yalnızca hediye uygulanmaz ve müşteri
+     * nedenini görür. Değerlendirme burada (siparişten önce), kayıt ise
+     * siparişten sonra yapılıyor; hediye işlemleri sipariş işleminin dışında
+     * kalsın ki bir hata siparişi geri almasın.
+     */
+    const hediyeKodu = hediyeKodunuNormallestir(body.hediyeKodu);
+    let hediyeDegerlendirmesi: Awaited<ReturnType<typeof hediyeKodunuDegerlendir>> | null = null;
+    if (hediyeKodu) {
+      try {
+        hediyeDegerlendirmesi = await hediyeKodunuDegerlendir({
+          kod: hediyeKodu,
+          eposta: body.email,
+          telefon: body.phone,
+          odenecekTutar: gercekToplam,
+        });
+      } catch (hediyeHatasi) {
+        console.error('Hediye kodu değerlendirilemedi:', hediyeHatasi);
+      }
+    }
     const indirimToplami =
       Math.round(
         kalemler.reduce((t, k) => t + (k.listeFiyati - k.birimFiyat) * k.adet, 0) * 100
@@ -650,6 +681,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Hediye: sipariş oluştuktan sonra, hata korumalı (siparişi etkilemez).
+    let hediyeUygulandi = false;
+    let siparisHediyeKodu: string | null = null;
+    let hediyeMesaji: string | null =
+      hediyeKodu && hediyeDegerlendirmesi && !hediyeDegerlendirmesi.gecerli ? hediyeDegerlendirmesi.mesaj : null;
+    try {
+      if (hediyeKodu && hediyeDegerlendirmesi?.gecerli) {
+        hediyeUygulandi = await hediyeyiSipariseUygula({
+          kod: hediyeKodu,
+          siparisId: orderWithItems.id,
+          mevcutNot: orderWithItems.notes,
+          eposta: body.email,
+          telefon: body.phone,
+        });
+        if (!hediyeUygulandi) hediyeMesaji = 'Hediye kodu kişi başı bir kez kullanılabilir.';
+      }
+      siparisHediyeKodu = await siparisIcinKodOlustur(prisma, orderWithItems.id);
+    } catch (hediyeHatasi) {
+      console.error('Hediye işlemi tamamlanamadı:', hediyeHatasi);
+    }
+
     // Send email notification
     await sendOrderEmail(
       orderNumber,
@@ -660,7 +712,8 @@ export async function POST(req: NextRequest) {
       gercekToplam,
       orderWithItems?.items || [],
       tutar.kdv,
-      faturaBilgiMetni
+      faturaBilgiMetni,
+      hediyeUygulandi ? hediyeKodu : null
     );
 
     // Logo GO3 Muhasebe Entegrasyonu: 120 Cari Kart, Satış Faturası ve Kargo Gideri İşleme
@@ -707,6 +760,12 @@ export async function POST(req: NextRequest) {
       discountTotal: orderWithItems?.discountTotal,
       kuponKodu: orderWithItems?.kuponKodu,
       kuponIndirimi: orderWithItems?.kuponIndirimi,
+      /** Müşterinin sevdiklerine göndereceği kendi hediye kodu (yoksa null). */
+      hediyeKodu: siparisHediyeKodu,
+      /** Bu siparişte arkadaş hediyesi uygulandı mı? ("ÜCRETSİZ HEDİYE" ibaresi için) */
+      hediyeUygulandi,
+      /** Kod girildiği hâlde uygulanamadıysa nedeni. */
+      hediyeMesaji,
       paymentMethod: orderWithItems?.paymentMethod,
       shippingAddress: orderWithItems?.shippingAddress,
       items: orderWithItems?.items || [],
@@ -787,10 +846,20 @@ export async function GET(req: NextRequest) {
       product: kalem.product ? vitrinUrunu(kalem.product) : kalem.product,
     }));
 
+    // Hediye: not alanı dışarı verilmiyor, yalnızca "hediye var mı" bilgisi ve müşterinin kendi kodu.
+    let hediyeKodu: string | null = null;
+    try {
+      hediyeKodu = await siparisinKodu(prisma, order.id);
+    } catch (hediyeHatasi) {
+      console.error('Hediye kodu okunamadı:', hediyeHatasi);
+    }
+
     return NextResponse.json({
       id: order.id,
       orderNumber: order.orderNumber,
       status: order.status,
+      hediyeKodu,
+      hediyeUygulandi: notHediyeIceriyor(order.notes),
       totalAmount: order.totalAmount,
       itemsTotal: order.itemsTotal,
       taxTotal: order.taxTotal,

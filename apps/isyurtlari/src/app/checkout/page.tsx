@@ -10,6 +10,8 @@ import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
 import { siparisToplami, KARGO_KARSI_ODEMELI, kargoDurumuMetni } from '@/lib/fiyat';
 import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
+import { HEDIYE_EN_AZ_SIPARIS_TUTARI, hediyeKodunuNormallestir } from '@/lib/hediye';
+import { HEDIYE_KODU_ANAHTARI } from '@/components/HediyeKoduYakala';
 import WorkshopDeliveryCommitment from '@/components/WorkshopDeliveryCommitment';
 
 interface Campaign {
@@ -76,6 +78,8 @@ export default function CheckoutPage() {
   const [kuponIndirimi, setKuponIndirimi] = useState(0);
   const [kuponMesaji, setKuponMesaji] = useState('');
   const [kuponIsleniyor, setKuponIsleniyor] = useState(false);
+  /** Arkadaşın hediye kodu (HD-XXXXX): bağlantıdan yakalanır ya da elle girilir. */
+  const [hediyeKoduGirdisi, setHediyeKoduGirdisi] = useState('');
   const [error, setError] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('TRANSFER');
   const [ibanKopyalandi, setIbanKopyalandi] = useState(false);
@@ -103,6 +107,15 @@ export default function CheckoutPage() {
     vergiDairesi: '',
     vergiNo: '',
   });
+
+  useEffect(() => {
+    try {
+      const kayitli = localStorage.getItem(HEDIYE_KODU_ANAHTARI);
+      if (kayitli) setHediyeKoduGirdisi(kayitli);
+    } catch {
+      // Depolama kapalıysa kod elle girilir.
+    }
+  }, []);
 
   useEffect(() => {
     const odemeHatasi = new URLSearchParams(window.location.search).get('hata');
@@ -238,6 +251,11 @@ export default function CheckoutPage() {
     ).map((k) => ({ tutar: k.indirimliTutar, kdvOrani: k.kdvOrani }))
   );
   const kuponluToplam = kuponluTutar.toplam;
+
+  // Hediye kodu: geçerli biçimde yazılmışsa siparişle gönderilir; uygunluğu (ilk sipariş,
+  // kişi başı bir kez, tutar) sunucu belirler. Burada yalnızca tutar eşiği bilgilendirilir.
+  const hediyeKodu = hediyeKodunuNormallestir(hediyeKoduGirdisi);
+  const hediyeIcinKalan = Math.max(0, Math.round((HEDIYE_EN_AZ_SIPARIS_TUTARI - kuponluToplam) * 100) / 100);
   const kuponluKdv = kuponluTutar.kdv;
 
   const kuponuUygula = async (e: React.FormEvent) => {
@@ -375,6 +393,7 @@ export default function CheckoutPage() {
           vergiDairesi: formData.vergiDairesi.trim(),
           vergiNo: formData.vergiNo.replace(/\D/g, ''),
           ...(uygulananKupon ? { kuponKodu: uygulananKupon } : {}),
+          ...(hediyeKodu ? { hediyeKodu } : {}),
         }),
       });
 
@@ -391,6 +410,15 @@ export default function CheckoutPage() {
         setError('Sipariş oluşturulmadı (orderId bulunamadı)');
         setSubmitting(false);
         return;
+      }
+
+      // Hediye kodu bu siparişte kullanıldı (ya da geçersizdi): bir sonraki alışverişe taşınmasın.
+      // Uygulanamadıysa nedeni onay sayfasında gösterilsin.
+      try {
+        localStorage.removeItem(HEDIYE_KODU_ANAHTARI);
+        if (data.hediyeMesaji) sessionStorage.setItem(`hediye_mesaji_${data.orderId}`, String(data.hediyeMesaji));
+      } catch {
+        // Depolama kapalıysa yalnızca bilgi mesajı gösterilemez.
       }
 
       if (paymentMethod === 'CREDIT_CARD') {
@@ -968,6 +996,30 @@ export default function CheckoutPage() {
                   {kuponMesaji && <p className="text-xs text-red-600 mt-1.5">{kuponMesaji}</p>}
                 </>
               )}
+            </div>
+
+            {/* Arkadaşın hediye kodu */}
+            <div className="mt-3 rounded-lg border border-dashed border-[#CC4E00]/40 bg-[#FDF1E7] px-3 py-3">
+              <label htmlFor="hediye-kodu" className="block text-sm font-semibold text-gray-800 mb-1.5">
+                🎁 Hediye kodunuz var mı?
+              </label>
+              <input
+                id="hediye-kodu"
+                value={hediyeKoduGirdisi}
+                onChange={(e) => setHediyeKoduGirdisi(e.target.value)}
+                placeholder="HD-XXXXX"
+                autoComplete="off"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono uppercase bg-white focus:outline-none focus:border-[#CC4E00]"
+              />
+              <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                {hediyeKoduGirdisi.trim() && !hediyeKodu
+                  ? 'Kod biçimi geçersiz görünüyor (örnek: HD-7K2M9).'
+                  : hediyeKodu && hediyeIcinKalan > 0
+                    ? `Hediye, ödenecek tutarı ${HEDIYE_EN_AZ_SIPARIS_TUTARI.toLocaleString('tr-TR')} ₺ ve üzeri olan siparişlerde verilir; ${hediyeIcinKalan.toLocaleString('tr-TR')} ₺ daha ekleyebilirsiniz.`
+                    : hediyeKodu
+                      ? 'Hediyeniz siparişinizle birlikte gelecek (ilk siparişte, kişi başı bir kez geçerlidir).'
+                      : `Bir yakınınızdan kod aldıysanız yazın. İlk siparişte, ${HEDIYE_EN_AZ_SIPARIS_TUTARI.toLocaleString('tr-TR')} ₺ ve üzeri tutarlarda küçük bir hediye eklenir; stokla sınırlıdır.`}
+              </p>
             </div>
 
             <div className="flex justify-between items-baseline border-t border-gray-100 mt-4 pt-4">

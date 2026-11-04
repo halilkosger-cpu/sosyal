@@ -30,6 +30,7 @@ import { kisaAd } from '@/lib/kategori-gorunum';
 import KategoriIkon from '@/components/KategoriIkon';
 import HesapMenusu from '@/components/HesapMenusu';
 import MobilKategoriSeridi from '@/components/MobilKategoriSeridi';
+import HediyeKoduYakala from '@/components/HediyeKoduYakala';
 import DahiliAnalitikTracker from '@/components/DahiliAnalitikTracker';
 import { CartDrawerProvider } from '@/context/CartDrawerContext';
 import PushBackLayout from '@/components/PushBackLayout';
@@ -347,6 +348,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {/* Sağdan Açılan Sepet Çekmecesi */}
           <CartDrawer />
 
+          <HediyeKoduYakala />
           <CookieConsent />
           <KampanyaModal />
           <Olcumler />
