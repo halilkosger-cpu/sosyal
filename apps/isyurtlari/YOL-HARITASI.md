@@ -1,6 +1,6 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 4 Kasım 2026 — Güvenlik bulgularının yeniden doğrulanması ve ilk düzeltmeler (TOTP hesap kilidi, iyzico eşleşmesi)
+Son güncelleme: 4 Kasım 2026 — Güvenlik düzeltmeleri (TOTP hesap kilidi, iyzico eşleşmesi, yedek kodlar, yönetici e-postaları)
 Önceki: 2 Kasım 2026 · Sıradaki iş: **Stoksuz ürünlerin vitrinden çıkarılması**
 
 ## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
@@ -53,12 +53,18 @@ Son güncelleme: 4 Kasım 2026 — Güvenlik bulgularının yeniden doğrulanmas
 - **Düzeltme gerekmedi — JWT geliştirme anahtarı:** `jwtAnahtari()` production'da `JWT_SECRET` yoksa hata fırlatıyor; yedek anahtar yalnızca geliştirmede kullanılıyor.
 - **Düşük risk — SVG yükleme:** Yalnızca yönetici girişiyle ve yalnızca `kategoriler` klasörüne; dosya `<img>` ile gösteriliyor (betik çalışmaz). Şimdilik bırakıldı.
 
+**4 Kasım 2026 ikinci tur (PR açık, birleştirme onayı bekliyor):**
+
+- **Düzeltildi — yedek kurtarma kodları:** Kodlar 32 bitti ve düz SHA-256 ile saklanıyordu (veritabanı sızarsa saniyeler içinde kırılır). Yeni kodlar 80 bit (`9F2C-8A4E-1B7D-3C90-AA12`) ve sunucu anahtarıyla HMAC'leniyor (`h2:` önekli). Mevcut kayıtlı eski kodlar doğrulamada hâlâ kabul ediliyor; **yönetici güvenlik sayfasından yedek kodları yeniden üretmek** eski kodları da yeni biçime geçirir. Testler: `src/lib/totp.test.ts`. Doğrulanmadı: yeni 24 karakterlik kodların `guvenlik-2fa` sayfasındaki kutuya sığması (görsel kontrol yapılmadı).
+- **Düzeltildi (iki aşamalı) — sabit yönetici e-postaları:** `ADMIN_EMAILS` (virgülle ayrılmış) ortam değişkeni desteği eklendi. Tanımlıysa yalnızca oradaki adresler (+ `ADMIN_EMAIL`) yetkili olur. **Yapılacak (kullanıcı):** Vercel'de `ADMIN_EMAILS` tanımlanmalı, sonra koddaki `VARSAYILAN_ADMIN_EMAILLER` listesi silinmeli. Tanımlanmazsa eski liste çalışmaya devam eder (kimse kilitlenmez). Testler: `src/lib/admin-auth.test.ts`.
+- **Değerlendirildi, değiştirilmedi — `otp-verify` hesap kilidi:** E-posta kodu başına 5 hatalı denemede kod imha ediliyor (`src/lib/otp.ts`), yani 6 haneli kodun kaba kuvvetle bulunması bu sayaçla sınırlı. Yeni kod isteme tarafında hesap bazlı sınır yok; e-posta bombardımanı riski düşük olarak bırakıldı.
+- **Bilinçli olarak bırakıldı — CSP `script-src 'unsafe-inline'`:** Next.js'in satır içi hydration betikleri yüzünden tüm sayfalarda gerekli. Nonce'lu CSP, middleware ile her istekte nonce üretmeyi ve sayfaları dinamik hâle getirmeyi gerektirir; bu, mevcut önbellek (`s-maxage=3600`) ve hız avantajını bozar. Mevcut CSP harici betik kaynaklarını, `object-src`, `frame-ancestors`, `base-uri` ve `form-action` değerlerini hâlâ kısıtlıyor. XSS riski çıktı kaçışlarıyla (e-posta, JSON-LD) azaltılıyor. Yeniden gündeme gelirse Next.js'in `experimental.sri` seçeneği ve performans ölçümüyle ayrı iş olarak ele alınmalı.
+
 **Hâlâ açık:**
 
-- CSP `script-src 'unsafe-inline'` içeriyor (nonce'a geçiş ayrı ve büyük bir iş).
-- `admin-auth.ts` içinde sabit yönetici e-postaları (env'e taşınmalı).
-- Yedek kodlar tuzsuz SHA-256 ve 32 bit kod (yeniden doğrulanmadı; hesap bazlı kilit kaba kuvveti zorlaştırıyor).
-- `otp-verify` için hesap bazlı kilit eklenmedi (e-posta kodu için ayrıca deneme sayacı var; doğrulanmadı).
+- Vercel'de `ADMIN_EMAILS` tanımlanmadı (kullanıcı); ardından koddaki varsayılan e-posta listesi silinmeli.
+- Yedek kodlar yönetici panelinden yeniden üretilmeli (kullanıcı), eski zayıf özetler kullanımdan çıksın.
+- Yedek kod tüketimi atomik değil (okuyup yazıyor); aynı kodla eşzamanlı iki istek ikisi de geçebilir. Hesap bazlı kilit bunu zorlaştırıyor; ayrıca düzeltilmedi.
 
 - Olumlu: scrypt parolalar, özetlenmiş oturumlar, IDOR kontrolleri, fiyatın sunucuda yeniden hesaplanması, e-posta ve JSON-LD kaçışları.
 
