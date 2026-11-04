@@ -11,6 +11,7 @@ import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { adresiYazdir } from '@/lib/adres-dogrulama';
 import { siparisMuhasebeyeIsle } from '@/lib/muhasebe-entegrasyonu';
+import { odemeAciklamasi } from '@/lib/odeme-aciklamasi';
 
 // Email sending function
 const SIPARIS_BILDIRIM_EKIBI = ['halil.kosger@gmail.com', 'tahaberke0312@gmail.com', 'asenaerbil.com@gmail.com'];
@@ -592,7 +593,7 @@ export async function POST(req: NextRequest) {
             currency: 'TRY',
             method: body.paymentMethod,
             status: 'PENDING',
-            description: `Sipariş #${orderNumber}`,
+            description: odemeAciklamasi(orderNumber),
           },
         });
 

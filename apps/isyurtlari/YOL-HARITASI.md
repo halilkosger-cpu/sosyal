@@ -1,6 +1,6 @@
 # isyurtlari.com.tr — Yol Haritası
 
-Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi, site güven/dönüşüm incelemesi
+Son güncelleme: 4 Kasım 2026 — Güvenlik bulgularının yeniden doğrulanması ve ilk düzeltmeler (TOTP hesap kilidi, iyzico eşleşmesi)
 Önceki: 2 Kasım 2026 · Sıradaki iş: **Stoksuz ürünlerin vitrinden çıkarılması**
 
 ## 3 Kasım 2026 — Günlük rapor, güvenlik denetimi ve site incelemesi
@@ -43,16 +43,23 @@ Son güncelleme: 3 Kasım 2026 — Günlük yönetim raporu, güvenlik denetimi,
 9. **"Fiyat Rekabet Gücü Raporu panelden açılabilir" notu geçersiz** (bölüm I5). Hesapta rapor yok; Merchant Center'da uygunluk ve ürün kataloğu eşleşmesi (GTIN/marka) kontrol edilmeli.
 10. **Merchant kargo ayarları** panelde sitedeki karşı ödemeli modelle tutarlı olmalı (yalnızca panelden yapılabilir).
 
-### Güvenlik denetimi bulguları (düzeltilmedi)
+### Güvenlik denetimi bulguları
 
-- `hiz-siniri.ts` `istemciAdresi` en soldaki `X-Forwarded-For` değerini kullanıyor (sahtelenebilir): admin `totp-verify`/`otp-verify`/`otp-request`, müşteri girişi ve `siparis-sorgula` hız sınırları atlatılabilir.
-- Admin TOTP için hesap bazlı kilitleme yok.
-- CSP `script-src 'unsafe-inline'` içeriyor.
-- iyzico callback `payment.updateMany` açıklamada `contains` kullanıyor (SG-2026-001, SG-2026-0010 ile eşleşir).
-- Kategoriler için SVG yükleme açık.
-- JWT için geliştirme ortamı yedek anahtarı var.
-- `admin-auth.ts` içinde sabit yönetici e-postaları.
-- Yedek kodlar tuzsuz SHA-256 (32 bit kod).
+**4 Kasım 2026 yeniden doğrulama ve düzeltmeler (PR açık, birleştirme onayı bekliyor):**
+
+- **Düzeltildi — admin TOTP hesap bazlı kilit:** `totp-verify` yalnızca IP başına dakikada 6 deneme sınırı uyguluyordu; çok IP'li bir saldırı sınırı aşabilirdi. Yönetici e-postası başına 15 dakikada 20 deneme sınırı eklendi (`totp-verify-hesap:<e-posta>`, veritabanı sayaçlı, hata durumunda reddeder). Test: `src/app/api/admin/totp-verify/route.test.ts`. Dengeleme: saldırgan sınırı doldurarak yöneticiyi en fazla 15 dakika kilitleyebilir; bu, kaba kuvvet riskine göre kabul edildi.
+- **Düzeltildi — iyzico callback `contains` eşleşmesi:** `payment.updateMany` açıklamada `contains` kullanıyordu. Sipariş numarası 3 haneye dolduruluyor (`SG-2026-100`), 1000. siparişten sonra `SG-2026-100` başka bir siparişin (`SG-2026-1000`) ödemesini de tamamlardı. Şu an gizli (sipariş sayısı az); açıklama artık `src/lib/odeme-aciklamasi.ts` ile üretilip tam eşleşmeyle aranıyor.
+- **Düzeltme gerekmedi — `X-Forwarded-For` sahteciliği:** Önceki denetimde "en soldaki değer sahtelenebilir" diye yazılmıştı. Site doğrudan Vercel arkasında (yanıtta `server: Vercel`, başka bir CDN yok) ve Vercel bu başlığı gerçek istemci adresiyle üzerine yazıyor; bu bulgu abartılmıştı. Önüne Cloudflare gibi bir vekil konulursa yeniden bakılmalı. Doğrulanmadı: Vercel davranışı dokümana dayanıyor, canlıda sahte başlıkla denenmedi.
+- **Düzeltme gerekmedi — JWT geliştirme anahtarı:** `jwtAnahtari()` production'da `JWT_SECRET` yoksa hata fırlatıyor; yedek anahtar yalnızca geliştirmede kullanılıyor.
+- **Düşük risk — SVG yükleme:** Yalnızca yönetici girişiyle ve yalnızca `kategoriler` klasörüne; dosya `<img>` ile gösteriliyor (betik çalışmaz). Şimdilik bırakıldı.
+
+**Hâlâ açık:**
+
+- CSP `script-src 'unsafe-inline'` içeriyor (nonce'a geçiş ayrı ve büyük bir iş).
+- `admin-auth.ts` içinde sabit yönetici e-postaları (env'e taşınmalı).
+- Yedek kodlar tuzsuz SHA-256 ve 32 bit kod (yeniden doğrulanmadı; hesap bazlı kilit kaba kuvveti zorlaştırıyor).
+- `otp-verify` için hesap bazlı kilit eklenmedi (e-posta kodu için ayrıca deneme sayacı var; doğrulanmadı).
+
 - Olumlu: scrypt parolalar, özetlenmiş oturumlar, IDOR kontrolleri, fiyatın sunucuda yeniden hesaplanması, e-posta ve JSON-LD kaçışları.
 
 ## 2 Kasım 2026 — Google Merchant Center Feed Güçlendirmesi (Hesap: 5876808666)

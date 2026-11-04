@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { iyzicoIstek, IYZICO_YOLLARI, odemeGecerli } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
 import { siparisMuhasebeyeIsle, odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
+import { odemeAciklamasi } from '@/lib/odeme-aciklamasi';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
 
       await tx.payment.updateMany({
         where: {
-          description: { contains: siparis.orderNumber },
+          description: odemeAciklamasi(siparis.orderNumber),
         },
         data: {
           status: 'COMPLETED',
