@@ -18,6 +18,7 @@ import KategoriIkon from '@/components/KategoriIkon';
 import { sepeteEkle } from '@/lib/cart';
 import { sepeteUcur } from '@/lib/sepete-ucus';
 import { urunGoruntulendi } from '@/lib/analiz';
+import { UCRETSIZ_KARGO_ESIGI } from '@/lib/fiyat';
 import { urunGorseli, urunSrcSet, yerelGorselVar } from '@/lib/urun-gorsel';
 import { URETIM_BILGISI } from '@/config/content';
 import { useMusteri } from '@/lib/musteri-istemci';
@@ -462,7 +463,7 @@ export default function ProductDetailPage({
                   <span className={`text-4xl font-extrabold tracking-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</span>
                   {product.campaign && <span className="text-lg text-gray-500 line-through">{fiyat(product.price)}</span>}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">KDV dahil · Kargo karşı ödemeli</p>
+                <p className="text-xs text-gray-500 mt-1">KDV dahil · Kargo karşı ödemeli · {UCRETSIZ_KARGO_ESIGI.toLocaleString('tr-TR')} ₺ ve üzeri siparişlerde ücretsiz</p>
               </>
             ) : (
               <p className="text-lg font-bold text-gray-700">Fiyat belirleniyor</p>
@@ -600,7 +601,7 @@ export default function ProductDetailPage({
           )}
 
           <div role="tabpanel" hidden={sekme !== 'teslimat'} className="space-y-3 text-[15px] leading-7 text-gray-700">
-            <p><strong className="text-gray-900">Kargo:</strong> Gönderiler karşı ödemeli yapılır. Kargo ücreti sipariş toplamına dahil değildir, teslimat sırasında kargo firmasına ödenir.</p>
+            <p><strong className="text-gray-900">Kargo:</strong> Gönderiler karşı ödemeli yapılır. Kargo ücreti sipariş toplamına dahil değildir, teslimat sırasında kargo firmasına ödenir. Ödenecek tutarı {UCRETSIZ_KARGO_ESIGI.toLocaleString('tr-TR')} ₺ ve üzeri olan siparişlerde kargo ücretsizdir; bu siparişlerde teslimatta kargo ücreti ödemezsiniz.</p>
             <p><strong className="text-gray-900">Sipariş takibi:</strong> Siparişiniz kargoya verildiğinde takip numarası Siparişlerim sayfasında görünür.</p>
             <p><strong className="text-gray-900">Cayma hakkı:</strong> Ürünü teslim aldığınız tarihten itibaren 14 gün içinde hiçbir gerekçe göstermeden iade edebilirsiniz.</p>
             <Link href="/teslimat-iade-sartlari" className="inline-flex items-center gap-1 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
@@ -718,7 +719,7 @@ export default function ProductDetailPage({
           <div className="min-w-0 flex-1">
             {product.campaign && <p className="text-[11px] text-gray-500 line-through leading-none">{fiyat(product.price)}</p>}
             <p className={`text-lg font-bold leading-tight ${product.campaign ? 'text-red-600' : 'text-[#141B2D]'}`}>{fiyat(gecerliFiyat)}</p>
-            <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli</p>
+            <p className="text-[10px] text-gray-500 leading-none">KDV dahil · Kargo karşı ödemeli · {UCRETSIZ_KARGO_ESIGI.toLocaleString('tr-TR')} ₺ üzeri ücretsiz</p>
           </div>
           <button onClick={handleAddToCart} tabIndex={cubukGorunur ? 0 : -1} className={`shrink-0 min-h-[44px] px-6 py-3 rounded-xl font-semibold text-white transition-colors ${added ? 'bg-green-600' : 'bg-[#CC4E00] hover:bg-[#A63F00]'}`}>
             {added ? 'Sepete eklendi' : 'Sepete Ekle'}

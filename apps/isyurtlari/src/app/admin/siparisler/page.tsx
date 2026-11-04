@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
 import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
+import { kargoUcretsizMi } from '@/lib/fiyat';
 
 interface OrderItem { quantity: number; price: number; product?: { name: string }; }
 interface Order {
@@ -222,6 +223,14 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-bold text-[#BA4700]">₺{order.totalAmount.toFixed(2)}</p>
+                    {kargoUcretsizMi(order.totalAmount) && (
+                      <p
+                        className="inline-block mt-0.5 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded"
+                        title="Sipariş tutarı ücretsiz kargo eşiğinde: müşteriye karşı ödemeli değil, gönderici ödemeli gönderin."
+                      >
+                        Ücretsiz kargo · gönderici ödemeli
+                      </p>
+                    )}
                     {(() => {
                       const cost = order.items.reduce((s: number, it: any) => {
                         const unitCost = it.purchasePrice > 0 ? it.purchasePrice : (it.product?.purchasePrice || 0);

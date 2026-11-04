@@ -6,6 +6,7 @@ import { varsayilanSirala } from '@/lib/urun-siralama';
 import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { kategorileriGetir } from '@/lib/kategoriler';
+import { UCRETSIZ_KARGO_ESIGI } from '@/lib/fiyat';
 
 /**
  * Ana sayfa her istekte yeniden üretilmiyor.
@@ -74,6 +75,7 @@ const sssJsonLd = {
           'Gönderiler karşı ödemeli gönderilir. Kargo ücreti sipariş tutarına dahil ' +
           'değildir; teslimat sırasında doğrudan kargo firmasına ödenir. Tutar, kargo ' +
           'firmasının o günkü tarifesine ve teslimat adresine göre belirlenir. ' +
+          `Ödenecek tutarı ${UCRETSIZ_KARGO_ESIGI.toLocaleString('tr-TR')} TL ve üzeri olan siparişlerde kargo ücretsizdir. ` +
           'Siparişler Türkiye geneline gönderilir.',
       },
     },

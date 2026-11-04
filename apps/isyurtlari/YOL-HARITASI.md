@@ -17,10 +17,16 @@ Son güncelleme: 4 Kasım 2026 — Güvenlik düzeltmeleri (TOTP hesap kilidi, i
 - **Merchant fiyat rekabeti verisi bu hesapta dönmüyor.** Sorgu (`price`, `benchmark_price` mesajları) hata vermiyor ama boş sonuç dönüyor; Merchant Center'da Analytics → Fiyatlandırma sayfası yalnızca indirimli fiyat önerilerini gösteriyor, fiyat rekabeti raporu yok. Rapor bunu "Rekabet verisi bu hesapta dönmedi." diye yazıyor. Veri ileride açılırsa otomatik dolar.
 - **Güvenlik denetimi yapıldı (yalnızca rapor, düzeltme yok)**; bulgular aşağıda "Yapılmayanlar"da.
 - **Site incelemesi yapıldı** (masaüstü, 375px mobil, ürün sayfası kodu, SEO sinyalleri). Hız iyi (ilk bayt ≈0,2 sn), `robots.txt`/`sitemap.xml`/JSON-LD var.
-- **Kargo kararı:** Karşı ödemeli model aynen kalıyor (`KARGO_KARSI_ODEMELI = true`).
+- **Kargo kararı (4 Kasım):** Karşı ödemeli model kalıyor (`KARGO_KARSI_ODEMELI = true`); ödenecek tutar **1.500 ₺ ve üzeri** siparişlerde kargo ücretsiz (işletme karşılar), altında kapıda kargo firmasına ödenir. Ayrıntısı aşağıda "Ücretsiz kargo eşiği (PR açık)".
 
 - **Güven düzeltmeleri (PR #11, birleştirildi):** ürün sayfasındaki sabit "Bugün 18 kişi inceledi" ve "%98 Memnuniyet" rozetleri, her gün sıfırlanan "Günün Fırsatı" sayacı ve `price * 1.2` ile uydurulmuş üstü çizili fiyat kaldırıldı. Blok "Öne Çıkan Ürün" oldu.
 - **Kargo vaadi (PR #12, birleştirildi):** karşı ödemeli modelle çelişen "1.500 TL üzeri kargonuz BEDAVA" çubuğu (sepet sayfası ve çekmece) kaldırıldı. `fiyat.ts` içindeki kullanılmayan `UCRETSIZ_KARGO_ESIGI` sabiti model değişirse diye bırakıldı.
+- **Ücretsiz kargo eşiği (4 Kasım, PR açık, birleştirme onayı bekliyor):** İş sahibi kararıyla çubuk doğru bilgiyle geri döndü ve kural koda işlendi.
+  - Kural: **eşik, ödenecek (Kasım indirimi ve kupon düşülmüş) ürün toplamıdır.** Ham 1.600 ₺'lik sepet %10 ile 1.440 ₺ olur, eşiği geçmez. Kargo hiçbir zaman toplama eklenmez (`kargo = 0`); eşik ve üzerinde müşteri kapıda hiçbir şey ödemez.
+  - Kod: `src/lib/fiyat.ts` (`kargoUcretsizMi`, `kargoEsigineKalan`, `kargoDurumuMetni`, `SiparisTutari.kargoUcretsiz`), testler `src/lib/fiyat.test.ts`. Sipariş kaydında yeni alan yok; durum `totalAmount`'tan türetiliyor.
+  - Gösterim: sepet çubuğu (sepet sayfası ve çekmece), sepet/ödeme özeti ("Ücretsiz" / "Karşı ödemeli"), ürün sayfası (fiyat altı notu ve Kargo sekmesi), ana sayfa SSS (JSON-LD dahil), sipariş onay e-postası, terk edilmiş sepet e-postası, "Siparişlerim", ürün sayfası JSON-LD `shippingRate`.
+  - **Sevkiyat:** Admin → Siparişler listesinde eşiği geçen siparişte "Ücretsiz kargo · gönderici ödemeli" rozeti çıkıyor; bu siparişler **gönderici ödemeli** gönderilmeli (kargo firmasıyla anlaşma gerekli).
+  - Bilinen sınırlar: Sepet çekmecesi yalnızca kampanya indirimini hesaba katar, ürün bazlı kampanyayı katmaz (kesin değer sepet/ödeme sayfasında). Ürün sayfası JSON-LD'sinde eşik altı için `110 TL` sabit tahmini duruyor (önceden de vardı); gerçek ücret kargo tarifesine göre değişir, doğrulanıp güncellenmeli veya kaldırılmalı. `teslimat-iade-sartlari` ve `mesafeli-satis-sozlesmesi` yasal metinlerine dokunulmadı; kargo ücreti cümlesi iş sahibi/hukuk tarafından gözden geçirilmeli.
 - **Yol haritası güncellemesi (PR #13, birleştirildi).**
 - **Mobil üst alan kısaltıldı (PR #14, birleştirildi ve canlıda doğrulandı):**
   - Kategori şeridi (`MobilKategoriSeridi`) sabit (`sticky`) başlığın içindeydi; mobilde kaydırırken bile ekranın yaklaşık dörtte birini kaplıyordu. Başlığın dışına alındı, artık sayfayla birlikte kayıyor. `/urun/`, `/sepet`, `/checkout`, `/order-confirmation` yollarında hiç gösterilmiyor.
@@ -41,7 +47,8 @@ Son güncelleme: 4 Kasım 2026 — Güvenlik düzeltmeleri (TOTP hesap kilidi, i
 7. **Trafik çeşitliliği:** oturumlar neredeyse tamamen organik (62) ve direkt (33); sosyal, e-posta ve ücretli kanal yok. Hediye Kutusu Yap ve kurumsal hediye öne çıkarılabilir.
 8. **Eski Merchant kodu temizliği:** `google-merchant-api.ts` hâlâ kapanan Content API v2.1'i kullanıyor ve canlı veri yoksa uydurma `YEREL_SIMULASYON` fiyatlarına düşüyor (admin fiyat analizi sayfasını yanıltabilir). `google-merchant-api.test.ts` içinde önceden var olan başarısız test ve `tsc` hataları da var.
 9. **"Fiyat Rekabet Gücü Raporu panelden açılabilir" notu geçersiz** (bölüm I5). Hesapta rapor yok; Merchant Center'da uygunluk ve ürün kataloğu eşleşmesi (GTIN/marka) kontrol edilmeli.
-10. **Merchant kargo ayarları** panelde sitedeki karşı ödemeli modelle tutarlı olmalı (yalnızca panelden yapılabilir).
+10. **Merchant kargo ayarları** panelde sitedeki modelle tutarlı olmalı: kargo karşı ödemeli, 1.500 ₺ ve üzeri siparişlerde ücretsiz (yalnızca panelden yapılabilir; tutarsızlık ürün reddine yol açabilir).
+11. **Ücretsiz kargo için gönderici ödemeli anlaşma** kargo firmasıyla netleştirilmeli ve sevkiyat ekibi admin rozetini bilmeli.
 
 ### Güvenlik denetimi bulguları
 

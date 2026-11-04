@@ -8,7 +8,7 @@ import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock
 import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
-import { siparisToplami, KARGO_KARSI_ODEMELI } from '@/lib/fiyat';
+import { siparisToplami, KARGO_KARSI_ODEMELI, kargoDurumuMetni } from '@/lib/fiyat';
 import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
 import WorkshopDeliveryCommitment from '@/components/WorkshopDeliveryCommitment';
 
@@ -946,7 +946,7 @@ export default function CheckoutPage() {
               {/* Kargo tutara dahil degil: gonderiler karsi odemeli. */}
               <div className="flex justify-between text-gray-600">
                 <dt>Kargo</dt>
-                <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? 'Karşı ödemeli' : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}</dd>
+                <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? kargoDurumuMetni(kuponluTutar.kargoUcretsiz) : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}</dd>
               </div>
             </dl>
 
@@ -977,7 +977,8 @@ export default function CheckoutPage() {
             {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor. */}
             <p className="text-xs leading-relaxed text-gray-500 mt-2">
               Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}).
-              {KARGO_KARSI_ODEMELI ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+              {KARGO_KARSI_ODEMELI && !kuponluTutar.kargoUcretsiz ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
+              {KARGO_KARSI_ODEMELI && kuponluTutar.kargoUcretsiz ? ' Kargo bu siparişte ücretsizdir; teslimatta kargo ücreti ödemezsiniz.' : ''}
             </p>
             <ul className="mt-4 space-y-2 text-xs text-gray-600">
               <li className="flex items-center gap-2"><LuRotateCcw size={14} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>

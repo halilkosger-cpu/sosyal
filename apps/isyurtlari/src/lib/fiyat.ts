@@ -24,9 +24,14 @@
  *
  * Gonderiler karsi odemeli: kargo bedeli siparis tutarina KATILMIYOR,
  * teslimatta dogrudan kargo firmasina odeniyor. Bu yuzden kargo hesabi
- * simdilik her zaman 0 donuyor. Ilerde sabit ucret + ucretsiz kargo esigi
- * modeline gecilirse yalnizca asagidaki uc sabit degistirilecek; cagiran
- * hicbir yerin degismesi gerekmiyor.
+ * her zaman 0 donuyor.
+ *
+ * Ucretsiz kargo esigi: odenecek (kampanya indirimi dusulmus) urun toplami
+ * UCRETSIZ_KARGO_ESIGI ve uzeriyse kargoyu isletme karsilar, musteri teslimatta
+ * kargo firmasina bir sey odemez. Bu durum `kargoUcretsizMi` ile belirlenir;
+ * siparis kaydinda ayri bir alan yok, toplamdan turetilir (toplam = urun
+ * toplami, cunku kargo eklenmiyor). Sevkiyat tarafi gonderici odemeli
+ * gondermelidir; admin siparis ekraninda bu siparisler isaretlenir.
  */
 
 /** Kategoride oran tanimli degilse kullanilan KDV orani (yuzde). */
@@ -71,6 +76,8 @@ export interface SiparisTutari {
   kdvHaric: number;
   /** Siparise eklenen kargo bedeli. Karsi odemeli iken 0. */
   kargo: number;
+  /** Urun toplami ucretsiz kargo esigine ulasti: musteri teslimatta kargo ucreti odemez. */
+  kargoUcretsiz: boolean;
   /** Musteriden tahsil edilecek tutar: urunToplami + kargo. */
   toplam: number;
 }
@@ -85,8 +92,23 @@ export function icindekiKdv(kdvDahilTutar: number, oran?: number | null): number
 /** Urun toplamina gore kargo bedeli. */
 export function kargoBedeli(urunToplami: number): number {
   if (KARGO_KARSI_ODEMELI) return 0;
-  if (UCRETSIZ_KARGO_ESIGI > 0 && urunToplami >= UCRETSIZ_KARGO_ESIGI) return 0;
+  if (kargoUcretsizMi(urunToplami)) return 0;
   return KARGO_UCRETI;
+}
+
+/** Odenecek urun toplami ucretsiz kargo esigine ulasti mi? */
+export function kargoUcretsizMi(urunToplami: number): boolean {
+  return UCRETSIZ_KARGO_ESIGI > 0 && urunToplami >= UCRETSIZ_KARGO_ESIGI;
+}
+
+/** Ucretsiz kargoya kalan tutar (esikte ve uzerinde 0). */
+export function kargoEsigineKalan(urunToplami: number): number {
+  return Math.max(0, yuvarla(UCRETSIZ_KARGO_ESIGI - urunToplami));
+}
+
+/** Ozet satirlarinda gosterilen kargo durumu. */
+export function kargoDurumuMetni(ucretsiz: boolean): string {
+  return ucretsiz ? 'Ücretsiz' : 'Karşı ödemeli';
 }
 
 /**
@@ -113,6 +135,7 @@ export function siparisToplami(kalemler: FiyatKalemi[], kampanyaIndirimiUygula =
     kdv,
     kdvHaric: yuvarla(urunToplami - kdv),
     kargo,
+    kargoUcretsiz: kargoUcretsizMi(urunToplami),
     toplam: yuvarla(urunToplami + kargo),
   };
 }
