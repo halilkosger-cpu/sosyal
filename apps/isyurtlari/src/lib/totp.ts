@@ -112,20 +112,39 @@ export function verifyTotpCode(token: string, secret: string, step = 30, window 
 }
 
 /**
- * 5 adet okunabilir tek kullanımlık kurtarma kodu üretir (örn: 9F2C-8A4E).
+ * 5 adet okunabilir tek kullanımlık kurtarma kodu üretir
+ * (örn: 9F2C-8A4E-1B7D-3C90-AA12, 80 bit).
+ *
+ * Eski kodlar 32 bitti ve düz SHA-256 ile saklanıyordu: veritabanı sızarsa
+ * saniyeler içinde kırılırdı. Yeni kodlar 80 bit ve sunucu anahtarıyla
+ * HMAC'lenir; veritabanı tek başına yetmez.
  */
 export function generateBackupCodes(count = 5): string[] {
   const codes: string[] = [];
   for (let i = 0; i < count; i++) {
-    const raw = randomBytes(4).toString('hex').toUpperCase();
-    codes.push(`${raw.substring(0, 4)}-${raw.substring(4, 8)}`);
+    const raw = randomBytes(10).toString('hex').toUpperCase();
+    codes.push(raw.match(/.{4}/g)!.join('-'));
   }
   return codes;
 }
 
+const YEDEK_KOD_OZET_ONEK = 'h2:';
+
+const yedekKodTemizle = (code: string) => code.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+
+/** Eski kayıtlar: 8 haneli kodun düz SHA-256 özeti. Yalnızca doğrulamada kabul edilir. */
+const eskiYedekKoduOzeti = (code: string) => createHash('sha256').update(yedekKodTemizle(code)).digest('hex');
+
 export function hashBackupCode(code: string): string {
-  const clean = code.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-  return createHash('sha256').update(clean).digest('hex');
+  const anahtar = createHash('sha256').update('admin-yedek-kod:' + jwtAnahtari()).digest();
+  return YEDEK_KOD_OZET_ONEK + createHmac('sha256', anahtar).update(yedekKodTemizle(code)).digest('hex');
+}
+
+/** Girilen kodun kayıtlı özetler arasındaki yerini döndürür (yoksa -1). Eski biçim de kabul edilir. */
+export function yedekKoduIndeksi(kayitliOzetler: string[], girilenKod: string): number {
+  const yeni = kayitliOzetler.indexOf(hashBackupCode(girilenKod));
+  if (yeni !== -1) return yeni;
+  return kayitliOzetler.indexOf(eskiYedekKoduOzeti(girilenKod));
 }
 
 // ─── VERİTABANI İŞLEMLERİ ──────────────────────────────────────────
@@ -292,8 +311,7 @@ export async function verifyAdminTotpOrBackup(
   }
 
   // 2. TOTP eşleşmediyse veya kod formatı kurtarma koduna benziyorsa Yedek Kurtarma Kodlarını kontrol et
-  const inputHash = hashBackupCode(cleanInput);
-  const codeIndex = record.backupCodes.indexOf(inputHash);
+  const codeIndex = yedekKoduIndeksi(record.backupCodes, cleanInput);
 
   if (codeIndex !== -1) {
     // Eşleşti! Bu tek kullanımlık kurtarma kodunu listeden sil
