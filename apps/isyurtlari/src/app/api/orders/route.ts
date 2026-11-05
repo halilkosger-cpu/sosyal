@@ -5,7 +5,7 @@ import { bankaBilgileri, bankaBilgisiTam } from '@/lib/bank';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
-import { siparisToplami, kargoUcretsizMi } from '@/lib/fiyat';
+import { siparisToplami, KARGO_UCRETI } from '@/lib/fiyat';
 import { indirimiKalemlereDagit, kuponuDogrula } from '@/lib/kupon';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
@@ -85,7 +85,7 @@ async function sendOrderEmail(
 
       <h3 style="margin-top: 20px;">Ödeme Bilgileri:</h3>
       <p><strong>Toplam Tutar:</strong> <span style="font-size: 18px; color: #FF6000;">₺${totalAmount.toFixed(2)}</span></p>
-      <p style="color: #666; font-size: 13px;">Fiyatlara KDV dahildir (₺${kdvTutari.toFixed(2)}). ${kargoUcretsizMi(totalAmount) ? 'Kargo bu siparişte ücretsizdir.' : 'Kargo karşı ödemelidir; ücreti teslimatta kargo firmasına ödenir.'}</p>
+      <p style="color: #666; font-size: 13px;">Fiyatlara KDV dahildir (₺${kdvTutari.toFixed(2)}). Kargo sabit ₺${KARGO_UCRETI.toFixed(2)} olup toplama dahildir.</p>
       <p><strong>Ödeme Yöntemi:</strong> Havale/EFT</p>
 
       <h3>Havale Detayları:</h3>
@@ -512,7 +512,8 @@ export async function POST(req: NextRequest) {
           kod: hediyeKodu,
           eposta: body.email,
           telefon: body.phone,
-          odenecekTutar: gercekToplam,
+          // Hediye eşiği kargo hariç ürün tutarına bakar (kargo 179 ₺ sabit, eşiğe sayılmaz).
+          odenecekTutar: tutar.urunToplami,
         });
       } catch (hediyeHatasi) {
         console.error('Hediye kodu değerlendirilemedi:', hediyeHatasi);

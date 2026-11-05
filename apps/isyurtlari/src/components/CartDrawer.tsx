@@ -7,8 +7,6 @@ import { LuX, LuShoppingBag, LuArrowRight, LuTrash2, LuPlus, LuMinus } from 'rea
 import Link from 'next/link';
 import Image from 'next/image';
 import { sepetiOku, sepetiYaz, SEPET_OLAYI, type SepetUrunu } from '../lib/cart';
-import { siparisToplami } from '../lib/fiyat';
-import KargoIlerlemeCubugu from './KargoIlerlemeCubugu';
 
 export interface CartDrawerProps {
   /** Ek Tailwind sınıfları */
@@ -116,12 +114,6 @@ export default function CartDrawer({
     return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   }, [items]);
 
-  // Ücretsiz kargo eşiği, sepet ve ödeme sayfasıyla aynı hesapla (kampanya indirimi dahil) bakılır.
-  const kargoIcinToplam = useMemo(
-    () => siparisToplami(items.map((item) => ({ tutar: item.price * item.quantity }))).urunToplami,
-    [items]
-  );
-
   // Animasyon varyantları
   const animationMode = shouldReduceMotion ? 'opacity' : 'slide';
 
@@ -192,12 +184,6 @@ export default function CartDrawer({
               </button>
             </div>
 
-            {/* Ücretsiz kargo ilerleme çubuğu */}
-            {items.length > 0 && (
-              <div className="px-6 pt-3 pb-1 bg-white">
-                <KargoIlerlemeCubugu urunToplami={kargoIcinToplam} kompakt />
-              </div>
-            )}
 
             {/* Sepet İçeriği */}
             {items.length === 0 ? (

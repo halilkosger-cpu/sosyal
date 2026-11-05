@@ -1,55 +1,32 @@
 import { describe, it, expect } from 'vitest';
-import {
-  kargoUcretsizMi,
-  kargoDurumuMetni,
-  kargoEsigineKalan,
-  siparisToplami,
-  UCRETSIZ_KARGO_ESIGI,
-} from './fiyat';
-
-describe('kargoUcretsizMi', () => {
-  it('eşik ve üzerinde ücretsiz, altında değil', () => {
-    expect(UCRETSIZ_KARGO_ESIGI).toBe(1500);
-    expect(kargoUcretsizMi(1499.99)).toBe(false);
-    expect(kargoUcretsizMi(1500)).toBe(true);
-    expect(kargoUcretsizMi(2400)).toBe(true);
-    expect(kargoUcretsizMi(0)).toBe(false);
-  });
-});
-
-describe('kargoEsigineKalan', () => {
-  it('eşiğe kalan tutarı verir, eşikte ve üstünde 0 döner', () => {
-    expect(kargoEsigineKalan(1000)).toBe(500);
-    expect(kargoEsigineKalan(1499.5)).toBe(0.5);
-    expect(kargoEsigineKalan(1500)).toBe(0);
-    expect(kargoEsigineKalan(3000)).toBe(0);
-  });
-});
-
-describe('kargoDurumuMetni', () => {
-  it('ücretsizse "Ücretsiz", değilse "Karşı ödemeli" yazar', () => {
-    expect(kargoDurumuMetni(true)).toBe('Ücretsiz');
-    expect(kargoDurumuMetni(false)).toBe('Karşı ödemeli');
-  });
-});
+import { siparisToplami, KARGO_UCRETI } from './fiyat';
 
 describe('siparisToplami kargo', () => {
-  it('eşik, indirim sonrası ödenecek tutara bakar (ham 1.600 ₺ %10 ile 1.440 ₺ olur)', () => {
-    const t = siparisToplami([{ tutar: 1600 }], true);
-    expect(t.urunToplami).toBe(1440);
-    expect(t.kargoUcretsiz).toBe(false);
+  it('kargo sabit 179 TL', () => {
+    expect(KARGO_UCRETI).toBe(179);
   });
 
-  it('indirim sonrası eşiği geçerse kargo ücretsiz işaretlenir; toplama kargo eklenmez', () => {
-    const t = siparisToplami([{ tutar: 2000 }], true);
-    expect(t.urunToplami).toBe(1800);
-    expect(t.kargoUcretsiz).toBe(true);
-    expect(t.kargo).toBe(0);
-    expect(t.toplam).toBe(1800);
+  it('kargoyu toplama ekler ve kargo satırında ayrıca döner', () => {
+    const t = siparisToplami([{ tutar: 100 }]);
+    expect(t.urunToplami).toBe(100);
+    expect(t.kargo).toBe(179);
+    expect(t.toplam).toBe(279);
   });
 
-  it('kampanya kapalıyken ham tutar eşiği belirler', () => {
-    expect(siparisToplami([{ tutar: 1500 }], false).kargoUcretsiz).toBe(true);
-    expect(siparisToplami([{ tutar: 1499 }], false).kargoUcretsiz).toBe(false);
+  it('tutar ne olursa olsun kargo 179 TL (ücretsiz eşik yok)', () => {
+    expect(siparisToplami([{ tutar: 5000 }]).kargo).toBe(179);
+    expect(siparisToplami([{ tutar: 5000 }]).toplam).toBe(5179);
+  });
+
+  it('boş sepette kargo alınmaz', () => {
+    expect(siparisToplami([]).kargo).toBe(0);
+    expect(siparisToplami([]).toplam).toBe(0);
+  });
+
+  it('KDV kalem kategorisine göre ürün toplamının içinden hesaplanır, toplama eklenmez', () => {
+    const t = siparisToplami([{ tutar: 110, kdvOrani: 10 }]);
+    expect(t.kdv).toBe(10);
+    expect(t.kdvHaric).toBe(100);
+    expect(t.toplam).toBe(289);
   });
 });

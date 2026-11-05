@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { LuClock, LuCheck, LuTruck, LuPackage, LuX } from 'react-icons/lu';
 import ExcelIndirDugmesi from '@/components/ExcelIndirDugmesi';
 import { KARGO_FIRMALARI } from '@/lib/kargo';
-import { kargoUcretsizMi } from '@/lib/fiyat';
 import { notHediyeIceriyor } from '@/lib/hediye';
 
 interface OrderItem { quantity: number; price: number; product?: { name: string }; }
@@ -229,14 +228,6 @@ export default function AdminOrdersPage() {
                         🎁 HEDİYE EKLENECEKTİR
                       </p>
                     )}
-                    {kargoUcretsizMi(order.totalAmount) && (
-                      <p
-                        className="inline-block mt-0.5 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 rounded"
-                        title="Sipariş tutarı ücretsiz kargo eşiğinde: müşteriye karşı ödemeli değil, gönderici ödemeli gönderin."
-                      >
-                        Ücretsiz kargo · gönderici ödemeli
-                      </p>
-                    )}
                     {(() => {
                       const cost = order.items.reduce((s: number, it: any) => {
                         const unitCost = it.purchasePrice > 0 ? it.purchasePrice : (it.product?.purchasePrice || 0);
@@ -382,7 +373,7 @@ export default function AdminOrdersPage() {
                                       <div class="section">
                                         <div class="label">KARGO VE ÖDEME BİLGİSİ</div>
                                         <div class="val" style="font-size: 13px;">
-                                          ${kacisHtml(firmaAd)} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kacisHtml(kargoAlanlari(order).takipNo)}` : '· (Karşı Ödemeli / Anlaşmalı)'}
+                                          ${kacisHtml(firmaAd)} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kacisHtml(kargoAlanlari(order).takipNo)}` : '· (Anlaşmalı)'}
                                         </div>
                                         <div style="font-size: 11px; color: #555; margin-top: 2px;">
                                           Ödeme: ${order.paymentMethod === 'TRANSFER' ? 'Banka Havalesi / EFT' : 'Kredi Kartı'} · Sipariş Tutarı: ₺${order.totalAmount.toFixed(2)}

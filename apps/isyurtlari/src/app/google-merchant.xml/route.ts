@@ -3,7 +3,6 @@ import { prisma } from '@isyurtlari/database';
 import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { urunGorseli, yerelGorselVar } from '@/lib/urun-gorsel';
-import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 import { markaBul, FEED_OZELLESTIRMELERI } from '@/lib/marka';
 
 export const dynamic = 'force-dynamic';
@@ -86,11 +85,7 @@ export async function GET() {
         const price = `${normalFiyat.toFixed(2)} TRY`;
 
         // sale_price bilerek yok: indirim sepette uygulaniyor, urun sayfasi tam fiyati gosteriyor.
-        // Google sayfa ile feed fiyati uyusmazsa urunu reddediyor; indirim Merchant Center Promosyonlar'dan tanitiliyor.
-        const customLabelXml =
-          KASIM_KAMPANYASI_AKTIF && KASIM_INDIRIM_ORANI > 0
-            ? `\n      <g:custom_label_0>Efsane Kasim %10 Indirim</g:custom_label_0>`
-            : '';
+        // Google sayfa ile feed fiyati uyusmazsa urunu reddediyor.
 
         const availability = p.quantity > 0 ? 'in_stock' : 'out_of_stock';
 
@@ -116,7 +111,7 @@ export async function GET() {
       <g:price>${price}</g:price>
       <g:brand>${brand}</g:brand>
       <g:google_product_category>${googleCat}</g:google_product_category>
-      <g:product_type>${categoryName}</g:product_type>${customLabelXml}
+      <g:product_type>${categoryName}</g:product_type>
       <g:identifier_exists>no</g:identifier_exists>
     </item>`;
       })

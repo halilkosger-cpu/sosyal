@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { jsonLdMetni } from '@/lib/json-ld';
 import { ViewTransitions } from 'next-view-transitions';
-import { KASIM_KAMPANYASI_AKTIF, KASIM_INDIRIM_ORANI } from '@/lib/fiyat';
 import HareketSaglayici from '@/components/HareketSaglayici';
 import { SITE_URL } from '@/lib/seo';
 import Link from 'next/link';
@@ -14,7 +13,6 @@ import {
   MobilKopru,
   PwaKayit,
   AltGezinme,
-  KampanyaModal,
   SepetToastBildirimi,
   HediyeDanismaniModal,
   MobilUygulamaBanneri,
@@ -183,18 +181,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             {/* ─── TOP BAR ─── */}
             <header className="sticky top-0 z-50 shadow-sm">
-          {/* Kampanya Duyuru Bandı */}
-          {KASIM_KAMPANYASI_AKTIF && (
-          <div className="bg-gradient-to-r from-[#BA4700] via-[#CC4E00] to-[#BA4700] text-white text-[11px] sm:text-xs py-1.5 px-3 text-center font-medium tracking-wide">
-            <span className="inline-flex items-center gap-1.5 justify-center sm:flex-wrap whitespace-nowrap">
-              <span>🔥</span>
-              {/* Mobilde tek satır; geniş ekranda tam metin */}
-              <span className="sm:hidden"><strong>Efsane Kasım:</strong> sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong></span>
-              <span className="hidden sm:inline"><strong>Büyük Açılış &amp; Efsane Kasım:</strong> Tüm ürünlerde sepette net <strong>%{KASIM_INDIRIM_ORANI} indirim</strong> anında uygulanır!</span>
-            </span>
-          </div>
-          )}
-
           {/* Main nav row - 2026 Eylul tasarimi: beyaz baslik */}
           <div className="bg-white border-b border-gray-100">
             <div className="max-w-screen-xl mx-auto px-4 py-2.5 flex items-center gap-3 md:gap-8">
@@ -350,7 +336,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           <HediyeKoduYakala />
           <CookieConsent />
-          <KampanyaModal />
           <Olcumler />
           <DahiliAnalitikTracker />
           {/* Sepet ve favorileri sunucuyla eslestirir; ciziyor bir sey yok. */}
