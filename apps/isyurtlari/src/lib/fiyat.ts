@@ -48,6 +48,35 @@ export interface SiparisTutari {
   toplam: number;
 }
 
+/**
+ * Urunun fatura / on muhasebede kullanilacak KDV orani.
+ *
+ * Tek kaynak kategori (gida %1, diger gruplar %20). Siparis fiyatlamasi da
+ * ayni orani kullandigi icin fatura ile checkout ayri oranlara dusmuyor.
+ * Urun bazli vatRate yalnizca kategorisi bilinmeyen urunler icin yedek.
+ */
+export function urunKdvOrani(
+  urun?: { vatRate?: number | null; category?: { kdvOrani?: number | null } | null } | null
+): number {
+  const kategoriOrani = urun?.category?.kdvOrani;
+  if (typeof kategoriOrani === 'number' && kategoriOrani > 0) return kategoriOrani;
+  const urunOrani = urun?.vatRate;
+  if (typeof urunOrani === 'number' && urunOrani > 0) return urunOrani;
+  return 20;
+}
+
+/**
+ * Fatura satirinda gosterilen KDV HARIC birim fiyat.
+ *
+ * Satirlarda birimFiyat KDV dahil saklaniyor; faturada birim fiyat KDV haric
+ * olmali. Satir toplami ve KDV tutarindan turetildigi icin her zaman toplamla
+ * tutarli (ornek: 420 TL, %1 -> 415,84 + 4,16 KDV).
+ */
+export function birimFiyatKdvHaric(satir: { satirToplam: number; kdvTutari: number; miktar: number }): number {
+  const adet = satir.miktar > 0 ? satir.miktar : 1;
+  return yuvarla((satir.satirToplam - satir.kdvTutari) / adet);
+}
+
 /** KDV dahil bir tutarin icindeki KDV. */
 export function icindekiKdv(kdvDahilTutar: number, oran?: number | null): number {
   const gecerliOran = typeof oran === 'number' && oran > 0 ? oran : VARSAYILAN_KDV_ORANI;

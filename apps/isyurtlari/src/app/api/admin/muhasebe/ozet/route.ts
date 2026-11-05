@@ -1,5 +1,6 @@
 import { prisma } from '@isyurtlari/database';
 import { adminGuard } from '@/lib/admin-auth';
+import { urunKdvOrani } from '@/lib/fiyat';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
                 id: true,
                 name: true,
                 vatRate: true,
+                category: { select: { kdvOrani: true } },
                 purchasePrice: true,
               },
             },
@@ -87,7 +89,7 @@ export async function GET(req: NextRequest) {
       toplamSatisBrut += order.totalAmount;
 
       order.items.forEach((item) => {
-        const vatRate = item.product?.vatRate ?? 20;
+        const vatRate = urunKdvOrani(item.product);
         const lineTotal = item.price * item.quantity;
         const lineMatrah = lineTotal / (1 + vatRate / 100);
         const lineKdv = lineTotal - lineMatrah;
