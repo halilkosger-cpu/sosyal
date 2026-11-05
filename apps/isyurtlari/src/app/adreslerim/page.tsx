@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import HesapSekmeleri from '@/components/HesapSekmeleri';
+import AdresFormu, { BOS_ADRES_FORMU, type AdresFormDegeri } from '@/components/AdresFormu';
 import { LuMapPin, LuPlus, LuInfo, LuPencil, LuTrash2, LuCheck } from 'react-icons/lu';
 import { useMusteri } from '@/lib/musteri-istemci';
+import { illeriGetir } from '@/lib/adres-alanlari';
 
 interface Adres {
   id: string;
@@ -15,21 +17,22 @@ interface Adres {
   district: string;
   neighborhood: string | null;
   addressLine: string;
+  sokak: string | null;
+  binaSite: string | null;
+  kat: string | null;
+  daireNo: string | null;
   postalCode: string | null;
   isDefaultShipping: boolean;
   isDefaultBilling: boolean;
 }
 
-const BOS_FORM = {
-  title: '',
-  fullName: '',
-  phone: '',
-  city: '',
-  district: '',
-  neighborhood: '',
-  addressLine: '',
-  postalCode: '',
-};
+/** "Ahmet Yılmaz Demir" -> { ad: "Ahmet Yılmaz", soyad: "Demir" } */
+function adiBol(adSoyad: string): { ad: string; soyad: string } {
+  const parcalar = adSoyad.trim().split(/\s+/).filter(Boolean);
+  if (parcalar.length <= 1) return { ad: parcalar[0] ?? '', soyad: '' };
+  const soyad = parcalar.pop() ?? '';
+  return { ad: parcalar.join(' '), soyad };
+}
 
 export default function AdreslerimSayfasi() {
   const { musteri, yukleniyor } = useMusteri();
@@ -38,7 +41,9 @@ export default function AdreslerimSayfasi() {
   const [hata, setHata] = useState('');
   const [formAcik, setFormAcik] = useState(false);
   const [duzenlenen, setDuzenlenen] = useState<string | null>(null);
-  const [form, setForm] = useState(BOS_FORM);
+  const [baslik, setBaslik] = useState('');
+  const [telefon, setTelefon] = useState('');
+  const [adresForm, setAdresForm] = useState<AdresFormDegeri>(BOS_ADRES_FORMU);
   const [gonderiliyor, setGonderiliyor] = useState(false);
 
   const yukle = useCallback(async () => {
@@ -66,30 +71,52 @@ export default function AdreslerimSayfasi() {
     yukle();
   }, [musteri, yukleniyor, yukle]);
 
-  const alan = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setForm((onceki) => ({ ...onceki, [e.target.name]: e.target.value }));
+  const formuKapat = () => {
+    setFormAcik(false);
+    setDuzenlenen(null);
+    setBaslik('');
+    setTelefon('');
+    setAdresForm(BOS_ADRES_FORMU);
+    setHata('');
+  };
 
   const formuAc = (adres?: Adres) => {
     setHata('');
-    if (adres) {
-      setDuzenlenen(adres.id);
-      setForm({
-        title: adres.title,
-        fullName: adres.fullName,
-        phone: adres.phone,
-        city: adres.city,
-        district: adres.district,
-        neighborhood: adres.neighborhood ?? '',
-        addressLine: adres.addressLine,
-        postalCode: adres.postalCode ?? '',
-      });
-    } else {
-      setDuzenlenen(null);
-      // Yeni adreste ad ve telefon hesaptan on dolduruluyor; musteri
-      // kendi adresini yazarken bunlari yeniden girmek zorunda kalmasin.
-      setForm({ ...BOS_FORM, fullName: musteri?.name ?? '', phone: musteri?.phone ?? '' });
-    }
     setFormAcik(true);
+
+    if (!adres) {
+      setDuzenlenen(null);
+      // Yeni adreste ad, soyad ve telefon hesaptan on dolduruluyor.
+      setBaslik('');
+      setTelefon(musteri?.phone ?? '');
+      setAdresForm({ ...BOS_ADRES_FORMU, ...adiBol(musteri?.name ?? '') });
+      return;
+    }
+
+    setDuzenlenen(adres.id);
+    setBaslik(adres.title);
+    setTelefon(adres.phone);
+    setAdresForm({
+      ...adiBol(adres.fullName),
+      ilKodu: '',
+      il: adres.city,
+      ilce: adres.district,
+      mahalle: adres.neighborhood ?? '',
+      // Eski kayitlarda parcalar yok; acik adres sokak alanina konur, musteri duzeltir.
+      sokak: adres.sokak ?? adres.addressLine,
+      binaSite: adres.binaSite ?? '',
+      kat: adres.kat ?? '',
+      daireNo: adres.daireNo ?? '',
+      postaKodu: adres.postalCode ?? '',
+    });
+
+    // Kayitli adreste il adi kayitli; ilce/mahalle listesi icin koda ihtiyac var.
+    illeriGetir()
+      .then((liste) => {
+        const kod = liste.find((i) => i.name === adres.city)?.code ?? '';
+        setAdresForm((onceki) => (onceki.il === adres.city ? { ...onceki, ilKodu: kod } : onceki));
+      })
+      .catch(() => setHata('İl listesi yüklenemedi. Sayfayı yenileyin.'));
   };
 
   const kaydet = async (olay: React.FormEvent) => {
@@ -97,13 +124,27 @@ export default function AdreslerimSayfasi() {
     setHata('');
     setGonderiliyor(true);
 
+    const govde = {
+      title: baslik,
+      phone: telefon,
+      fullName: `${adresForm.ad} ${adresForm.soyad}`.trim(),
+      city: adresForm.il,
+      district: adresForm.ilce,
+      neighborhood: adresForm.mahalle,
+      sokak: adresForm.sokak,
+      binaSite: adresForm.binaSite,
+      kat: adresForm.kat,
+      daireNo: adresForm.daireNo,
+      postalCode: adresForm.postaKodu,
+    };
+
     try {
       const yanit = await fetch(
         duzenlenen ? `/api/musteri/adresler/${duzenlenen}` : '/api/musteri/adresler',
         {
           method: duzenlenen ? 'PATCH' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
+          body: JSON.stringify(govde),
         }
       );
       const veri = await yanit.json();
@@ -113,9 +154,7 @@ export default function AdreslerimSayfasi() {
         return;
       }
 
-      setFormAcik(false);
-      setDuzenlenen(null);
-      setForm(BOS_FORM);
+      formuKapat();
       await yukle();
     } catch {
       setHata('Bağlantı hatası. Lütfen tekrar deneyin.');
@@ -215,50 +254,21 @@ export default function AdreslerimSayfasi() {
               {duzenlenen ? 'Adresi Düzenle' : 'Yeni Adres'}
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">Adres başlığı</label>
-                <input id="title" name="title" value={form.title} onChange={alan}
+                <label htmlFor="baslik" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Adres adı <span className="text-gray-400 font-normal">(ör. Ev, İş)</span>
+                </label>
+                <input id="baslik" type="text" required value={baslik} onChange={(e) => setBaslik(e.target.value)}
                   className="store-input" placeholder="Ev, İş..." />
               </div>
+
+              <AdresFormu value={adresForm} onChange={setAdresForm} idOneki="adres" />
+
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">Ad Soyad</label>
-                <input id="fullName" name="fullName" required value={form.fullName} onChange={alan}
-                  className="store-input" placeholder="Teslim alacak kişi" />
-              </div>
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">Cep telefonu</label>
-                <input id="phone" name="phone" type="tel" required value={form.phone} onChange={alan}
+                <label htmlFor="telefon" className="block text-sm font-medium text-gray-700 mb-1.5">Cep telefonu</label>
+                <input id="telefon" type="tel" required value={telefon} onChange={(e) => setTelefon(e.target.value)}
                   className="store-input" placeholder="0532 123 45 67" />
-              </div>
-              <div>
-                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-2">
-                  Posta kodu <span className="text-gray-400 font-normal">(isteğe bağlı)</span>
-                </label>
-                <input id="postalCode" name="postalCode" value={form.postalCode} onChange={alan}
-                  className="store-input" placeholder="34000" inputMode="numeric" />
-              </div>
-              <div>
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">İl</label>
-                <input id="city" name="city" required value={form.city} onChange={alan}
-                  className="store-input" placeholder="İstanbul" />
-              </div>
-              <div>
-                <label htmlFor="district" className="block text-sm font-medium text-gray-700 mb-2">İlçe</label>
-                <input id="district" name="district" required value={form.district} onChange={alan}
-                  className="store-input" placeholder="Kadıköy" />
-              </div>
-              <div className="md:col-span-2">
-                <label htmlFor="neighborhood" className="block text-sm font-medium text-gray-700 mb-2">
-                  Mahalle <span className="text-gray-400 font-normal">(isteğe bağlı)</span>
-                </label>
-                <input id="neighborhood" name="neighborhood" value={form.neighborhood} onChange={alan}
-                  className="store-input" placeholder="Caferağa Mahallesi" />
-              </div>
-              <div className="md:col-span-2">
-                <label htmlFor="addressLine" className="block text-sm font-medium text-gray-700 mb-2">Açık adres</label>
-                <textarea id="addressLine" name="addressLine" required rows={3} value={form.addressLine} onChange={alan}
-                  className="store-input" placeholder="Sokak, bina no, daire no" />
               </div>
             </div>
 
@@ -267,8 +277,7 @@ export default function AdreslerimSayfasi() {
                 className="bg-[#CC4E00] hover:bg-[#A63F00] disabled:bg-orange-300 text-white px-6 py-2.5 rounded-lg font-semibold transition">
                 {gonderiliyor ? 'Kaydediliyor...' : duzenlenen ? 'Güncelle' : 'Adresi Kaydet'}
               </button>
-              <button type="button"
-                onClick={() => { setFormAcik(false); setDuzenlenen(null); setForm(BOS_FORM); setHata(''); }}
+              <button type="button" onClick={formuKapat}
                 className="border border-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition">
                 Vazgeç
               </button>
@@ -314,8 +323,8 @@ export default function AdreslerimSayfasi() {
                   <p className="font-medium text-gray-900">{adres.fullName}</p>
                   <p className="text-gray-600">{adres.phone}</p>
                   <p className="leading-relaxed">
+                    {adres.neighborhood ? `${adres.neighborhood}, ` : ''}
                     {adres.addressLine}
-                    {adres.neighborhood ? `, ${adres.neighborhood}` : ''}
                   </p>
                   <p className="text-gray-600">
                     {adres.district} / {adres.city}

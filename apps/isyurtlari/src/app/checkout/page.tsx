@@ -13,6 +13,7 @@ import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
 import { HEDIYE_EN_AZ_SIPARIS_TUTARI, hediyeKodunuNormallestir } from '@/lib/hediye';
 import { HEDIYE_KODU_ANAHTARI } from '@/components/HediyeKoduYakala';
 import WorkshopDeliveryCommitment from '@/components/WorkshopDeliveryCommitment';
+import AdresFormu, { BOS_ADRES_FORMU, adresFormunuMetne, type AdresFormDegeri } from '@/components/AdresFormu';
 
 interface Campaign {
   id: string;
@@ -81,7 +82,7 @@ export default function CheckoutPage() {
   /** Arkadaşın hediye kodu (HD-XXXXX): bağlantıdan yakalanır ya da elle girilir. */
   const [hediyeKoduGirdisi, setHediyeKoduGirdisi] = useState('');
   const [error, setError] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('TRANSFER');
+  const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'TRANSFER'>('CREDIT_CARD');
   const [ibanKopyalandi, setIbanKopyalandi] = useState(false);
   const [qrAcik, setQrAcik] = useState(false);
   const [qrModu, setQrModu] = useState<'fast' | 'iban'>('iban');
@@ -93,14 +94,15 @@ export default function CheckoutPage() {
   };
   const [ulkeKodu, setUlkeKodu] = useState('+90');
   const [telefonNo, setTelefonNo] = useState('');
+  // Yeni teslimat adresi (kayitli adres secilmediginde). Ad/soyad burada alici bilgisidir.
+  const [yeniAdres, setYeniAdres] = useState<AdresFormDegeri>(BOS_ADRES_FORMU);
+  const [adresiKaydet, setAdresiKaydet] = useState(false);
+  const [adresAdi, setAdresAdi] = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: '',
-    ilce: '',
-    il: '',
-    postaKodu: '',
     faturaTuru: 'bireysel' as 'bireysel' | 'kurumsal',
     tcKimlikNo: '',
     sirketUnvani: '',
@@ -323,9 +325,16 @@ export default function CheckoutPage() {
         return;
       }
     }
-    if (!kayitliAdresSecili && (!formData.address.trim() || !formData.ilce.trim() || !formData.il.trim())) {
-      setError('Adres, ilçe ve il alanlarını doldurun ya da kayıtlı adreslerinizden birini seçin');
-      return;
+    if (!kayitliAdresSecili) {
+      const a = yeniAdres;
+      if (!a.ad.trim() || !a.soyad.trim() || !a.ilKodu || !a.ilce || !a.mahalle || !a.sokak.trim() || !a.daireNo.trim()) {
+        setError('Teslimat adresindeki zorunlu alanları doldurun ya da kayıtlı adreslerinizden birini seçin');
+        return;
+      }
+      if (musteri && adresiKaydet && !adresAdi.trim()) {
+        setError('Adresi kaydetmek için bir adres adı yazın (örn. Ev, İş)');
+        return;
+      }
     }
 
     // Fatura & Yasal Kimlik Doğrulaması (Kargo ve fatura için zorunlu)
@@ -354,6 +363,33 @@ export default function CheckoutPage() {
     setSubmitting(true);
 
     try {
+      // Musteri "bu adresi kaydet" dediyse once adres defterine yaz; hata varsa siparis olusmaz.
+      if (!kayitliAdresSecili && musteri && adresiKaydet) {
+        const kayit = await fetch('/api/musteri/adresler', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: adresAdi.trim(),
+            fullName: `${yeniAdres.ad.trim()} ${yeniAdres.soyad.trim()}`,
+            phone: tamTelefon,
+            city: yeniAdres.il,
+            district: yeniAdres.ilce,
+            neighborhood: yeniAdres.mahalle,
+            sokak: yeniAdres.sokak.trim(),
+            binaSite: yeniAdres.binaSite.trim(),
+            kat: yeniAdres.kat.trim(),
+            daireNo: yeniAdres.daireNo.trim(),
+            postalCode: yeniAdres.postaKodu.trim() || null,
+          }),
+        });
+        if (!kayit.ok) {
+          const hataVerisi = await kayit.json().catch(() => ({}));
+          setError(hataVerisi.error || 'Adres kaydedilemedi');
+          setSubmitting(false);
+          return;
+        }
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -370,13 +406,7 @@ export default function CheckoutPage() {
           ...(kayitliAdresSecili
             ? { addressId: seciliAdres }
             : {
-                shippingAddress: [
-                  formData.address.trim(),
-                  `${formData.ilce.trim()} / ${formData.il.trim()}`,
-                  formData.postaKodu.trim(),
-                ]
-                  .filter(Boolean)
-                  .join(', '),
+                shippingAddress: `${yeniAdres.ad.trim()} ${yeniAdres.soyad.trim()}, ${adresFormunuMetne(yeniAdres)}`,
               }),
           items: cart.map((item) => ({
             id: item.id,
@@ -580,27 +610,21 @@ export default function CheckoutPage() {
               )}
 
               {seciliAdres === 'yeni' && (
-                <div className="mt-5">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1.5">Adres</label>
-                  <textarea id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleInputChange} rows={2} className="store-input" placeholder="Mahalle, sokak, bina no, daire no" required />
-                  <div className="grid grid-cols-2 gap-3 mt-3">
-                    <div>
-                      <label htmlFor="ilce" className="block text-sm font-medium text-gray-700 mb-1.5">İlçe</label>
-                      <input id="ilce" type="text" name="ilce" autoComplete="address-level2" value={formData.ilce} onChange={handleInputChange} className="store-input" required />
+                <div className="mt-5 space-y-4">
+                  <AdresFormu value={yeniAdres} onChange={setYeniAdres} idOneki="odeme" />
+                  {musteri && (
+                    <div className="rounded-lg border border-gray-200 p-3.5 space-y-3">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                        <input type="checkbox" checked={adresiKaydet} onChange={(e) => setAdresiKaydet(e.target.checked)} className="w-4 h-4 accent-[#CC4E00]" />
+                        Bu adresi adres defterime kaydet
+                      </label>
+                      {adresiKaydet && (
+                        <div>
+                          <label htmlFor="adres-adi" className="block text-sm font-medium text-gray-700 mb-1.5">Adres adı</label>
+                          <input id="adres-adi" type="text" value={adresAdi} onChange={(e) => setAdresAdi(e.target.value)} className="store-input" placeholder="Örn: Ev, İş, Annemler" maxLength={40} />
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <label htmlFor="il" className="block text-sm font-medium text-gray-700 mb-1.5">İl</label>
-                      <input id="il" type="text" name="il" autoComplete="address-level1" value={formData.il} onChange={handleInputChange} className="store-input" required />
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <label htmlFor="postaKodu" className="block text-sm font-medium text-gray-700 mb-1.5">Posta kodu <span className="text-gray-400 font-normal">(isteğe bağlı)</span></label>
-                    <input id="postaKodu" type="text" name="postaKodu" inputMode="numeric" autoComplete="postal-code" maxLength={5} value={formData.postaKodu} onChange={handleInputChange} className="store-input" />
-                  </div>
-                  {musteri && adresler.length === 0 && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Bu adresi <Link href="/adreslerim" className="text-[#BA4700] hover:text-[#8F3700] font-medium underline">adres defterinize</Link> kaydederseniz sonraki siparişlerinizde baştan yazmanız gerekmez.
-                    </p>
                   )}
                 </div>
               )}
@@ -745,6 +769,24 @@ export default function CheckoutPage() {
             <section className={kutu}>
               <h2 className={baslik}>{adim(4)} Ödeme & Sipariş Yöntemi</h2>
               <div className="space-y-3 mt-5">
+                <label className={secenek(paymentMethod === 'CREDIT_CARD')}>
+                  <input type="radio" name="paymentMethod" value="CREDIT_CARD" checked={paymentMethod === 'CREDIT_CARD'} onChange={() => setPaymentMethod('CREDIT_CARD')} className="mt-1 w-4 h-4 accent-[#CC4E00] shrink-0" />
+                  <span className="flex-1 min-w-0">
+                    <span className="flex items-center justify-between gap-2 font-bold text-gray-900 flex-wrap">
+                      <span className="flex items-center gap-2">
+                        <LuCreditCard size={17} className="text-[#BA4700] shrink-0" /> Kredi / Banka Kartı ile Ödeme
+                      </span>
+                      <span className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded border border-gray-200">
+                        <Image src="/visa.png" alt="Visa" width={28} height={16} className="h-3 w-auto object-contain" />
+                        <Image src="/mastercard.png" alt="MasterCard" width={24} height={16} className="h-3.5 w-auto object-contain" />
+                        <Image src="/iyzico.png" alt="iyzico" width={40} height={16} className="h-3 w-auto object-contain" />
+                      </span>
+                    </span>
+                    <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
+                      Kart bilgileriniz iyzico'nun güvenli ödeme sayfasında girilir; sitemizde saklanmaz.
+                    </span>
+                  </span>
+                </label>
                 <label className={secenek(paymentMethod === 'TRANSFER')}>
                   <input type="radio" name="paymentMethod" value="TRANSFER" checked={paymentMethod === 'TRANSFER'} onChange={() => setPaymentMethod('TRANSFER')} className="mt-1 w-4 h-4 accent-[#CC4E00] shrink-0" />
                   <span className="flex-1 min-w-0">
@@ -892,24 +934,6 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     )}
-                  </span>
-                </label>
-                <label className={secenek(paymentMethod === 'CREDIT_CARD')}>
-                  <input type="radio" name="paymentMethod" value="CREDIT_CARD" checked={paymentMethod === 'CREDIT_CARD'} onChange={() => setPaymentMethod('CREDIT_CARD')} className="mt-1 w-4 h-4 accent-[#CC4E00] shrink-0" />
-                  <span className="flex-1 min-w-0">
-                    <span className="flex items-center justify-between gap-2 font-bold text-gray-900 flex-wrap">
-                      <span className="flex items-center gap-2">
-                        <LuCreditCard size={17} className="text-[#BA4700] shrink-0" /> Kredi / Banka Kartı ile Ödeme
-                      </span>
-                      <span className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded border border-gray-200">
-                        <Image src="/visa.png" alt="Visa" width={28} height={16} className="h-3 w-auto object-contain" />
-                        <Image src="/mastercard.png" alt="MasterCard" width={24} height={16} className="h-3.5 w-auto object-contain" />
-                        <Image src="/iyzico.png" alt="iyzico" width={40} height={16} className="h-3 w-auto object-contain" />
-                      </span>
-                    </span>
-                    <span className="block text-xs text-gray-600 mt-1 leading-relaxed">
-                      Kart bilgileriniz iyzico'nun güvenli ödeme sayfasında girilir; sitemizde saklanmaz.
-                    </span>
                   </span>
                 </label>
               </div>

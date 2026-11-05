@@ -258,6 +258,9 @@ export default function AdminOrdersPage() {
                             <div key={i} className="flex items-center justify-between text-sm py-1 border-b border-gray-50">
                               <div>
                                 <span className="text-gray-700 font-medium">{item.product?.name || 'Bilinmeyen Ürün'} <span className="text-gray-400">x{item.quantity}</span></span>
+                                <span className="block text-[11px] text-gray-400 font-mono break-all">
+                                  Kalem No: {item.id}{item.product?.slug ? ` · iyzico kodu (yeni siparişler): ${item.product.slug}` : ''}
+                                </span>
                                 {unitCost > 0 && (
                                   <span className="block text-[11px] text-gray-400">
                                     Birim Alış: ₺{unitCost.toFixed(2)} • Brüt Kâr: <strong className={lineProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}>₺{lineProfit.toFixed(2)}</strong>
