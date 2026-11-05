@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import type { NextRequest } from 'next/server';
 import { SITE_URL } from '@/lib/seo';
-import { UCRETSIZ_KARGO_ESIGI } from '@/lib/fiyat';
+import { KARGO_UCRETI } from '@/lib/fiyat';
 
 /**
  * Musteri hesabi e-postalari.
@@ -206,8 +206,7 @@ export async function sepetHatirlatmaEpostasiGonder(
     </p>
     <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0 0 8px;">
       Stoklar sınırlıdır; ürünlerin sepetinizde kalması ayrılmış olduğu anlamına gelmez.
-      Gönderiler karşı ödemelidir, kargo ücreti teslimat sırasında kargo firmasına ödenir;
-      ödenecek tutarı ${UCRETSIZ_KARGO_ESIGI.toLocaleString('tr-TR')} TL ve üzeri olan siparişlerde kargo ücretsizdir.
+      Kargo ücreti sabit ₺${KARGO_UCRETI.toFixed(2)} olup sipariş toplamına dahildir.
     </p>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
     <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:0;">

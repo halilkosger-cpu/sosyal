@@ -9,7 +9,6 @@ export const SenkronKopru = dynamic(() => import('@/components/SenkronKopru'), {
 export const MobilKopru = dynamic(() => import('@/components/MobilKopru'), { ssr: false });
 export const PwaKayit = dynamic(() => import('@/components/PwaKayit'), { ssr: false });
 export const AltGezinme = dynamic(() => import('@/components/AltGezinme'), { ssr: false });
-export const KampanyaModal = dynamic(() => import('@/components/KampanyaModal'), { ssr: false });
 export const SepetToastBildirimi = dynamic(() => import('@/components/SepetToastBildirimi'), { ssr: false });
 export const HediyeDanismaniModal = dynamic(() => import('@/components/HediyeDanismaniModal'), { ssr: false });
 export const MobilUygulamaBanneri = dynamic(() => import('@/components/MobilUygulamaBanneri'), { ssr: false });

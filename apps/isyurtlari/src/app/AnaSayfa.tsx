@@ -8,7 +8,6 @@ import { urunYedegi } from './urun-yedegi';
 import { content } from '@/config/content';
 import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
-import KampanyaHeroBanner from '@/components/KampanyaHeroBanner';
 import AnaSayfaVitrini from '@/components/AnaSayfaVitrini';
 import AtolyeHikayesi from '@/components/AtolyeHikayesi';
 
@@ -251,9 +250,6 @@ export default function AnaSayfa({
           </div>
       </section>
 
-      {/* ─── BÜYÜK AÇILIŞ & EFSANE KASIM VİTRİN BANNERI ─── */}
-      <KampanyaHeroBanner />
-
       {/* ─── GÜNÜN FIRSATI & CANLI GERİ SAYIM SAYACI ─── */}
       {products.length > 0 && <GununFirsati products={products} />}
 
@@ -308,9 +304,8 @@ export default function AnaSayfa({
               değiştirildiği anda sitede yayına girer; yani karşınızdaki{' '}
               <strong className="font-semibold text-gray-800">güncel fiyat listesi</strong>, o
               anki geçerli fiyatlardır. Fiyatı henüz belirlenmemiş ürünlerde tutar yerine &quot;Fiyat
-              belirleniyor&quot; ifadesi görürsünüz ve bu ürünler sepete eklenemez. Gönderiler karşı
-              ödemeli yapılır: kargo ücreti sipariş toplamına dahil değildir, teslimat sırasında
-              kargo firmasına ödenir.
+              belirleniyor&quot; ifadesi görürsünüz ve bu ürünler sepete eklenemez. Kargo ücreti
+              sabittir (179 ₺) ve sipariş toplamına dahildir.
             </p>
             <p>
               Aradığınız ürün o an stokta değilse ürün kartındaki &quot;Ön Talep&quot; bağlantısını

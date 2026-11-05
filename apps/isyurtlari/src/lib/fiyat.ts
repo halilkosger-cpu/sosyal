@@ -7,77 +7,43 @@
  * fiyattir. KDV bu tutarin USTUNE eklenmez; ICINDEN hesaplanip yalnizca
  * kirilim olarak gosterilir ve siparise yazilir.
  *
- * Onceden boyle degildi: bu dosya tum urunlere odeme adiminda sabit %10
- * ekliyordu. Yani kartta 100 TL goren musteri odeme sayfasinda 110 TL ile
- * karsilasiyordu. Bu hem sitenin kendi metinleriyle celisiyordu (ana
- * sayfadaki aciklama ve sikca sorulan sorular "fiyatlar KDV dahildir"
- * diyor, urun sayfasi da oyle), hem de tuketiciye gosterilen fiyatin KDV
- * dahil olmasi gerektigi kuralina aykiriydi. Artik gosterilen tutar ile
- * tahsil edilen tutar ayni.
- *
  * KDV orani kategoride tutuluyor (ProductCategory.kdvOrani). Oran girilmemis
- * kategoriler icin VARSAYILAN_KDV_ORANI kullaniliyor. Oranlarin ürün grubuna
- * gore dogru girilmesi mali musavir teyidi isteyen bir konudur; kod tek bir
- * oran varsaymiyor, kategoriden okuyor.
+ * kategoriler icin VARSAYILAN_KDV_ORANI kullaniliyor.
  *
  * ─── KARGO ─────────────────────────────────────────────────────────────
  *
- * Gonderiler karsi odemeli: kargo bedeli siparis tutarina KATILMIYOR,
- * teslimatta dogrudan kargo firmasina odeniyor. Bu yuzden kargo hesabi
- * her zaman 0 donuyor.
+ * Kargo sabit ve tek tutar: KARGO_UCRETI (179 TL). Siparis toplamina eklenir
+ * ve odeme adiminda "Kargo" satirinda gosterilir. Ucretsiz kargo esigi yoktur.
  *
- * Ucretsiz kargo esigi: odenecek (kampanya indirimi dusulmus) urun toplami
- * UCRETSIZ_KARGO_ESIGI ve uzeriyse kargoyu isletme karsilar, musteri teslimatta
- * kargo firmasina bir sey odemez. Bu durum `kargoUcretsizMi` ile belirlenir;
- * siparis kaydinda ayri bir alan yok, toplamdan turetilir (toplam = urun
- * toplami, cunku kargo eklenmiyor). Sevkiyat tarafi gonderici odemeli
- * gondermelidir; admin siparis ekraninda bu siparisler isaretlenir.
+ * ─── KASIM INDIRIMI ────────────────────────────────────────────────────
+ *
+ * Kaldirildi. Sepette ek yuzde indirim uygulanmaz.
  */
 
 /** Kategoride oran tanimli degilse kullanilan KDV orani (yuzde). */
 export const VARSAYILAN_KDV_ORANI = 10;
 
-/** Kargo karsi odemeli mi? true iken kargo bedeli siparise eklenmez. */
-export const KARGO_KARSI_ODEMELI = true;
-
-/** Karsi odemeli degilken uygulanacak sabit kargo bedeli (TL). */
-export const KARGO_UCRETI = 0;
-
-/** Bu tutar ve uzeri siparislerde kargo ucretsiz (1500 TL). */
-export const UCRETSIZ_KARGO_ESIGI = 1500;
-
-/**
- * Büyük Açılış & Efsane Kasım Kampanyası:
- * Tüm ürünlerde sepette net %10 otomatik indirim.
- */
-export const KASIM_KAMPANYASI_BITIS = new Date('2026-12-01T00:00:00+03:00');
-export const KASIM_KAMPANYASI_AKTIF = Date.now() < KASIM_KAMPANYASI_BITIS.getTime();
-export const KASIM_INDIRIM_ORANI = 10; // %10
+/** Sabit kargo bedeli (TL). Siparis toplamina eklenir. */
+export const KARGO_UCRETI = 179;
 
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
 
 export interface FiyatKalemi {
-  /** KDV dahil satir tutari: birim fiyat x adet, kampanya indirimi uygulanmis. */
+  /** KDV dahil satir tutari: birim fiyat x adet, varsa urun kampanyasi uygulanmis. */
   tutar: number;
   /** Kategorinin KDV orani (yuzde). Verilmezse varsayilan kullanilir. */
   kdvOrani?: number | null;
 }
 
 export interface SiparisTutari {
-  /** İndirimsiz ham ürün toplamı. */
-  hamUrunToplami: number;
-  /** Kasım kampanyası indirim tutarı (%10). */
-  kasimIndirimi: number;
-  /** KDV dahil indirimli urun toplami. */
+  /** KDV dahil urun toplami. */
   urunToplami: number;
   /** urunToplami ICINDEKI KDV. Toplama ayrica eklenmez. */
   kdv: number;
   /** urunToplami - kdv. Fatura kirilimi icin. */
   kdvHaric: number;
-  /** Siparise eklenen kargo bedeli. Karsi odemeli iken 0. */
+  /** Siparise eklenen sabit kargo bedeli. */
   kargo: number;
-  /** Urun toplami ucretsiz kargo esigine ulasti: musteri teslimatta kargo ucreti odemez. */
-  kargoUcretsiz: boolean;
   /** Musteriden tahsil edilecek tutar: urunToplami + kargo. */
   toplam: number;
 }
@@ -89,53 +55,23 @@ export function icindekiKdv(kdvDahilTutar: number, oran?: number | null): number
   return yuvarla(kdvDahilTutar - kdvDahilTutar / (1 + gecerliOran / 100));
 }
 
-/** Urun toplamina gore kargo bedeli. */
-export function kargoBedeli(urunToplami: number): number {
-  if (KARGO_KARSI_ODEMELI) return 0;
-  if (kargoUcretsizMi(urunToplami)) return 0;
-  return KARGO_UCRETI;
-}
-
-/** Odenecek urun toplami ucretsiz kargo esigine ulasti mi? */
-export function kargoUcretsizMi(urunToplami: number): boolean {
-  return UCRETSIZ_KARGO_ESIGI > 0 && urunToplami >= UCRETSIZ_KARGO_ESIGI;
-}
-
-/** Ucretsiz kargoya kalan tutar (esikte ve uzerinde 0). */
-export function kargoEsigineKalan(urunToplami: number): number {
-  return Math.max(0, yuvarla(UCRETSIZ_KARGO_ESIGI - urunToplami));
-}
-
-/** Ozet satirlarinda gosterilen kargo durumu. */
-export function kargoDurumuMetni(ucretsiz: boolean): string {
-  return ucretsiz ? 'Ücretsiz' : 'Karşı ödemeli';
-}
-
 /**
  * Siparis tutarini kalemlerden uretir.
  *
  * Ayni hesap hem sepet ve odeme sayfasinda hem siparis ucunda kullaniliyor;
  * boylece musteriye gosterilen tutar ile siparise yazilan tutar tek kaynaktan
- * geliyor. KDV her kalem icin kendi kategori oraniyla hesaplanip toplaniyor:
- * kategorilere farkli oranlar girildiginde de dogru sonuc verir.
+ * geliyor. KDV her kalem icin kendi kategori oraniyla hesaplanip toplaniyor.
  */
-export function siparisToplami(kalemler: FiyatKalemi[], kampanyaIndirimiUygula = KASIM_KAMPANYASI_AKTIF): SiparisTutari {
-  const hamUrunToplami = yuvarla(kalemler.reduce((t, k) => t + k.tutar, 0));
-  const kasimIndirimi = kampanyaIndirimiUygula ? yuvarla(hamUrunToplami * (KASIM_INDIRIM_ORANI / 100)) : 0;
-  const urunToplami = yuvarla(hamUrunToplami - kasimIndirimi);
-
-  const carpan = hamUrunToplami > 0 ? urunToplami / hamUrunToplami : 1;
-  const kdv = yuvarla(kalemler.reduce((t, k) => t + icindekiKdv(k.tutar * carpan, k.kdvOrani), 0));
-  const kargo = kargoBedeli(urunToplami);
+export function siparisToplami(kalemler: FiyatKalemi[]): SiparisTutari {
+  const urunToplami = yuvarla(kalemler.reduce((t, k) => t + k.tutar, 0));
+  const kdv = yuvarla(kalemler.reduce((t, k) => t + icindekiKdv(k.tutar, k.kdvOrani), 0));
+  const kargo = urunToplami > 0 ? KARGO_UCRETI : 0;
 
   return {
-    hamUrunToplami,
-    kasimIndirimi,
     urunToplami,
     kdv,
     kdvHaric: yuvarla(urunToplami - kdv),
     kargo,
-    kargoUcretsiz: kargoUcretsizMi(urunToplami),
     toplam: yuvarla(urunToplami + kargo),
   };
 }

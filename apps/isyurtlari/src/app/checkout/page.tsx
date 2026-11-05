@@ -8,7 +8,7 @@ import { LuInfo, LuMapPin, LuPlus, LuArrowLeft, LuLandmark, LuCreditCard, LuLock
 import { generateQrSvg, generateTrKarekodFastPayload } from '@/lib/qr-generator';
 import { odemeyeBaslandi } from '@/lib/analiz';
 import { useMusteri } from '@/lib/musteri-istemci';
-import { siparisToplami, KARGO_KARSI_ODEMELI, kargoDurumuMetni } from '@/lib/fiyat';
+import { siparisToplami } from '@/lib/fiyat';
 import { indirimiKalemlereDagit } from '@/lib/kupon-hesap';
 import { HEDIYE_EN_AZ_SIPARIS_TUTARI, hediyeKodunuNormallestir } from '@/lib/hediye';
 import { HEDIYE_KODU_ANAHTARI } from '@/components/HediyeKoduYakala';
@@ -212,17 +212,14 @@ export default function CheckoutPage() {
   // musteriye gosterilen tutar ile siparise yazilan tutar ayrismasin.
   // Fiyatlar KDV dahil: kdv toplama eklenmiyor, icinden hesaplaniyor.
   const {
-    hamUrunToplami,
-    kasimIndirimi,
     urunToplami: subtotal,
-    kargo: shipping,
   } = siparisToplami(
     cart.map((item) => ({
       tutar: getItemPrice(item) * item.quantity,
       kdvOrani: item.kdvOrani,
     }))
   );
-  const totalDiscount = originalSubtotal - (hamUrunToplami || subtotal);
+  const totalDiscount = originalSubtotal - subtotal;
 
   /**
    * Kupon.
@@ -255,7 +252,8 @@ export default function CheckoutPage() {
   // Hediye kodu: geçerli biçimde yazılmışsa siparişle gönderilir; uygunluğu (ilk sipariş,
   // kişi başı bir kez, tutar) sunucu belirler. Burada yalnızca tutar eşiği bilgilendirilir.
   const hediyeKodu = hediyeKodunuNormallestir(hediyeKoduGirdisi);
-  const hediyeIcinKalan = Math.max(0, Math.round((HEDIYE_EN_AZ_SIPARIS_TUTARI - kuponluToplam) * 100) / 100);
+  // Hediye eşiği kargo hariç ürün tutarına bakar.
+  const hediyeIcinKalan = Math.max(0, Math.round((HEDIYE_EN_AZ_SIPARIS_TUTARI - kuponluTutar.urunToplami) * 100) / 100);
   const kuponluKdv = kuponluTutar.kdv;
 
   const kuponuUygula = async (e: React.FormEvent) => {
@@ -960,21 +958,13 @@ export default function CheckoutPage() {
               {totalDiscount > 0 && (
                 <div className="flex justify-between text-green-700 font-semibold"><dt>Ürün İndirimi</dt><dd>-₺{totalDiscount.toFixed(2)}</dd></div>
               )}
-              {kasimIndirimi > 0 && (
-                <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200/60">
-                  <dt className="flex items-center gap-1.5">
-                    <span>🔥</span> Açılış &amp; Kasım İndirimi (%10)
-                  </dt>
-                  <dd>-₺{kasimIndirimi.toFixed(2)}</dd>
-                </div>
-              )}
               {kuponIndirimi > 0 && (
                 <div className="flex justify-between text-green-700 font-semibold"><dt>Kupon ({uygulananKupon})</dt><dd>-₺{kuponIndirimi.toFixed(2)}</dd></div>
               )}
-              {/* Kargo tutara dahil degil: gonderiler karsi odemeli. */}
+              {/* Kargo sabit tutar, toplama dahil. */}
               <div className="flex justify-between text-gray-600">
                 <dt>Kargo</dt>
-                <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? kargoDurumuMetni(kuponluTutar.kargoUcretsiz) : shipping > 0 ? `₺${shipping.toFixed(2)}` : 'Ücretsiz'}</dd>
+                <dd className="font-medium text-gray-700">₺{kuponluTutar.kargo.toFixed(2)}</dd>
               </div>
             </dl>
 
@@ -1028,9 +1018,7 @@ export default function CheckoutPage() {
             </div>
             {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor. */}
             <p className="text-xs leading-relaxed text-gray-500 mt-2">
-              Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}).
-              {KARGO_KARSI_ODEMELI && !kuponluTutar.kargoUcretsiz ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
-              {KARGO_KARSI_ODEMELI && kuponluTutar.kargoUcretsiz ? ' Kargo bu siparişte ücretsizdir; teslimatta kargo ücreti ödemezsiniz.' : ''}
+              Fiyatlara KDV dahildir (₺{kuponluKdv.toFixed(2)}). Kargo sabit ₺{kuponluTutar.kargo.toFixed(2)}&apos;dir ve toplama dahildir.
             </p>
             <ul className="mt-4 space-y-2 text-xs text-gray-600">
               <li className="flex items-center gap-2"><LuRotateCcw size={14} className="text-[#E8620C] shrink-0" /> 14 gün cayma hakkı</li>

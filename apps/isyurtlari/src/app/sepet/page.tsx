@@ -7,8 +7,7 @@ import { LuArrowLeft, LuArrowRight, LuMinus, LuPlus, LuRotateCcw, LuShieldCheck,
 
 const tl = (n: number) => `₺${n.toFixed(2).replace('.', ',')}`;
 import { sepettenCikarildi } from '@/lib/analiz';
-import { siparisToplami, KARGO_KARSI_ODEMELI, kargoDurumuMetni } from '@/lib/fiyat';
-import KargoIlerlemeCubugu from '@/components/KargoIlerlemeCubugu';
+import { siparisToplami, KARGO_UCRETI } from '@/lib/fiyat';
 
 interface Campaign {
   id: string;
@@ -88,12 +87,9 @@ export default function CartPage() {
   // yazilmisti; iki yerde duran hesap birbirinden ayrisabiliyordu.
   // Fiyatlar KDV dahil oldugu icin kdv toplama EKLENMIYOR, icinden cikiyor.
   const {
-    hamUrunToplami,
-    kasimIndirimi,
     urunToplami: subtotal,
     kdv: tax,
     kargo: shipping,
-    kargoUcretsiz,
     toplam: total,
   } = siparisToplami(
     cart.map((item) => ({
@@ -101,7 +97,7 @@ export default function CartPage() {
       kdvOrani: item.kdvOrani,
     }))
   );
-  const totalDiscount = originalSubtotal - (hamUrunToplami || subtotal);
+  const totalDiscount = originalSubtotal - subtotal;
 
   if (loading) {
     return (
@@ -137,9 +133,6 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
             <div className="lg:col-span-2 space-y-4">
-              {/* Ücretsiz kargo ilerleme çubuğu (eşik: ödenecek ürün toplamı) */}
-              <KargoIlerlemeCubugu urunToplami={subtotal} />
-
               {/* Ürünler */}
               <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 bg-white">
               {cart.map((item) => (
@@ -202,20 +195,12 @@ export default function CartPage() {
               <h2 className="text-lg font-bold text-gray-900 mb-4">Sipariş özeti</h2>
               <dl className="space-y-2.5 text-sm">
                 <div className="flex justify-between text-gray-600"><dt>Ara toplam</dt><dd>{tl(originalSubtotal)}</dd></div>
-                {kasimIndirimi > 0 && (
-                  <div className="flex justify-between items-center text-emerald-800 bg-emerald-50/90 border border-emerald-200/70 px-2.5 py-1.5 rounded-xl font-semibold text-xs md:text-sm shadow-xs">
-                    <dt className="flex items-center gap-1.5">
-                      <span>🔥 Açılış &amp; Kasım İndirimi (%10)</span>
-                    </dt>
-                    <dd className="font-bold text-emerald-700">-{tl(kasimIndirimi)}</dd>
-                  </div>
-                )}
                 {totalDiscount > 0 && (
                   <div className="flex justify-between text-green-700 font-semibold"><dt>Ürün Kampanyası</dt><dd>-{tl(totalDiscount)}</dd></div>
                 )}
                 <div className="flex justify-between text-gray-600">
                   <dt>Kargo</dt>
-                  <dd className="font-medium text-gray-700">{KARGO_KARSI_ODEMELI ? kargoDurumuMetni(kargoUcretsiz) : shipping > 0 ? tl(shipping) : 'Ücretsiz'}</dd>
+                  <dd className="font-medium text-gray-700">{tl(shipping)}</dd>
                 </div>
               </dl>
               <div className="flex justify-between items-baseline border-t border-gray-200 mt-4 pt-4">
@@ -224,9 +209,7 @@ export default function CartPage() {
               </div>
               {/* Fiyatlar KDV dahil: KDV toplamin ustune eklenmiyor, icinden cikiyor. */}
               <p className="text-xs leading-relaxed text-gray-500 mt-2">
-                Fiyatlara KDV dahildir ({tl(tax)}).
-                {KARGO_KARSI_ODEMELI && !kargoUcretsiz ? ' Kargo ücreti bu tutara dahil değildir; teslimat sırasında kargo firmasına ödenir.' : ''}
-                {KARGO_KARSI_ODEMELI && kargoUcretsiz ? ' Kargo bu siparişte ücretsizdir; teslimatta kargo ücreti ödemezsiniz.' : ''}
+                Fiyatlara KDV dahildir ({tl(tax)}). Kargo sabit {tl(KARGO_UCRETI)}&apos;dir.
               </p>
               <button onClick={() => router.push('/checkout')} className="w-full mt-5 h-12 bg-[#CC4E00] hover:bg-[#A63F00] text-white rounded-xl font-bold flex items-center justify-center gap-2">
                 Ödemeye Geç <LuArrowRight size={18} />
