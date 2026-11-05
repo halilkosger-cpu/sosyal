@@ -39,8 +39,8 @@ export function adresFormunuMetne(f: AdresFormDegeri): string {
     f.binaSite && `Bina/Site: ${f.binaSite}`,
     f.kat && `Kat: ${f.kat}`,
     f.daireNo && `Kapı No: ${f.daireNo}`,
-    `${f.ilce} / ${f.il}`,
     f.postaKodu,
+    `${f.ilce} / ${f.il}`,
   ];
   return parcalar.filter(Boolean).join(', ');
 }
@@ -163,7 +163,7 @@ export default function AdresFormu({ value, onChange, adSoyadGoster = true, idOn
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label htmlFor={`${idOneki}-bina`} className={etiket}>Bina / Site <span className="text-gray-400 font-normal">(isteğe bağlı)</span></label>
+          <label htmlFor={`${idOneki}-bina`} className={etiket}>Bina / Site</label>
           <input id={`${idOneki}-bina`} type="text" value={value.binaSite} onChange={(e) => degistir({ binaSite: e.target.value })} className="store-input" />
         </div>
         <div>
