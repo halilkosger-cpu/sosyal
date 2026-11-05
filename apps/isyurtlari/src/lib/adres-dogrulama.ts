@@ -16,7 +16,13 @@ export interface AdresGirdisi {
   neighborhood: string | null;
   addressLine: string;
   postalCode: string | null;
+  sokak: string | null;
+  binaSite: string | null;
+  kat: string | null;
+  daireNo: string | null;
 }
+
+import { acikAdresOlustur } from '@/lib/adres-alanlari';
 
 const kirp = (deger: unknown): string => (typeof deger === 'string' ? deger.trim() : '');
 
@@ -51,14 +57,31 @@ export function adresiDogrula(govde: Record<string, unknown>): DogrulamaSonucu {
   const fullName = kirp(govde.fullName);
   const city = kirp(govde.city);
   const district = kirp(govde.district);
-  const addressLine = kirp(govde.addressLine);
   const neighborhood = kirp(govde.neighborhood) || null;
   const postalCode = kirp(govde.postalCode) || null;
+
+  // Yapilandirilmis mod: sokak alani geldiyse adres parcalardan uretilir.
+  // Eski istemciler tek satir addressLine gonderir; o yol da desteklenir.
+  const yapilandirilmis = kirp(govde.sokak) !== '';
+  const sokak = kirp(govde.sokak) || null;
+  const binaSite = kirp(govde.binaSite) || null;
+  const kat = kirp(govde.kat) || null;
+  const daireNo = kirp(govde.daireNo) || null;
 
   if (fullName.length < 2) return { hata: 'Ad soyad en az 2 karakter olmalı' };
   if (!city) return { hata: 'İl bilgisi gerekli' };
   if (!district) return { hata: 'İlçe bilgisi gerekli' };
-  if (addressLine.length < 10) return { hata: 'Açık adres en az 10 karakter olmalı' };
+
+  let addressLine: string;
+  if (yapilandirilmis) {
+    if (!neighborhood) return { hata: 'Mahalle bilgisi gerekli' };
+    if (!daireNo) return { hata: 'Kapı no gerekli' };
+    if (sokak!.length < 2) return { hata: 'Sokak / cadde adı en az 2 karakter olmalı' };
+    addressLine = acikAdresOlustur({ sokak: sokak!, binaSite, kat, daireNo });
+  } else {
+    addressLine = kirp(govde.addressLine);
+    if (addressLine.length < 10) return { hata: 'Açık adres en az 10 karakter olmalı' };
+  }
   if (addressLine.length > 500) return { hata: 'Açık adres en fazla 500 karakter olabilir' };
 
   const phone = telefonuDuzenle(String(govde.phone ?? ''));
@@ -71,7 +94,20 @@ export function adresiDogrula(govde: Record<string, unknown>): DogrulamaSonucu {
   }
 
   return {
-    adres: { title, fullName, phone, city, district, neighborhood, addressLine, postalCode },
+    adres: {
+      title,
+      fullName,
+      phone,
+      city,
+      district,
+      neighborhood,
+      addressLine,
+      postalCode,
+      sokak,
+      binaSite,
+      kat,
+      daireNo,
+    },
   };
 }
 

@@ -541,6 +541,11 @@ model Address {
   city              String
   district          String
   neighborhood      String?
+  /// Yapilandirilmis acik adres. addressLine bunlardan uretilen metin (geriye donuk uyumluluk).
+  sokak             String?
+  binaSite          String?
+  kat               String?
+  daireNo           String?
   addressLine       String
   postalCode        String?
   isDefaultShipping Boolean  @default(false)

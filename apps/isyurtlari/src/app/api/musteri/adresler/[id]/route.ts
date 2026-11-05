@@ -15,6 +15,10 @@ const SECIM = {
   district: true,
   neighborhood: true,
   addressLine: true,
+  sokak: true,
+  binaSite: true,
+  kat: true,
+  daireNo: true,
   postalCode: true,
   isDefaultShipping: true,
   isDefaultBilling: true,
@@ -57,6 +61,7 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
      */
     const yalnizVarsayilan =
       govde?.addressLine === undefined &&
+      govde?.sokak === undefined &&
       (govde?.isDefaultShipping !== undefined || govde?.isDefaultBilling !== undefined);
 
     const guncel = await prisma.$transaction(async (tx) => {
