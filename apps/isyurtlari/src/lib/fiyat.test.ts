@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { siparisToplami, KARGO_UCRETI } from './fiyat';
+import { siparisToplami, KARGO_UCRETI, urunKdvOrani, birimFiyatKdvHaric, icindekiKdv } from './fiyat';
 
 describe('siparisToplami kargo', () => {
   it('kargo sabit 179 TL', () => {
@@ -28,5 +28,28 @@ describe('siparisToplami kargo', () => {
     expect(t.kdv).toBe(10);
     expect(t.kdvHaric).toBe(100);
     expect(t.toplam).toBe(289);
+  });
+});
+
+describe('urunKdvOrani', () => {
+  it('kategori orani urun bazli orandan once gelir', () => {
+    expect(urunKdvOrani({ vatRate: 20, category: { kdvOrani: 1 } })).toBe(1);
+  });
+
+  it('kategori yoksa urun oranina, o da yoksa %20 ye duser', () => {
+    expect(urunKdvOrani({ vatRate: 10, category: null })).toBe(10);
+    expect(urunKdvOrani(null)).toBe(20);
+  });
+});
+
+describe('birimFiyatKdvHaric', () => {
+  it('420 TL, %1 KDV -> 415,84 + 4,16', () => {
+    const kdv = icindekiKdv(420, 1);
+    expect(kdv).toBe(4.16);
+    expect(birimFiyatKdvHaric({ satirToplam: 420, kdvTutari: kdv, miktar: 1 })).toBe(415.84);
+  });
+
+  it('adet birim fiyati bolerek hesaplar', () => {
+    expect(birimFiyatKdvHaric({ satirToplam: 240, kdvTutari: 40, miktar: 2 })).toBe(100);
   });
 });

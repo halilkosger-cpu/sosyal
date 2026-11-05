@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { prisma } from '@isyurtlari/database';
+import { birimFiyatKdvHaric } from '@/lib/fiyat';
 
 export interface SirketBilgileri {
   vkn: string;
@@ -110,7 +111,7 @@ export function generateUBLTRXML(params: {
         <cbc:Name><![CDATA[${s.aciklama}]]></cbc:Name>
       </cac:Item>
       <cac:Price>
-        <cbc:PriceAmount currencyID="TRY">${s.birimFiyat.toFixed(2)}</cbc:PriceAmount>
+        <cbc:PriceAmount currencyID="TRY">${birimFiyatKdvHaric(s).toFixed(2)}</cbc:PriceAmount>
       </cac:Price>
     </cac:InvoiceLine>`
     )
@@ -236,7 +237,7 @@ export function generateOfficialEArsivHTML(params: {
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${i + 1}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>${s.aciklama}</strong></td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${s.miktar} Adet</td>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">₺${s.birimFiyat.toFixed(2)}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">₺${birimFiyatKdvHaric(s).toFixed(2)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">%${s.kdvOrani}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">₺${s.kdvTutari.toFixed(2)}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: bold;">₺${s.satirToplam.toFixed(2)}</td>
@@ -309,7 +310,7 @@ export function generateOfficialEArsivHTML(params: {
           <th style="width: 30px; text-align: center;">#</th>
           <th>Mal / Hizmet Açıklaması</th>
           <th style="width: 80px; text-align: center;">Miktar</th>
-          <th style="width: 90px; text-align: right;">Birim Fiyat</th>
+          <th style="width: 110px; text-align: right;">Birim Fiyat (KDV Hariç)</th>
           <th style="width: 60px; text-align: center;">KDV</th>
           <th style="width: 80px; text-align: right;">KDV Tutarı</th>
           <th style="width: 95px; text-align: right;">Tutar</th>

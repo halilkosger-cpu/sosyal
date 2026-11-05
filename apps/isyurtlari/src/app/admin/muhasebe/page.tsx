@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
+import { birimFiyatKdvHaric } from '@/lib/fiyat';
 import {
   LuTrendingUp, LuFileText, LuTriangleAlert, LuPercent, LuPlus,
   LuReceipt, LuPackagePlus, LuDownload, LuTrash2, LuCheck,
@@ -2458,7 +2459,7 @@ export default function LogoGo3MuhasebeMerkezi() {
                       <th className="py-2.5 px-3">#</th>
                       <th className="py-2.5 px-3">Mal / Hizmet Açıklaması</th>
                       <th className="py-2.5 px-3 text-center">Miktar</th>
-                      <th className="py-2.5 px-3 text-right">Birim Fiyat</th>
+                      <th className="py-2.5 px-3 text-right">Birim Fiyat (KDV Hariç)</th>
                       <th className="py-2.5 px-3 text-center">KDV %</th>
                       <th className="py-2.5 px-3 text-right">KDV Tutarı</th>
                       <th className="py-2.5 px-3 text-right">Satır Toplamı</th>
@@ -2470,7 +2471,7 @@ export default function LogoGo3MuhasebeMerkezi() {
                         <td className="py-2 px-3 text-gray-400 font-mono">{idx + 1}</td>
                         <td className="py-2 px-3 font-semibold text-gray-900">{satir.aciklama}</td>
                         <td className="py-2 px-3 text-center font-bold">{satir.miktar}</td>
-                        <td className="py-2 px-3 text-right font-mono">₺{Number(satir.birimFiyat).toFixed(2)}</td>
+                        <td className="py-2 px-3 text-right font-mono">₺{birimFiyatKdvHaric({ satirToplam: Number(satir.satirToplam), kdvTutari: Number(satir.kdvTutari), miktar: Number(satir.miktar) }).toFixed(2)}</td>
                         <td className="py-2 px-3 text-center">%{satir.kdvOrani}</td>
                         <td className="py-2 px-3 text-right font-mono text-purple-700">₺{Number(satir.kdvTutari).toFixed(2)}</td>
                         <td className="py-2 px-3 text-right font-mono font-bold text-gray-900">₺{Number(satir.satirToplam).toFixed(2)}</td>

@@ -5,7 +5,7 @@ import { bankaBilgileri, bankaBilgisiTam } from '@/lib/bank';
 import { Resend } from 'resend';
 import { prisma } from '@isyurtlari/database';
 import { emailTemplates } from '@/lib/email-templates';
-import { siparisToplami, KARGO_UCRETI } from '@/lib/fiyat';
+import { siparisToplami, KARGO_UCRETI, urunKdvOrani } from '@/lib/fiyat';
 import { indirimiKalemlereDagit, kuponuDogrula } from '@/lib/kupon';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
@@ -581,7 +581,7 @@ export async function POST(req: NextRequest) {
               })),
             },
           },
-          include: { items: { include: { product: true } } },
+          include: { items: { include: { product: { include: { category: { select: { kdvOrani: true } } } } } } },
         });
 
         /**
@@ -740,7 +740,7 @@ export async function POST(req: NextRequest) {
             name: it.product?.name || 'Ürün',
             quantity: it.quantity,
             price: it.price,
-            vatRate: it.product?.vatRate ?? 20,
+            vatRate: urunKdvOrani(it.product),
           })),
         });
       }

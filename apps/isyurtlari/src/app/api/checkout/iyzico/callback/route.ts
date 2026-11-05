@@ -3,6 +3,7 @@ import { iyzicoIstek, IYZICO_YOLLARI, odemeGecerli } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
 import { siparisMuhasebeyeIsle, odemeTahsilatiIsle } from '@/lib/muhasebe-entegrasyonu';
 import { odemeAciklamasi } from '@/lib/odeme-aciklamasi';
+import { urunKdvOrani } from '@/lib/fiyat';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     const siparis = await prisma.order.findUnique({
       where: { orderNumber },
       include: {
-        items: { include: { product: true } },
+        items: { include: { product: { include: { category: { select: { kdvOrani: true } } } } } },
         customer: true,
       },
     });
@@ -122,7 +123,7 @@ export async function POST(req: NextRequest) {
         name: it.product?.name || 'Ürün',
         quantity: it.quantity,
         price: it.price,
-        vatRate: it.product?.vatRate ?? 20,
+        vatRate: urunKdvOrani(it.product),
       })),
     });
 
