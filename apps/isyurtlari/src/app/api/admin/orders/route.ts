@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       items: {
         include: {
           product: {
-            select: { name: true, purchasePrice: true, vatRate: true },
+            select: { name: true, slug: true, purchasePrice: true, vatRate: true },
           },
         },
       },

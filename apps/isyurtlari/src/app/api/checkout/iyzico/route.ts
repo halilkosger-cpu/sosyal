@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     const siparis = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
-        items: { include: { product: { select: { name: true, category: { select: { name: true } } } } } },
+        items: { include: { product: { select: { name: true, slug: true, category: { select: { name: true } } } } } },
         customer: { select: { name: true, email: true, phone: true } },
       },
     });
@@ -149,8 +149,25 @@ export async function POST(req: NextRequest) {
      * toplamdan dusuluyor. Fark paidPrice'ta gosteriliyor - alani tam da
      * bunun icin var.
      */
+    /**
+     * Sepet kalemi kimligi: iyzico panelinde "Uye Isyeri Sepet Numarasi" olarak
+     * gorunur. Okunabilir olmasi icin urun slug'i kullaniliyor; ayni urun bir
+     * siparişte birden fazla kalemde geçerse benzersizlik icin sonek eklenir.
+     * Slug degisirse yalnizca yeni siparisler etkilenir (eski kayitlar sabit kalir).
+     */
+    const kullanilanKimlikler = new Set<string>();
+    const sepetKimligi = (slug: string) => {
+      let aday = slug.slice(0, 100);
+      let sayac = 2;
+      while (kullanilanKimlikler.has(aday)) {
+        aday = `${slug.slice(0, 90)}-${sayac++}`;
+      }
+      kullanilanKimlikler.add(aday);
+      return aday;
+    };
+
     const sepet = siparis.items.map((k) => ({
-      id: k.id,
+      id: sepetKimligi(k.product.slug),
       name: k.product.name.slice(0, 200),
       category1: k.product.category?.name ?? 'El Emeği Ürünleri',
       itemType: 'PHYSICAL' as const,
