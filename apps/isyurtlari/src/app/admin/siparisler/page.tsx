@@ -376,12 +376,9 @@ export default function AdminOrdersPage() {
                                       </div>
 
                                       <div class="section">
-                                        <div class="label">KARGO VE ÖDEME BİLGİSİ</div>
+                                        <div class="label">KARGO BİLGİSİ</div>
                                         <div class="val" style="font-size: 13px;">
                                           ${kacisHtml(firmaAd)} ${kargoAlanlari(order).takipNo ? `· Takip No: ${kacisHtml(kargoAlanlari(order).takipNo)}` : '· (Anlaşmalı)'}
-                                        </div>
-                                        <div style="font-size: 11px; color: #555; margin-top: 2px;">
-                                          Ödeme: ${order.paymentMethod === 'TRANSFER' ? 'Banka Havalesi / EFT' : 'Kredi Kartı'} · Sipariş Tutarı: ₺${order.totalAmount.toFixed(2)}
                                         </div>
                                       </div>
 
