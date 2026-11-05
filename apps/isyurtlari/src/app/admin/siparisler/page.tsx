@@ -346,8 +346,10 @@ export default function AdminOrdersPage() {
                                       
                                       <div class="section" style="border-bottom: 1px dashed #ccc; padding-bottom: 8px; margin-bottom: 10px;">
                                         <div class="label">GÖNDERİCİ BİLGİLERİ</div>
-                                        <div class="val" style="font-size: 13px;">İŞ-YRT Gıda Ltd. Şti.</div>
+                                        <div class="val" style="font-size: 13px;">İŞ-YRT e-Ticaret Gıda Ltd. Şti.</div>
                                         <div style="font-size: 11px; color: #555;">Online Dağıtım & Sevkiyat Merkezi · isyurtlari.com.tr</div>
+                                        <div style="font-size: 11px; color: #555;">Hisar Mh. Bağlum Blv. No:58/C, Keçiören, Ankara</div>
+                                        <div style="font-size: 11px; color: #555;">Tel.: 5015555257, email: info@isyurtlari.com.tr</div>
                                       </div>
 
                                       <div class="section">
