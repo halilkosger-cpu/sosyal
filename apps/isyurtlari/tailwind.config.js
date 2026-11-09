@@ -1,3 +1,4 @@
+// css-onbellek-temizle: 2026-11-09
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
