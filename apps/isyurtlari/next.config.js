@@ -28,6 +28,8 @@ const nextConfig = {
 
   async redirects() {
     return [
+      { source: '/guvenlı-aliveri', destination: '/guvenli-alisveris', permanent: true },
+      { source: '/mobilya', destination: '/ahsap', permanent: true },
       { source: '/urun/lokum', destination: '/gida', permanent: true },
       { source: '/urun/susam-yagi', destination: '/gida', permanent: true },
       { source: '/urun/burdur-cezerye', destination: '/gida', permanent: true },

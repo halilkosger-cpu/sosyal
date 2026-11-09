@@ -12,7 +12,7 @@ function kanonikOlmayanHost(host: string | null): boolean {
   return temiz !== KANONIK_HOST;
 }
 
-const OZEL_YOLLAR = ['/hesabim', '/adreslerim', '/siparislerim', '/iadelerim', '/checkout', '/sepet', '/favoriler', '/order-confirmation', '/yorum', '/giris', '/kayit', '/sifre-sifirla', '/eposta-dogrula'];
+const OZEL_YOLLAR = ['/hesabim', '/adreslerim', '/siparislerim', '/iadelerim', '/checkout', '/sepet', '/favoriler', '/order-confirmation', '/yorum', '/giris', '/kayit', '/sifre-sifirla', '/eposta-dogrula', '/ara'];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
