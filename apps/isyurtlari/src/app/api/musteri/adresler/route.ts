@@ -1,3 +1,4 @@
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { musteriGuard } from '@/lib/musteri-auth';
@@ -57,6 +58,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const hizSinirYaniti = await hizSiniriGuard(req, 'adres-yaz', 30, 600);
+  if (hizSinirYaniti) return hizSinirYaniti;
+
   const musteri = await musteriGuard();
   if (musteri instanceof NextResponse) return musteri;
 

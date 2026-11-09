@@ -1,3 +1,4 @@
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { NextRequest, NextResponse } from 'next/server';
 import { iyzicoIstek, IYZICO_YOLLARI, odemeGecerli } from '@/lib/iyzico';
 import { prisma } from '@isyurtlari/database';
@@ -9,6 +10,9 @@ export const dynamic = 'force-dynamic';
 
 
 export async function POST(req: NextRequest) {
+  const hizSinirYaniti = await hizSiniriGuard(req, 'iyzico-callback', 60, 600);
+  if (hizSinirYaniti) return hizSinirYaniti;
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isyurtlari.com.tr';
 
   try {
