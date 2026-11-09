@@ -4,6 +4,7 @@ import { SITE_URL } from '@/lib/seo';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
 import { urunGorseli, yerelGorselVar } from '@/lib/urun-gorsel';
 import { markaBul, FEED_OZELLESTIRMELERI } from '@/lib/marka';
+import { urunOzellikleri } from '@/lib/feed-ozellik';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // 1 saat önbellek
@@ -99,6 +100,16 @@ export async function GET() {
           tamGorselUrl = `${SITE_URL}${p.imageUrl}`;
         }
         const imageUrl = xmlEscape(tamGorselUrl);
+        const ozelliklerXml = urunOzellikleri(rawTitle, p.slug)
+          .map(
+            (o) => `
+      <g:product_detail>
+        <g:section_name>${xmlEscape(o.bolum)}</g:section_name>
+        <g:attribute_name>${xmlEscape(o.ad)}</g:attribute_name>
+        <g:attribute_value>${xmlEscape(o.deger)}</g:attribute_value>
+      </g:product_detail>`
+          )
+          .join('');
 
         return `    <item>
       <g:id>${p.id}</g:id>
@@ -112,7 +123,7 @@ export async function GET() {
       <g:brand>${brand}</g:brand>
       <g:google_product_category>${googleCat}</g:google_product_category>
       <g:product_type>${categoryName}</g:product_type>
-      <g:identifier_exists>no</g:identifier_exists>
+      <g:identifier_exists>no</g:identifier_exists>${ozelliklerXml}
     </item>`;
       })
       .join('\n');
