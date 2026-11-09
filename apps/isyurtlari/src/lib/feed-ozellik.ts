@@ -20,6 +20,8 @@ const AROMALAR: Array<[RegExp, string]> = [
 export const SEKER_ICERIGI: Record<string, string> = {
   'cilek-receli': '62 g / 100 g',
   'elban-tam-yagli-kasar-peyniri-500-gr': '1 g / 100 g',
+  // Etiketteki 19,1 g hatali (karbonhidrattan buyuk); 0,30 g degeri urun sahibi tarafindan belirlendi.
+  'siyah-zeytin': '0,3 g / 100 g',
 };
 
 export interface UrunOzelligi {
