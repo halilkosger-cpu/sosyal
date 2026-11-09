@@ -4,6 +4,10 @@ import { SITE_URL } from '@/lib/seo';
 /**
  * robots.txt
  *
+ * GUVENLIK: Gizli yollar (admin vb.) buraya YAZILMAZ; robots.txt herkese acik
+ * oldugu icin hedef gostermis olur. Bunlar middleware.ts'de X-Robots-Tag
+ * noindex header'i ve kimlik dogrulamasi ile korunur.
+ *
  * Onceden public/robots.txt de vardi ve bu route'u eziyordu (ortama gore
  * hangisinin servis edildigi degisiyordu). O dosya silindi; kurallari buraya
  * tasindi ki tek bir kaynak olsun ve adres SITE_URL ile hep tutarli kalsin.
@@ -27,11 +31,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
         allow: '/',
         disallow: [
-          '/admin',
-          '/admin/',
-          '/admin/*',
-          '/api/admin',
-          '/api/admin/*',
           '/api',
           '/api/*',
           '/_next',
@@ -50,11 +49,6 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/admin',
-          '/admin/',
-          '/admin/*',
-          '/api/admin',
-          '/api/admin/*',
           '/api',
           '/api/*',
           '/_next',

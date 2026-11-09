@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SITE_URL } from '@/lib/seo';
+import { adminTokenGecerliMi } from '@/lib/admin-jwt-edge';
 
 /** Sitenin kanonik alan adı (SITE_URL'den türetiliyor). */
 const KANONIK_HOST = new URL(SITE_URL).host;
@@ -11,25 +12,16 @@ function kanonikOlmayanHost(host: string | null): boolean {
   return temiz !== KANONIK_HOST;
 }
 
-export function middleware(req: NextRequest) {
+const OZEL_YOLLAR = ['/hesabim', '/adreslerim', '/siparislerim', '/iadelerim', '/checkout', '/sepet', '/favoriler', '/order-confirmation', '/yorum', '/giris', '/kayit', '/sifre-sifirla', '/eposta-dogrula'];
+
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Admin Koruması (/admin/login ve /admin/logout hariç)
+  // Admin Koruması (/admin/login ve /admin/logout hariç): imzalı ve süresi dolmamış JWT şart.
+  // Yetkisiz istekler giriş sayfasına yönlendirilmez; 404 döner (yolun varlığı sızmaz).
   if (pathname.startsWith('/admin') && pathname !== '/admin/login' && pathname !== '/admin/logout') {
-    const cookieToken = req.cookies.get('admin-token')?.value;
-
-    const headerCookies = req.headers.get('cookie') || '';
-    const rawCookieToken = headerCookies
-      .split(';')
-      .map((c) => c.trim())
-      .find((c) => c.startsWith('admin-token='))
-      ?.split('=')[1];
-
-    const token = cookieToken || rawCookieToken;
-
-    if (!token) {
-      const loginUrl = new URL('/admin/login', req.url);
-      const res = NextResponse.redirect(loginUrl);
+    if (!(await adminTokenGecerliMi(req.cookies.get('admin-token')?.value))) {
+      const res = NextResponse.rewrite(new URL('/404', req.url), { status: 404 });
       res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
       res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       return res;
@@ -45,6 +37,11 @@ export function middleware(req: NextRequest) {
     res.headers.set('Pragma', 'no-cache');
     res.headers.set('Expires', '0');
     res.headers.set('Surrogate-Control', 'no-store');
+  }
+
+  // Kisiye ozel/islem sayfalari: robots.txt'te listelemeden noindex ile gizle
+  if (OZEL_YOLLAR.some((y) => pathname === y || pathname.startsWith(y + '/'))) {
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   }
 
   if (kanonikOlmayanHost(req.headers.get('host'))) {
