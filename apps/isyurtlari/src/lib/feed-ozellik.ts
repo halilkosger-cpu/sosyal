@@ -19,6 +19,7 @@ const AROMALAR: Array<[RegExp, string]> = [
 /** Etiketten dogrulanmis seker degerleri (100 g basina). Slug -> deger. */
 export const SEKER_ICERIGI: Record<string, string> = {
   'cilek-receli': '62 g / 100 g',
+  'elban-tam-yagli-kasar-peyniri-500-gr': '1 g / 100 g',
 };
 
 export interface UrunOzelligi {

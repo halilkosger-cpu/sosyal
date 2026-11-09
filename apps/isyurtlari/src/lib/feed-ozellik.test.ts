@@ -17,4 +17,8 @@ describe('feed ozellikleri', () => {
     const vişne = urunOzellikleri('Elban Vişne Reçeli Cam Kavanoz 420 gr', 'visne-receli');
     expect(vişne.map((o) => o.ad)).toEqual(['Aroma']);
   });
+  it('kasar peynirine seker eklenir, aroma eklenmez', () => {
+    const k = urunOzellikleri('Elban Tam Yağlı Kaşar Peyniri 500 gr', 'elban-tam-yagli-kasar-peyniri-500-gr');
+    expect(k).toEqual([{ bolum: 'Besin Değerleri', ad: 'Şeker İçeriği', deger: '1 g / 100 g' }]);
+  });
 });
