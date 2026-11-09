@@ -79,6 +79,8 @@ interface Review {
   helpfulCount: number;
 }
 
+import type { UrunIcerik } from '@/lib/urun-icerik';
+
 type Sekme = 'aciklama' | 'ozellikler' | 'teslimat' | 'yorumlar';
 
 const HIKAYE_BOLUMU: Record<string, { kod: string; etiket: string; baslik: string }> = {
@@ -114,9 +116,11 @@ const GUVENCELER = [
 
 export default function ProductDetailPage({
   baslangicUrun = null,
+  zenginIcerik = null,
   benzerUrunler = [],
 }: {
   baslangicUrun?: Product | null;
+  zenginIcerik?: UrunIcerik | null;
   benzerUrunler?: KartUrunu[];
 }) {
   const params = useParams();
@@ -588,6 +592,38 @@ export default function ProductDetailPage({
         <div className="pt-6 max-w-4xl">
           <div role="tabpanel" hidden={sekme !== 'aciklama'} className="space-y-4 text-[15px] leading-7 text-gray-700">
             <p className="whitespace-pre-line">{product.description}</p>
+            {zenginIcerik && (
+              <div className="space-y-5">
+                <p>{zenginIcerik.giris}</p>
+                <section>
+                  <h2 className="text-lg font-semibold text-gray-900">Nasıl kullanılır?</h2>
+                  <ul className="mt-2 list-disc pl-5 space-y-1">
+                    {zenginIcerik.kullanim.map((k) => <li key={k}>{k}</li>)}
+                  </ul>
+                </section>
+                <section>
+                  <h2 className="text-lg font-semibold text-gray-900">Saklama</h2>
+                  <p className="mt-2">{zenginIcerik.saklama}</p>
+                </section>
+                <section>
+                  <h2 className="text-lg font-semibold text-gray-900">Alırken dikkat edin</h2>
+                  <ul className="mt-2 list-disc pl-5 space-y-1">
+                    {zenginIcerik.ipuclari.map((k) => <li key={k}>{k}</li>)}
+                  </ul>
+                </section>
+                <section>
+                  <h2 className="text-lg font-semibold text-gray-900">Sık sorulan sorular</h2>
+                  <dl className="mt-2 space-y-3">
+                    {zenginIcerik.sss.map((s) => (
+                      <div key={s.soru}>
+                        <dt className="font-medium text-gray-900">{s.soru}</dt>
+                        <dd>{s.cevap}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              </div>
+            )}
             <p className="rounded-xl bg-[#FDF1E7] border border-orange-100 px-4 py-3 text-sm text-gray-700">
               Bu ürün, Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde hükümlülerin el emeğiyle üretilmiştir.
             </p>

@@ -8,6 +8,7 @@ import { onTalepSayilari } from '@/lib/on-talep-sayilari';
 import { GORSELLI_URUN, gorselliMi } from '@/lib/urun-gorunurluk';
 import { yerelGorselVar } from '@/lib/urun-gorsel';
 import { markaBul } from '@/lib/marka';
+import { sssJsonLd, urunIcerigi } from '@/lib/urun-icerik';
 import { KARGO_UCRETI } from '@/lib/fiyat';
 import {
   SITE_URL,
@@ -341,6 +342,8 @@ export default async function ProductPage(props: ProductPageProps) {
     }
   }
 
+  const zenginIcerik = urunIcerigi(params.slug);
+
   const jsonLd = [
     breadcrumbJsonLd([
       { name: 'Ana Sayfa', url: absoluteUrl('/') },
@@ -354,6 +357,7 @@ export default async function ProductPage(props: ProductPageProps) {
       },
     ]),
     ...(productJsonLd ? [productJsonLd] : []),
+    ...(sssJsonLd(zenginIcerik, absoluteUrl(`/urun/${params.slug}`)) ? [sssJsonLd(zenginIcerik, absoluteUrl(`/urun/${params.slug}`))] : []),
   ];
 
   return (
@@ -363,7 +367,7 @@ export default async function ProductPage(props: ProductPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdMetni(jsonLd) }}
       />
-      <ProductDetailClient baslangicUrun={baslangicUrun} benzerUrunler={benzerUrunler} />
+      <ProductDetailClient baslangicUrun={baslangicUrun} benzerUrunler={benzerUrunler} zenginIcerik={zenginIcerik} />
     </>
   );
 }
