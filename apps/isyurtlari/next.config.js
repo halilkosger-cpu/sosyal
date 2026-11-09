@@ -91,7 +91,16 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'geolocation=(), microphone=(), camera=()',
+            value: 'geolocation=(), microphone=(), camera=(), usb=(), bluetooth=(), serial=(), accelerometer=(), gyroscope=(), magnetometer=(), interest-cohort=()',
+          },
+          {
+            // Iyzico 3D Secure acilir pencereleri icin allow-popups; diger pencerelerle baglanti kopar.
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none',
           },
         ],
       },

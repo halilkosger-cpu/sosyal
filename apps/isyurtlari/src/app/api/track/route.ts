@@ -1,3 +1,4 @@
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@isyurtlari/database';
 import { tabloyuHazirla } from '@/lib/analitik-db';
@@ -7,6 +8,9 @@ import { hasDatabaseUrl } from '@/lib/seo';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
+  const hizSinirYaniti = await hizSiniriGuard(req, 'track', 120, 60);
+  if (hizSinirYaniti) return hizSinirYaniti;
+
   try {
     if (!hasDatabaseUrl()) {
       return NextResponse.json({ skipped: true, reason: 'no_database_url' });

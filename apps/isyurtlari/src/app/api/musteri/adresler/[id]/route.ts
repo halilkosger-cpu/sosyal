@@ -1,3 +1,4 @@
+import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { NextRequest, NextResponse } from 'next/server';
 import { KullaniciHatasi, guvenliHataMesaji } from '@/lib/kullanici-hatasi';
 import { prisma } from '@isyurtlari/database';
@@ -44,6 +45,9 @@ async function sahipMi(adresId: string, customerId: string): Promise<boolean> {
 const bulunamadi = () => NextResponse.json({ error: 'Adres bulunamadı' }, { status: 404 });
 
 export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const hizSinirYaniti = await hizSiniriGuard(req, 'adres-yaz', 30, 600);
+  if (hizSinirYaniti) return hizSinirYaniti;
+
   const params = await props.params;
   const musteri = await musteriGuard();
   if (musteri instanceof NextResponse) return musteri;
@@ -127,6 +131,9 @@ export async function PATCH(req: NextRequest, props: { params: Promise<{ id: str
 }
 
 export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const hizSinirYaniti = await hizSiniriGuard(_req, 'adres-yaz', 30, 600);
+  if (hizSinirYaniti) return hizSinirYaniti;
+
   const params = await props.params;
   const musteri = await musteriGuard();
   if (musteri instanceof NextResponse) return musteri;
