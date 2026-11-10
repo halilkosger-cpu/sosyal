@@ -31,6 +31,8 @@ export interface UrunOzelligi {
 }
 
 export function aromaBul(baslik: string): string | null {
+  // Bal: etikette 'CICEK BALI' yaziyor.
+  if (/çiçek balı/i.test(baslik)) return 'Çiçek';
   if (!/reçel/i.test(baslik)) return null;
   // Karisik paketlerde tek aroma yok.
   if (/karışık|\d'lü/i.test(baslik)) return null;
