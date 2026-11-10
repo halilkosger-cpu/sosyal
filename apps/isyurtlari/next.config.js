@@ -117,11 +117,6 @@ const nextConfig = {
         has: [{ type: 'host', value: '(?!isyurtlari\\.com\\.tr$).*' }],
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
-      // sitemap.xml dinamik uretiliyor; CDN'de onbellege alinsin (bot taramalari fonksiyon cagirmasin).
-      {
-        source: '/sitemap.xml',
-        headers: [{ key: 'Cache-Control', value: 'public, s-maxage=3600, stale-while-revalidate=86400' }],
-      },
       // Admin ve tüm alt klasörleri: Arama motorları ve botlar için ÇOK GİZLİ (noindex, nofollow, noarchive, nosnippet)
       {
         source: '/admin/:path*',
