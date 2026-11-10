@@ -37,7 +37,7 @@ export const FEED_OZELLESTIRMELERI: Record<string, FeedOzellestirme> = {
     marka: 'Elban',
   },
   'bal-ari-urunleri': {
-    baslik: 'Elban Doğal Yayla Süzme Çiçek Balı 850 gr',
+    baslik: 'Elban Doğal Bal Çiçek Balı 850 gr',
     marka: 'Elban',
   },
   'polen': {

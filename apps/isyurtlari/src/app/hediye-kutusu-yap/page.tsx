@@ -62,10 +62,10 @@ const KUTULAR: KutuSecenegi[] = [
 const SECILEBILIR_URUNLER: IcerikUrunu[] = [
   {
     id: 'bal-ari-urunleri',
-    ad: 'Doğal Yayla Balı (Süzme Çiçek)',
+    ad: 'Elban Doğal Bal',
     kategori: 'Doğal Gıda',
     fiyat: 290,
-    gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426320257-bal-ari-urunleri-4MmrQbfLaPtjHUOTlgx7doMxvAB0sB.jpg',
+    gorsel: '/urun/bal-ari-urunleri-800.webp',
   },
   {
     id: 'zeytinyagi-500ml',
