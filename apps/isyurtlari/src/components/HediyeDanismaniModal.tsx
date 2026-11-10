@@ -32,12 +32,12 @@ interface UrunOneri {
 const ONERILEN_KATALOG: Record<string, UrunOneri[]> = {
   gida: [
     {
-      ad: 'Bal & Arı Ürünleri',
+      ad: 'Elban Doğal Bal',
       slug: 'bal-ari-urunleri',
       fiyat: 290,
       kategori: 'Doğal Gıda',
-      gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426320257-bal-ari-urunleri-4MmrQbfLaPtjHUOTlgx7doMxvAB0sB.jpg',
-      aciklama: 'Katkısız yayla süzme balı, doğrudan işyurtları arıcılık atölyesinden.',
+      gorsel: '/urun/bal-ari-urunleri-800.webp',
+      aciklama: 'Elban Edirne çiçek balı, cam kavanozda 850 g.',
       uyumYuzdesi: 98,
     },
     {
@@ -99,12 +99,12 @@ const ONERILEN_KATALOG: Record<string, UrunOneri[]> = {
       uyumYuzdesi: 99,
     },
     {
-      ad: 'Bal & Arı Ürünleri',
+      ad: 'Elban Doğal Bal',
       slug: 'bal-ari-urunleri',
       fiyat: 290,
       kategori: 'Prestij & Kurumsal',
-      gorsel: 'https://bsvzh3olpntnziyt.public.blob.vercel-storage.com/products/1788426320257-bal-ari-urunleri-4MmrQbfLaPtjHUOTlgx7doMxvAB0sB.jpg',
-      aciklama: 'Doğal polen ve süzme çiçek balı seti.',
+      gorsel: '/urun/bal-ari-urunleri-800.webp',
+      aciklama: 'Elban Edirne çiçek balı, cam kavanozda 850 g.',
       uyumYuzdesi: 93,
     },
     {
