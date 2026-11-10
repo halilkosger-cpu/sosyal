@@ -21,8 +21,11 @@ describe('feed ozellikleri', () => {
     const k = urunOzellikleri('Elban Tam Yağlı Kaşar Peyniri 500 gr', 'elban-tam-yagli-kasar-peyniri-500-gr');
     expect(k).toEqual([{ bolum: 'Besin Değerleri', ad: 'Şeker İçeriği', deger: '1 g / 100 g' }]);
   });
-  it('cicek balina aroma eklenir, seker eklenmez', () => {
+  it('cicek balina aroma ve seker eklenir', () => {
     const b = urunOzellikleri('Elban Doğal Bal Çiçek Balı 850 gr', 'bal-ari-urunleri');
-    expect(b).toEqual([{ bolum: 'Ürün Özellikleri', ad: 'Aroma', deger: 'Çiçek' }]);
+    expect(b).toEqual([
+      { bolum: 'Ürün Özellikleri', ad: 'Aroma', deger: 'Çiçek' },
+      { bolum: 'Besin Değerleri', ad: 'Şeker İçeriği', deger: '77 g / 100 g' },
+    ]);
   });
 });

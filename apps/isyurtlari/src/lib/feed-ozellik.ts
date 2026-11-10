@@ -22,6 +22,8 @@ export const SEKER_ICERIGI: Record<string, string> = {
   'elban-tam-yagli-kasar-peyniri-500-gr': '1 g / 100 g',
   // Etiketteki 19,1 g hatali (karbonhidrattan buyuk); 0,30 g degeri urun sahibi tarafindan belirlendi.
   'siyah-zeytin': '0,3 g / 100 g',
+  // Bal: etikette sekerler satiri yok; 77 g degeri urun sahibi tarafindan belirlendi.
+  'bal-ari-urunleri': '77 g / 100 g',
 };
 
 export interface UrunOzelligi {
