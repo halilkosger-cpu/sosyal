@@ -48,6 +48,7 @@ export default function DahiliAnalitikTracker() {
   const pathname = usePathname();
   const baslangicZamani = useRef<number>(Date.now());
   const sonSayfa = useRef<string>('');
+  const sureGonderilen = useRef<string>('');
 
   useEffect(() => {
     // Admin ve dahili API sayfalarını kesinlikle kaydetme
@@ -63,7 +64,8 @@ export default function DahiliAnalitikTracker() {
     // Önceki sayfada kalınan süreyi gönder
     if (sonSayfa.current) {
       const gecenSure = Math.round((Date.now() - baslangicZamani.current) / 1000);
-      if (gecenSure > 1) {
+      if (gecenSure > 1 && sureGonderilen.current !== sonSayfa.current) {
+        sureGonderilen.current = sonSayfa.current;
         sureyiIlet(sonSayfa.current, gecenSure);
       }
     }
@@ -108,7 +110,9 @@ export default function DahiliAnalitikTracker() {
     const handleCikis = () => {
       if (!sonSayfa.current || sonSayfa.current.startsWith('/admin')) return;
       const gecenSure = Math.round((Date.now() - baslangicZamani.current) / 1000);
-      if (gecenSure > 1) {
+      // visibilitychange + pagehide ayni cikista iki kez tetiklenir; ayni sayfa icin tek bildirim.
+      if (gecenSure > 1 && sureGonderilen.current !== sonSayfa.current) {
+        sureGonderilen.current = sonSayfa.current;
         sureyiIlet(sonSayfa.current, gecenSure);
       }
     };
