@@ -1,4 +1,4 @@
-﻿import { MetadataRoute } from 'next';
+﻿import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import { prisma } from '@isyurtlari/database';
 import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
@@ -20,14 +20,12 @@ import { GORSELLI_URUN } from '@/lib/urun-gorunurluk';
  * Maliyet dusuk: yanit CDN'de bir saat onbellekleniyor (next.config.js), yani
  * pratikte bolge basina saatte iki sorgu.
  */
-export const dynamic = 'force-dynamic';
-
 const hasDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;
   return url?.startsWith('postgresql://') || url?.startsWith('postgres://');
 };
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export async function sitemapGirdileri(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
 
   // Static pages
