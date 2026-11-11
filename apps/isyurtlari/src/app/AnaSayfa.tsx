@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import HarfHarf, { harfSayisi } from '@/components/HarfHarf';
-import GirisVideosu from '@/components/GirisVideosu';
 import { LuArrowRight, LuInfo, LuHammer, LuGraduationCap, LuRotateCcw } from 'react-icons/lu';
 import UrunKarti from '@/components/UrunKarti';
 import KategoriIkon from '@/components/KategoriIkon';
@@ -209,7 +208,6 @@ export default function AnaSayfa({
               fetchPriority="high"
             />
           </picture>
-          <GirisVideosu />
           </div>
         </div>
       </section>
