@@ -117,7 +117,7 @@ function HikayeKarti({ bolum, sira, kartRef }: { bolum: Bolum; sira: number; kar
                 href="#urunler"
                 className="hikaye-acil hikaye-g3 mt-7 inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-[#FBF6EF] px-6 py-3 text-sm font-semibold text-[#141B2D] transition-colors hover:bg-white"
               >
-                Ürünleri keşfet <span aria-hidden="true">→</span>
+                Atölye ürünlerine göz at <span aria-hidden="true">→</span>
               </a>
             )}
           </div>

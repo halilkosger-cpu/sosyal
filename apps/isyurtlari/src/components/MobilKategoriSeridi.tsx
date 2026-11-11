@@ -41,7 +41,7 @@ export default function MobilKategoriSeridi({ categories }: { categories: Catego
             <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xl">
               <span>🎁</span>
             </div>
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 border-2 border-white rounded-full animate-ping" />
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 border-2 border-white rounded-full animate-ping ping-gpu" />
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 border-2 border-white rounded-full" />
           </div>
           <span className="text-[11px] font-bold text-[#BA4700] tracking-tight whitespace-nowrap">

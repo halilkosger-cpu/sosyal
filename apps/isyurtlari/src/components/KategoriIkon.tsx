@@ -44,8 +44,8 @@ export default function KategoriIkon({
         src={dosya}
         alt=""
         aria-hidden="true"
-        width={256}
-        height={256}
+        width={160}
+        height={160}
         className={`${className} object-contain`}
         loading="lazy"
         decoding="async"
