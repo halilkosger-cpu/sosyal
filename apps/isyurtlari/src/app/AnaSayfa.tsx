@@ -105,6 +105,24 @@ export default function AnaSayfa({
 
   return (
     <div className="min-h-screen bg-white">
+      {/* LCP gorselini HTML'in basinda kesfettir: tarayici CSS ve fontlari
+          beklemeden indirmeye baslar (PageSpeed: kaynak yukleme gecikmesi
+          460 ms). React 19 bu etiketleri <head>'e tasir; media kosulu
+          sayesinde her ekran yalnizca kendi gorselini indirir. */}
+      <link
+        rel="preload"
+        as="image"
+        href={HERO_GORSEL.dar.src}
+        media="(max-width: 1023px)"
+        fetchPriority="high"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href={HERO_GORSEL.genis.src}
+        media="(min-width: 1024px)"
+        fetchPriority="high"
+      />
 
       {/* ─── DUYURU ŞERİDİ ───
           Marka turuncusu #CC4E00 beyaz yaziyla 4.5:1 kontrast veriyor. */}
