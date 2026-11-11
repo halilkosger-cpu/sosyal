@@ -11,10 +11,6 @@
       "schedule": "0 9 * * *"
     },
     {
-      "path": "/api/gorevler/gunluk-rapor",
-      "schedule": "0 6 * * *"
-    },
-    {
       "path": "/api/gorevler/yorum-istegi",
       "schedule": "0 10 * * *"
     }

@@ -123,6 +123,22 @@ export function epostaNormalize(eposta: string): string {
 
 // ─── OTURUM ───────────────────────────────────────────────────────────
 
+/**
+ * "Bu tarayicida giris yapilmis olabilir" ipucu. httpOnly DEGIL: istemci okuyup
+ * /api/musteri/ben'i yalnizca gerektiginde cagirir (her ziyaretcinin her sayfa
+ * yuklemesinde fonksiyon cagrisi olmasin). Icinde hicbir kimlik bilgisi yok.
+ */
+export const MUSTERI_IPUCU_CEREZI = 'musteri_ipucu';
+export async function ipucuCereziniYaz(sonKullanma: Date): Promise<void> {
+  (await cookies()).set(MUSTERI_IPUCU_CEREZI, '1', {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    expires: sonKullanma,
+  });
+}
+
 const jetonOzeti = (jeton: string) => createHash('sha256').update(jeton).digest('hex');
 
 /**
@@ -155,6 +171,7 @@ export async function oturumAc(
     path: '/',
     expires: sonKullanma,
   });
+  await ipucuCereziniYaz(sonKullanma);
 }
 
 export interface OturumdakiMusteri {
@@ -227,6 +244,7 @@ export async function oturumdakiMusteri(): Promise<OturumdakiMusteri | null> {
 export async function oturumKapat(): Promise<void> {
   const jeton = (await cookies()).get(OTURUM_CEREZI)?.value;
   (await cookies()).delete(OTURUM_CEREZI);
+  (await cookies()).delete(MUSTERI_IPUCU_CEREZI);
   if (!jeton) return;
 
   await prisma.customerSession

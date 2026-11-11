@@ -44,8 +44,39 @@ async function getir(): Promise<Musteri | null> {
   }
 }
 
+const IPUCU_CEREZI = 'musteri_ipucu';
+const KONTROL_ANAHTARI = 'musteri_son_kontrol';
+const KONTROL_ARALIGI_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Sunucuya sormak gerekli mi?
+ *
+ * Her ziyaretcinin her sayfa yuklemesinde /api/musteri/ben'e gitmek bir
+ * fonksiyon cagrisi demekti (Vercel kotasi). Artik yalnizca giris ipucu
+ * cerezi varsa sorulur; ipucu yoksa (misafir ya da cerez eklenmeden onceki
+ * eski oturum) cihaz basina gunde bir kez sorulur.
+ */
+function sunucuyaSorulmali(): boolean {
+  if (typeof document === 'undefined') return true;
+  if (document.cookie.split('; ').some((c) => c === `${IPUCU_CEREZI}=1`)) return true;
+  try {
+    const son = Number(localStorage.getItem(KONTROL_ANAHTARI) || 0);
+    if (Date.now() - son > KONTROL_ARALIGI_MS) {
+      localStorage.setItem(KONTROL_ANAHTARI, String(Date.now()));
+      return true;
+    }
+    return false;
+  } catch {
+    return true; // depolama kapaliysa eski davranis
+  }
+}
+
 export function musteriGetir(): Promise<Musteri | null> {
   if (onbellek !== undefined) return Promise.resolve(onbellek);
+  if (!bekleyen && !sunucuyaSorulmali()) {
+    onbellek = null;
+    return Promise.resolve(null);
+  }
   if (!bekleyen) {
     bekleyen = getir().then((m) => {
       onbellek = m;

@@ -20,7 +20,7 @@ import { KARGO_UCRETI } from '@/lib/fiyat';
  * icerikTazele() çağrılıyor (bkz. lib/kategoriler.ts) ve sayfa anında
  * tazeleniyor. Beş dakika bir gecikme değil, yalnızca üst sınır.
  */
-export const revalidate = 300;
+export const revalidate = 3600;
 
 /**
  * Ana sayfanin basligi ve aciklamasi BILEREK kok layout'tan miras aliniyor.
