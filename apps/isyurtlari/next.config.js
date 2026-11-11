@@ -31,13 +31,13 @@ const nextConfig = {
       // Bot taramalari: bu adresler sitede hic yok. CDN'de statik 404'e
       // yonlendirilir; fonksiyon cagrisi ve ISR yazimi uretmez.
       {
-        source: '/:path*.(php|asp|aspx|jsp|cgi|env|sql|bak|ini|zip|tar|gz|git)',
+        source: '/:path(.*\\.(?:php|asp|aspx|jsp|cgi|env|sql|bak|ini|zip|tar|gz|git))',
         destination: '/404',
         permanent: false,
       },
-      { source: '/wp-:rest*', destination: '/404', permanent: false },
-      { source: '/.git/:rest*', destination: '/404', permanent: false },
-      { source: '/phpmyadmin:rest*', destination: '/404', permanent: false },
+      { source: '/wp-:rest(.*)', destination: '/404', permanent: false },
+      { source: '/.git/:rest(.*)', destination: '/404', permanent: false },
+      { source: '/phpmyadmin:rest(.*)', destination: '/404', permanent: false },
       { source: '/guven:x-aliveri', destination: '/guvenli-alisveris', permanent: true },
       { source: '/mobilya', destination: '/ahsap', permanent: true },
       { source: '/urun/lokum', destination: '/gida', permanent: true },
