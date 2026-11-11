@@ -6,7 +6,7 @@ import Image from 'next/image';
 import {
   LuLayoutDashboard, LuPackage, LuTag, LuShoppingBag, LuShoppingCart,
   LuLogOut, LuMenu, LuMail, LuActivity, LuBell, LuTag as LuPrice, LuImage, LuDatabase,
-  LuRotateCcw, LuTicket, LuFileText, LuShieldCheck, LuTrendingUp, LuMessageSquare,
+  LuRotateCcw, LuTicket, LuFileText, LuShieldCheck, LuMessageSquare,
 } from 'react-icons/lu';
 import { useState } from 'react';
 
@@ -17,7 +17,6 @@ const navItems = [
   { href: '/admin/analitik',   label: 'Ziyaretçi Analitiği', Icon: LuActivity },
   { href: '/admin/urunler',    label: 'Ürünler',     Icon: LuPackage         },
   { href: '/admin/fiyatlar',   label: 'Fiyatlar',    Icon: LuPrice           },
-  { href: '/admin/fiyat-analizi', label: 'Piyasa & Fiyat Analizi', Icon: LuTrendingUp },
   { href: '/admin/gorseller',  label: 'Görseller',   Icon: LuImage           },
   { href: '/admin/aciklamalar', label: 'Açıklamalar', Icon: LuFileText       },
   { href: '/admin/kategoriler', label: 'Kategoriler', Icon: LuTag            },
