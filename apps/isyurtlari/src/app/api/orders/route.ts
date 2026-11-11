@@ -10,6 +10,7 @@ import { indirimiKalemlereDagit, kuponuDogrula } from '@/lib/kupon';
 import { hizSiniriGuard } from '@/lib/hiz-siniri';
 import { oturumdakiMusteri } from '@/lib/musteri-auth';
 import { adresiYazdir } from '@/lib/adres-dogrulama';
+import { icerikTazele } from '@/lib/kategoriler';
 import { siparisMuhasebeyeIsle } from '@/lib/muhasebe-entegrasyonu';
 import { odemeAciklamasi } from '@/lib/odeme-aciklamasi';
 import { hediyeKodunuNormallestir, hediyeNotu, notHediyeIceriyor } from '@/lib/hediye';
@@ -680,6 +681,14 @@ export async function POST(req: NextRequest) {
         { error: 'Sipariş numarası üretilemedi, lütfen tekrar deneyin' },
         { status: 503 }
       );
+    }
+
+    // Sipariş stok düştü; ISR ile saklanan ana sayfa/ürün/kategori sayfaları (revalidate 1 saat)
+    // eski stoğu göstermesin. Hata siparişi etkilemez.
+    try {
+      icerikTazele();
+    } catch (e) {
+      console.error('Sayfa tazeleme hatası (sipariş etkilenmedi):', e);
     }
 
     // Hediye: sipariş oluştuktan sonra, hata korumalı (siparişi etkilemez).

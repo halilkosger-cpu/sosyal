@@ -35,7 +35,7 @@ import {
  * Stok ve süzgeçler yine anlık: ızgara ilk çizimden sonra /api/urunler'e
  * gidiyor, o uç dinamik.
  */
-export const revalidate = 300;
+export const revalidate = 3600;
 
 /**
  * Kategoriler derleme anında biliniyor; hepsi önceden üretiliyor.

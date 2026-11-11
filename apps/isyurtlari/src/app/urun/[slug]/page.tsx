@@ -27,7 +27,7 @@ import {
  * da düşürüyor, yani beş dakika yalnızca hiçbir değişiklik olmadığında
  * geçerli bir üst sınır.
  */
-export const revalidate = 300;
+export const revalidate = 3600;
 
 /**
  * Ürünler derleme anında biliniyor; sayfaları önceden üretiliyor.

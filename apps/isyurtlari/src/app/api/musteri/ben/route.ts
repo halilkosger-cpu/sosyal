@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { oturumdakiMusteri } from '@/lib/musteri-auth';
+import { cookies } from 'next/headers';
+import { oturumdakiMusteri, ipucuCereziniYaz, MUSTERI_IPUCU_CEREZI } from '@/lib/musteri-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,5 +14,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET() {
   const musteri = await oturumdakiMusteri();
+  // Ipucu cerezi eklenmeden once acilmis oturumlar da bir sonraki ziyarette taninsin.
+  if (musteri && !(await cookies()).get(MUSTERI_IPUCU_CEREZI)) {
+    await ipucuCereziniYaz(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+  }
   return NextResponse.json({ musteri });
 }
