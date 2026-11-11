@@ -200,9 +200,18 @@ const getCategoryTitle = (categoryName: string, categorySlug?: string) => {
   return `${taban} — ${ek}`;
 };
 
+/**
+ * Kategori slug'lari yalnizca kucuk harf, rakam ve tire icerir. Nokta, buyuk
+ * harf vb. iceren adresler (/wp-login.php, /.env, /backup.sql ...) bot
+ * taramasidir; veritabani sorgusu ve ISR kaydi uretmeden dogrudan 404.
+ */
+const GECERLI_SLUG = /^[a-z0-9-]{1,100}$/;
+
 export async function generateMetadata(props: CategoryPageProps): Promise<Metadata> {
   const params = await props.params;
-  const sonuc = await getCategory(params.categorySlug);
+  const sonuc: KategoriSonucu = GECERLI_SLUG.test(params.categorySlug)
+    ? await getCategory(params.categorySlug)
+    : { durum: 'yok' };
 
   if (sonuc.durum !== 'bulundu') {
     // Olmayan kategori 404 donuyor; kendine isaret eden canonical uretmemeli.
@@ -266,6 +275,9 @@ export async function generateMetadata(props: CategoryPageProps): Promise<Metada
 
 export default async function CategoryPage(props: CategoryPageProps) {
   const params = await props.params;
+  if (!GECERLI_SLUG.test(params.categorySlug)) {
+    notFound();
+  }
   const [sonuc, urunler, kategoriler] = await Promise.all([
     getCategory(params.categorySlug),
     getCategoryProducts(params.categorySlug),
