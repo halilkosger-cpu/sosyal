@@ -44,31 +44,41 @@ function oturumKimligiAl(): string {
   }
 }
 
+/** JS calistiran botlar ve otomasyon tarayicilari fonksiyon cagrisi harcamasin. */
+function botBenzeriMi(): boolean {
+  if (typeof navigator === 'undefined') return true;
+  if ((navigator as Navigator & { webdriver?: boolean }).webdriver) return true;
+  return /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternalhit|bingpreview/i.test(
+    navigator.userAgent || ''
+  );
+}
+
+/**
+ * Sayfa basina TEK istek: onceki sayfada gecen sure, bir sonraki pageview
+ * istegine eklenir (ayri "duration" beacon'i yok). Oturumun son sayfasinin
+ * suresi gonderilmez; bu, fonksiyon cagrisi kotasi icin bilincli bir tercih.
+ */
 export default function DahiliAnalitikTracker() {
   const pathname = usePathname();
   const baslangicZamani = useRef<number>(Date.now());
   const sonSayfa = useRef<string>('');
-  const sureGonderilen = useRef<string>('');
 
   useEffect(() => {
     // Admin ve dahili API sayfalarını kesinlikle kaydetme
     if (!pathname || pathname.startsWith('/admin') || pathname.startsWith('/api')) {
       return;
     }
+    if (botBenzeriMi()) return;
 
     const searchStr = typeof window !== 'undefined' ? window.location.search : '';
     const tamYol = searchStr ? `${pathname}${searchStr}` : pathname;
 
     if (tamYol === sonSayfa.current) return;
 
-    // Önceki sayfada kalınan süreyi gönder
-    if (sonSayfa.current) {
-      const gecenSure = Math.round((Date.now() - baslangicZamani.current) / 1000);
-      if (gecenSure > 1 && sureGonderilen.current !== sonSayfa.current) {
-        sureGonderilen.current = sonSayfa.current;
-        sureyiIlet(sonSayfa.current, gecenSure);
-      }
-    }
+    const oncekiSayfa = sonSayfa.current;
+    const oncekiSure = oncekiSayfa
+      ? Math.round((Date.now() - baslangicZamani.current) / 1000)
+      : 0;
 
     sonSayfa.current = tamYol;
     baslangicZamani.current = Date.now();
@@ -85,72 +95,20 @@ export default function DahiliAnalitikTracker() {
       referrer: typeof document !== 'undefined' ? document.referrer : '',
       ekran: typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : '',
       dil: typeof navigator !== 'undefined' ? navigator.language : 'tr-TR',
+      ...(oncekiSayfa && oncekiSure > 1
+        ? { oncekiSayfa, oncekiSureSaniye: oncekiSure }
+        : {}),
     };
 
-    const jsonStr = JSON.stringify(payload);
-
-    // Birinci parti güvenli ve anlık fetch (VPN / AdBlock / Mobil Safari engellemelerine takılmaz)
     try {
       fetch('/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: jsonStr,
+        body: JSON.stringify(payload),
         keepalive: true,
-      }).catch(() => {
-        // Fallback sendBeacon
-        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-          navigator.sendBeacon('/api/track', new Blob([jsonStr], { type: 'text/plain' }));
-        }
-      });
+      }).catch(() => {});
     } catch {}
   }, [pathname]);
 
-  // Sayfadan çıkışta veya arka plana geçişte süreyi ilet
-  useEffect(() => {
-    const handleCikis = () => {
-      if (!sonSayfa.current || sonSayfa.current.startsWith('/admin')) return;
-      const gecenSure = Math.round((Date.now() - baslangicZamani.current) / 1000);
-      // visibilitychange + pagehide ayni cikista iki kez tetiklenir; ayni sayfa icin tek bildirim.
-      if (gecenSure > 1 && sureGonderilen.current !== sonSayfa.current) {
-        sureGonderilen.current = sonSayfa.current;
-        sureyiIlet(sonSayfa.current, gecenSure);
-      }
-    };
-
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') handleCikis();
-    });
-    window.addEventListener('pagehide', handleCikis);
-
-    return () => {
-      window.removeEventListener('pagehide', handleCikis);
-    };
-  }, []);
-
   return null;
-}
-
-function sureyiIlet(sayfa: string, sureSaniye: number) {
-  try {
-    const vid = ziyaretciKimligiAl();
-    const sid = oturumKimligiAl();
-    const payload = JSON.stringify({
-      olay: 'duration',
-      ziyaretciId: vid,
-      oturumId: sid,
-      sayfa,
-      sureSaniye,
-    });
-
-    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-      navigator.sendBeacon('/api/track', new Blob([payload], { type: 'text/plain' }));
-    } else {
-      fetch('/api/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    }
-  } catch {}
 }

@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
       dil = 'tr-TR',
       sureSaniye = 0,
       olay = 'pageview',
+      oncekiSayfa = '',
+      oncekiSureSaniye = 0,
     } = body;
 
     // Admin ve dahili API rotalarını kaydetme
@@ -88,6 +90,24 @@ export async function POST(req: NextRequest) {
         ).catch(() => {});
       }
       return NextResponse.json({ ok: true, type: 'duration_updated' });
+    }
+
+    // Onceki sayfanin suresi bu istege eklenmis olabilir (tek istek/sayfa).
+    if (oncekiSayfa && oturumId && oncekiSureSaniye > 0 && !String(oncekiSayfa).startsWith('/admin')) {
+      const sure = Math.min(Math.round(Number(oncekiSureSaniye)), 3600);
+      if ((prisma as any).ziyaretKaydi) {
+        await (prisma as any).ziyaretKaydi.updateMany({
+          where: { oturumId, sayfa: String(oncekiSayfa).substring(0, 500) },
+          data: { sureSaniye: sure },
+        }).catch(() => {});
+      } else {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "ZiyaretKaydi" SET "sureSaniye" = GREATEST("sureSaniye", $1) WHERE "oturumId" = $2 AND "sayfa" = $3`,
+          sure,
+          oturumId,
+          String(oncekiSayfa).substring(0, 500)
+        ).catch(() => {});
+      }
     }
 
     // Yeni sayfa ziyareti
