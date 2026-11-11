@@ -171,7 +171,7 @@ export default function HediyeDanismaniModal() {
       >
         <div className="relative flex items-center justify-center">
           <span className="relative flex h-2 w-2 mr-0 md:mr-1">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+            <span className="animate-ping ping-gpu absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
           </span>
           <LuGift className="text-orange-400 group-hover:rotate-12 transition-transform" size={17} />

@@ -114,12 +114,12 @@ export default function HarvestFilter({
                       stiffness: 340,
                       mass: 0.6,
                     }}
-                    className="absolute inset-0 bg-[#0F2040] rounded-xl shadow-md -z-10"
+                    className="absolute inset-0 bg-[#0F2040] rounded-xl shadow-md z-0"
                   />
                 )}
 
-                <span className="text-sm sm:text-base leading-none">{season.icon}</span>
-                <span>{season.label}</span>
+                <span className="relative z-10 text-sm sm:text-base leading-none">{season.icon}</span>
+                <span className="relative z-10">{season.label}</span>
               </button>
             );
           })}
