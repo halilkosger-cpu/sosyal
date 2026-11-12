@@ -197,7 +197,7 @@ const YEREL = new Set([
   // 12 Kasim 2026: raftan cekilen yeni urunler (fotograflar temizlendi).
   'advem-limon-kolonyasi-400-ml',
   'elban-kalkandere-sayili-gun-cayi-500-gr',
-  'elban-visne-receli-pet-kavanoz',
+  'elban-visne-receli-1000-gr',
 ]);
 
 /**
