@@ -64,9 +64,12 @@ export const metadata: Metadata = {
     title: 'İşyurtları',
   },
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/favicon-48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/logo.png', sizes: '1024x1024', type: 'image/png' },
+    ],
     apple: [
-      { url: '/logo.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   title: 'İsyurtları Online Mağaza | Cezaevi & Hapishane Ürünleri',
@@ -149,8 +152,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <meta name="apple-mobile-web-app-title" content="İşyurtları" />
         <meta name="application-name" content="İşyurtları" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/logo.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         {/* Google Analytics betikleri buradaydi; Olcumler bilesenine tasindi
@@ -197,9 +199,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                       kucultulmus WebP kullaniliyor: 54 KB -> 12.5 KB.
                       logo.jpg og:image icin oldugu gibi duruyor. */}
                   <Image
-                    src="/logo-160.webp"
+                    src="/logo-header.png"
                     alt="İsyurtları"
-                    width={60}
+                    width={74}
                     height={60}
                     className="object-contain h-[60px] w-auto"
                     priority
@@ -277,7 +279,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="max-w-screen-xl mx-auto px-4 pt-10 pb-24 md:pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="col-span-2 md:col-span-1">
-                <Image src="/logo-160.webp" alt="İsyurtları" width={60} height={60} className="h-[52px] w-auto mb-3" />
+                <Image src="/logo-header.png" alt="İsyurtları" width={64} height={52} className="h-[52px] w-auto mb-3" />
                 <p className="text-sm text-gray-600 leading-relaxed max-w-xs">
                   Adalet Bakanlığı işyurtlarındaki meslek eğitim atölyelerinde hükümlülerin el emeğiyle
                   üretilen ürünlerin online satış mağazası.

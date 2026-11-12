@@ -108,7 +108,7 @@ export default function MobilUygulamaBanneri() {
             <LuX size={16} />
           </button>
           <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-white/10 border border-white/20 shrink-0">
-            <Image src="/logo.webp" alt="İsyurtları" fill className="object-contain p-0.5" />
+            <Image src="/logo-header.png" alt="İsyurtları" fill className="object-contain p-0.5" />
           </div>
           <div className="min-w-0 leading-tight">
             <p className="text-xs font-bold text-white truncate">İşyurtları Mobil Uygulaması</p>
@@ -135,7 +135,7 @@ export default function MobilUygulamaBanneri() {
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center">
-                  <Image src="/logo.webp" alt="Logo" width={24} height={24} className="object-contain" />
+                  <Image src="/logo-header.png" alt="Logo" width={24} height={24} className="object-contain" />
                 </div>
                 <div>
                   <h3 className="font-bold text-sm text-gray-900">İşyurtları Uygulamasını Ekle</h3>
