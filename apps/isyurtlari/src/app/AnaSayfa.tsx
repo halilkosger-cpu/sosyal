@@ -9,6 +9,7 @@ import VipBulten from '@/components/VipBulten';
 import GununFirsati from '@/components/GununFirsati';
 import AnaSayfaVitrini from '@/components/AnaSayfaVitrini';
 import AtolyeHikayesi from '@/components/AtolyeHikayesi';
+import InstagramBolumu from '@/components/InstagramBolumu';
 
 /**
  * Ana sayfa - 2026 Eylul, editoryel duzen.
@@ -291,6 +292,8 @@ export default function AnaSayfa({
       )}
 
       <AnaSayfaVitrini products={products} tumUrunler={tumUrunler} />
+
+      <InstagramBolumu />
 
       <AtolyeHikayesi />
 
