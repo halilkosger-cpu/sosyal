@@ -4,6 +4,7 @@ import { ViewTransitions } from 'next-view-transitions';
 import HareketSaglayici from '@/components/HareketSaglayici';
 import { SITE_URL } from '@/lib/seo';
 import Link from 'next/link';
+import { SOSYAL_HESAPLAR, WHATSAPP_URL } from '@/lib/sosyal';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {
@@ -284,6 +285,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <a href="mailto:info@isyurtlari.com.tr" className="inline-block mt-3 text-sm font-semibold text-[#BA4700] hover:text-[#8F3700]">
                   info@isyurtlari.com.tr
                 </a>
+                <ul className="flex flex-wrap gap-x-3 gap-y-1 mt-3" aria-label="Sosyal medya hesapları">
+                  {SOSYAL_HESAPLAR.map((h) => (
+                    <li key={h.ad}>
+                      <a href={h.url} target="_blank" rel="noopener noreferrer me" className="text-xs text-gray-600 hover:text-[#BA4700] transition-colors">{h.ad}</a>
+                    </li>
+                  ))}
+                  <li>
+                    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-600 hover:text-[#BA4700] transition-colors">WhatsApp</a>
+                  </li>
+                </ul>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-900 mb-3">Alışveriş</h3>
