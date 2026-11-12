@@ -1,6 +1,5 @@
 export const SOSYAL_HESAPLAR = [
   { ad: 'Instagram', url: 'https://www.instagram.com/isyurtlari' },
-  { ad: 'Facebook', url: 'https://www.facebook.com/isyurtlari' },
   { ad: 'X (Twitter)', url: 'https://x.com/isyurtlari_tr' },
   { ad: 'YouTube', url: 'https://www.youtube.com/@isyurtlarimagaza' },
   { ad: 'TikTok', url: 'https://www.tiktok.com/@isyurtlari' },
