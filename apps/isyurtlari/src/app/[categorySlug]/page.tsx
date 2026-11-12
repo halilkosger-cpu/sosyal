@@ -35,7 +35,9 @@ import {
  * Stok ve süzgeçler yine anlık: ızgara ilk çizimden sonra /api/urunler'e
  * gidiyor, o uç dinamik.
  */
-export const revalidate = 3600;
+// Icerik degisince yonetim paneli icerikTazele() ile sayfayi aninda
+// dusuruyor (bkz. lib/kategoriler.ts); sure yalnizca emniyet siniri.
+export const revalidate = 86400;
 
 /**
  * Kategoriler derleme anında biliniyor; hepsi önceden üretiliyor.
