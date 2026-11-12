@@ -88,7 +88,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
               "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://vitals.vercel-insights.com https://*.iyzipay.com",
-              "frame-src https://*.iyzipay.com https://*.iyzico.com",
+              "frame-src https://*.iyzipay.com https://*.iyzico.com https://www.instagram.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self' https://*.iyzipay.com",
