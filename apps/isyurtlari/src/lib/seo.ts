@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SOSYAL_HESAPLAR } from './sosyal';
 
 // Kanonik adres www'SUZ surumdur. Sebep: Google'in indeksi ve siralamasi
 // bu adreste; Search Console mulku de www'suz. Site su an www'dan servis
@@ -124,10 +125,7 @@ export const organizationJsonLd = {
     email: 'info@isyurtlari.com.tr',
     availableLanguage: 'Turkish',
   },
-  sameAs: [
-    'https://www.instagram.com/isyurtlari',
-    'https://www.facebook.com/isyurtlari',
-  ],
+  sameAs: SOSYAL_HESAPLAR.map((h) => h.url),
 };
 
 export const websiteJsonLd = {
