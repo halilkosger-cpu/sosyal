@@ -27,7 +27,9 @@ import {
  * da düşürüyor, yani beş dakika yalnızca hiçbir değişiklik olmadığında
  * geçerli bir üst sınır.
  */
-export const revalidate = 3600;
+// Icerik degisince yonetim paneli icerikTazele() ile sayfayi aninda
+// dusuruyor (bkz. lib/kategoriler.ts); sure yalnizca emniyet siniri.
+export const revalidate = 86400;
 
 /**
  * Ürünler derleme anında biliniyor; sayfaları önceden üretiliyor.
