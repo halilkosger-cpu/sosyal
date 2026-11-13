@@ -62,6 +62,19 @@ const nextConfig = {
       return [];
     }
 
+    /**
+     * Statik dosyalar (public/) Vercel'de varsayilan olarak `max-age=0` ile
+     * geliyor: tarayici her sayfada "degisti mi?" diye yeniden soruyor ve her
+     * soru bir Edge Request sayiliyor (PageSpeed/Vercel verisi: sayfa basina ~40
+     * istek; ikonlar ve manifest her sayfa gosteriminde isteniyordu).
+     * Dosya adlari icerik karmasi tasimiyor, bu yuzden uzun sureli "immutable"
+     * yerine 1 gun: degisen dosya en gec 1-2 gunde yenilenir.
+     * service-worker.js bilerek DISARIDA: her zaman guncel olmali.
+     */
+    const STATIK_ONBELLEK = [
+      { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=86400' },
+    ];
+
     return [
       {
         source: '/:path*',
@@ -276,6 +289,27 @@ const nextConfig = {
           },
         ],
       },
+      // Genel `max-age=0` kuralindan SONRA gelmeli: ayni anahtarda sonraki kural gecerli.
+      ...[
+        '/kategori-ikon/:path*',
+        '/hero/:path*',
+        '/hikaye/:path*',
+        '/images/:path*',
+        '/kategori/:path*',
+        '/kampanya/:path*',
+        '/iyzico/:path*',
+        '/urun/:dosya(.+\\.(?:webp|jpg|jpeg|png|avif))',
+        '/manifest.json',
+        '/logo.png',
+        '/logo.jpg',
+        '/logo.webp',
+        '/logo-160.webp',
+        '/og-gorsel.jpg',
+        '/mastercard.png',
+        '/visa.png',
+        '/logo_band_colored@1X.png',
+        '/logo_band_white@1X.png',
+      ].map((source) => ({ source, headers: STATIK_ONBELLEK })),
     ];
   },
 
